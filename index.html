@@ -758,23 +758,50 @@ function applyI18n() {
 }
 
 /* =============================================
-   Mock Users (sorted: admin → SL → OP, then 50音順)
+   Supabase Config
 ============================================= */
-const USERS = [
-  { id:1,  name:'田中 管理',   role:'admin', pin:'1234', shift:0 },
-  { id:2,  name:'山田 太郎',   role:'sl',    pin:'1111', shift:1 },
-  { id:3,  name:'佐藤 次郎',   role:'sl',    pin:'2222', shift:2 },
-  { id:4,  name:'鈴木 三郎',   role:'sl',    pin:'3333', shift:3 },
-  { id:5,  name:'高橋 A',      role:'op',    pin:'0000', shift:1 },
-  { id:6,  name:'伊藤 B',      role:'op',    pin:'0000', shift:1 },
-  { id:7,  name:'渡辺 C',      role:'op',    pin:'0000', shift:1 },
-  { id:8,  name:'中村 D',      role:'op',    pin:'0000', shift:2 },
-  { id:9,  name:'小林 E',      role:'op',    pin:'0000', shift:2 },
-  { id:10, name:'加藤 F',      role:'op',    pin:'0000', shift:2 },
-  { id:11, name:'Nguyen Van A',role:'op',    pin:'0000', shift:3 },
-  { id:12, name:'Tran Thi B',  role:'op',    pin:'0000', shift:3 },
-  { id:13, name:'Le Van C',    role:'op',    pin:'0000', shift:3 },
-];
+const SUPABASE_URL = 'https://avureyklkpslrjasrxuv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
+
+async function sbFetch(path, opts={}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+    },
+    ...opts,
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+/* =============================================
+   Users (loaded from Supabase)
+============================================= */
+let USERS = [];
+
+async function loadUsers() {
+  try {
+    const users = await sbFetch('users?select=*&is_active=eq.true&order=name');
+    USERS = users.map(u => ({
+      id: u.id,
+      name: u.name,
+      role: u.role,
+      pin_hash: u.pin_hash || '0000',
+      shift: u.shift ? parseInt(u.shift) : null,
+      is_active: u.is_active,
+      pin_fail_count: u.pin_fail_count || 0,
+      pin_lock_until: u.pin_lock_until || null,
+    }));
+  } catch (err) {
+    console.error('ユーザー読み込み失敗:', err);
+    // フォールバック: エラー時はログイン画面でメッセージ表示
+    USERS = [];
+  }
+}
 
 const ROLE_ORDER = { sl:0, op:1, admin:2 };
 
@@ -793,8 +820,6 @@ const state = {
   selectedShift: null,
   selectedUser: null,
   pinInput: '',
-  failCount: {},    // userId -> count
-  lockUntil: {},    // userId -> timestamp
   lockTimers: {},
 };
 
@@ -838,7 +863,6 @@ function goStep(n) {
       document.getElementById('line'+i).className = 'step-line' + (i < n ? ' done' : '');
     }
   });
-  // Scroll to top
   document.getElementById('main').scrollTo(0, 0);
 }
 
@@ -856,7 +880,6 @@ function selectShift(s) {
   }, 150);
 }
 
-/* Suggest shift from time */
 function autoSuggestShift() {
   const h = new Date().getHours();
   if (h >= 8  && h < 16) return 1;
@@ -868,9 +891,9 @@ function autoSuggestShift() {
    Step 2 – User
 ============================================= */
 function renderUsers(filter='') {
-  // admin always shown; SL+OP filtered by shift
+  // admin/SL(shift=null) は常に表示、OPは選択シフトで絞り込み
   const list = USERS.filter(u => {
-    if (u.role === 'admin') return true;
+    if (u.role === 'admin' || u.role === 'sl') return true;
     if (u.shift === state.selectedShift) return true;
     return false;
   });
@@ -883,8 +906,13 @@ function renderUsers(filter='') {
   const grid = document.getElementById('userGrid');
   grid.innerHTML = '';
 
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);font-size:13px">ユーザーが見つかりません</div>';
+    return;
+  }
+
   filtered.forEach(u => {
-    const locked = isLocked(u.id);
+    const locked = isLocked(u);
     const btn = document.createElement('button');
     btn.className = 'user-btn' + (locked ? ' user-locked' : '');
     btn.onclick = () => selectUser(u);
@@ -919,7 +947,7 @@ function selectUser(u) {
   roleEl.className = 'pin-user-role ' + rc;
   clearError();
   document.getElementById('loginBtn').disabled = true;
-  checkLockState(u.id);
+  checkLockState(u);
   goStep(3);
 }
 
@@ -951,32 +979,54 @@ function updatePinDots() {
   }
 }
 
-function doLogin() {
+let loginBusy = false;
+async function doLogin() {
   const u = state.selectedUser;
   if (!u || state.pinInput.length !== 4) return;
-  if (isLocked(u.id)) return;
+  if (isLocked(u)) return;
+  if (loginBusy) return;
+  loginBusy = true;
+  document.getElementById('loginBtn').disabled = true;
 
-  if (state.pinInput === u.pin) {
-    // Success
-    state.failCount[u.id] = 0;
-    // セッション保存
+  if (state.pinInput === u.pin_hash) {
+    // ✅ 成功: DB上のfail_countとlockをリセット
+    try {
+      await sbFetch(`users?id=eq.${u.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
+      });
+    } catch(err) { console.error('PIN reset failed:', err); }
+
+    u.pin_fail_count = 0;
+    u.pin_lock_until = null;
+
     sessionStorage.setItem('traq_session', JSON.stringify({
       id: u.id, name: u.name, role: u.role, shift: state.selectedShift
     }));
     flashSuccess();
   } else {
-    // Fail
-    state.failCount[u.id] = (state.failCount[u.id] || 0) + 1;
-    const fails = state.failCount[u.id];
+    // ❌ 失敗: DB上のfail_countをインクリメント
+    const newCount = (u.pin_fail_count || 0) + 1;
+    u.pin_fail_count = newCount;
+
     shakeDots();
-    if (fails >= 3) {
-      lockAccount(u.id);
+
+    if (newCount >= 3) {
+      await lockAccount(u);
     } else {
-      showError(t('pin_error_wrong', fails));
+      showError(t('pin_error_wrong', newCount));
+      // DBに失敗回数を保存
+      try {
+        await sbFetch(`users?id=eq.${u.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ pin_fail_count: newCount })
+        });
+      } catch(err) { console.error('Fail count update failed:', err); }
     }
     state.pinInput = '';
     updatePinDots();
     document.getElementById('loginBtn').disabled = true;
+    loginBusy = false;
   }
 }
 
@@ -985,11 +1035,9 @@ function flashSuccess() {
   const btn = document.getElementById('loginBtn');
   btn.textContent = '✓ ' + t('login_ok', u.name.split(' ')[0]);
   btn.style.background = 'var(--success)';
-  // セッション保存
   sessionStorage.setItem('traq_session', JSON.stringify({
     id: u.id, name: u.name, role: u.role, shift: state.selectedShift
   }));
-  // ロール別ホームへ遷移
   setTimeout(() => {
     if (u.role === 'sl') {
       location.href = 'home_sl.html';
@@ -1016,45 +1064,61 @@ function clearError() {
 }
 
 /* =============================================
-   Lock logic
+   Lock logic (DB連携)
 ============================================= */
-function isLocked(uid) {
-  const until = state.lockUntil[uid];
-  if (!until) return false;
-  return Date.now() < until;
+function isLocked(u) {
+  if (!u.pin_lock_until) return false;
+  return Date.now() < new Date(u.pin_lock_until).getTime();
 }
 
-function lockAccount(uid) {
-  const until = Date.now() + 5 * 60 * 1000;
-  state.lockUntil[uid] = until;
-  showLockScreen(uid, until);
+async function lockAccount(u) {
+  const until = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  u.pin_lock_until = until;
+  u.pin_fail_count = 3;
+
+  // DBにロック状態を保存
+  try {
+    await sbFetch(`users?id=eq.${u.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ pin_fail_count: 3, pin_lock_until: until })
+    });
+  } catch(err) { console.error('Lock write failed:', err); }
+
+  showLockScreen(u);
 }
 
-function showLockScreen(uid, until) {
+function showLockScreen(u) {
   document.getElementById('pinInputArea').style.display = 'none';
   clearError();
   const lockEl = document.getElementById('pinLockEl');
   lockEl.style.display = 'block';
-  updateLockTimer(uid, until, lockEl);
-  state.lockTimers[uid] = setInterval(() => {
-    if (Date.now() >= until) {
-      clearInterval(state.lockTimers[uid]);
-      delete state.lockTimers[uid];
-      state.failCount[uid] = 0;
+  const untilTs = new Date(u.pin_lock_until).getTime();
+  updateLockTimer(u, untilTs, lockEl);
+  state.lockTimers[u.id] = setInterval(() => {
+    if (Date.now() >= untilTs) {
+      clearInterval(state.lockTimers[u.id]);
+      delete state.lockTimers[u.id];
+      u.pin_fail_count = 0;
+      u.pin_lock_until = null;
       lockEl.style.display = 'none';
       document.getElementById('pinInputArea').style.display = 'block';
       state.pinInput = '';
       updatePinDots();
       document.getElementById('loginBtn').disabled = true;
       renderUsers(document.getElementById('userSearch').value);
+      // DBのロック解除
+      sbFetch(`users?id=eq.${u.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
+      }).catch(err => console.error('Unlock write failed:', err));
     } else {
-      updateLockTimer(uid, until, lockEl);
+      updateLockTimer(u, untilTs, lockEl);
     }
   }, 1000);
 }
 
-function updateLockTimer(uid, until, el) {
-  const rem = Math.max(0, until - Date.now());
+function updateLockTimer(u, untilTs, el) {
+  const rem = Math.max(0, untilTs - Date.now());
   const m = Math.floor(rem / 60000);
   const s = Math.floor((rem % 60000) / 1000);
   el.innerHTML = `
@@ -1067,26 +1131,31 @@ function updateLockTimer(uid, until, el) {
   `;
 }
 
-function checkLockState(uid) {
-  if (isLocked(uid)) {
-    const until = state.lockUntil[uid];
+function checkLockState(u) {
+  if (isLocked(u)) {
     document.getElementById('pinInputArea').style.display = 'none';
     const lockEl = document.getElementById('pinLockEl');
     lockEl.style.display = 'block';
-    updateLockTimer(uid, until, lockEl);
-    if (!state.lockTimers[uid]) {
-      state.lockTimers[uid] = setInterval(() => {
-        if (Date.now() >= state.lockUntil[uid]) {
-          clearInterval(state.lockTimers[uid]);
-          delete state.lockTimers[uid];
-          state.failCount[uid] = 0;
+    const untilTs = new Date(u.pin_lock_until).getTime();
+    updateLockTimer(u, untilTs, lockEl);
+    if (!state.lockTimers[u.id]) {
+      state.lockTimers[u.id] = setInterval(() => {
+        if (Date.now() >= untilTs) {
+          clearInterval(state.lockTimers[u.id]);
+          delete state.lockTimers[u.id];
+          u.pin_fail_count = 0;
+          u.pin_lock_until = null;
           lockEl.style.display = 'none';
           document.getElementById('pinInputArea').style.display = 'block';
           state.pinInput = '';
           updatePinDots();
           document.getElementById('loginBtn').disabled = true;
+          sbFetch(`users?id=eq.${u.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
+          }).catch(err => console.error('Unlock write failed:', err));
         } else {
-          updateLockTimer(uid, state.lockUntil[uid], lockEl);
+          updateLockTimer(u, untilTs, lockEl);
         }
       }, 1000);
     }
@@ -1099,13 +1168,18 @@ function checkLockState(uid) {
 /* =============================================
    Init
 ============================================= */
-(function init() {
+(async function init() {
   initTheme();
   const savedLang = localStorage.getItem('traq_lang') || 'ja';
   setLang(savedLang);
+  await loadUsers();
+  if (!USERS.length) {
+    document.getElementById('main').innerHTML =
+      '<div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px">⚠️</div><div style="font-size:14px">ユーザーデータの読み込みに失敗しました。<br>インターネット接続を確認してください。</div></div>';
+    return;
+  }
   const suggested = autoSuggestShift();
   document.getElementById('shift'+suggested).classList.add('selected');
-  // Don't auto-select; just highlight suggestion
   applyI18n();
 })();
 </script>
