@@ -989,14 +989,7 @@ async function doLogin() {
   document.getElementById('loginBtn').disabled = true;
 
   if (state.pinInput === u.pin_hash) {
-    // ✅ 成功: DB上のfail_countとlockをリセット
-    try {
-      await sbFetch(`users?id=eq.${u.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
-      });
-    } catch(err) { console.error('PIN reset failed:', err); }
-
+    // ✅ 成功
     u.pin_fail_count = 0;
     u.pin_lock_until = null;
 
@@ -1005,23 +998,16 @@ async function doLogin() {
     }));
     flashSuccess();
   } else {
-    // ❌ 失敗: DB上のfail_countをインクリメント
+    // ❌ 失敗
     const newCount = (u.pin_fail_count || 0) + 1;
     u.pin_fail_count = newCount;
 
     shakeDots();
 
     if (newCount >= 3) {
-      await lockAccount(u);
+      lockAccount(u);
     } else {
       showError(t('pin_error_wrong', newCount));
-      // DBに失敗回数を保存
-      try {
-        await sbFetch(`users?id=eq.${u.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ pin_fail_count: newCount })
-        });
-      } catch(err) { console.error('Fail count update failed:', err); }
     }
     state.pinInput = '';
     updatePinDots();
@@ -1035,9 +1021,6 @@ function flashSuccess() {
   const btn = document.getElementById('loginBtn');
   btn.textContent = '✓ ' + t('login_ok', u.name.split(' ')[0]);
   btn.style.background = 'var(--success)';
-  sessionStorage.setItem('traq_session', JSON.stringify({
-    id: u.id, name: u.name, role: u.role, shift: state.selectedShift
-  }));
   setTimeout(() => {
     if (u.role === 'sl') {
       location.href = 'home_sl.html';
@@ -1064,26 +1047,17 @@ function clearError() {
 }
 
 /* =============================================
-   Lock logic (DB連携)
+   Lock logic (メモリ管理)
 ============================================= */
 function isLocked(u) {
   if (!u.pin_lock_until) return false;
   return Date.now() < new Date(u.pin_lock_until).getTime();
 }
 
-async function lockAccount(u) {
+function lockAccount(u) {
   const until = new Date(Date.now() + 5 * 60 * 1000).toISOString();
   u.pin_lock_until = until;
   u.pin_fail_count = 3;
-
-  // DBにロック状態を保存
-  try {
-    await sbFetch(`users?id=eq.${u.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ pin_fail_count: 3, pin_lock_until: until })
-    });
-  } catch(err) { console.error('Lock write failed:', err); }
-
   showLockScreen(u);
 }
 
@@ -1106,11 +1080,6 @@ function showLockScreen(u) {
       updatePinDots();
       document.getElementById('loginBtn').disabled = true;
       renderUsers(document.getElementById('userSearch').value);
-      // DBのロック解除
-      sbFetch(`users?id=eq.${u.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
-      }).catch(err => console.error('Unlock write failed:', err));
     } else {
       updateLockTimer(u, untilTs, lockEl);
     }
@@ -1150,10 +1119,6 @@ function checkLockState(u) {
           state.pinInput = '';
           updatePinDots();
           document.getElementById('loginBtn').disabled = true;
-          sbFetch(`users?id=eq.${u.id}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ pin_fail_count: 0, pin_lock_until: null })
-          }).catch(err => console.error('Unlock write failed:', err));
         } else {
           updateLockTimer(u, untilTs, lockEl);
         }

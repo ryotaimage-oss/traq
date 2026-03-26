@@ -548,7 +548,7 @@ async function saveUser(id){
     closeModal();await loadAll();showToast(t('user_saved'),'success');
   } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
-async function resetPin(id){ const u=USERS.find(x=>x.id===id);if(!u)return;if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`))return;try{await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({pin_hash:'0000',pin_fail_count:0,pin_lock_until:null})});await loadAll();showToast(t('pin_reset_done',u.name),'success')}catch(err){showToast('リセットに失敗','error')}}
+async function resetPin(id){ const u=USERS.find(x=>x.id===id);if(!u)return;if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`))return;try{await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({pin_hash:'0000'})});await loadAll();showToast(t('pin_reset_done',u.name),'success')}catch(err){showToast('リセットに失敗','error')}}
 async function toggleActive(id){ const u=USERS.find(x=>x.id===id);if(!u)return;if(!confirm(u.is_active?t('deactivate_confirm'):t('activate_confirm')))return;try{await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!u.is_active})});await loadAll();showToast(t('user_saved'),'success')}catch(err){showToast('更新に失敗','error')}}
 async function deleteUser(id){ if(!confirm(t('delete_confirm')))return;try{await sbFetch(`users?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}}
 
