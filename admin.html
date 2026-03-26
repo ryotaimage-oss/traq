@@ -988,7 +988,42 @@ function showToast(msg,type='info'){const el=document.getElementById('toastEl');
   const sl=localStorage.getItem('traq_lang')||'ja';currentLang=sl;
   ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
   await loadAll();
+  // 重複ライン自動クリーンアップ（1回のみ実行）
+  if(!localStorage.getItem('traq_line_cleanup_done')){
+    await cleanupDuplicateLines();
+    localStorage.setItem('traq_line_cleanup_done','1');
+  }
 })();
+
+/* ===== 重複ラインクリーンアップ ===== */
+async function cleanupDuplicateLines(){
+  try {
+    // 短縮名ライン(A,B,C等)とフルネームライン(Aライン,Bライン等)の重複を検出
+    const shortLines = LINES.filter(l => /^[A-Z]$/i.test((l.line_name||'').trim()));
+    if(!shortLines.length) return;
+
+    for(const sl of shortLines){
+      const letter = sl.line_name.trim().toUpperCase();
+      // 対応するフルネームラインが存在するか
+      const fullLine = LINES.find(l => l.id !== sl.id && l.line_name && l.line_name.replace(/ライン|line/gi,'').trim().toUpperCase() === letter);
+      if(!fullLine) continue;
+
+      // 短縮名ラインに紐づいた機番をフルネームラインに移行
+      const linkedMachines = MACHINES.filter(m => m.line_id === sl.id);
+      for(const m of linkedMachines){
+        await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({line_id:fullLine.id})});
+      }
+      // 短縮名ラインを削除
+      await sbFetch(`lines?id=eq.${sl.id}`,{method:'DELETE'});
+      console.log(`ライン「${sl.line_name}」を削除し、機番${linkedMachines.length}台を「${fullLine.line_name}」に移行しました`);
+    }
+    // リロード
+    await loadAll();
+    if(shortLines.length) showToast(`重複ライン ${shortLines.length}件を自動整理しました`,'success');
+  } catch(err){
+    console.error('ラインクリーンアップ失敗:', err);
+  }
+}
 
 /* ===== Categories ===== */
 function renderCategories(){

@@ -237,6 +237,59 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
+    <!-- PIN変更セクション（非表示、PIN変更クリックで表示） -->
+    <div class="section" id="section-pin" style="display:none;animation-delay:.12s">
+      <div class="section-label">PIN変更</div>
+      <div class="pin-section">
+        <div class="pin-step-label" id="pinStepLabel">ステップ 1 / 3</div>
+        <div class="pin-step-title" id="pinTitle">現在のPINを入力してください</div>
+        <div id="pinKeypadArea">
+          <div class="pin-dots">
+            <div class="pin-dot" id="pd0"></div>
+            <div class="pin-dot" id="pd1"></div>
+            <div class="pin-dot" id="pd2"></div>
+            <div class="pin-dot" id="pd3"></div>
+          </div>
+          <div class="pin-keypad">
+            <button class="key-btn" onclick="pinKey('1')">1</button>
+            <button class="key-btn" onclick="pinKey('2')">2</button>
+            <button class="key-btn" onclick="pinKey('3')">3</button>
+            <button class="key-btn" onclick="pinKey('4')">4</button>
+            <button class="key-btn" onclick="pinKey('5')">5</button>
+            <button class="key-btn" onclick="pinKey('6')">6</button>
+            <button class="key-btn" onclick="pinKey('7')">7</button>
+            <button class="key-btn" onclick="pinKey('8')">8</button>
+            <button class="key-btn" onclick="pinKey('9')">9</button>
+            <button class="key-btn" style="font-size:13px;color:var(--text2)" onclick="pinClear()">クリア</button>
+            <button class="key-btn" onclick="pinKey('0')">0</button>
+            <button class="key-btn" style="font-size:20px;color:var(--text2)" onclick="pinDel()">⌫</button>
+          </div>
+          <div class="pin-error" id="pinError"></div>
+        </div>
+        <div id="pinSuccessArea" style="display:none">
+          <div class="pin-success-wrap">
+            <div class="pin-success-icon">✅</div>
+            <div class="pin-success-text">PINを変更しました</div>
+          </div>
+        </div>
+        <button onclick="setSection(null)" style="width:100%;height:40px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;margin-top:8px">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- ホーム画面に追加 -->
+    <div class="section" style="animation-delay:.13s">
+      <div class="section-label">アプリ</div>
+      <div class="add-home-card">
+        <div class="add-home-icon">📲</div>
+        <div class="add-home-info">
+          <div class="add-home-title">ホーム画面に追加</div>
+          <div class="add-home-desc">ワンタップでTraqを起動できます</div>
+          <button class="btn-add-home" id="addHomeBtn" onclick="addToHomeScreen()" disabled>ホーム画面に追加</button>
+          <div id="addHomeGuide" style="display:none;margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- 🔔 通知設定（SLのみ表示） -->
     <div class="section" id="notificationSection" style="display:none;animation-delay:.15s">
       <div class="section-label">通知設定</div>
