@@ -981,13 +981,20 @@ function flashSuccess() {
   const btn = document.getElementById('loginBtn');
   btn.textContent = '✓ ' + t('login_ok', u.name.split(' ')[0]);
   btn.style.background = 'var(--success)';
-  // In real app: set session + redirect to home
+  // セッション保存
+  sessionStorage.setItem('traq_session', JSON.stringify({
+    id: u.id, name: u.name, role: u.role, shift: state.selectedShift
+  }));
+  // ロール別ホームへ遷移
   setTimeout(() => {
-    btn.textContent = t('login_btn');
-    btn.style.background = '';
-    // TODO: redirect to main app
-    alert('ログイン成功！（開発中）\nホーム画面に遷移します');
-  }, 1200);
+    if (u.role === 'admin') {
+      location.href = 'admin.html';
+    } else if (u.role === 'sl') {
+      location.href = 'home_sl.html';
+    } else {
+      location.href = 'home.html';
+    }
+  }, 1000);
 }
 
 function shakeDots() {
