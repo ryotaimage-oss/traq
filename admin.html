@@ -150,6 +150,26 @@ tr:hover td{background:rgba(239,159,39,.03)}
 .line-tab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .line-tab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
 
+/* Product pills */
+.product-pills{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.product-pill{display:inline-flex;align-items:center;gap:3px;background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.25);color:var(--orange);font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap}
+.product-pill .pill-x{cursor:pointer;font-size:13px;color:var(--text2);margin-left:2px;line-height:1;transition:color .15s}
+.product-pill .pill-x:hover{color:var(--danger)}
+.link-btn{background:none;border:1px dashed var(--border);border-radius:12px;padding:2px 10px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.link-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Link modal checkbox list */
+.link-list{max-height:320px;overflow-y:auto;margin:8px 0}
+.link-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);transition:background .1s;cursor:pointer}
+.link-item:hover{background:var(--bg3)}
+.link-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--orange);cursor:pointer;flex-shrink:0}
+.link-item-info{flex:1;min-width:0}
+.link-item-code{font-size:13px;font-weight:700}
+.link-item-name{font-size:11px;color:var(--text2)}
+.link-search{width:100%;height:38px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 12px;outline:none;margin-bottom:6px}
+.link-search:focus{border-color:var(--orange)}
+.link-search::placeholder{color:var(--text2)}
+
 /* Empty */
 .empty{text-align:center;padding:32px;color:var(--text2);font-size:13px}
 
@@ -493,6 +513,7 @@ let USERS = [];
 let MACHINES = [];
 let LINES = [];
 let PRODUCTS = [];
+let MACHINE_PRODUCTS = [];
 let EQ_CATEGORIES = [];
 let MD_CATEGORIES = [];
 
@@ -526,6 +547,11 @@ async function loadAll() {
 
     // Categories
     const cats = await sbFetch('categories?select=*&order=sort_order');
+
+    // Machine Products (linking table)
+    const mp = await sbFetch('machine_products?select=id,machine_id,product_id');
+    MACHINE_PRODUCTS = mp || [];
+
     EQ_CATEGORIES = cats.filter(c => c.type === 'equipment').map(c => ({
       id: c.id, name: c.name, sort: c.sort_order, is_active: c.is_active
     }));
@@ -729,13 +755,27 @@ function renderMachines(){
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>機番</th><th>ライン</th><th>メモ</th><th>状態</th><th>操作</th>
+              <th>機番</th><th>ライン</th><th>紐づき品番</th><th>メモ</th><th>状態</th><th>操作</th>
             </tr></thead>
             <tbody>
-              ${machines.map(m=>`
+              ${machines.map(m=>{
+                const linked = MACHINE_PRODUCTS
+                  .filter(mp => mp.machine_id === m.id)
+                  .map(mp => PRODUCTS.find(p => p.id === mp.product_id))
+                  .filter(Boolean);
+                const pills = linked.map(p =>
+                  `<span class="product-pill">${p.code}<span class="pill-x" onclick="event.stopPropagation();unlinkProduct(${m.id},${p.id})" title="紐づけ解除">×</span></span>`
+                ).join('');
+                return `
                 <tr style="${!m.is_active?'opacity:.5':''}">
                   <td style="font-weight:700">${m.no}号機</td>
                   <td>${m.line}ライン</td>
+                  <td>
+                    <div class="product-pills">
+                      ${pills}
+                      <button class="link-btn" onclick="openLinkModal(${m.id})">+ 紐づけ</button>
+                    </div>
+                  </td>
                   <td>
                     <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px"
                       value="${m.memo||''}"
@@ -752,7 +792,7 @@ function renderMachines(){
                     </div>
                   </td>
                 </tr>
-              `).join('')}
+              `}).join('')}
             </tbody>
           </table>
         </div>
@@ -892,6 +932,97 @@ async function toggleMachine(id){
     await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!m.is_active})});
     await loadAll();
   } catch(err){showToast('更新に失敗','error')}
+}
+
+/* ===== Machine-Product Linking ===== */
+function openLinkModal(machineId){
+  const m = MACHINES.find(x => x.id === machineId);
+  if(!m) return;
+  const linkedIds = new Set(MACHINE_PRODUCTS.filter(mp => mp.machine_id === machineId).map(mp => mp.product_id));
+  const activeProducts = PRODUCTS.filter(p => p.is_active);
+
+  const checkboxes = activeProducts.map(p => {
+    const checked = linkedIds.has(p.id) ? 'checked' : '';
+    return `<label class="link-item">
+      <input type="checkbox" value="${p.id}" ${checked}>
+      <div class="link-item-info">
+        <div class="link-item-code">${p.code}</div>
+        <div class="link-item-name">${p.name}</div>
+      </div>
+    </label>`;
+  }).join('');
+
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${m.no}号機（${m.line}ライン）の品番紐づけ</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">紐づける品番にチェックを入れてください</div>
+    <input class="link-search" type="text" placeholder="品番・品名で絞り込み..." oninput="filterLinkItems(this.value)">
+    <div class="link-list" id="linkList">${checkboxes}</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px" id="linkCount">選択中: ${linkedIds.size}件</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn-primary" onclick="saveMachineLinks(${machineId})">保存</button>
+    </div>
+  `, true);
+
+  // Update count on checkbox change
+  setTimeout(() => {
+    document.querySelectorAll('#linkList input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const cnt = document.querySelectorAll('#linkList input[type="checkbox"]:checked').length;
+        document.getElementById('linkCount').textContent = `選択中: ${cnt}件`;
+      });
+    });
+  }, 50);
+}
+
+function filterLinkItems(query){
+  const q = query.toLowerCase();
+  document.querySelectorAll('#linkList .link-item').forEach(item => {
+    const code = item.querySelector('.link-item-code')?.textContent.toLowerCase() || '';
+    const name = item.querySelector('.link-item-name')?.textContent.toLowerCase() || '';
+    item.style.display = (!q || code.includes(q) || name.includes(q)) ? '' : 'none';
+  });
+}
+
+async function saveMachineLinks(machineId){
+  const checkboxes = document.querySelectorAll('#linkList input[type="checkbox"]');
+  const newIds = new Set();
+  checkboxes.forEach(cb => { if(cb.checked) newIds.add(parseInt(cb.value)); });
+
+  const currentLinks = MACHINE_PRODUCTS.filter(mp => mp.machine_id === machineId);
+  const currentIds = new Set(currentLinks.map(mp => mp.product_id));
+
+  // Additions
+  const toAdd = [...newIds].filter(id => !currentIds.has(id));
+  // Removals
+  const toRemove = [...currentIds].filter(id => !newIds.has(id));
+
+  try {
+    for(const productId of toAdd){
+      await sbFetch('machine_products', {method:'POST', body:JSON.stringify({machine_id:machineId, product_id:productId})});
+    }
+    for(const productId of toRemove){
+      await sbFetch(`machine_products?machine_id=eq.${machineId}&product_id=eq.${productId}`, {method:'DELETE'});
+    }
+    closeModal();
+    await loadAll();
+    const msg = [];
+    if(toAdd.length) msg.push(`追加${toAdd.length}件`);
+    if(toRemove.length) msg.push(`解除${toRemove.length}件`);
+    showToast(msg.length ? `紐づけ更新: ${msg.join('・')}` : '変更なし', msg.length ? 'success' : 'info');
+  } catch(err){
+    showToast('紐づけの保存に失敗: ' + err.message, 'error');
+  }
+}
+
+async function unlinkProduct(machineId, productId){
+  if(!confirm('この品番の紐づけを解除しますか？')) return;
+  try {
+    await sbFetch(`machine_products?machine_id=eq.${machineId}&product_id=eq.${productId}`, {method:'DELETE'});
+    await loadAll();
+    showToast('紐づけを解除しました','success');
+  } catch(err){showToast('解除に失敗','error')}
 }
 
 /* ===== Product modal ===== */
@@ -1079,6 +1210,7 @@ function handleMasterExcelImport(event) {
 
       const addMachines = [], updateMachines = [];
       const addProducts = [], updateProducts = [];
+      const linkPairs = []; // {line, machineNo, productCode} for machine_products
       const seenMachineKeys = new Set();
       const seenProductCodes = new Set();
 
@@ -1124,9 +1256,14 @@ function handleMasterExcelImport(event) {
             addProducts.push({ id: nextProductId++, code, name: pname || code, is_active: true });
           }
         }
+
+        // 紐づけペア収集
+        if (code) {
+          linkPairs.push({ line, machineNo, productCode: code });
+        }
       }
 
-      const totalChanges = addMachines.length + updateMachines.length + addProducts.length + updateProducts.length;
+      const totalChanges = addMachines.length + updateMachines.length + addProducts.length + updateProducts.length + linkPairs.length;
       if (totalChanges === 0) {
         showToast('変更対象のデータがありません', 'info');
         return;
@@ -1165,11 +1302,15 @@ function handleMasterExcelImport(event) {
           </tbody></table></div>
           ${addProducts.length > 20 ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ${addProducts.length - 20}件...</div>` : ''}`;
       }
+      if (linkPairs.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:6px">🔗 紐づけ: ${linkPairs.length}件</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">機番×品番の紐づけをインポートします（既存の紐づけと重複するものはスキップ）</div>`;
+      }
 
       showModal(`
         <div class="modal-title">Excelインポート プレビュー</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-          新規 ${addMachines.length + addProducts.length}件 ・ 更新 ${updateMachines.length + updateProducts.length}件
+          新規 ${addMachines.length + addProducts.length}件 ・ 更新 ${updateMachines.length + updateProducts.length}件 ・ 紐づけ ${linkPairs.length}件
         </div>
         ${html}
         <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -1178,7 +1319,7 @@ function handleMasterExcelImport(event) {
         </div>
       `, true);
 
-      window._pendingMasterImport = { addMachines, updateMachines, addProducts, updateProducts };
+      window._pendingMasterImport = { addMachines, updateMachines, addProducts, updateProducts, linkPairs };
 
     } catch (err) {
       showToast('ファイルの読み込みに失敗しました: ' + err.message, 'error');
@@ -1191,6 +1332,7 @@ async function confirmMasterImport() {
   const d = window._pendingMasterImport;
   if (!d) return;
   try {
+    // 1. 機番の追加/更新
     for (const m of d.addMachines) {
       const lineId=getLineId(m.line);
       if(lineId) await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(m.no),line_id:lineId,memo:m.memo,is_active:true})});
@@ -1198,12 +1340,44 @@ async function confirmMasterImport() {
     for (const m of d.updateMachines) {
       await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({memo:m.memo})});
     }
+    // 2. 品番の追加/更新
     for (const p of d.addProducts) {
       await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
     }
     for (const p of d.updateProducts) {
       await sbFetch(`products?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({product_name:p.name})});
     }
+
+    // 3. 紐づけ作成 — まずデータをリロードして最新IDを取得
+    if (d.linkPairs && d.linkPairs.length > 0) {
+      // Reload machines and products to get IDs of newly created items
+      const freshMachines = await sbFetch('machines?select=*,lines(line_name)&order=machine_no');
+      const freshProducts = await sbFetch('products?select=*&order=product_code');
+      const freshMP = await sbFetch('machine_products?select=id,machine_id,product_id');
+
+      const existingLinks = new Set((freshMP||[]).map(mp => `${mp.machine_id}-${mp.product_id}`));
+      let linkCount = 0;
+
+      for (const pair of d.linkPairs) {
+        // Resolve machine ID
+        const machine = freshMachines.find(m => {
+          const mLine = m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() || 'A';
+          return mLine === pair.line && String(m.machine_no) === pair.machineNo;
+        });
+        // Resolve product ID
+        const product = freshProducts.find(p => p.product_code === pair.productCode);
+
+        if (machine && product) {
+          const linkKey = `${machine.id}-${product.id}`;
+          if (!existingLinks.has(linkKey)) {
+            await sbFetch('machine_products', {method:'POST', body:JSON.stringify({machine_id:machine.id, product_id:product.id})});
+            existingLinks.add(linkKey);
+            linkCount++;
+          }
+        }
+      }
+    }
+
     window._pendingMasterImport = null;
     closeModal();await loadAll();
     const msgs = [];
@@ -1211,6 +1385,7 @@ async function confirmMasterImport() {
     const updateTotal = d.updateMachines.length + d.updateProducts.length;
     if (addTotal) msgs.push(`追加 ${addTotal}件`);
     if (updateTotal) msgs.push(`更新 ${updateTotal}件`);
+    if (d.linkPairs?.length) msgs.push(`紐づけ処理 ${d.linkPairs.length}件`);
     showToast(`マスタ ${msgs.join('・')}`, 'success');
   } catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
@@ -1347,23 +1522,22 @@ function exportUsers(){
 }
 
 function exportMaster(){
-  // ⑤ 1シート形式：ライン名 / 機番 / 品番 / 品名（インポートテンプレートと同一フォーマット）
   const wb=XLSX.utils.book_new();
   const headers=['ライン名','機番','品番','品名'];
   const rows=[];
-  // machine_products的な紐づけを展開（モックでは全品番を全機番に紐づけと仮定）
   MACHINES.forEach(m=>{
-    PRODUCTS.filter(p=>p.is_active).forEach(p=>{
-      rows.push([m.line+'ライン', m.no, p.code, p.name]);
-    });
+    const linkedProducts = MACHINE_PRODUCTS
+      .filter(mp => mp.machine_id === m.id)
+      .map(mp => PRODUCTS.find(p => p.id === mp.product_id))
+      .filter(Boolean);
+    if(linkedProducts.length){
+      linkedProducts.forEach(p => rows.push([m.line+'ライン', m.no, p.code, p.name]));
+    } else {
+      rows.push([m.line+'ライン', m.no, '', '']);
+    }
   });
-  // 紐づけがない場合は機番のみ行を追加
-  if(!rows.length){
-    MACHINES.forEach(m=>rows.push([m.line+'ライン', m.no, '', '']));
-  }
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
   ws['!cols']=[{wch:10},{wch:8},{wch:14},{wch:20}];
-  // ヘッダー行の注記
   XLSX.utils.book_append_sheet(wb,ws,'マスタ');
   XLSX.writeFile(wb,'Traq_マスタ_インポート用.xlsx');
   showToast('マスタをExcel出力しました（インポートテンプレート形式）','success');
@@ -1403,6 +1577,8 @@ async function updateProductName(id, val){
 async function deleteMachine(id){
   if(!confirm(t('delete_confirm'))) return;
   try {
+    // 紐づけも削除（FK cascadeがない場合に備えて）
+    await sbFetch(`machine_products?machine_id=eq.${id}`,{method:'DELETE'});
     await sbFetch(`machines?id=eq.${id}`,{method:'DELETE'});
     await loadAll();showToast(t('user_deleted'),'success');
   } catch(err){showToast('削除に失敗','error')}
