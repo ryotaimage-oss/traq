@@ -479,7 +479,7 @@ async function loadUsers(){
       shift:        u.default_shift ? parseInt(u.default_shift) : null,
       is_active:    u.is_active,
       pin_fail_count:   u.pin_fail_count   || 0,
-      pin_lock_until: u.pin_lock_until || null,
+      pin_locked_until: u.pin_locked_until || null,
     }));
   } catch(err){
     console.error('ユーザー読み込み失敗:', err);
@@ -641,12 +641,12 @@ async function doLogin(){
 
   try {
     // DBから最新のpin_hashを直接取得して照合
-    const rows = await sbFetch(`users?id=eq.${u.id}&select=id,pin_hash,pin_fail_count,pin_lock_until`);
+    const rows = await sbFetch(`users?id=eq.${u.id}&select=id,pin_hash,pin_fail_count,pin_locked_until`);
     if(!rows||!rows.length) throw new Error('ユーザーが見つかりません');
     const fresh = rows[0];
 
-    if(fresh.pin_lock_until && Date.now() < new Date(fresh.pin_lock_until).getTime()){
-      u.pin_lock_until = fresh.pin_lock_until;
+    if(fresh.pin_locked_until && Date.now() < new Date(fresh.pin_locked_until).getTime()){
+      u.pin_locked_until = fresh.pin_locked_until;
       u.pin_fail_count   = fresh.pin_fail_count;
       showLockScreen(u);
       loginBusy=false;
@@ -658,9 +658,9 @@ async function doLogin(){
       // ✅ 成功
       await sbFetch(`users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
-        body: JSON.stringify({ pin_fail_count:0, pin_lock_until:null })
+        body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
       });
-      u.pin_fail_count=0; u.pin_lock_until=null;
+      u.pin_fail_count=0; u.pin_locked_until=null;
       flashSuccess();
 
     } else {
@@ -715,17 +715,17 @@ function clearError(){ document.getElementById('pinErrorEl').innerHTML=''; }
    Lock logic
 ============================================= */
 function isLocked(u){
-  if(!u.pin_lock_until) return false;
-  return Date.now() < new Date(u.pin_lock_until).getTime();
+  if(!u.pin_locked_until) return false;
+  return Date.now() < new Date(u.pin_locked_until).getTime();
 }
 
 async function lockAccount(u){
   const until=new Date(Date.now()+5*60*1000).toISOString();
-  u.pin_lock_until=until; u.pin_fail_count=3;
+  u.pin_locked_until=until; u.pin_fail_count=3;
   try {
     await sbFetch(`users?id=eq.${u.id}`,{
       method:'PATCH', prefer:'return=minimal',
-      body: JSON.stringify({ pin_fail_count:3, pin_lock_until:until })
+      body: JSON.stringify({ pin_fail_count:3, pin_locked_until:until })
     });
   } catch(err){ console.error('Lock write failed:',err); }
   showLockScreen(u);
@@ -736,14 +736,14 @@ function showLockScreen(u){
   clearError();
   const lockEl=document.getElementById('pinLockEl');
   lockEl.style.display='block';
-  const untilTs=new Date(u.pin_lock_until).getTime();
+  const untilTs=new Date(u.pin_locked_until).getTime();
   updateLockTimer(u,untilTs,lockEl);
   if(state.lockTimers[u.id]) clearInterval(state.lockTimers[u.id]);
   state.lockTimers[u.id]=setInterval(()=>{
     if(Date.now()>=untilTs){
       clearInterval(state.lockTimers[u.id]);
       delete state.lockTimers[u.id];
-      u.pin_fail_count=0; u.pin_lock_until=null;
+      u.pin_fail_count=0; u.pin_locked_until=null;
       lockEl.style.display='none';
       document.getElementById('pinInputArea').style.display='block';
       state.pinInput=''; updatePinDots();
@@ -751,7 +751,7 @@ function showLockScreen(u){
       renderUsers(document.getElementById('userSearch').value);
       sbFetch(`users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
-        body: JSON.stringify({ pin_fail_count:0, pin_lock_until:null })
+        body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
       }).catch(err=>console.error('Unlock write failed:',err));
     } else {
       updateLockTimer(u,untilTs,lockEl);
@@ -777,21 +777,21 @@ function checkLockState(u){
     document.getElementById('pinInputArea').style.display='none';
     const lockEl=document.getElementById('pinLockEl');
     lockEl.style.display='block';
-    const untilTs=new Date(u.pin_lock_until).getTime();
+    const untilTs=new Date(u.pin_locked_until).getTime();
     updateLockTimer(u,untilTs,lockEl);
     if(!state.lockTimers[u.id]){
       state.lockTimers[u.id]=setInterval(()=>{
         if(Date.now()>=untilTs){
           clearInterval(state.lockTimers[u.id]);
           delete state.lockTimers[u.id];
-          u.pin_fail_count=0; u.pin_lock_until=null;
+          u.pin_fail_count=0; u.pin_locked_until=null;
           lockEl.style.display='none';
           document.getElementById('pinInputArea').style.display='block';
           state.pinInput=''; updatePinDots();
           document.getElementById('loginBtn').disabled=true;
           sbFetch(`users?id=eq.${u.id}`,{
             method:'PATCH', prefer:'return=minimal',
-            body: JSON.stringify({ pin_fail_count:0, pin_lock_until:null })
+            body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
           }).catch(err=>console.error('Unlock write failed:',err));
         } else {
           updateLockTimer(u,untilTs,lockEl);
