@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Traq – Excelダウンロード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;--bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;--factory:#2e3a52;--roof:#3d4e6e;--text1:#e8eaf0;--text2:#8b90a0;--border:rgba(255,255,255,0.08);--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4)}
+[data-theme="light"]{--bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;--text1:#1a1f2e;--text2:#666666;--border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text2);transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar-title{font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+.scroll-area{flex:1;overflow-y:auto;padding:20px 16px 40px}
+.inner{max-width:560px;margin:0 auto}
+.section{margin-bottom:24px;animation:slideUp .3s ease both}
+.section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
+.date-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.date-field label{font-size:11px;color:var(--text2);margin-bottom:5px;display:block}
+.date-input{width:100%;height:48px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text1);padding:0 12px;outline:none;transition:border-color .15s}
+.date-input:focus{border-color:var(--orange)}
+.date-sep{font-size:16px;color:var(--text2);text-align:center;padding-top:16px}
+.quick-row{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.quick-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.quick-btn:hover,.quick-btn.active{border-color:var(--orange);color:var(--orange);background:rgba(239,159,39,.08)}
+.count-preview{display:flex;gap:10px;margin-top:14px}
+.count-chip{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;text-align:center}
+.count-num{font-size:24px;font-weight:700;color:var(--orange);line-height:1}
+.count-label{font-size:11px;color:var(--text2);margin-top:3px}
+.dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dl-btn{height:80px;border:none;border-radius:12px;font-family:inherit;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.dl-btn:active{transform:scale(.97)}
+.dl-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.dl-eq{background:linear-gradient(135deg,#1e3a5f,#1e2d45);border:1px solid rgba(96,165,250,.25)}
+.dl-md{background:linear-gradient(135deg,#3b1f5e,#2d1e45);border:1px solid rgba(192,132,252,.25)}
+.dl-both{background:linear-gradient(135deg,rgba(239,159,39,.15),rgba(239,159,39,.08));border:1px solid rgba(239,159,39,.3)}
+.dl-icon{font-size:24px}
+.dl-name{font-size:13px;font-weight:700;color:var(--text1)}
+.dl-sub{font-size:10px;color:var(--text2)}
+.preview-wrap{overflow-x:auto}
+.preview-table{width:100%;border-collapse:collapse;font-size:12px;min-width:580px}
+.preview-table th{background:var(--bg3);padding:8px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+.preview-table td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.preview-table tr:last-child td{border-bottom:none}
+.type-eq{color:#60a5fa;font-weight:700}
+.type-md{color:#c084fc;font-weight:700}
+.progress-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:300}
+.progress-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;min-width:220px}
+.progress-spinner{font-size:36px;animation:spin 1s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-text{font-size:14px;font-weight:500}
+.progress-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:400;white-space:nowrap}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="location.href='home_sl.html'">←</button>
+      <span class="topbar-title">📥 <span data-i18n="page_title">Excelダウンロード</span></span>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </div>
+
+  <div class="scroll-area">
+  <div class="inner">
+
+    <!-- 期間 -->
+    <div class="section">
+      <div class="section-title" data-i18n="sec_range">出力期間</div>
+      <div class="card">
+        <div class="date-row">
+          <div class="date-field">
+            <label data-i18n="label_from">開始日</label>
+            <input class="date-input" type="date" id="dateFrom" onchange="onDateChange()">
+          </div>
+          <div class="date-sep">〜</div>
+          <div class="date-field">
+            <label data-i18n="label_to">終了日</label>
+            <input class="date-input" type="date" id="dateTo" onchange="onDateChange()">
+          </div>
+        </div>
+        <div class="quick-row">
+          <button class="quick-btn" id="qb-today"     onclick="setQuick('today')"     data-i18n="qb_today">今日</button>
+          <button class="quick-btn" id="qb-week"      onclick="setQuick('week')"      data-i18n="qb_week">直近7日</button>
+          <button class="quick-btn active" id="qb-month" onclick="setQuick('month')"  data-i18n="qb_month">今月</button>
+          <button class="quick-btn" id="qb-lastmonth" onclick="setQuick('lastmonth')" data-i18n="qb_lastmonth">先月</button>
+          <button class="quick-btn" id="qb-all"       onclick="setQuick('all')"       data-i18n="qb_all">全期間</button>
+        </div>
+        <div class="count-preview">
+          <div class="count-chip"><div class="count-num" id="cntEq">—</div><div class="count-label" data-i18n="cnt_eq">設備 件数</div></div>
+          <div class="count-chip"><div class="count-num" id="cntMd">—</div><div class="count-label" data-i18n="cnt_md">金型 件数</div></div>
+          <div class="count-chip"><div class="count-num" id="cntStop">—</div><div class="count-label" data-i18n="cnt_stop">停止時間(分)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ダウンロード -->
+    <div class="section" style="animation-delay:.08s">
+      <div class="section-title" data-i18n="sec_dl">ファイル出力</div>
+      <div class="dl-grid">
+        <button class="dl-btn dl-eq" id="dlEqBtn" onclick="downloadExcel('equipment')">
+          <span class="dl-icon">⚙️</span>
+          <span class="dl-name" data-i18n="dl_eq">設備トラブル集計</span>
+          <span class="dl-sub">.xlsx</span>
+        </button>
+        <button class="dl-btn dl-md" id="dlMdBtn" onclick="downloadExcel('mold')">
+          <span class="dl-icon">🔧</span>
+          <span class="dl-name" data-i18n="dl_md">金型トラブル集計</span>
+          <span class="dl-sub">.xlsx</span>
+        </button>
+      </div>
+      <div style="margin-top:8px">
+        <button class="dl-btn dl-both" onclick="downloadExcel('both')" style="width:100%;height:56px;flex-direction:row;gap:10px">
+          <span class="dl-icon" style="font-size:18px">📦</span>
+          <div style="text-align:left">
+            <div class="dl-name" data-i18n="dl_both">両方まとめてダウンロード</div>
+            <div class="dl-sub" data-i18n="dl_both_sub">設備・金型 2ファイル同時出力</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- プレビュー -->
+    <div class="section" style="animation-delay:.16s">
+      <div class="section-title" data-i18n="sec_preview">データプレビュー（承認済みのみ）</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="preview-wrap">
+          <table class="preview-table">
+            <thead><tr>
+              <th>No</th>
+              <th data-i18n="th_type">種別</th>
+              <th data-i18n="th_date">日付</th>
+              <th data-i18n="th_shift">直</th>
+              <th data-i18n="th_machine">機番</th>
+              <th data-i18n="th_product">品番</th>
+              <th data-i18n="th_stop">停止(分)</th>
+              <th data-i18n="th_category">分類</th>
+              <th data-i18n="th_occ">初発/再発</th>
+            </tr></thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+<div id="progressEl" style="display:none"></div>
+<div id="toastEl" style="display:none"></div>
+
+<script>
+const I18N={
+  ja:{page_title:'Excelダウンロード',sec_range:'出力期間',sec_dl:'ファイル出力',sec_preview:'データプレビュー（承認済みのみ）',label_from:'開始日',label_to:'終了日',qb_today:'今日',qb_week:'直近7日',qb_month:'今月',qb_lastmonth:'先月',qb_all:'全期間',cnt_eq:'設備 件数',cnt_md:'金型 件数',cnt_stop:'停止時間(分)',dl_eq:'設備トラブル集計',dl_md:'金型トラブル集計',dl_both:'両方まとめてダウンロード',dl_both_sub:'設備・金型 2ファイル同時出力',th_type:'種別',th_date:'日付',th_shift:'直',th_machine:'機番',th_product:'品番',th_stop:'停止(分)',th_category:'分類',th_occ:'初発/再発',type_eq:'設備',type_md:'金型',occ_first:'初発',occ_rec:'再発',shift_label:s=>`${s}直`,generating:'Excel生成中...',generating_sub:'しばらくお待ちください',dl_done_eq:n=>`設備トラブル集計.xlsx を出力しました（${n}件）`,dl_done_md:n=>`金型トラブル集計.xlsx を出力しました（${n}件）`,dl_done_both:(a,b)=>`2ファイル出力しました（設備${a}件・金型${b}件）`,no_data:'対象期間に承認済みデータがありません',sheet_results:'実績',sheet_summary:'集計',col_no:'No',col_date:'日付',col_shift:'直',col_machine:'機番',col_code:'品番',col_name:'品名',col_stop:'停止時間(分)',col_category:'分類',col_detail:'詳細内容',col_occ:'初発/再発',col_submitter:'入力者',col_approved:'承認者',sum_machine:'機番別件数',sum_category:'分類別件数',sum_product:'品番別件数',sum_total:'総件数',sum_stop:'総停止時間(分)',sum_avg:'平均件数/日'},
+  vi:{page_title:'Tải Excel',sec_range:'Khoảng thời gian',sec_dl:'Xuất file',sec_preview:'Xem trước (đã duyệt)',label_from:'Từ ngày',label_to:'Đến ngày',qb_today:'Hôm nay',qb_week:'7 ngày',qb_month:'Tháng này',qb_lastmonth:'Tháng trước',qb_all:'Tất cả',cnt_eq:'Thiết bị',cnt_md:'Khuôn',cnt_stop:'Tổng dừng(phút)',dl_eq:'Sự cố thiết bị',dl_md:'Sự cố khuôn',dl_both:'Tải cả 2 file',dl_both_sub:'Thiết bị & Khuôn cùng lúc',th_type:'Loại',th_date:'Ngày',th_shift:'Ca',th_machine:'Máy',th_product:'Mã SP',th_stop:'Dừng(p)',th_category:'Phân loại',th_occ:'Đầu/Tái',type_eq:'Thiết bị',type_md:'Khuôn',occ_first:'Lần đầu',occ_rec:'Tái phát',shift_label:s=>`Ca ${s}`,generating:'Đang tạo Excel...',generating_sub:'Vui lòng đợi',dl_done_eq:n=>`Đã xuất file thiết bị (${n} bản ghi)`,dl_done_md:n=>`Đã xuất file khuôn (${n} bản ghi)`,dl_done_both:(a,b)=>`Đã xuất 2 file (TB:${a}, Khuôn:${b})`,no_data:'Không có dữ liệu đã duyệt',sheet_results:'Dữ liệu',sheet_summary:'Tổng hợp',col_no:'No',col_date:'Ngày',col_shift:'Ca',col_machine:'Máy',col_code:'Mã SP',col_name:'Tên SP',col_stop:'Dừng(p)',col_category:'Loại',col_detail:'Chi tiết',col_occ:'Lần đầu/Tái',col_submitter:'Người nhập',col_approved:'Người duyệt',sum_machine:'Theo máy',sum_category:'Theo loại',sum_product:'Theo SP',sum_total:'Tổng',sum_stop:'Tổng dừng',sum_avg:'TB/ngày'},
+  en:{page_title:'Excel Download',sec_range:'Date Range',sec_dl:'Export Files',sec_preview:'Data Preview (Approved only)',label_from:'From',label_to:'To',qb_today:'Today',qb_week:'Last 7 days',qb_month:'This month',qb_lastmonth:'Last month',qb_all:'All',cnt_eq:'Equipment',cnt_md:'Mold',cnt_stop:'Total Stop(min)',dl_eq:'Equipment Report',dl_md:'Mold Report',dl_both:'Download Both Files',dl_both_sub:'Equipment & Mold simultaneously',th_type:'Type',th_date:'Date',th_shift:'Shift',th_machine:'Machine',th_product:'Code',th_stop:'Stop(m)',th_category:'Category',th_occ:'First/Rec',type_eq:'Equipment',type_md:'Mold',occ_first:'First',occ_rec:'Recurrence',shift_label:s=>`Shift ${s}`,generating:'Generating Excel...',generating_sub:'Please wait',dl_done_eq:n=>`Equipment report exported (${n} records)`,dl_done_md:n=>`Mold report exported (${n} records)`,dl_done_both:(a,b)=>`2 files exported (Eq:${a}, Mold:${b})`,no_data:'No approved data in selected period',sheet_results:'Records',sheet_summary:'Summary',col_no:'No',col_date:'Date',col_shift:'Shift',col_machine:'Machine',col_code:'Code',col_name:'Name',col_stop:'Stop(min)',col_category:'Category',col_detail:'Detail',col_occ:'First/Rec',col_submitter:'Submitted by',col_approved:'Approved by',sum_machine:'By Machine',sum_category:'By Category',sum_product:'By Product',sum_total:'Total',sum_stop:'Total Stop',sum_avg:'Avg/Day'}
+};
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(...a):(v??k)}
+function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===lang));applyI18n();updatePreview()}
+function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n))}
+function toggleTheme(){const html=document.documentElement;const d=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('traq_theme',d?'light':'dark')}
+function initTheme(){const s=localStorage.getItem('traq_theme');const p=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const th=s||p;document.documentElement.setAttribute('data-theme',th);document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️'}
+
+const ALL_DATA=[
+  {id:1,type:'equipment',date:'2026-03-25',shift:'1',line:'Aライン',machine:'12',product_code:'AP2',product_name:'AP2ユニット',stop_minutes:30,category:'成形機',detail:'射出圧力不安定によるショートショット多発',occurrence:'first',status:'approved',submitted_by:'高橋 A',approved_by:'山田 太郎'},
+  {id:2,type:'mold',date:'2026-03-25',shift:'1',line:'Bライン',machine:'28',product_code:'690カプラ',product_name:'690カプラ',stop_minutes:15,category:'バリ',detail:'パーティングラインにバリ発生・再発',occurrence:'recurrence',status:'approved',submitted_by:'伊藤 B',approved_by:'山田 太郎'},
+  {id:3,type:'equipment',date:'2026-03-24',shift:'2',line:'Bライン',machine:'33',product_code:'940',product_name:'940',stop_minutes:20,category:'取出機',detail:'取出機アーム動作異常。センサー調整で対応。',occurrence:'first',status:'approved',submitted_by:'加藤 F',approved_by:'山田 太郎'},
+  {id:4,type:'mold',date:'2026-03-24',shift:'1',line:'Aライン',machine:'3',product_code:'PE01',product_name:'PE01',stop_minutes:10,category:'油漏れ',detail:'接続部から微量の油漏れ。シール交換。',occurrence:'first',status:'approved',submitted_by:'高橋 A',approved_by:'山田 太郎'},
+  {id:5,type:'equipment',date:'2026-03-23',shift:'2',line:'Cライン',machine:'62',product_code:'ジョイント',product_name:'ジョイント',stop_minutes:60,category:'材料供給設備',detail:'ホッパーモーター故障。部品交換後復旧。',occurrence:'recurrence',status:'approved',submitted_by:'Le Van C',approved_by:'山田 太郎'},
+  {id:6,type:'mold',date:'2026-03-22',shift:'3',line:'Aライン',machine:'7',product_code:'260D',product_name:'260D',stop_minutes:45,category:'金型動作異常',detail:'エジェクターピン動作不良。分解点検。',occurrence:'recurrence',status:'approved',submitted_by:'Tran Thi B',approved_by:'佐藤 次郎'},
+  {id:7,type:'equipment',date:'2026-03-20',shift:'1',line:'Aライン',machine:'5',product_code:'090クランプ',product_name:'090クランプ',stop_minutes:null,category:'付帯設備',detail:'冷却水温アラーム。チラー点検。',occurrence:'first',status:'approved',submitted_by:'高橋 A',approved_by:'山田 太郎'},
+  {id:8,type:'mold',date:'2026-03-18',shift:'2',line:'Cライン',machine:'55',product_code:'880',product_name:'880',stop_minutes:25,category:'金型温度異常',detail:'温調器設定値と実測値に大きな乖離。',occurrence:'first',status:'approved',submitted_by:'Nguyen Van A',approved_by:'鈴木 三郎'},
+  {id:9,type:'equipment',date:'2026-03-15',shift:'1',line:'Bライン',machine:'25',product_code:'AP2',product_name:'AP2ユニット',stop_minutes:35,category:'成形機',detail:'型締め圧力不足によるフラッシュ発生。',occurrence:'recurrence',status:'approved',submitted_by:'小林 E',approved_by:'山田 太郎'},
+  {id:10,type:'mold',date:'2026-03-10',shift:'2',line:'Aライン',machine:'10',product_code:'KH5T',product_name:'KH5T',stop_minutes:5,category:'エアー漏れ',detail:'エアバルブ接続部からエアー漏れ。増し締めで対応。',occurrence:'first',status:'approved',submitted_by:'伊藤 B',approved_by:'山田 太郎'},
+];
+
+function toISO(d){return d.toISOString().slice(0,10)}
+function setQuick(type){
+  const now=new Date();let from,to;
+  if(type==='today'){from=to=toISO(now)}
+  else if(type==='week'){const d=new Date(now);d.setDate(d.getDate()-6);from=toISO(d);to=toISO(now)}
+  else if(type==='month'){from=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;to=toISO(now)}
+  else if(type==='lastmonth'){const lm=new Date(now.getFullYear(),now.getMonth()-1,1);const le=new Date(now.getFullYear(),now.getMonth(),0);from=toISO(lm);to=toISO(le)}
+  else{from='2026-01-01';to=toISO(now)}
+  document.getElementById('dateFrom').value=from;
+  document.getElementById('dateTo').value=to;
+  ['today','week','month','lastmonth','all'].forEach(k=>document.getElementById('qb-'+k).classList.toggle('active',k===type));
+  updatePreview();
+}
+function onDateChange(){['today','week','month','lastmonth','all'].forEach(k=>document.getElementById('qb-'+k).classList.remove('active'));updatePreview()}
+function getFiltered(){const from=document.getElementById('dateFrom').value;const to=document.getElementById('dateTo').value;return ALL_DATA.filter(d=>d.status==='approved'&&(!from||d.date>=from)&&(!to||d.date<=to))}
+
+function updatePreview(){
+  const data=getFiltered();
+  const eq=data.filter(d=>d.type==='equipment');
+  const md=data.filter(d=>d.type==='mold');
+  const stop=data.reduce((s,d)=>s+(d.stop_minutes||0),0);
+  document.getElementById('cntEq').textContent=eq.length;
+  document.getElementById('cntMd').textContent=md.length;
+  document.getElementById('cntStop').textContent=stop||0;
+  document.getElementById('dlEqBtn').disabled=eq.length===0;
+  document.getElementById('dlMdBtn').disabled=md.length===0;
+  const tbody=document.getElementById('previewBody');
+  if(!data.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text2)">${t('no_data')}</td></tr>`;return}
+  tbody.innerHTML=data.map((d,i)=>`<tr><td>${i+1}</td><td class="${d.type==='equipment'?'type-eq':'type-md'}">${t(d.type==='equipment'?'type_eq':'type_md')}</td><td>${d.date.replace(/-/g,'/')}</td><td>${t('shift_label',d.shift)}</td><td>${d.machine}号機</td><td>${d.product_code}</td><td>${d.stop_minutes??'—'}</td><td>${d.category}</td><td>${d.occurrence==='first'?t('occ_first'):t('occ_rec')}</td></tr>`).join('');
+}
+
+function downloadExcel(type){
+  if(type==='both'){
+    const eq=getFiltered().filter(d=>d.type==='equipment');
+    const md=getFiltered().filter(d=>d.type==='mold');
+    if(!eq.length&&!md.length){showToast(t('no_data'),'error');return}
+    showProgress();
+    setTimeout(()=>{
+      if(eq.length) genFile(eq,'equipment');
+      setTimeout(()=>{if(md.length) genFile(md,'mold');hideProgress();showToast(t('dl_done_both',eq.length,md.length),'success')},400);
+    },300);
+    return;
+  }
+  const data=getFiltered().filter(d=>d.type===(type==='equipment'?'equipment':'mold'));
+  if(!data.length){showToast(t('no_data'),'error');return}
+  showProgress();
+  setTimeout(()=>{genFile(data,type);hideProgress();showToast(type==='equipment'?t('dl_done_eq',data.length):t('dl_done_md',data.length),'success')},400);
+}
+
+function genFile(data,type){
+  const wb=XLSX.utils.book_new();
+  const hdr=[t('col_no'),t('col_date'),t('col_shift'),t('col_machine'),t('col_code'),t('col_name'),t('col_stop'),t('col_category'),t('col_detail'),t('col_occ'),t('col_submitter'),t('col_approved')];
+  const rows=data.map((d,i)=>[i+1,d.date.replace(/-/g,'/'),t('shift_label',d.shift),d.machine+'号機',d.product_code,d.product_name,d.stop_minutes??'',d.category,d.detail,d.occurrence==='first'?t('occ_first'):t('occ_rec'),d.submitted_by,d.approved_by||'']);
+  const ws=XLSX.utils.aoa_to_sheet([hdr,...rows]);
+  ws['!cols']=[{wch:5},{wch:12},{wch:6},{wch:10},{wch:12},{wch:16},{wch:10},{wch:16},{wch:40},{wch:8},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws,t('sheet_results'));
+
+  const sumRows=[];
+  const byM={};data.forEach(d=>{byM[d.machine]=(byM[d.machine]||0)+1});
+  sumRows.push([t('sum_machine'),'']);
+  Object.entries(byM).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>sumRows.push([k+'号機',v]));
+  sumRows.push([]);
+  const byC={};data.forEach(d=>{byC[d.category]=(byC[d.category]||0)+1});
+  sumRows.push([t('sum_category'),'']);
+  Object.entries(byC).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>sumRows.push([k,v]));
+  sumRows.push([]);
+  const byP={};data.forEach(d=>{byP[d.product_code]=(byP[d.product_code]||0)+1});
+  sumRows.push([t('sum_product'),'']);
+  Object.entries(byP).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>sumRows.push([k,v]));
+  sumRows.push([]);
+  const totalStop=data.reduce((s,d)=>s+(d.stop_minutes||0),0);
+  const from=document.getElementById('dateFrom').value;const to=document.getElementById('dateTo').value;
+  const days=from&&to?Math.max(1,Math.round((new Date(to)-new Date(from))/(864e5))+1):1;
+  sumRows.push([t('sum_total'),data.length]);
+  sumRows.push([t('sum_stop'),totalStop]);
+  sumRows.push([t('sum_avg'),(data.length/days).toFixed(2)]);
+  const ws2=XLSX.utils.aoa_to_sheet(sumRows);ws2['!cols']=[{wch:20},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws2,t('sheet_summary'));
+
+  const f1=(document.getElementById('dateFrom').value||'').replace(/-/g,'');
+  const f2=(document.getElementById('dateTo').value||'').replace(/-/g,'');
+  XLSX.writeFile(wb,type==='equipment'?`設備トラブル集計_${f1}-${f2}.xlsx`:`金型トラブル集計_${f1}-${f2}.xlsx`);
+}
+
+function showProgress(){document.getElementById('progressEl').innerHTML=`<div class="progress-overlay"><div class="progress-box"><div class="progress-spinner">⚙️</div><div class="progress-text">${t('generating')}</div><div class="progress-sub">${t('generating_sub')}</div></div></div>`;document.getElementById('progressEl').style.display='block'}
+function hideProgress(){document.getElementById('progressEl').style.display='none'}
+let toastTimer=null;
+function showToast(msg,type='info'){const el=document.getElementById('toastEl');el.innerHTML=`<div class="toast ${type}">${msg}</div>`;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none'},3000)}
+
+(function init(){
+  initTheme();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
+  applyI18n();setQuick('month');
+})();
+</script>
+<script src="traq-version.js"></script>
+</body>
+</html>

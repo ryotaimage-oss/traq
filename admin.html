@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Traq – 管理者画面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
+  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
+  --factory:#2e3a52;--roof:#3d4e6e;
+  --text1:#e8eaf0;--text2:#8b90a0;
+  --border:rgba(255,255,255,0.08);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+  --nav-h:64px;
+}
+[data-theme="light"]{
+  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --text1:#1a1f2e;--text2:#666666;
+  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text2);transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar-title{font-size:15px;font-weight:700}
+.admin-badge{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Tab bar */
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab-item{flex:1;padding:12px 8px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
+.tab-item.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:16px}
+
+/* Section */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.btn-add{height:36px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:0 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-add:hover{background:var(--orange-dark)}
+
+/* Search / Filter bar */
+.search-bar{display:flex;gap:8px;margin-bottom:12px}
+.search-input{flex:1;height:40px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 12px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--orange)}
+.search-input::placeholder{color:var(--text2)}
+.filter-select{height:40px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 10px;outline:none;cursor:pointer;min-width:80px}
+
+/* Table */
+.table-wrap{overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(239,159,39,.03)}
+
+/* Role badges */
+.role-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.role-op{background:rgba(96,165,250,.12);color:#60a5fa}
+.role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
+.role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
+
+/* Status badges */
+.status-active{color:var(--success);font-size:12px}
+.status-inactive{color:var(--text2);font-size:12px}
+.status-locked{color:var(--danger);font-size:12px}
+
+/* Action buttons in table */
+.tbl-actions{display:flex;gap:5px}
+.tbl-btn{height:28px;border-radius:5px;font-family:inherit;font-size:11px;font-weight:500;padding:0 10px;cursor:pointer;transition:all .12s;border:1px solid var(--border);background:none;color:var(--text2);white-space:nowrap}
+.tbl-btn:hover{border-color:var(--orange);color:var(--orange)}
+.tbl-btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+.tbl-btn.primary{background:var(--orange);border-color:var(--orange);color:var(--navy)}
+
+/* Master cards */
+.master-section{margin-bottom:24px}
+.master-section-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.master-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;transition:all .15s}
+.master-card:hover{border-color:rgba(239,159,39,.3)}
+.master-card-left{}
+.master-card-code{font-size:13px;font-weight:700}
+.master-card-name{font-size:11px;color:var(--text2);margin-top:2px}
+.master-card-meta{font-size:10px;color:var(--text2);margin-top:2px}
+.master-card-actions{display:flex;gap:4px;flex-shrink:0}
+.inactive-tag{font-size:10px;color:var(--text2);background:var(--bg3);border-radius:3px;padding:1px 5px}
+
+/* Import bar */
+.import-bar{background:var(--bg3);border:1px dashed var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;cursor:pointer;transition:all .15s}
+.import-bar:hover{border-color:var(--orange)}
+.import-bar-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
+.import-bar-right{font-size:12px;color:var(--orange)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:200}
+.modal-overlay.center{align-items:center}
+.modal-sheet{background:var(--bg2);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;animation:slideUp .2s ease}
+.modal-overlay.center .modal-sheet{border-radius:12px;margin:20px;max-height:85vh}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:16px}
+
+/* Form fields */
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.5px}
+.req{background:var(--danger);color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;letter-spacing:0}
+.form-input,.form-select{width:100%;height:46px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);padding:0 14px;outline:none;transition:border-color .15s}
+.form-input:focus,.form-select:focus{border-color:var(--orange)}
+.form-input::placeholder{color:var(--text2)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Modal buttons */
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.btn-primary{flex:2;height:50px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-primary:hover{background:var(--orange-dark)}
+.btn-secondary{flex:1;height:50px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:14px;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.btn-danger-full{width:100%;height:46px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius);color:var(--danger);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
+.btn-danger-full:hover{background:rgba(239,68,68,.2)}
+
+/* PIN reset notice */
+.pin-reset-notice{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--warning);margin-top:8px}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:400;white-space:nowrap}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+
+/* Line tab */
+.line-tabs{display:flex;gap:6px;margin-bottom:12px}
+.line-tab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.line-tab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
+
+/* Empty */
+.empty{text-align:center;padding:32px;color:var(--text2);font-size:13px}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+@media(min-width:768px){
+  .master-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="location.href='home_sl.html'">←</button>
+      <span class="topbar-title">🔐 管理者画面</span>
+      <span class="admin-badge">admin</span>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-item active" id="tab-users"      onclick="setTab('users')">👥 ユーザー</button>
+    <button class="tab-item"        id="tab-machines"   onclick="setTab('machines')">⚙️ 機番</button>
+    <button class="tab-item"        id="tab-products"   onclick="setTab('products')">📦 品番</button>
+    <button class="tab-item"        id="tab-categories" onclick="setTab('categories')">🏷️ 分類</button>
+    <button class="tab-item"        id="tab-storage"    onclick="setTab('storage')">💾 ストレージ</button>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area" id="scrollArea">
+
+    <!-- ===== USERS TAB ===== -->
+    <div id="panel-users">
+
+      <div class="section-header">
+        <span class="section-title">ユーザー一覧</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportUsers()">📥 Excel出力</button>
+          <button class="btn-add" onclick="openUserModal()">＋ ユーザー追加</button>
+        </div>
+      </div>
+
+      <!-- Import bar -->
+      <div class="import-bar" onclick="showToast('CSV一括インポートは開発中です','info')">
+        <div class="import-bar-left">📄 CSVで一括インポート</div>
+        <div class="import-bar-right">選択 →</div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <input class="search-input" type="text" id="userSearch" placeholder="名前で検索..." oninput="renderUsers()">
+        <select class="filter-select" id="roleFilter" onchange="renderUsers()">
+          <option value="">全ロール</option>
+          <option value="op">OP</option>
+          <option value="sl">SL</option>
+          <option value="admin">admin</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="renderUsers()">
+          <option value="">全状態</option>
+          <option value="active">有効</option>
+          <option value="inactive">無効</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>ロール</th>
+              <th>デフォルト直</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== MACHINES TAB ===== -->
+    <div id="panel-machines" style="display:none">
+      <div class="section-header">
+        <span class="section-title">機番マスタ</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportMaster()">📥 Excel出力</button>
+          <button class="btn-add" onclick="openMachineModal()">＋ 機番追加</button>
+        </div>
+      </div>
+
+      <!-- ラインタブ -->
+      <div class="line-tabs">
+        <button class="line-tab active" id="ltab-all" onclick="setLinetab('all')">全ライン</button>
+        <button class="line-tab" id="ltab-A" onclick="setLinetab('A')">Aライン</button>
+        <button class="line-tab" id="ltab-B" onclick="setLinetab('B')">Bライン</button>
+        <button class="line-tab" id="ltab-C" onclick="setLinetab('C')">Cライン</button>
+      </div>
+
+      <!-- 検索 -->
+      <div class="search-bar">
+        <input class="search-input" type="text" id="machineSearch" placeholder="機番で検索..." oninput="renderMachines()">
+        <select class="filter-select" id="machineStatusFilter" onchange="renderMachines()">
+          <option value="">全状態</option>
+          <option value="active">有効</option>
+          <option value="inactive">無効</option>
+        </select>
+      </div>
+
+      <!-- Import bar -->
+      <div class="import-bar" style="margin-bottom:12px" onclick="showToast('Excelインポートは開発中です','info')">
+        <div class="import-bar-left">📊 Excelで一括インポート（ライン名/機番/品番/品名）</div>
+        <div class="import-bar-right">選択 →</div>
+      </div>
+
+      <div id="masterContent"></div>
+    </div>
+
+    <!-- ===== PRODUCTS TAB ===== -->
+    <div id="panel-products" style="display:none">
+      <div class="section-header">
+        <span class="section-title">品番マスタ</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportProducts()">📥 Excel出力</button>
+          <button class="btn-add" onclick="openProductModal()">＋ 品番追加</button>
+        </div>
+      </div>
+
+      <!-- 検索 -->
+      <div class="search-bar">
+        <input class="search-input" type="text" id="productSearch" placeholder="品番・品名で検索..." oninput="renderProducts()">
+        <select class="filter-select" id="productStatusFilter" onchange="renderProducts()">
+          <option value="">全状態</option>
+          <option value="active">有効</option>
+          <option value="inactive">無効</option>
+        </select>
+      </div>
+
+      <!-- ページネーション情報 -->
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px" id="productPageInfo"></div>
+
+      <div id="productGrid"></div>
+
+      <!-- ページネーション -->
+      <div id="productPager" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px"></div>
+    </div>
+
+    <!-- ===== CATEGORIES TAB ===== -->
+    <div id="panel-categories" style="display:none">
+
+      <!-- 設備分類 -->
+      <div class="section-header">
+        <span class="section-title">設備 分類</span>
+        <button class="btn-add" onclick="openCategoryModal('equipment')">＋ 追加</button>
+      </div>
+      <div class="search-bar" style="margin-bottom:10px">
+        <input class="search-input" type="text" id="eqCatSearch" placeholder="分類名で検索..." oninput="renderCategories()">
+      </div>
+      <div class="table-wrap" style="margin-bottom:24px">
+        <table>
+          <thead><tr>
+            <th>順番</th><th>分類名</th><th>状態</th><th>操作</th>
+          </tr></thead>
+          <tbody id="eqCategoryBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 金型分類 -->
+      <div class="section-header">
+        <span class="section-title">金型 異常内容</span>
+        <button class="btn-add" onclick="openCategoryModal('mold')">＋ 追加</button>
+      </div>
+      <div class="search-bar" style="margin-bottom:10px">
+        <input class="search-input" type="text" id="mdCatSearch" placeholder="異常内容名で検索..." oninput="renderCategories()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>順番</th><th>異常内容名</th><th>状態</th><th>操作</th>
+          </tr></thead>
+          <tbody id="mdCategoryBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ===== STORAGE TAB ===== -->
+    <div id="panel-storage" style="display:none">
+      <div class="section-header">
+        <span class="section-title">ストレージ管理</span>
+      </div>
+
+      <!-- 使用量バー -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:14px;font-weight:700">💾 Supabase Storage 使用量</span>
+          <span style="font-size:16px;font-weight:700" id="storageLabel2">計算中...</span>
+        </div>
+        <div style="height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:8px">
+          <div id="storageFill2" style="height:100%;border-radius:6px;transition:width .6s ease;width:0%"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text2)" id="storageDetail2"></div>
+      </div>
+
+      <!-- 見通し -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">📊 容量の長期見通し</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--bg3);border-radius:var(--radius);padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">テキストデータ年間増加</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success)">約1.2MB</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px">削除不要・永続保存</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:var(--radius);padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">画像データ年間最大</div>
+            <div style="font-size:18px;font-weight:700;color:var(--warning)">240MB</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px">年1回エクスポート後に削除</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 画像エクスポート -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🖼️ 画像エクスポート</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7">
+          削除前に画像ファイル名と対応するトラブル情報をExcelで出力してください。<br>
+          出力後に削除することで後から「何の画像か」を確認できます。
+        </div>
+        <button class="btn-add" style="width:100%;height:48px;font-size:14px;border-radius:var(--radius)" onclick="exportImages()">
+          📥 画像情報をExcel出力してダウンロード
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal / Toast -->
+<div id="modalEl" style="display:none"></div>
+<div id="toastEl" style="display:none"></div>
+
+<script>
+/* ===== i18n ===== */
+const I18N={
+  ja:{shift_none:'未設定',shift_label:s=>`${s}直`,role_op:'OP',role_sl:'SL',role_adm:'admin',active:'有効',inactive:'無効',locked:'ロック中',
+    edit:'編集',pin_reset:'PINリセット',toggle_active:'無効化',toggle_inactive:'有効化',delete:'削除',
+    user_add:'ユーザー追加',user_edit:'ユーザー編集',
+    label_name:'名前',label_role:'ロール',label_shift:'デフォルト直',label_pin:'初期PIN（4桁）',
+    save:'保存',cancel:'キャンセル',
+    pin_reset_done:name=>`${name} のPINを0000にリセットしました`,
+    user_saved:'保存しました',user_deleted:'削除しました',
+    machine_add:'機番追加',machine_edit:'機番編集',
+    label_machine_no:'機番',label_line:'ライン',label_memo:'メモ（任意）',
+    product_add:'品番追加',product_edit:'品番編集',
+    label_code:'品番',label_pname:'品名',
+    deactivate_confirm:'無効化しますか？',activate_confirm:'有効化しますか？',
+    delete_confirm:'削除しますか？この操作は取り消せません。',
+    confirm_yes:'実行',confirm_no:'キャンセル',
+    products_label:n=>`品番 ${n}件`,
+  },
+  vi:{shift_none:'Chưa chọn',shift_label:s=>`Ca ${s}`,role_op:'OP',role_sl:'SL',role_adm:'admin',active:'Hoạt động',inactive:'Vô hiệu',locked:'Bị khóa',
+    edit:'Sửa',pin_reset:'Reset PIN',toggle_active:'Vô hiệu hóa',toggle_inactive:'Kích hoạt',delete:'Xóa',
+    user_add:'Thêm người dùng',user_edit:'Sửa người dùng',
+    label_name:'Tên',label_role:'Vai trò',label_shift:'Ca mặc định',label_pin:'PIN ban đầu (4 số)',
+    save:'Lưu',cancel:'Hủy',
+    pin_reset_done:name=>`Đã reset PIN của ${name} về 0000`,
+    user_saved:'Đã lưu',user_deleted:'Đã xóa',
+    machine_add:'Thêm máy',machine_edit:'Sửa máy',
+    label_machine_no:'Số máy',label_line:'Dây chuyền',label_memo:'Ghi chú',
+    product_add:'Thêm sản phẩm',product_edit:'Sửa sản phẩm',
+    label_code:'Mã SP',label_pname:'Tên SP',
+    deactivate_confirm:'Vô hiệu hóa?',activate_confirm:'Kích hoạt?',
+    delete_confirm:'Xóa? Không thể hoàn tác.',
+    confirm_yes:'Xác nhận',confirm_no:'Hủy',
+    products_label:n=>`${n} sản phẩm`,
+  },
+  en:{shift_none:'Not set',shift_label:s=>`Shift ${s}`,role_op:'OP',role_sl:'SL',role_adm:'admin',active:'Active',inactive:'Inactive',locked:'Locked',
+    edit:'Edit',pin_reset:'Reset PIN',toggle_active:'Deactivate',toggle_inactive:'Activate',delete:'Delete',
+    user_add:'Add User',user_edit:'Edit User',
+    label_name:'Name',label_role:'Role',label_shift:'Default Shift',label_pin:'Initial PIN (4 digits)',
+    save:'Save',cancel:'Cancel',
+    pin_reset_done:name=>`Reset PIN for ${name} to 0000`,
+    user_saved:'Saved',user_deleted:'Deleted',
+    machine_add:'Add Machine',machine_edit:'Edit Machine',
+    label_machine_no:'Machine No.',label_line:'Line',label_memo:'Memo (optional)',
+    product_add:'Add Product',product_edit:'Edit Product',
+    label_code:'Product Code',label_pname:'Product Name',
+    deactivate_confirm:'Deactivate this?',activate_confirm:'Activate this?',
+    delete_confirm:'Delete? This cannot be undone.',
+    confirm_yes:'Confirm',confirm_no:'Cancel',
+    products_label:n=>`${n} product(s)`,
+  }
+};
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(...a):(v??k)}
+function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===lang));renderUsers();renderMaster()}
+function toggleTheme(){const html=document.documentElement;const d=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('traq_theme',d?'light':'dark')}
+function initTheme(){const s=localStorage.getItem('traq_theme');const p=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const th=s||p;document.documentElement.setAttribute('data-theme',th);document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️'}
+
+/* ===== Mock data ===== */
+let USERS=[
+  {id:1,name:'田中 管理',role:'admin',shift:null,is_active:true,locked:false},
+  {id:2,name:'山田 太郎',role:'sl',shift:1,is_active:true,locked:false},
+  {id:3,name:'佐藤 次郎',role:'sl',shift:2,is_active:true,locked:false},
+  {id:4,name:'鈴木 三郎',role:'sl',shift:3,is_active:true,locked:false},
+  {id:5,name:'高橋 A',role:'op',shift:1,is_active:true,locked:false},
+  {id:6,name:'伊藤 B',role:'op',shift:1,is_active:true,locked:false},
+  {id:7,name:'渡辺 C',role:'op',shift:1,is_active:true,locked:false},
+  {id:8,name:'中村 D',role:'op',shift:2,is_active:true,locked:false},
+  {id:9,name:'小林 E',role:'op',shift:2,is_active:false,locked:false},
+  {id:10,name:'加藤 F',role:'op',shift:2,is_active:true,locked:true},
+  {id:11,name:'Nguyen Van A',role:'op',shift:3,is_active:true,locked:false},
+  {id:12,name:'Tran Thi B',role:'op',shift:3,is_active:true,locked:false},
+  {id:13,name:'Le Van C',role:'op',shift:3,is_active:true,locked:false},
+];
+let nextUserId=14;
+
+let MACHINES=[
+  {id:1,no:'1',line:'A',memo:'',is_active:true},
+  {id:2,no:'2',line:'A',memo:'',is_active:true},
+  {id:3,no:'3',line:'A',memo:'',is_active:true},
+  {id:4,no:'4',line:'A',memo:'',is_active:true},
+  {id:5,no:'5',line:'A',memo:'',is_active:true},
+  {id:6,no:'23',line:'B',memo:'',is_active:true},
+  {id:7,no:'24',line:'B',memo:'',is_active:true},
+  {id:8,no:'46',line:'C',memo:'',is_active:true},
+  {id:9,no:'47',line:'C',memo:'',is_active:false},
+];
+let nextMachineId=10;
+
+let PRODUCTS=[
+  {id:1,code:'948',name:'948ブラケット',is_active:true},
+  {id:2,code:'AP2',name:'AP2ユニット',is_active:true},
+  {id:3,code:'PE01',name:'PE01カバー',is_active:true},
+  {id:4,code:'690CP',name:'690カプラ',is_active:true},
+  {id:5,code:'EN200',name:'EN200ハウジング',is_active:true},
+  {id:6,code:'090CL',name:'090クランプ',is_active:true},
+  {id:7,code:'940',name:'940ベース',is_active:true},
+  {id:8,code:'880',name:'880プレート',is_active:true},
+  {id:9,code:'KH5T',name:'KH5Tブラケット',is_active:false},
+];
+let nextProductId=10;
+
+/* ===== State ===== */
+let currentTab='users';
+let currentLinetab='all';
+
+/* ===== Tab ===== */
+function setTab(tab){
+  currentTab=tab;
+  ['users','machines','products','categories','storage'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
+  });
+  document.getElementById('scrollArea').scrollTo(0,0);
+  if(tab==='machines')   renderMachines();
+  if(tab==='products')   renderProducts();
+  if(tab==='categories') renderCategories();
+  if(tab==='storage')    initStorageBar2();
+}
+
+function setLinetab(line){
+  currentLinetab=line;
+  ['all','A','B','C'].forEach(k=>document.getElementById('ltab-'+k).classList.toggle('active',k===line));
+  renderMaster();
+}
+
+/* ===== Users ===== */
+function renderUsers(){
+  const q=document.getElementById('userSearch').value.toLowerCase();
+  const rf=document.getElementById('roleFilter').value;
+  const sf=document.getElementById('statusFilter').value;
+  const filtered=USERS.filter(u=>{
+    if(q&&!u.name.toLowerCase().includes(q)) return false;
+    if(rf&&u.role!==rf) return false;
+    if(sf==='active'&&!u.is_active) return false;
+    if(sf==='inactive'&&u.is_active) return false;
+    return true;
+  });
+  // Sort: admin→sl→op, then name
+  const order={admin:0,sl:1,op:2};
+  filtered.sort((a,b)=>order[a.role]-order[b.role]||a.name.localeCompare(b.name,'ja'));
+
+  const body=document.getElementById('userTableBody');
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="5" class="empty">該当するユーザーがいません</td></tr>`;return}
+  body.innerHTML=filtered.map(u=>{
+    const roleLabel=u.role==='admin'?t('role_adm'):u.role==='sl'?t('role_sl'):t('role_op');
+    const roleClass=u.role==='admin'?'role-admin':u.role==='sl'?'role-sl':'role-op';
+    const shiftLabel=u.shift?t('shift_label',u.shift):t('shift_none');
+    const statusEl=u.locked?`<span class="status-locked">🔒 ${t('locked')}</span>`
+      :u.is_active?`<span class="status-active">● ${t('active')}</span>`
+      :`<span class="status-inactive">○ ${t('inactive')}</span>`;
+    const toggleLabel=u.is_active?t('toggle_active'):t('toggle_inactive');
+    return `<tr>
+      <td style="font-weight:600">${u.name}</td>
+      <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
+      <td style="color:var(--text2)">${shiftLabel}</td>
+      <td>${statusEl}</td>
+      <td>
+        <div class="tbl-actions">
+          <button class="tbl-btn primary" onclick="openUserModal(${u.id})">${t('edit')}</button>
+          <button class="tbl-btn" onclick="resetPin(${u.id})">${t('pin_reset')}</button>
+          <button class="tbl-btn" onclick="toggleActive(${u.id})">${toggleLabel}</button>
+          ${u.role!=='admin'?`<button class="tbl-btn danger" onclick="deleteUser(${u.id})">${t('delete')}</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== User modal ===== */
+function openUserModal(id=null){
+  const u=id?USERS.find(x=>x.id===id):null;
+  const title=u?t('user_edit'):t('user_add');
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${title}</div>
+    <div class="form-group">
+      <div class="form-label">${t('label_name')} <span class="req">必須</span></div>
+      <input class="form-input" id="f-name" value="${u?.name||''}" placeholder="例：山田 太郎">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">${t('label_role')} <span class="req">必須</span></div>
+        <select class="form-select" id="f-role">
+          <option value="op" ${u?.role==='op'?'selected':''}>OP</option>
+          <option value="sl" ${u?.role==='sl'?'selected':''}>SL</option>
+          <option value="admin" ${u?.role==='admin'?'selected':''}>admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">${t('label_shift')}</div>
+        <select class="form-select" id="f-shift">
+          <option value="" ${!u?.shift?'selected':''}>—</option>
+          <option value="1" ${u?.shift==1?'selected':''}>1直</option>
+          <option value="2" ${u?.shift==2?'selected':''}>2直</option>
+          <option value="3" ${u?.shift==3?'selected':''}>3直</option>
+        </select>
+      </div>
+    </div>
+    ${!u?`<div class="form-group">
+      <div class="form-label">${t('label_pin')} <span class="req">必須</span></div>
+      <input class="form-input" id="f-pin" type="text" maxlength="4" placeholder="0000" value="0000">
+    </div>`:''}
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+      <button class="btn-primary" onclick="saveUser(${id||'null'})">${t('save')}</button>
+    </div>
+  `);
+}
+
+function saveUser(id){
+  const name=document.getElementById('f-name').value.trim();
+  const role=document.getElementById('f-role').value;
+  const shift=document.getElementById('f-shift').value;
+  if(!name){showToast('名前を入力してください','error');return}
+  if(id){
+    const u=USERS.find(x=>x.id===id);
+    if(u){u.name=name;u.role=role;u.shift=shift?Number(shift):null}
+  } else {
+    USERS.push({id:nextUserId++,name,role,shift:shift?Number(shift):null,is_active:true,locked:false});
+  }
+  closeModal();renderUsers();showToast(t('user_saved'),'success');
+}
+
+function resetPin(id){
+  const u=USERS.find(x=>x.id===id);
+  if(!u) return;
+  if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`)) return;
+  u.locked=false;
+  showToast(t('pin_reset_done',u.name),'success');
+  renderUsers();
+}
+
+function toggleActive(id){
+  const u=USERS.find(x=>x.id===id);
+  if(!u) return;
+  const msg=u.is_active?t('deactivate_confirm'):t('activate_confirm');
+  if(!confirm(msg)) return;
+  u.is_active=!u.is_active;
+  renderUsers();showToast(t('user_saved'),'success');
+}
+
+function deleteUser(id){
+  if(!confirm(t('delete_confirm'))) return;
+  USERS=USERS.filter(x=>x.id!==id);
+  renderUsers();showToast(t('user_deleted'),'success');
+}
+
+/* ===== Master ===== */
+function renderMaster(){
+  renderMachines();
+}
+
+function renderMachines(){
+  const q=(document.getElementById('machineSearch')?.value||'').toLowerCase();
+  const sf=document.getElementById('machineStatusFilter')?.value||'';
+  const lines=currentLinetab==='all'?['A','B','C']:[currentLinetab];
+  const content=document.getElementById('masterContent');
+  content.innerHTML=lines.map(line=>{
+    const machines=MACHINES.filter(m=>{
+      if(m.line!==line) return false;
+      if(q && !m.no.toLowerCase().includes(q) && !(m.memo||'').toLowerCase().includes(q)) return false;
+      if(sf==='active' && !m.is_active) return false;
+      if(sf==='inactive' && m.is_active) return false;
+      return true;
+    });
+    return `
+      <div class="master-section" style="margin-bottom:20px">
+        <div class="master-section-title" style="margin-bottom:8px">
+          <span style="color:var(--orange);font-size:14px">●</span>
+          ${line}ライン（${machines.length}台）
+          <button class="btn-add" style="margin-left:auto;font-size:11px;height:28px;padding:0 10px" onclick="openMachineModal(null,'${line}')">＋ 追加</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>機番</th><th>ライン</th><th>メモ</th><th>状態</th><th>操作</th>
+            </tr></thead>
+            <tbody>
+              ${machines.map(m=>`
+                <tr style="${!m.is_active?'opacity:.5':''}">
+                  <td style="font-weight:700">${m.no}号機</td>
+                  <td>${m.line}ライン</td>
+                  <td>
+                    <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px"
+                      value="${m.memo||''}"
+                      onfocus="this.style.borderBottomColor='var(--orange)'"
+                      onblur="this.style.borderBottomColor='transparent';updateMachineMemo(${m.id},this.value)"
+                      placeholder="メモを入力">
+                  </td>
+                  <td>${m.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
+                  <td>
+                    <div class="tbl-actions">
+                      <button class="tbl-btn" onclick="toggleMachine(${m.id})">${m.is_active?'無効化':'有効化'}</button>
+                      <button class="tbl-btn danger" onclick="deleteMachine(${m.id})">削除</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+let productPage=1;
+const PRODUCTS_PER_PAGE=20;
+
+function renderProducts(){
+  const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
+  const sf=document.getElementById('productStatusFilter')?.value||'';
+  const filtered=PRODUCTS.filter(p=>{
+    if(q && !p.code.toLowerCase().includes(q) && !p.name.toLowerCase().includes(q)) return false;
+    if(sf==='active' && !p.is_active) return false;
+    if(sf==='inactive' && p.is_active) return false;
+    return true;
+  });
+  const total=filtered.length;
+  const totalPages=Math.max(1,Math.ceil(total/PRODUCTS_PER_PAGE));
+  if(productPage>totalPages) productPage=1;
+  const start=(productPage-1)*PRODUCTS_PER_PAGE;
+  const pageItems=filtered.slice(start,start+PRODUCTS_PER_PAGE);
+
+  const info=document.getElementById('productPageInfo');
+  if(info) info.textContent=`${total}件中 ${start+1}〜${Math.min(start+PRODUCTS_PER_PAGE,total)}件を表示`;
+
+  const container=document.getElementById('productGrid');
+  if(!container) return;
+  container.innerHTML=`
+    <div class="table-wrap" style="margin-bottom:8px">
+      <table>
+        <thead><tr>
+          <th>品番</th><th>品名</th><th>状態</th><th>操作</th>
+        </tr></thead>
+        <tbody>
+          ${pageItems.map(p=>`
+            <tr style="${!p.is_active?'opacity:.5':''}">
+              <td style="font-weight:700">${p.code}</td>
+              <td>
+                <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px"
+                  value="${p.name}"
+                  onfocus="this.style.borderBottomColor='var(--orange)'"
+                  onblur="this.style.borderBottomColor='transparent';updateProductName(${p.id},this.value)"
+                  placeholder="品名を入力">
+              </td>
+              <td>${p.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
+              <td>
+                <div class="tbl-actions">
+                  <button class="tbl-btn" onclick="openProductModal(${p.id})">${t('edit')}</button>
+                  <button class="tbl-btn danger" onclick="toggleProduct(${p.id})">${p.is_active?'無効化':'有効化'}</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // ページネーション
+  const pager=document.getElementById('productPager');
+  if(!pager) return;
+  if(totalPages<=1){pager.innerHTML='';return}
+  let btns='';
+  btns+=`<button onclick="goProductPage(${productPage-1})" ${productPage===1?'disabled':''} style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-family:inherit">←</button>`;
+  for(let i=1;i<=totalPages;i++){
+    btns+=`<button onclick="goProductPage(${i})" style="background:${i===productPage?'var(--orange)':'var(--bg2)'};border:1px solid ${i===productPage?'var(--orange)':'var(--border)'};border-radius:6px;padding:5px 10px;cursor:pointer;color:${i===productPage?'var(--navy)':'var(--text2)'};font-family:inherit;font-weight:${i===productPage?'700':'400'}">${i}</button>`;
+  }
+  btns+=`<button onclick="goProductPage(${productPage+1})" ${productPage===totalPages?'disabled':''} style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-family:inherit">→</button>`;
+  pager.innerHTML=btns;
+}
+
+function goProductPage(p){
+  const totalPages=Math.ceil(PRODUCTS.length/PRODUCTS_PER_PAGE);
+  if(p<1||p>totalPages) return;
+  productPage=p;
+  renderProducts();
+  document.getElementById('scrollArea').scrollTo(0,0);
+}
+
+/* ===== Machine modal ===== */
+function openMachineModal(id=null, defaultLine='A'){
+  const m=id?MACHINES.find(x=>x.id===id):null;
+  const title=m?t('machine_edit'):t('machine_add');
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${title}</div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">${t('label_machine_no')} <span class="req">必須</span></div>
+        <input class="form-input" id="m-no" value="${m?.no||''}" placeholder="例：12">
+      </div>
+      <div class="form-group">
+        <div class="form-label">${t('label_line')} <span class="req">必須</span></div>
+        <select class="form-select" id="m-line">
+          <option value="A" ${(m?.line||defaultLine)==='A'?'selected':''}>Aライン</option>
+          <option value="B" ${(m?.line||defaultLine)==='B'?'selected':''}>Bライン</option>
+          <option value="C" ${(m?.line||defaultLine)==='C'?'selected':''}>Cライン</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">${t('label_memo')}</div>
+      <input class="form-input" id="m-memo" value="${m?.memo||''}" placeholder="備考">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+      <button class="btn-primary" onclick="saveMachine(${id||'null'})">${t('save')}</button>
+    </div>
+  `);
+}
+
+function saveMachine(id){
+  const no=document.getElementById('m-no').value.trim();
+  const line=document.getElementById('m-line').value;
+  const memo=document.getElementById('m-memo').value.trim();
+  if(!no){showToast('機番を入力してください','error');return}
+  if(id){
+    const m=MACHINES.find(x=>x.id===id);
+    if(m){m.no=no;m.line=line;m.memo=memo}
+  } else {
+    MACHINES.push({id:nextMachineId++,no,line,memo,is_active:true});
+  }
+  closeModal();renderMaster();showToast(t('user_saved'),'success');
+}
+
+function toggleMachine(id){
+  const m=MACHINES.find(x=>x.id===id);
+  if(!m) return;
+  m.is_active=!m.is_active;
+  renderMaster();
+}
+
+/* ===== Product modal ===== */
+function openProductModal(id=null){
+  const p=id?PRODUCTS.find(x=>x.id===id):null;
+  const title=p?t('product_edit'):t('product_add');
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${title}</div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">${t('label_code')} <span class="req">必須</span></div>
+        <input class="form-input" id="p-code" value="${p?.code||''}" placeholder="例：AP2">
+      </div>
+      <div class="form-group">
+        <div class="form-label">${t('label_pname')} <span class="req">必須</span></div>
+        <input class="form-input" id="p-name" value="${p?.name||''}" placeholder="例：AP2ユニット">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+      <button class="btn-primary" onclick="saveProduct(${id||'null'})">${t('save')}</button>
+    </div>
+  `);
+}
+
+function saveProduct(id){
+  const code=document.getElementById('p-code').value.trim();
+  const name=document.getElementById('p-name').value.trim();
+  if(!code||!name){showToast('品番と品名を入力してください','error');return}
+  if(id){
+    const p=PRODUCTS.find(x=>x.id===id);
+    if(p){p.code=code;p.name=name}
+  } else {
+    PRODUCTS.push({id:nextProductId++,code,name,is_active:true});
+  }
+  closeModal();renderMaster();showToast(t('user_saved'),'success');
+}
+
+function toggleProduct(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  p.is_active=!p.is_active;
+  renderMaster();
+}
+
+
+/* ===== Excel Export ===== */
+function exportImages(){
+  // ② 画像エクスポート：画像ファイル名一覧＋対応トラブル情報をExcel出力
+  // 実際はSupabaseから取得するが、モックデータで実装
+  const wb=XLSX.utils.book_new();
+  const headers=['ファイル名','日付','直','機番','品番','詳細内容'];
+  const mockRows=[
+    ['20260325_1直_機番8_AP2_001.jpg','2026/03/25','1','8号機','AP2','冷却ユニット異常'],
+    ['20260325_1直_機番8_AP2_002.jpg','2026/03/25','1','8号機','AP2','冷却ユニット異常'],
+    ['20260324_2直_機番33_940_001.jpg','2026/03/24','2','33号機','940','取出機アーム動作異常'],
+  ];
+  const ws=XLSX.utils.aoa_to_sheet([headers,...mockRows]);
+  ws['!cols']=[{wch:36},{wch:12},{wch:5},{wch:8},{wch:12},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,ws,'画像一覧');
+  XLSX.writeFile(wb,'Traq_画像エクスポート.xlsx');
+  showToast('画像情報をExcel出力しました（実運用時は実データが出力されます）','success');
+}
+
+function exportUsers(){
+  const wb=XLSX.utils.book_new();
+  const headers=['ID','名前','ロール','デフォルト直','状態'];
+  const rows=USERS.map(u=>[
+    u.id, u.name,
+    u.role==='admin'?'admin':u.role==='sl'?'SL':'OP',
+    u.shift?`${u.shift}直`:'—',
+    u.is_active?'有効':'無効'
+  ]);
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+  ws['!cols']=[{wch:5},{wch:20},{wch:8},{wch:10},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,'ユーザー');
+  XLSX.writeFile(wb,'Traq_ユーザー一覧.xlsx');
+  showToast('ユーザー一覧をExcel出力しました','success');
+}
+
+function exportMaster(){
+  // ⑤ 1シート形式：ライン名 / 機番 / 品番 / 品名（インポートテンプレートと同一フォーマット）
+  const wb=XLSX.utils.book_new();
+  const headers=['ライン名','機番','品番','品名'];
+  const rows=[];
+  // machine_products的な紐づけを展開（モックでは全品番を全機番に紐づけと仮定）
+  MACHINES.forEach(m=>{
+    PRODUCTS.filter(p=>p.is_active).forEach(p=>{
+      rows.push([m.line+'ライン', m.no, p.code, p.name]);
+    });
+  });
+  // 紐づけがない場合は機番のみ行を追加
+  if(!rows.length){
+    MACHINES.forEach(m=>rows.push([m.line+'ライン', m.no, '', '']));
+  }
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+  ws['!cols']=[{wch:10},{wch:8},{wch:14},{wch:20}];
+  // ヘッダー行の注記
+  XLSX.utils.book_append_sheet(wb,ws,'マスタ');
+  XLSX.writeFile(wb,'Traq_マスタ_インポート用.xlsx');
+  showToast('マスタをExcel出力しました（インポートテンプレート形式）','success');
+}
+
+function exportProducts(){
+  const wb=XLSX.utils.book_new();
+  const headers=['品番','品名','状態'];
+  const rows=PRODUCTS.map(p=>[p.code, p.name, p.is_active?'有効':'無効']);
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+  ws['!cols']=[{wch:14},{wch:20},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,'品番マスタ');
+  XLSX.writeFile(wb,'Traq_品番マスタ.xlsx');
+  showToast('品番マスタをExcel出力しました','success');
+}
+
+/* ===== Modal ===== */
+function showModal(html,center=false){
+  const el=document.getElementById('modalEl');
+  el.innerHTML=`<div class="modal-overlay ${center?'center':''}" onclick="handleOverlay(event)"><div class="modal-sheet">${html}</div></div>`;
+  el.style.display='block';
+  setTimeout(()=>el.querySelector('.form-input')?.focus(),100);
+}
+function closeModal(){document.getElementById('modalEl').style.display='none'}
+function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal()}
+
+/* ===== Inline edit helpers ===== */
+function updateMachineMemo(id, val){
+  const m=MACHINES.find(x=>x.id===id);
+  if(m) m.memo=val;
+}
+function updateProductName(id, val){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(p&&val.trim()) p.name=val.trim();
+}
+function deleteMachine(id){
+  if(!confirm(t('delete_confirm'))) return;
+  MACHINES=MACHINES.filter(x=>x.id!==id);
+  renderMaster();
+  showToast(t('user_deleted'),'success');
+}
+
+/* ===== Toast ===== */
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toastEl');
+  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
+  el.style.display='block';
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{el.style.display='none'},2500);
+}
+
+/* ===== Init ===== */
+(function init(){
+  initTheme();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
+  renderUsers();
+})();
+
+/* ===== Categories Master ===== */
+let EQ_CATEGORIES = [
+  {id:1, name:'材料供給設備', sort:1, is_active:true},
+  {id:2, name:'成形機',       sort:2, is_active:true},
+  {id:3, name:'取出機',       sort:3, is_active:true},
+  {id:4, name:'付帯設備',     sort:4, is_active:true},
+];
+let MD_CATEGORIES = [
+  {id:1, name:'金型温度異常', sort:1, is_active:true},
+  {id:2, name:'金型動作異常', sort:2, is_active:true},
+  {id:3, name:'メンテ依頼',   sort:3, is_active:true},
+  {id:4, name:'油漏れ',       sort:4, is_active:true},
+  {id:5, name:'エアー漏れ',   sort:5, is_active:true},
+  {id:6, name:'バリ',         sort:6, is_active:true},
+  {id:7, name:'その他',       sort:7, is_active:true},
+];
+let nextEqCatId=5, nextMdCatId=8;
+
+function renderCategories(){
+  const eqQ=(document.getElementById('eqCatSearch')?.value||'').toLowerCase();
+  const mdQ=(document.getElementById('mdCatSearch')?.value||'').toLowerCase();
+
+  // 設備分類
+  const eqFiltered=EQ_CATEGORIES.filter(c=>!eqQ||c.name.toLowerCase().includes(eqQ));
+  document.getElementById('eqCategoryBody').innerHTML=
+    eqFiltered.length ? eqFiltered.map(c=>`
+      <tr style="${!c.is_active?'opacity:.5':''}">
+        <td style="color:var(--text2);width:60px">
+          <div style="display:flex;gap:3px">
+            <button class="tbl-btn" onclick="moveCat('eq',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button>
+            <button class="tbl-btn" onclick="moveCat('eq',${c.id},1)"  style="padding:0 6px;font-size:10px">↓</button>
+          </div>
+        </td>
+        <td>
+          <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%"
+            value="${c.name}"
+            onfocus="this.style.borderBottomColor='var(--orange)'"
+            onblur="this.style.borderBottomColor='transparent';updateCatName('eq',${c.id},this.value)">
+        </td>
+        <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
+        <td>
+          <div class="tbl-actions">
+            <button class="tbl-btn" onclick="toggleCat('eq',${c.id})">${c.is_active?'無効化':'有効化'}</button>
+            <button class="tbl-btn danger" onclick="deleteCat('eq',${c.id})">削除</button>
+          </div>
+        </td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" class="empty">該当なし</td></tr>`;
+
+  // 金型分類
+  const mdFiltered=MD_CATEGORIES.filter(c=>!mdQ||c.name.toLowerCase().includes(mdQ));
+  document.getElementById('mdCategoryBody').innerHTML=
+    mdFiltered.length ? mdFiltered.map(c=>`
+      <tr style="${!c.is_active?'opacity:.5':''}">
+        <td style="color:var(--text2);width:60px">
+          <div style="display:flex;gap:3px">
+            <button class="tbl-btn" onclick="moveCat('md',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button>
+            <button class="tbl-btn" onclick="moveCat('md',${c.id},1)"  style="padding:0 6px;font-size:10px">↓</button>
+          </div>
+        </td>
+        <td>
+          <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%"
+            value="${c.name}"
+            onfocus="this.style.borderBottomColor='var(--orange)'"
+            onblur="this.style.borderBottomColor='transparent';updateCatName('md',${c.id},this.value)">
+        </td>
+        <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
+        <td>
+          <div class="tbl-actions">
+            <button class="tbl-btn" onclick="toggleCat('md',${c.id})">${c.is_active?'無効化':'有効化'}</button>
+            <button class="tbl-btn danger" onclick="deleteCat('md',${c.id})">削除</button>
+          </div>
+        </td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" class="empty">該当なし</td></tr>`;
+}
+
+function openCategoryModal(type){
+  const label=type==='equipment'?'設備 分類':'金型 異常内容';
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${label}を追加</div>
+    <div class="form-group">
+      <div class="form-label">名前 <span class="req">必須</span></div>
+      <input class="form-input" id="cat-name" placeholder="${type==='equipment'?'例：金属加工設備':'例：割れ・欠け'}">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn-primary" onclick="saveCategory('${type}')">追加</button>
+    </div>
+  `);
+}
+
+function saveCategory(type){
+  const name=document.getElementById('cat-name')?.value.trim();
+  if(!name){showToast('名前を入力してください','error');return}
+  if(type==='equipment'){
+    const maxSort=EQ_CATEGORIES.reduce((m,c)=>Math.max(m,c.sort),0);
+    EQ_CATEGORIES.push({id:nextEqCatId++,name,sort:maxSort+1,is_active:true});
+  } else {
+    const maxSort=MD_CATEGORIES.reduce((m,c)=>Math.max(m,c.sort),0);
+    MD_CATEGORIES.push({id:nextMdCatId++,name,sort:maxSort+1,is_active:true});
+  }
+  closeModal();renderCategories();showToast('追加しました','success');
+}
+
+function updateCatName(type,id,val){
+  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
+  const c=arr.find(x=>x.id===id);
+  if(c&&val.trim()) c.name=val.trim();
+}
+
+function toggleCat(type,id){
+  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
+  const c=arr.find(x=>x.id===id);
+  if(c) c.is_active=!c.is_active;
+  renderCategories();
+}
+
+function deleteCat(type,id){
+  if(!confirm('削除しますか？入力フォームから削除されます。')) return;
+  if(type==='eq') EQ_CATEGORIES=EQ_CATEGORIES.filter(x=>x.id!==id);
+  else            MD_CATEGORIES=MD_CATEGORIES.filter(x=>x.id!==id);
+  renderCategories();showToast('削除しました','success');
+}
+
+function moveCat(type,id,dir){
+  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
+  arr.sort((a,b)=>a.sort-b.sort);
+  const idx=arr.findIndex(x=>x.id===id);
+  const swapIdx=idx+dir;
+  if(swapIdx<0||swapIdx>=arr.length) return;
+  const tmpSort=arr[idx].sort;
+  arr[idx].sort=arr[swapIdx].sort;
+  arr[swapIdx].sort=tmpSort;
+  arr.sort((a,b)=>a.sort-b.sort);
+  renderCategories();
+}
+
+/* 入力フォーム連携用：有効な分類一覧を取得 */
+function getActiveEqCategories(){ return EQ_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort); }
+function getActiveMdCategories(){ return MD_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort); }
+
+function initStorageBar2(){
+  const used=420, total=1024;
+  const pct=Math.round(used/total*100);
+  ['2'].forEach(suffix=>{
+    const fill=document.getElementById('storageFill'+suffix);
+    const label=document.getElementById('storageLabel'+suffix);
+    const detail=document.getElementById('storageDetail'+suffix);
+    if(!fill) return;
+    setTimeout(()=>{
+      fill.style.width=pct+'%';
+      fill.style.background=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
+      label.textContent=`${used}MB / ${total}MB (${pct}%)`;
+      label.style.color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
+      detail.textContent=pct>=70?'⚠️ 70%を超えています。不要な画像を削除してください。':`残り ${total-used}MB 利用可能`;
+      detail.style.color=pct>=70?'var(--danger)':'var(--text2)';
+    },200);
+  });
+}
+
+function initStorageBar(){
+  // モック: 使用量 420MB / 1024MB (41%)
+  const used=420, total=1024;
+  const pct=Math.round(used/total*100);
+  const fill=document.getElementById('storageFill');
+  const label=document.getElementById('storageLabel');
+  const detail=document.getElementById('storageDetail');
+  if(!fill) return;
+  setTimeout(()=>{
+    fill.style.width=pct+'%';
+    fill.style.background=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
+    label.textContent=`${used}MB / ${total}MB (${pct}%)`;
+    label.style.color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
+    detail.textContent=pct>=70?'⚠️ 70%を超えています。不要な画像を削除してください。'
+      :`残り ${total-used}MB 利用可能`;
+    detail.style.color=pct>=70?'var(--danger)':'var(--text2)';
+  },300);
+}
+</script>
+<script src="traq-version.js"></script>
+</body>
+</html>

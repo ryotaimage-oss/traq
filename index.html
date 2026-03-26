@@ -955,6 +955,10 @@ function doLogin() {
   if (state.pinInput === u.pin) {
     // Success
     state.failCount[u.id] = 0;
+    // セッション保存
+    sessionStorage.setItem('traq_session', JSON.stringify({
+      id: u.id, name: u.name, role: u.role, shift: state.selectedShift
+    }));
     flashSuccess();
   } else {
     // Fail
@@ -1096,5 +1100,6 @@ function checkLockState(uid) {
   applyI18n();
 })();
 </script>
+<script src="traq-version.js"></script>
 </body>
 </html>

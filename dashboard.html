@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Traq – ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
+  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
+  --factory:#2e3a52;--roof:#3d4e6e;
+  --text1:#e8eaf0;--text2:#8b90a0;
+  --border:rgba(255,255,255,0.08);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --eq:#60a5fa;--md:#c084fc;
+  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+[data-theme="light"]{
+  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --text1:#1a1f2e;--text2:#666666;
+  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text2);transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar-title{font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Period filter bar */
+.period-bar{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.period-bar::-webkit-scrollbar{display:none}
+.period-btn{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.period-btn.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+.kpi-item{padding:10px 12px;text-align:center;border-right:1px solid var(--border)}
+.kpi-item:last-child{border-right:none}
+.kpi-num{font-size:20px;font-weight:700;color:var(--orange);line-height:1}
+.kpi-label{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:12px 12px 32px}
+
+/* Chart grid */
+.chart-grid{display:grid;grid-template-columns:1fr;gap:12px;max-width:900px;margin:0 auto}
+@media(min-width:640px){.chart-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.chart-grid{grid-template-columns:1fr 1fr 1fr}}
+
+/* Chart card */
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;animation:slideUp .3s ease both}
+.chart-card.wide{grid-column:1/-1}
+@media(min-width:640px){.chart-card.wide2{grid-column:span 2}}
+.chart-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.chart-title-dot{width:8px;height:8px;border-radius:50%}
+.chart-wrap{position:relative;height:180px}
+.chart-wrap.tall{height:220px}
+.chart-wrap.short{height:150px}
+
+/* Legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Rank list */
+.rank-list{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.rank-item{display:flex;align-items:center;gap:8px}
+.rank-no{font-size:10px;font-weight:700;color:var(--text2);width:16px;text-align:right;flex-shrink:0}
+.rank-label{font-size:12px;color:var(--text1);min-width:60px;flex-shrink:0}
+.rank-bar-wrap{flex:1;height:14px;background:var(--bg3);border-radius:7px;overflow:hidden}
+.rank-bar{height:100%;border-radius:7px;transition:width .6s ease}
+.rank-val{font-size:11px;color:var(--text2);min-width:24px;text-align:right;flex-shrink:0}
+
+/* Type filter dimming */
+.chart-card.dimmed{opacity:.35;pointer-events:none}
+
+/* Pie legend */
+.pie-legend{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px}
+.pie-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.pie-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="(()=>{ const s=JSON.parse(sessionStorage.getItem('traq_session')||'null'); location.href=s&&s.role==='op'?'home.html':'home_sl.html'; })()">←</button>
+      <span class="topbar-title">📊 <span data-i18n="page_title">ダッシュボード</span></span>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </div>
+
+  <!-- Period filter -->
+  <div class="period-bar">
+    <button class="period-btn active" id="p7"     onclick="setPeriod(7)"   data-i18n="p7">直近7日</button>
+    <button class="period-btn" id="p_all"  onclick="setPeriod(0)"   data-i18n="p_all">全期間</button>
+    <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px"></div>
+    <button class="period-btn" id="p_custom" onclick="openDatePicker()" data-i18n="p_custom">📅 期間指定</button>
+    <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px"></div>
+    <button class="period-btn active" id="type-all" onclick="setTypeFilter('all')" data-i18n="type_all">全て</button>
+    <button class="period-btn" id="type-eq"  onclick="setTypeFilter('eq')"  style="color:var(--eq)" data-i18n="type_eq">⚙️ 設備</button>
+    <button class="period-btn" id="type-md"  onclick="setTypeFilter('md')"  style="color:var(--md)" data-i18n="type_md">🔧 金型</button>
+  </div>
+
+  <!-- Custom date picker -->
+  <div id="datePickerBar" style="display:none;padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;animation:fadeIn .2s ease">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;max-width:480px">
+      <div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px" data-i18n="label_from">開始日</div>
+        <input type="date" id="customFrom" style="width:100%;height:40px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 10px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'" oninput="onCustomDate()">
+      </div>
+      <div style="color:var(--text2);padding-top:16px;font-size:14px">〜</div>
+      <div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px" data-i18n="label_to">終了日</div>
+        <input type="date" id="customTo" style="width:100%;height:40px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 10px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'" oninput="onCustomDate()">
+      </div>
+      <button onclick="closeDatePicker()" style="padding-top:16px;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;transition:color .15s" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text2)'">✕</button>
+    </div>
+    <div id="customRangeLabel" style="font-size:11px;color:var(--orange);margin-top:6px;min-height:16px"></div>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="kpi-strip">
+    <div class="kpi-item"><div class="kpi-num" id="kpi-total">—</div><div class="kpi-label" data-i18n="kpi_total">総件数</div></div>
+    <div class="kpi-item"><div class="kpi-num" id="kpi-eq">—</div><div class="kpi-label" data-i18n="kpi_eq">設備</div></div>
+    <div class="kpi-item"><div class="kpi-num" id="kpi-md">—</div><div class="kpi-label" data-i18n="kpi_md">金型</div></div>
+    <div class="kpi-item"><div class="kpi-num" id="kpi-stop">—</div><div class="kpi-label" data-i18n="kpi_stop">停止時間(分)</div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="scroll-area">
+  <div class="chart-grid">
+
+    <!-- 1: 日別件数 棒グラフ -->
+    <div class="chart-card wide" style="animation-delay:0s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--orange)"></div>
+        <span data-i18n="chart1_title">日別件数推移</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chart1"></canvas></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--eq)"></div><span data-i18n="legend_eq">設備</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--md)"></div><span data-i18n="legend_md">金型</span></div>
+      </div>
+    </div>
+
+    <!-- 2: 停止時間推移 -->
+    <div class="chart-card wide2" style="animation-delay:.05s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--warning)"></div>
+        <span data-i18n="chart2_title">停止時間合計推移（分）</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+    </div>
+
+    <!-- 3: 再発率 -->
+    <div class="chart-card" style="animation-delay:.08s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--danger)"></div>
+        <span data-i18n="chart3_title">初発・再発比率</span>
+      </div>
+      <div class="chart-wrap short"><canvas id="chart3"></canvas></div>
+      <div class="pie-legend" id="legend3"></div>
+    </div>
+
+    <!-- 4: 設備分類別 -->
+    <div class="chart-card" style="animation-delay:.1s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--eq)"></div>
+        <span data-i18n="chart4_title">設備 分類別件数</span>
+      </div>
+      <div class="chart-wrap short"><canvas id="chart4"></canvas></div>
+      <div class="pie-legend" id="legend4"></div>
+    </div>
+
+    <!-- 5: 金型分類別 -->
+    <div class="chart-card" style="animation-delay:.12s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--md)"></div>
+        <span data-i18n="chart5_title">金型 異常内容別件数</span>
+      </div>
+      <div class="chart-wrap short"><canvas id="chart5"></canvas></div>
+      <div class="pie-legend" id="legend5"></div>
+    </div>
+
+    <!-- 6: 機番別ランキング -->
+    <div class="chart-card wide2" style="animation-delay:.14s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--orange)"></div>
+        <span data-i18n="chart6_title">機番別件数ランキング（上位10）</span>
+      </div>
+      <div class="rank-list" id="rankMachine"></div>
+    </div>
+
+    <!-- 7: 品番別ランキング -->
+    <div class="chart-card wide2" style="animation-delay:.16s">
+      <div class="chart-title">
+        <div class="chart-title-dot" style="background:var(--success)"></div>
+        <span data-i18n="chart7_title">品番別件数ランキング（上位10）</span>
+      </div>
+      <div class="rank-list" id="rankProduct"></div>
+    </div>
+
+  </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== i18n ===== */
+const I18N={
+  ja:{page_title:'ダッシュボード',p7:'直近7日',p_all:'全期間',p_custom:'📅 期間指定',label_from:'開始日',label_to:'終了日',type_all:'全て',type_eq:'⚙️ 設備',type_md:'🔧 金型',kpi_total:'総件数',kpi_eq:'設備',kpi_md:'金型',kpi_stop:'停止時間(分)',chart1_title:'日別件数推移',chart2_title:'停止時間合計推移（分）',chart3_title:'初発・再発比率',chart4_title:'設備 分類別件数',chart5_title:'金型 異常内容別件数',chart6_title:'機番別件数ランキング（上位10）',chart7_title:'品番別件数ランキング（上位10）',legend_eq:'設備',legend_md:'金型',first:'初発',rec:'再発',unit_cases:'件'},
+  vi:{page_title:'Thống kê',p7:'7 ngày',p_all:'Tất cả',p_custom:'📅 Chọn ngày',label_from:'Từ ngày',label_to:'Đến ngày',type_all:'Tất cả',type_eq:'⚙️ Thiết bị',type_md:'🔧 Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng theo ngày (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Top 10 máy',chart7_title:'Top 10 sản phẩm',legend_eq:'Thiết bị',legend_md:'Khuôn',first:'Lần đầu',rec:'Tái phát',unit_cases:''},
+  en:{page_title:'Dashboard',p7:'Last 7d',p_all:'All',p_custom:'📅 Custom',label_from:'From',label_to:'To',type_all:'All',type_eq:'⚙️ Equipment',type_md:'🔧 Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Trouble Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Top 10 Machines',chart7_title:'Top 10 Products',legend_eq:'Equipment',legend_md:'Mold',first:'First',rec:'Recurrence',unit_cases:''}
+};
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+function t(k){return I18N[currentLang][k]??k}
+function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===lang));applyI18n();rebuildAll()}
+function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n))}
+function toggleTheme(){const html=document.documentElement;const d=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('traq_theme',d?'light':'dark');rebuildAll()}
+function initTheme(){const s=localStorage.getItem('traq_theme');const p=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const th=s||p;document.documentElement.setAttribute('data-theme',th);document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️'}
+
+/* ===== Mock data generator ===== */
+function makeData(){
+  const data=[];
+  const eqCats=['材料供給設備','成形機','取出機','付帯設備'];
+  const mdCats=['金型温度異常','金型動作異常','メンテ依頼','油漏れ','エアー漏れ','バリ','その他'];
+  const products=['AP2','PE01','690カプラ','EN200','940','880','KH5T','260D','948','877RH'];
+  const now=new Date('2026-03-25');
+  for(let i=89;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const date=d.toISOString().slice(0,10);
+    const cnt=Math.floor(Math.random()*4)+1;
+    for(let j=0;j<cnt;j++){
+      const isEq=Math.random()>0.45;
+      const machine=String(Math.floor(Math.random()*68)+1);
+      data.push({
+        date,type:isEq?'equipment':'mold',
+        machine,
+        product:products[Math.floor(Math.random()*products.length)],
+        category:isEq?eqCats[Math.floor(Math.random()*eqCats.length)]:mdCats[Math.floor(Math.random()*mdCats.length)],
+        stop_minutes:Math.random()>0.2?Math.floor(Math.random()*60)+5:null,
+        occurrence:Math.random()>0.35?'first':'recurrence',
+        status:'approved'
+      });
+    }
+  }
+  return data;
+}
+const ALL_DATA=makeData();
+
+/* ===== State ===== */
+let currentPeriod=7;
+const charts={};
+
+let customFrom=null, customTo=null;
+let typeFilter='all';
+
+function setTypeFilter(f){
+  typeFilter=f;
+  ['all','eq','md'].forEach(k=>{
+    const el=document.getElementById('type-'+k);
+    if(!el) return;
+    el.classList.toggle('active',k===f);
+    // アクティブでない設備/金型ボタンの色を維持
+    if(k==='eq') el.style.color=f==='eq'?'var(--navy)':'var(--eq)';
+    if(k==='md') el.style.color=f==='md'?'var(--navy)':'var(--md)';
+    if(k==='all') el.style.color='';
+  });
+  rebuildAll();
+}
+
+function setPeriod(days){
+  currentPeriod=days;
+  customFrom=null; customTo=null;
+  closeDatePicker();
+  ['7','_all','_custom'].forEach(k=>{
+    const el=document.getElementById('p'+k);
+    if(el) el.classList.toggle('active',(k==='_all'&&days===0)||(k==='7'&&days===7));
+  });
+  rebuildAll();
+}
+
+function openDatePicker(){
+  document.getElementById('datePickerBar').style.display='block';
+  document.getElementById('p_custom').classList.add('active');
+  ['7','30','90','_all'].forEach(k=>{
+    const el=document.getElementById('p'+k);
+    if(el) el.classList.remove('active');
+  });
+  // デフォルト: 今月
+  const now=new Date('2026-03-25');
+  const from=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const to=now.toISOString().slice(0,10);
+  if(!document.getElementById('customFrom').value) document.getElementById('customFrom').value=from;
+  if(!document.getElementById('customTo').value)   document.getElementById('customTo').value=to;
+  onCustomDate();
+}
+
+function closeDatePicker(){
+  document.getElementById('datePickerBar').style.display='none';
+}
+
+function onCustomDate(){
+  const from=document.getElementById('customFrom').value;
+  const to=document.getElementById('customTo').value;
+  if(!from||!to) return;
+  if(from>to){
+    document.getElementById('customRangeLabel').textContent='⚠️ 終了日は開始日以降にしてください';
+    return;
+  }
+  customFrom=from; customTo=to;
+  currentPeriod=-1; // カスタムモード
+  const days=Math.round((new Date(to)-new Date(from))/(1000*60*60*24))+1;
+  document.getElementById('customRangeLabel').textContent=`${from.replace(/-/g,'/')} 〜 ${to.replace(/-/g,'/')}（${days}日間）`;
+  rebuildAll();
+}
+
+function getFiltered(){
+  let data;
+  if(currentPeriod===-1&&customFrom&&customTo){
+    data=ALL_DATA.filter(d=>d.date>=customFrom&&d.date<=customTo);
+  } else if(currentPeriod===0){
+    data=ALL_DATA;
+  } else {
+    const cutoff=new Date('2026-03-25');
+    cutoff.setDate(cutoff.getDate()-currentPeriod+1);
+    const cut=cutoff.toISOString().slice(0,10);
+    data=ALL_DATA.filter(d=>d.date>=cut);
+  }
+  if(typeFilter==='eq') return data.filter(d=>d.type==='equipment');
+  if(typeFilter==='md') return data.filter(d=>d.type==='mold');
+  return data;
+}
+
+/* ===== Chart theme colors ===== */
+function getThemeColors(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  return{
+    grid:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.08)',
+    tick:isDark?'#8b90a0':'#888888',
+    bg:isDark?'#111827':'#ffffff',
+  };
+}
+
+/* ===== Rebuild all ===== */
+function rebuildAll(){
+  const data=getFiltered();
+  updateKPI(data);
+  buildChart1(data);
+  buildChart2(data);
+  buildChart3(data);
+  // 設備のみ/金型のみ時は該当しないグラフをdim
+  const c4=document.getElementById('chart4')?.closest('.chart-card');
+  const c5=document.getElementById('chart5')?.closest('.chart-card');
+  if(c4) c4.classList.toggle('dimmed', typeFilter==='md');
+  if(c5) c5.classList.toggle('dimmed', typeFilter==='eq');
+  if(typeFilter!=='md') buildChart4(data);
+  if(typeFilter!=='eq') buildChart5(data);
+  buildRankMachine(data);
+  buildRankProduct(data);
+}
+
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
+
+/* ===== KPI ===== */
+function updateKPI(data){
+  const eq=data.filter(d=>d.type==='equipment');
+  const md=data.filter(d=>d.type==='mold');
+  const stop=data.reduce((s,d)=>s+(d.stop_minutes||0),0);
+  document.getElementById('kpi-total').textContent=data.length;
+  document.getElementById('kpi-eq').textContent=eq.length;
+  document.getElementById('kpi-md').textContent=md.length;
+  document.getElementById('kpi-stop').textContent=stop;
+}
+
+/* ===== Chart 1: 日別件数 ===== */
+function buildChart1(data){
+  destroyChart('c1');
+  const {grid,tick}=getThemeColors();
+  // 表示日数
+  const days=currentPeriod||90;
+  const labels=[];const eqArr=[];const mdArr=[];
+  for(let i=Math.min(days,90)-1;i>=0;i--){
+    const d=new Date('2026-03-25');d.setDate(d.getDate()-i);
+    const date=d.toISOString().slice(0,10);
+    labels.push(date.slice(5));// MM-DD
+    eqArr.push(data.filter(x=>x.date===date&&x.type==='equipment').length);
+    mdArr.push(data.filter(x=>x.date===date&&x.type==='mold').length);
+  }
+  // 表示が多い場合は間引き
+  const step=labels.length>30?7:labels.length>14?3:1;
+  const ctx=document.getElementById('chart1').getContext('2d');
+  charts['c1']=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:t('legend_eq'),data:eqArr,backgroundColor:'rgba(96,165,250,0.75)',borderRadius:3,stack:'a'},
+      {label:t('legend_md'),data:mdArr,backgroundColor:'rgba(192,132,252,0.75)',borderRadius:3,stack:'a'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{stacked:true,grid:{color:grid},ticks:{color:tick,maxTicksLimit:10,font:{size:10}}},
+              y:{stacked:true,grid:{color:grid},ticks:{color:tick,font:{size:10}},beginAtZero:true}}}
+  });
+}
+
+/* ===== Chart 2: 停止時間推移 ===== */
+function buildChart2(data){
+  destroyChart('c2');
+  const {grid,tick}=getThemeColors();
+  const days=Math.min(currentPeriod||90,90);
+  const labels=[];const stops=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date('2026-03-25');d.setDate(d.getDate()-i);
+    const date=d.toISOString().slice(0,10);
+    labels.push(date.slice(5));
+    stops.push(data.filter(x=>x.date===date).reduce((s,x)=>s+(x.stop_minutes||0),0));
+  }
+  const ctx=document.getElementById('chart2').getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,'rgba(245,158,11,0.4)');
+  grad.addColorStop(1,'rgba(245,158,11,0.02)');
+  charts['c2']=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{label:'停止時間(分)',data:stops,borderColor:'#f59e0b',backgroundColor:grad,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:grid},ticks:{color:tick,maxTicksLimit:8,font:{size:10}}},
+              y:{grid:{color:grid},ticks:{color:tick,font:{size:10}},beginAtZero:true}}}
+  });
+}
+
+/* ===== Chart 3: 再発率 ===== */
+function buildChart3(data){
+  destroyChart('c3');
+  const first=data.filter(d=>d.occurrence==='first').length;
+  const rec=data.filter(d=>d.occurrence==='recurrence').length;
+  const ctx=document.getElementById('chart3').getContext('2d');
+  charts['c3']=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:[t('first'),t('rec')],datasets:[{data:[first,rec],backgroundColor:['rgba(16,185,129,0.8)','rgba(239,68,68,0.8)'],borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}件`}}},cutout:'65%'}
+  });
+  const leg=document.getElementById('legend3');
+  leg.innerHTML=[
+    {c:'#10b981',l:`${t('first')}: ${first}件`},
+    {c:'#ef4444',l:`${t('rec')}: ${rec}件`},
+  ].map(x=>`<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${x.c}"></div>${x.l}</div>`).join('');
+}
+
+/* ===== Chart 4: 設備分類別 ===== */
+function buildChart4(data){
+  destroyChart('c4');
+  const eq=data.filter(d=>d.type==='equipment');
+  const cats={};eq.forEach(d=>{cats[d.category]=(cats[d.category]||0)+1});
+  const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const colors=['#60a5fa','#34d399','#fbbf24','#f87171','#a78bfa','#38bdf8'];
+  const ctx=document.getElementById('chart4').getContext('2d');
+  charts['c4']=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:sorted.map(x=>x[0]),datasets:[{data:sorted.map(x=>x[1]),backgroundColor:sorted.map((_,i)=>colors[i%colors.length]),borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'55%'}
+  });
+  document.getElementById('legend4').innerHTML=sorted.map((x,i)=>`<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${colors[i%colors.length]}"></div>${x[0]}: ${x[1]}</div>`).join('');
+}
+
+/* ===== Chart 5: 金型分類別 ===== */
+function buildChart5(data){
+  destroyChart('c5');
+  const md=data.filter(d=>d.type==='mold');
+  const cats={};md.forEach(d=>{cats[d.category]=(cats[d.category]||0)+1});
+  const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const colors=['#c084fc','#f472b6','#fb923c','#34d399','#60a5fa','#fbbf24','#f87171'];
+  const ctx=document.getElementById('chart5').getContext('2d');
+  charts['c5']=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:sorted.map(x=>x[0]),datasets:[{data:sorted.map(x=>x[1]),backgroundColor:sorted.map((_,i)=>colors[i%colors.length]),borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'55%'}
+  });
+  document.getElementById('legend5').innerHTML=sorted.map((x,i)=>`<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${colors[i%colors.length]}"></div>${x[0]}: ${x[1]}</div>`).join('');
+}
+
+/* ===== Rank: 機番別 ===== */
+function buildRankMachine(data){
+  const counts={};data.forEach(d=>{counts[d.machine]=(counts[d.machine]||0)+1});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const max=sorted[0]?.[1]||1;
+  document.getElementById('rankMachine').innerHTML=sorted.map(([k,v],i)=>`
+    <div class="rank-item">
+      <span class="rank-no">${i+1}</span>
+      <span class="rank-label">${k}号機</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${v/max*100}%;background:var(--orange)"></div></div>
+      <span class="rank-val">${v}</span>
+    </div>`).join('');
+}
+
+/* ===== Rank: 品番別 ===== */
+function buildRankProduct(data){
+  const counts={};data.forEach(d=>{counts[d.product]=(counts[d.product]||0)+1});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const max=sorted[0]?.[1]||1;
+  document.getElementById('rankProduct').innerHTML=sorted.map(([k,v],i)=>`
+    <div class="rank-item">
+      <span class="rank-no">${i+1}</span>
+      <span class="rank-label">${k}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${v/max*100}%;background:var(--success)"></div></div>
+      <span class="rank-val">${v}</span>
+    </div>`).join('');
+}
+
+/* ===== Init ===== */
+(function init(){
+  initTheme();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
+  applyI18n();
+  rebuildAll();
+})();
+</script>
+<script src="traq-version.js"></script>
+</body>
+</html>
