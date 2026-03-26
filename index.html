@@ -639,7 +639,9 @@ async function doLogin(){
   loginBusy=true;
   document.getElementById('loginBtn').disabled=true;
 
-  if(state.pinInput===u.pin_hash){
+  const pinHash = (u.pin_hash || '').trim();
+  console.log('PIN入力:', state.pinInput, '/ DB:', pinHash, '/ 一致:', state.pinInput === pinHash);
+  if(state.pinInput === pinHash){
     // ✅ 成功 → fail_count / locked_until をリセット
     try {
       await sbFetch(`users?id=eq.${u.id}`,{
