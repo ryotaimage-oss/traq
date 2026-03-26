@@ -414,7 +414,7 @@ let EQ_CATEGORIES = [], MD_CATEGORIES = [];
 async function loadAll() {
   try {
     const users = await sbFetch('users?select=*&order=name');
-    USERS = users.map(u => ({ id:u.id, name:u.name, role:u.role, shift:u.shift?parseInt(u.shift):null, is_active:u.is_active, locked:!!u.pin_lock_until }));
+    USERS = users.map(u => ({ id:u.id, name:u.name, role:u.role, shift:u.default_shift||null, is_active:u.is_active, locked:!!u.pin_lock_until }));
 
     LINES = await sbFetch('lines?select=*&order=id');
 
@@ -544,7 +544,7 @@ function openUserModal(id=null){
 async function saveUser(id){
   const name=document.getElementById('f-name').value.trim();const role=document.getElementById('f-role').value;const shift=document.getElementById('f-shift').value||null;
   if(!name){showToast('名前を入力してください','error');return}
-  try { if(id){ await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name,role,shift})}); } else { const pin=document.getElementById('f-pin')?.value||'0000'; await sbFetch('users',{method:'POST',body:JSON.stringify({name,role,shift,pin_hash:pin,is_active:true})}); }
+  try { if(id){ await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name,role,default_shift:shift})}); } else { const pin=document.getElementById('f-pin')?.value||'0000'; await sbFetch('users',{method:'POST',body:JSON.stringify({name,role,default_shift:shift,pin_hash:pin,is_active:true})}); }
     closeModal();await loadAll();showToast(t('user_saved'),'success');
   } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
@@ -839,8 +839,8 @@ function handleUserCsvImport(event){
 
 async function confirmUserImport(){
   const d=window._pendingUserImport;if(!d)return;
-  try{for(const u of d.addList)await sbFetch('users',{method:'POST',body:JSON.stringify({name:u.name,role:u.role,shift:u.shift,pin_hash:'0000',is_active:true})});
-  for(const u of d.updateList)await sbFetch(`users?id=eq.${u.id}`,{method:'PATCH',body:JSON.stringify({role:u.role,shift:u.shift})});
+  try{for(const u of d.addList)await sbFetch('users',{method:'POST',body:JSON.stringify({name:u.name,role:u.role,default_shift:u.shift,pin_hash:'0000',is_active:true})});
+  for(const u of d.updateList)await sbFetch(`users?id=eq.${u.id}`,{method:'PATCH',body:JSON.stringify({role:u.role,default_shift:u.shift})});
   window._pendingUserImport=null;closeModal();await loadAll();const msgs=[];if(d.addList.length)msgs.push(`追加 ${d.addList.length}件`);if(d.updateList.length)msgs.push(`更新 ${d.updateList.length}件`);showToast(`ユーザー ${msgs.join('・')}`,'success')}catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
@@ -988,40 +988,47 @@ function showToast(msg,type='info'){const el=document.getElementById('toastEl');
   const sl=localStorage.getItem('traq_lang')||'ja';currentLang=sl;
   ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
   await loadAll();
-  // 重複ライン自動クリーンアップ（1回のみ実行）
-  if(!localStorage.getItem('traq_line_cleanup_done')){
-    await cleanupDuplicateLines();
-    localStorage.setItem('traq_line_cleanup_done','1');
-  }
+  // 短縮名ライン(A,B,C)が残っていたら毎回クリーンアップ
+  await cleanupDuplicateLines();
 })();
 
 /* ===== 重複ラインクリーンアップ ===== */
 async function cleanupDuplicateLines(){
   try {
-    // 短縮名ライン(A,B,C等)とフルネームライン(Aライン,Bライン等)の重複を検出
+    // 短縮名ライン(A,B,C等 = 1文字のみ)を検出
     const shortLines = LINES.filter(l => /^[A-Z]$/i.test((l.line_name||'').trim()));
     if(!shortLines.length) return;
 
+    let deletedCount = 0;
     for(const sl of shortLines){
       const letter = sl.line_name.trim().toUpperCase();
-      // 対応するフルネームラインが存在するか
+      // 対応するフルネームライン(Aライン等)が存在するか
       const fullLine = LINES.find(l => l.id !== sl.id && l.line_name && l.line_name.replace(/ライン|line/gi,'').trim().toUpperCase() === letter);
-      if(!fullLine) continue;
 
-      // 短縮名ラインに紐づいた機番をフルネームラインに移行
-      const linkedMachines = MACHINES.filter(m => m.line_id === sl.id);
-      for(const m of linkedMachines){
-        await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({line_id:fullLine.id})});
+      if(fullLine){
+        // フルネームラインが存在 → 機番を移行してから短縮名を削除
+        const linkedMachines = MACHINES.filter(m => m.line_id === sl.id);
+        for(const m of linkedMachines){
+          await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({line_id:fullLine.id})});
+        }
+        await sbFetch(`lines?id=eq.${sl.id}`,{method:'DELETE'});
+        console.log(`ライン「${sl.line_name}」を削除 → 機番${linkedMachines.length}台を「${fullLine.line_name}」に移行`);
+        deletedCount++;
+      } else {
+        // フルネームラインが存在しない → 短縮名をフルネームにリネーム
+        const newName = letter + 'ライン';
+        await sbFetch(`lines?id=eq.${sl.id}`,{method:'PATCH',body:JSON.stringify({line_name:newName})});
+        console.log(`ライン「${sl.line_name}」を「${newName}」にリネーム`);
+        deletedCount++;
       }
-      // 短縮名ラインを削除
-      await sbFetch(`lines?id=eq.${sl.id}`,{method:'DELETE'});
-      console.log(`ライン「${sl.line_name}」を削除し、機番${linkedMachines.length}台を「${fullLine.line_name}」に移行しました`);
     }
-    // リロード
-    await loadAll();
-    if(shortLines.length) showToast(`重複ライン ${shortLines.length}件を自動整理しました`,'success');
+    if(deletedCount){
+      await loadAll(); // リロードして画面を更新
+      showToast(`ライン名を ${deletedCount}件 整理しました`,'success');
+    }
   } catch(err){
     console.error('ラインクリーンアップ失敗:', err);
+    showToast('ラインの自動整理に失敗しました','error');
   }
 }
 
