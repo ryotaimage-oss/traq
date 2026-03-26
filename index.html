@@ -639,37 +639,52 @@ async function doLogin(){
   loginBusy=true;
   document.getElementById('loginBtn').disabled=true;
 
-  const pinHash = (u.pin_hash || '').trim();
-  console.log('PIN入力:', state.pinInput, '/ DB:', pinHash, '/ 一致:', state.pinInput === pinHash);
-  if(state.pinInput === pinHash){
-    // ✅ 成功 → fail_count / locked_until をリセット
-    try {
+  try {
+    // DBから最新のpin_hashを直接取得して照合
+    const rows = await sbFetch(`users?id=eq.${u.id}&select=id,pin_hash,fail_count,locked_until`);
+    if(!rows||!rows.length) throw new Error('ユーザーが見つかりません');
+    const fresh = rows[0];
+
+    if(fresh.locked_until && Date.now() < new Date(fresh.locked_until).getTime()){
+      u.locked_until = fresh.locked_until;
+      u.fail_count   = fresh.fail_count;
+      showLockScreen(u);
+      loginBusy=false;
+      return;
+    }
+
+    const pinHash = (fresh.pin_hash || '').trim();
+    if(state.pinInput === pinHash){
+      // ✅ 成功
       await sbFetch(`users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
         body: JSON.stringify({ fail_count:0, locked_until:null })
       });
-    } catch(err){ console.error('PIN reset failed:',err); }
+      u.fail_count=0; u.locked_until=null;
+      flashSuccess();
 
-    u.fail_count=0; u.locked_until=null;
-    flashSuccess();
-
-  } else {
-    // ❌ 失敗
-    const newCount = (u.fail_count||0)+1;
-    u.fail_count = newCount;
-    shakeDots();
-
-    if(newCount>=3){
-      await lockAccount(u);
     } else {
-      showError(t('pin_error_wrong',newCount));
-      try {
+      // ❌ 失敗
+      const newCount = (fresh.fail_count||0)+1;
+      u.fail_count = newCount;
+      shakeDots();
+
+      if(newCount>=3){
+        await lockAccount(u);
+      } else {
+        showError(t('pin_error_wrong',newCount));
         await sbFetch(`users?id=eq.${u.id}`,{
           method:'PATCH', prefer:'return=minimal',
           body: JSON.stringify({ fail_count:newCount })
         });
-      } catch(err){ console.error('Fail count update failed:',err); }
+      }
+      state.pinInput=''; updatePinDots();
+      document.getElementById('loginBtn').disabled=true;
+      loginBusy=false;
     }
+  } catch(err){
+    console.error('ログインエラー:', err);
+    showError('通信エラーが発生しました。再度お試しください。');
     state.pinInput=''; updatePinDots();
     document.getElementById('loginBtn').disabled=true;
     loginBusy=false;
