@@ -45,18 +45,21 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
 /* Tab bar */
-.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
-.tab-item{flex:1;padding:12px 8px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.tab-item{flex:1;padding:12px 6px;text-align:center;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;min-width:0}
 .tab-item.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700}
 
 /* Scroll */
 .scroll-area{flex:1;overflow-y:auto;padding:16px}
 
-/* Section */
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+/* Section header with buttons */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .section-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
-.btn-add{height:36px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:0 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.header-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-add{height:36px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:0 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-add:hover{background:var(--orange-dark)}
+.btn-outline{height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text1);font-family:inherit;font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-outline:hover{border-color:var(--orange);color:var(--orange)}
 
 /* Search / Filter bar */
 .search-bar{display:flex;gap:8px;margin-bottom:12px}
@@ -69,6 +72,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .table-wrap{overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
 table{width:100%;border-collapse:collapse;min-width:520px}
 th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+th.sortable{cursor:pointer;user-select:none;transition:color .15s}
+th.sortable:hover{color:var(--orange)}
+th .sort-icon{font-size:11px;opacity:.5;margin-left:2px}
+th.sorted .sort-icon{opacity:1;color:var(--orange)}
 td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(239,159,39,.03)}
@@ -84,25 +91,18 @@ tr:hover td{background:rgba(239,159,39,.03)}
 .status-inactive{color:var(--text2);font-size:12px}
 .status-locked{color:var(--danger);font-size:12px}
 
+/* Line badge */
+.line-badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:4px;background:rgba(239,159,39,.1);color:var(--orange)}
+
+/* Unlinked indicator */
+.unlinked{color:var(--text2);font-size:12px;font-style:italic}
+
 /* Action buttons in table */
 .tbl-actions{display:flex;gap:5px}
 .tbl-btn{height:28px;border-radius:5px;font-family:inherit;font-size:11px;font-weight:500;padding:0 10px;cursor:pointer;transition:all .12s;border:1px solid var(--border);background:none;color:var(--text2);white-space:nowrap}
 .tbl-btn:hover{border-color:var(--orange);color:var(--orange)}
 .tbl-btn.danger:hover{border-color:var(--danger);color:var(--danger)}
 .tbl-btn.primary{background:var(--orange);border-color:var(--orange);color:var(--navy)}
-
-/* Master cards */
-.master-section{margin-bottom:24px}
-.master-section-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
-.master-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;transition:all .15s}
-.master-card:hover{border-color:rgba(239,159,39,.3)}
-.master-card-left{}
-.master-card-code{font-size:13px;font-weight:700}
-.master-card-name{font-size:11px;color:var(--text2);margin-top:2px}
-.master-card-meta{font-size:10px;color:var(--text2);margin-top:2px}
-.master-card-actions{display:flex;gap:4px;flex-shrink:0}
-.inactive-tag{font-size:10px;color:var(--text2);background:var(--bg3);border-radius:3px;padding:1px 5px}
 
 /* Import bar */
 .import-bar{background:var(--bg3);border:1px dashed var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;cursor:pointer;transition:all .15s}
@@ -136,7 +136,6 @@ tr:hover td{background:rgba(239,159,39,.03)}
 .btn-danger-full{width:100%;height:46px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius);color:var(--danger);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
 .btn-danger-full:hover{background:rgba(239,68,68,.2)}
 
-/* PIN reset notice */
 .pin-reset-notice{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--warning);margin-top:8px}
 
 /* Toast */
@@ -145,42 +144,12 @@ tr:hover td{background:rgba(239,159,39,.03)}
 .toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
 .toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
 
-/* Line tab */
-.line-tabs{display:flex;gap:6px;margin-bottom:12px}
-.line-tab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
-.line-tab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
-
-/* Product pills */
-.product-pills{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.product-pill{display:inline-flex;align-items:center;gap:3px;background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.25);color:var(--orange);font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap}
-.product-pill .pill-x{cursor:pointer;font-size:13px;color:var(--text2);margin-left:2px;line-height:1;transition:color .15s}
-.product-pill .pill-x:hover{color:var(--danger)}
-.link-btn{background:none;border:1px dashed var(--border);border-radius:12px;padding:2px 10px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
-.link-btn:hover{border-color:var(--orange);color:var(--orange)}
-
-/* Link modal checkbox list */
-.link-list{max-height:320px;overflow-y:auto;margin:8px 0}
-.link-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);transition:background .1s;cursor:pointer}
-.link-item:hover{background:var(--bg3)}
-.link-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--orange);cursor:pointer;flex-shrink:0}
-.link-item-info{flex:1;min-width:0}
-.link-item-code{font-size:13px;font-weight:700}
-.link-item-name{font-size:11px;color:var(--text2)}
-.link-search{width:100%;height:38px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);padding:0 12px;outline:none;margin-bottom:6px}
-.link-search:focus{border-color:var(--orange)}
-.link-search::placeholder{color:var(--text2)}
-
-/* Empty */
 .empty{text-align:center;padding:32px;color:var(--text2);font-size:13px}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-
-@media(min-width:768px){
-  .master-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-}
 </style>
 </head>
 <body>
@@ -204,6 +173,7 @@ tr:hover td{background:rgba(239,159,39,.03)}
   <!-- Tab bar -->
   <div class="tab-bar">
     <button class="tab-item active" id="tab-users"      onclick="setTab('users')">👥 ユーザー</button>
+    <button class="tab-item"        id="tab-lines"      onclick="setTab('lines')">🏭 ライン</button>
     <button class="tab-item"        id="tab-machines"   onclick="setTab('machines')">⚙️ 機番</button>
     <button class="tab-item"        id="tab-products"   onclick="setTab('products')">📦 品番</button>
     <button class="tab-item"        id="tab-categories" onclick="setTab('categories')">🏷️ 分類</button>
@@ -215,51 +185,43 @@ tr:hover td{background:rgba(239,159,39,.03)}
 
     <!-- ===== USERS TAB ===== -->
     <div id="panel-users">
-
       <div class="section-header">
         <span class="section-title">ユーザー一覧</span>
-        <div style="display:flex;gap:6px">
-          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportUsers()">📥 Excel出力</button>
+        <div class="header-actions">
+          <button class="btn-outline" onclick="exportUsers()">↓ Excel出力</button>
+          <button class="btn-outline" onclick="document.getElementById('csvFileInput').click()">↑ CSVインポート</button>
           <button class="btn-add" onclick="openUserModal()">＋ ユーザー追加</button>
         </div>
       </div>
-
-      <!-- Import bar -->
-      <div class="import-bar" onclick="document.getElementById('csvFileInput').click()">
-        <div class="import-bar-left">📄 CSVで一括インポート</div>
-        <div class="import-bar-right">選択 →</div>
-      </div>
       <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleUserCsvImport(event)">
-
-      <!-- Search -->
       <div class="search-bar">
         <input class="search-input" type="text" id="userSearch" placeholder="名前で検索..." oninput="renderUsers()">
         <select class="filter-select" id="roleFilter" onchange="renderUsers()">
-          <option value="">全ロール</option>
-          <option value="op">OP</option>
-          <option value="sl">SL</option>
-          <option value="admin">admin</option>
+          <option value="">全ロール</option><option value="op">OP</option><option value="sl">SL</option><option value="admin">admin</option>
         </select>
         <select class="filter-select" id="statusFilter" onchange="renderUsers()">
-          <option value="">全状態</option>
-          <option value="active">有効</option>
-          <option value="inactive">無効</option>
+          <option value="">全状態</option><option value="active">有効</option><option value="inactive">無効</option>
         </select>
       </div>
-
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>名前</th>
-              <th>ロール</th>
-              <th>デフォルト直</th>
-              <th>状態</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="userTableBody"></tbody>
-        </table>
+        <table><thead><tr>
+          <th>名前</th><th>ロール</th><th>デフォルト直</th><th>状態</th><th>操作</th>
+        </tr></thead><tbody id="userTableBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ===== LINES TAB ===== -->
+    <div id="panel-lines" style="display:none">
+      <div class="section-header">
+        <span class="section-title">ラインマスタ</span>
+        <div class="header-actions">
+          <button class="btn-add" onclick="openLineModal()">＋ ライン追加</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th>ライン名</th><th>状態</th><th>操作</th>
+        </tr></thead><tbody id="lineTableBody"></tbody></table>
       </div>
     </div>
 
@@ -267,134 +229,78 @@ tr:hover td{background:rgba(239,159,39,.03)}
     <div id="panel-machines" style="display:none">
       <div class="section-header">
         <span class="section-title">機番マスタ</span>
-        <div style="display:flex;gap:6px">
-          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportMaster()">📥 Excel出力</button>
+        <div class="header-actions">
+          <button class="btn-outline" onclick="exportMachines()">↓ Excel出力</button>
+          <button class="btn-outline" onclick="document.getElementById('machineFileInput').click()">↑ Excelインポート</button>
           <button class="btn-add" onclick="openMachineModal()">＋ 機番追加</button>
         </div>
       </div>
-
-      <!-- ラインタブ -->
-      <div class="line-tabs">
-        <button class="line-tab active" id="ltab-all" onclick="setLinetab('all')">全ライン</button>
-        <button class="line-tab" id="ltab-A" onclick="setLinetab('A')">Aライン</button>
-        <button class="line-tab" id="ltab-B" onclick="setLinetab('B')">Bライン</button>
-        <button class="line-tab" id="ltab-C" onclick="setLinetab('C')">Cライン</button>
-      </div>
-
-      <!-- 検索 -->
+      <input type="file" id="machineFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleMachineImport(event)">
       <div class="search-bar">
         <input class="search-input" type="text" id="machineSearch" placeholder="機番で検索..." oninput="renderMachines()">
+        <select class="filter-select" id="machineLineFilter" onchange="renderMachines()"><option value="">全ライン</option></select>
         <select class="filter-select" id="machineStatusFilter" onchange="renderMachines()">
-          <option value="">全状態</option>
-          <option value="active">有効</option>
-          <option value="inactive">無効</option>
+          <option value="">全状態</option><option value="active">有効</option><option value="inactive">無効</option>
         </select>
       </div>
-
-      <!-- Import bar -->
-      <div class="import-bar" style="margin-bottom:12px" onclick="document.getElementById('excelFileInput').click()">
-        <div class="import-bar-left">📊 Excelで一括インポート（ライン名/機番/品番/品名）</div>
-        <div class="import-bar-right">選択 →</div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th class="sortable" onclick="toggleSort('machine','no')">機番 <span class="sort-icon" id="si-m-no">↕</span></th>
+          <th class="sortable" onclick="toggleSort('machine','line')">ライン <span class="sort-icon" id="si-m-line">↕</span></th>
+          <th>備考</th><th>状態</th><th>操作</th>
+        </tr></thead><tbody id="machineTableBody"></tbody></table>
       </div>
-      <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleMasterExcelImport(event)">
-
-      <div id="masterContent"></div>
     </div>
 
     <!-- ===== PRODUCTS TAB ===== -->
     <div id="panel-products" style="display:none">
       <div class="section-header">
         <span class="section-title">品番マスタ</span>
-        <div style="display:flex;gap:6px">
-          <button class="btn-add" style="background:var(--bg3);color:var(--text1);border:1px solid var(--border)" onclick="exportProducts()">📥 Excel出力</button>
+        <div class="header-actions">
+          <button class="btn-outline" onclick="exportProducts()">↓ Excel出力</button>
+          <button class="btn-outline" onclick="document.getElementById('productFileInput').click()">↑ Excelインポート</button>
           <button class="btn-add" onclick="openProductModal()">＋ 品番追加</button>
         </div>
       </div>
-
-      <!-- 検索 -->
+      <input type="file" id="productFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleProductImport(event)">
       <div class="search-bar">
         <input class="search-input" type="text" id="productSearch" placeholder="品番・品名で検索..." oninput="renderProducts()">
-        <select class="filter-select" id="productStatusFilter" onchange="renderProducts()">
-          <option value="">全状態</option>
-          <option value="active">有効</option>
-          <option value="inactive">無効</option>
-        </select>
+        <select class="filter-select" id="productLineFilter" onchange="renderProducts()"><option value="">全ライン</option></select>
       </div>
-
-      <!-- Import bar -->
-      <div class="import-bar" style="margin-bottom:12px" onclick="document.getElementById('productFileInput').click()">
-        <div class="import-bar-left">📊 Excelで一括インポート（品番/品名）</div>
-        <div class="import-bar-right">選択 →</div>
-      </div>
-      <input type="file" id="productFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleProductExcelImport(event)">
-
-      <!-- ページネーション情報 -->
       <div style="font-size:11px;color:var(--text2);margin-bottom:8px" id="productPageInfo"></div>
-
-      <div id="productGrid"></div>
-
-      <!-- ページネーション -->
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th class="sortable" onclick="toggleSort('product','code')">品番 <span class="sort-icon" id="si-p-code">↕</span></th>
+          <th class="sortable" onclick="toggleSort('product','name')">品名 <span class="sort-icon" id="si-p-name">↕</span></th>
+          <th class="sortable" onclick="toggleSort('product','machine')">機番 <span class="sort-icon" id="si-p-machine">↕</span></th>
+          <th class="sortable" onclick="toggleSort('product','line')">ライン <span class="sort-icon" id="si-p-line">↕</span></th>
+          <th>操作</th>
+        </tr></thead><tbody id="productTableBody"></tbody></table>
+      </div>
       <div id="productPager" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px"></div>
     </div>
 
     <!-- ===== CATEGORIES TAB ===== -->
     <div id="panel-categories" style="display:none">
-
-      <!-- 設備分類 -->
-      <div class="section-header">
-        <span class="section-title">設備 分類</span>
-        <button class="btn-add" onclick="openCategoryModal('equipment')">＋ 追加</button>
-      </div>
-      <div class="search-bar" style="margin-bottom:10px">
-        <input class="search-input" type="text" id="eqCatSearch" placeholder="分類名で検索..." oninput="renderCategories()">
-      </div>
-      <div class="table-wrap" style="margin-bottom:24px">
-        <table>
-          <thead><tr>
-            <th>順番</th><th>分類名</th><th>状態</th><th>操作</th>
-          </tr></thead>
-          <tbody id="eqCategoryBody"></tbody>
-        </table>
-      </div>
-
-      <!-- 金型分類 -->
-      <div class="section-header">
-        <span class="section-title">金型 異常内容</span>
-        <button class="btn-add" onclick="openCategoryModal('mold')">＋ 追加</button>
-      </div>
-      <div class="search-bar" style="margin-bottom:10px">
-        <input class="search-input" type="text" id="mdCatSearch" placeholder="異常内容名で検索..." oninput="renderCategories()">
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>順番</th><th>異常内容名</th><th>状態</th><th>操作</th>
-          </tr></thead>
-          <tbody id="mdCategoryBody"></tbody>
-        </table>
-      </div>
-
+      <div class="section-header"><span class="section-title">設備 分類</span><button class="btn-add" onclick="openCategoryModal('equipment')">＋ 追加</button></div>
+      <div class="search-bar" style="margin-bottom:10px"><input class="search-input" type="text" id="eqCatSearch" placeholder="分類名で検索..." oninput="renderCategories()"></div>
+      <div class="table-wrap" style="margin-bottom:24px"><table><thead><tr><th>順番</th><th>分類名</th><th>状態</th><th>操作</th></tr></thead><tbody id="eqCategoryBody"></tbody></table></div>
+      <div class="section-header"><span class="section-title">金型 異常内容</span><button class="btn-add" onclick="openCategoryModal('mold')">＋ 追加</button></div>
+      <div class="search-bar" style="margin-bottom:10px"><input class="search-input" type="text" id="mdCatSearch" placeholder="異常内容名で検索..." oninput="renderCategories()"></div>
+      <div class="table-wrap"><table><thead><tr><th>順番</th><th>異常内容名</th><th>状態</th><th>操作</th></tr></thead><tbody id="mdCategoryBody"></tbody></table></div>
     </div>
 
     <!-- ===== STORAGE TAB ===== -->
     <div id="panel-storage" style="display:none">
-      <div class="section-header">
-        <span class="section-title">ストレージ管理</span>
-      </div>
-
-      <!-- 使用量バー -->
+      <div class="section-header"><span class="section-title">ストレージ管理</span></div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <span style="font-size:14px;font-weight:700">💾 Supabase Storage 使用量</span>
           <span style="font-size:16px;font-weight:700" id="storageLabel2">計算中...</span>
         </div>
-        <div style="height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:8px">
-          <div id="storageFill2" style="height:100%;border-radius:6px;transition:width .6s ease;width:0%"></div>
-        </div>
+        <div style="height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:8px"><div id="storageFill2" style="height:100%;border-radius:6px;transition:width .6s ease;width:0%"></div></div>
         <div style="font-size:12px;color:var(--text2)" id="storageDetail2"></div>
       </div>
-
-      <!-- 見通し -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
         <div style="font-size:13px;font-weight:700;margin-bottom:12px">📊 容量の長期見通し</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -410,17 +316,10 @@ tr:hover td{background:rgba(239,159,39,.03)}
           </div>
         </div>
       </div>
-
-      <!-- 画像エクスポート -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">🖼️ 画像エクスポート</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7">
-          削除前に画像ファイル名と対応するトラブル情報をExcelで出力してください。<br>
-          出力後に削除することで後から「何の画像か」を確認できます。
-        </div>
-        <button class="btn-add" style="width:100%;height:48px;font-size:14px;border-radius:var(--radius)" onclick="exportImages()">
-          📥 画像情報をExcel出力してダウンロード
-        </button>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7">削除前に画像ファイル名と対応するトラブル情報をExcelで出力してください。</div>
+        <button class="btn-add" style="width:100%;height:48px;font-size:14px;border-radius:var(--radius)" onclick="exportImages()">📥 画像情報をExcel出力してダウンロード</button>
       </div>
     </div>
 
@@ -485,7 +384,7 @@ const I18N={
 };
 let currentLang=localStorage.getItem('traq_lang')||'ja';
 function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(...a):(v??k)}
-function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===lang));renderUsers();renderMaster()}
+function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===lang));renderAll()}
 function toggleTheme(){const html=document.documentElement;const d=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('traq_theme',d?'light':'dark')}
 function initTheme(){const s=localStorage.getItem('traq_theme');const p=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const th=s||p;document.documentElement.setAttribute('data-theme',th);document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️'}
 
@@ -508,65 +407,40 @@ async function sbFetch(path, opts={}) {
   return text ? JSON.parse(text) : null;
 }
 
-/* ===== Data (loaded from Supabase) ===== */
-let USERS = [];
-let MACHINES = [];
-let LINES = [];
-let PRODUCTS = [];
-let MACHINE_PRODUCTS = [];
-let EQ_CATEGORIES = [];
-let MD_CATEGORIES = [];
+/* ===== Data ===== */
+let USERS = [], MACHINES = [], LINES = [], PRODUCTS = [], MACHINE_PRODUCTS = [];
+let EQ_CATEGORIES = [], MD_CATEGORIES = [];
 
 async function loadAll() {
   try {
-    // Users
     const users = await sbFetch('users?select=*&order=name');
-    USERS = users.map(u => ({
-      id: u.id, name: u.name, role: u.role,
-      shift: u.shift ? parseInt(u.shift) : null,
-      is_active: u.is_active, locked: !!u.pin_lock_until
-    }));
+    USERS = users.map(u => ({ id:u.id, name:u.name, role:u.role, shift:u.shift?parseInt(u.shift):null, is_active:u.is_active, locked:!!u.pin_lock_until }));
 
-    // Lines
     LINES = await sbFetch('lines?select=*&order=id');
 
-    // Machines (join with lines)
     const machines = await sbFetch('machines?select=*,lines(line_name)&order=machine_no');
-    MACHINES = machines.map(m => ({
-      id: m.id, no: String(m.machine_no),
-      line: m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() || 'A',
-      line_id: m.line_id, memo: m.memo || '', is_active: m.is_active
-    }));
+    MACHINES = machines.map(m => ({ id:m.id, no:String(m.machine_no), line:m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase()||'A', line_id:m.line_id, memo:m.memo||'', is_active:m.is_active }));
 
-    // Products
     const products = await sbFetch('products?select=*&order=product_code');
-    PRODUCTS = products.map(p => ({
-      id: p.id, code: p.product_code, name: p.product_name,
-      memo: p.memo || '', is_active: p.is_active
-    }));
+    PRODUCTS = products.map(p => ({ id:p.id, code:p.product_code, name:p.product_name, memo:p.memo||'', is_active:p.is_active }));
 
-    // Categories
-    const cats = await sbFetch('categories?select=*&order=sort_order');
-
-    // Machine Products (linking table)
     const mp = await sbFetch('machine_products?select=id,machine_id,product_id');
     MACHINE_PRODUCTS = mp || [];
 
-    EQ_CATEGORIES = cats.filter(c => c.type === 'equipment').map(c => ({
-      id: c.id, name: c.name, sort: c.sort_order, is_active: c.is_active
-    }));
-    MD_CATEGORIES = cats.filter(c => c.type === 'mold').map(c => ({
-      id: c.id, name: c.name, sort: c.sort_order, is_active: c.is_active
-    }));
+    const cats = await sbFetch('categories?select=*&order=sort_order');
+    EQ_CATEGORIES = cats.filter(c=>c.type==='equipment').map(c=>({id:c.id,name:c.name,sort:c.sort_order,is_active:c.is_active}));
+    MD_CATEGORIES = cats.filter(c=>c.type==='mold').map(c=>({id:c.id,name:c.name,sort:c.sort_order,is_active:c.is_active}));
 
-    renderUsers();
-    renderMaster();
-    renderProducts();
-    renderCategories();
-  } catch (err) {
+    renderAll();
+  } catch(err) {
     console.error('Load error:', err);
-    showToast('データの読み込みに失敗しました', 'error');
+    showToast('データの読み込みに失敗しました','error');
   }
+}
+
+function renderAll(){
+  updateLineFilters();
+  renderUsers(); renderLines(); renderMachines(); renderProducts(); renderCategories();
 }
 
 function getLineId(lineLetter) {
@@ -574,35 +448,66 @@ function getLineId(lineLetter) {
   return l ? l.id : null;
 }
 
+function getLineLetter(lineId) {
+  const l = LINES.find(x => x.id === lineId);
+  return l ? l.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() : '';
+}
+
 /* ===== State ===== */
 let currentTab='users';
-let currentLinetab='all';
+let machineSort={col:'no',dir:'asc'};
+let productSort={col:'code',dir:'asc'};
+let productPage=1;
+const PRODUCTS_PER_PAGE=30;
+
+/* ===== Sort ===== */
+function toggleSort(table,col){
+  const s = table==='machine' ? machineSort : productSort;
+  if(s.col===col) s.dir=s.dir==='asc'?'desc':'asc';
+  else { s.col=col; s.dir='asc'; }
+  if(table==='machine') renderMachines(); else renderProducts();
+}
+
+function updateSortIcons(table){
+  const s = table==='machine' ? machineSort : productSort;
+  const prefix = table==='machine' ? 'si-m-' : 'si-p-';
+  const cols = table==='machine' ? ['no','line'] : ['code','name','machine','line'];
+  cols.forEach(c=>{
+    const el=document.getElementById(prefix+c);
+    if(!el) return;
+    if(s.col===c){ el.textContent=s.dir==='asc'?'↑':'↓'; el.parentElement.classList.add('sorted'); }
+    else { el.textContent='↕'; el.parentElement.classList.remove('sorted'); }
+  });
+}
 
 /* ===== Tab ===== */
 function setTab(tab){
   currentTab=tab;
-  ['users','machines','products','categories','storage'].forEach(t=>{
+  ['users','lines','machines','products','categories','storage'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
   });
   document.getElementById('scrollArea').scrollTo(0,0);
-  if(tab==='machines')   renderMachines();
-  if(tab==='products')   renderProducts();
-  if(tab==='categories') renderCategories();
-  if(tab==='storage')    initStorageBar2();
+  if(tab==='storage') initStorageBar2();
 }
 
-function setLinetab(line){
-  currentLinetab=line;
-  ['all','A','B','C'].forEach(k=>document.getElementById('ltab-'+k).classList.toggle('active',k===line));
-  renderMaster();
+/* ===== Line filter dropdowns ===== */
+function updateLineFilters(){
+  const opts = '<option value="">全ライン</option>' + LINES.map(l=>{
+    const letter = l.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase()||'';
+    return `<option value="${letter}">${l.line_name||letter}</option>`;
+  }).join('');
+  const mf=document.getElementById('machineLineFilter');
+  const pf=document.getElementById('productLineFilter');
+  if(mf){ const v=mf.value; mf.innerHTML=opts; mf.value=v; }
+  if(pf){ const v=pf.value; pf.innerHTML=opts; pf.value=v; }
 }
 
-/* ===== Users ===== */
+/* ===== Users (unchanged) ===== */
 function renderUsers(){
-  const q=document.getElementById('userSearch').value.toLowerCase();
-  const rf=document.getElementById('roleFilter').value;
-  const sf=document.getElementById('statusFilter').value;
+  const q=document.getElementById('userSearch')?.value.toLowerCase()||'';
+  const rf=document.getElementById('roleFilter')?.value||'';
+  const sf=document.getElementById('statusFilter')?.value||'';
   const filtered=USERS.filter(u=>{
     if(q&&!u.name.toLowerCase().includes(q)) return false;
     if(rf&&u.role!==rf) return false;
@@ -610,1195 +515,498 @@ function renderUsers(){
     if(sf==='inactive'&&u.is_active) return false;
     return true;
   });
-  // Sort: admin→sl→op, then name
   const order={admin:0,sl:1,op:2};
   filtered.sort((a,b)=>order[a.role]-order[b.role]||a.name.localeCompare(b.name,'ja'));
-
   const body=document.getElementById('userTableBody');
-  if(!filtered.length){body.innerHTML=`<tr><td colspan="5" class="empty">該当するユーザーがいません</td></tr>`;return}
+  if(!body) return;
+  if(!filtered.length){body.innerHTML='<tr><td colspan="5" class="empty">該当するユーザーがいません</td></tr>';return}
   body.innerHTML=filtered.map(u=>{
     const roleLabel=u.role==='admin'?t('role_adm'):u.role==='sl'?t('role_sl'):t('role_op');
     const roleClass=u.role==='admin'?'role-admin':u.role==='sl'?'role-sl':'role-op';
     const shiftLabel=u.shift?t('shift_label',u.shift):t('shift_none');
-    const statusEl=u.locked?`<span class="status-locked">🔒 ${t('locked')}</span>`
-      :u.is_active?`<span class="status-active">● ${t('active')}</span>`
-      :`<span class="status-inactive">○ ${t('inactive')}</span>`;
+    const statusEl=u.locked?`<span class="status-locked">🔒 ${t('locked')}</span>`:u.is_active?`<span class="status-active">● ${t('active')}</span>`:`<span class="status-inactive">○ ${t('inactive')}</span>`;
     const toggleLabel=u.is_active?t('toggle_active'):t('toggle_inactive');
-    return `<tr>
-      <td style="font-weight:600">${u.name}</td>
-      <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
-      <td style="color:var(--text2)">${shiftLabel}</td>
-      <td>${statusEl}</td>
-      <td>
-        <div class="tbl-actions">
-          <button class="tbl-btn primary" onclick="openUserModal(${u.id})">${t('edit')}</button>
-          <button class="tbl-btn" onclick="resetPin(${u.id})">${t('pin_reset')}</button>
-          <button class="tbl-btn" onclick="toggleActive(${u.id})">${toggleLabel}</button>
-          ${u.role!=='admin'?`<button class="tbl-btn danger" onclick="deleteUser(${u.id})">${t('delete')}</button>`:''}
-        </div>
-      </td>
-    </tr>`;
+    return `<tr><td style="font-weight:600">${u.name}</td><td><span class="role-badge ${roleClass}">${roleLabel}</span></td><td style="color:var(--text2)">${shiftLabel}</td><td>${statusEl}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openUserModal(${u.id})">${t('edit')}</button><button class="tbl-btn" onclick="resetPin(${u.id})">${t('pin_reset')}</button><button class="tbl-btn" onclick="toggleActive(${u.id})">${toggleLabel}</button>${u.role!=='admin'?`<button class="tbl-btn danger" onclick="deleteUser(${u.id})">${t('delete')}</button>`:''}</div></td></tr>`;
   }).join('');
 }
 
-/* ===== User modal ===== */
 function openUserModal(id=null){
   const u=id?USERS.find(x=>x.id===id):null;
   const title=u?t('user_edit'):t('user_add');
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${title}</div>
-    <div class="form-group">
-      <div class="form-label">${t('label_name')} <span class="req">必須</span></div>
-      <input class="form-input" id="f-name" value="${u?.name||''}" placeholder="例：山田 太郎">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <div class="form-label">${t('label_role')} <span class="req">必須</span></div>
-        <select class="form-select" id="f-role">
-          <option value="op" ${u?.role==='op'?'selected':''}>OP</option>
-          <option value="sl" ${u?.role==='sl'?'selected':''}>SL</option>
-          <option value="admin" ${u?.role==='admin'?'selected':''}>admin</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <div class="form-label">${t('label_shift')}</div>
-        <select class="form-select" id="f-shift">
-          <option value="" ${!u?.shift?'selected':''}>—</option>
-          <option value="1" ${u?.shift==1?'selected':''}>1直</option>
-          <option value="2" ${u?.shift==2?'selected':''}>2直</option>
-          <option value="3" ${u?.shift==3?'selected':''}>3直</option>
-        </select>
-      </div>
-    </div>
-    ${!u?`<div class="form-group">
-      <div class="form-label">${t('label_pin')} <span class="req">必須</span></div>
-      <input class="form-input" id="f-pin" type="text" maxlength="4" placeholder="0000" value="0000">
-    </div>`:''}
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
-      <button class="btn-primary" onclick="saveUser(${id||'null'})">${t('save')}</button>
-    </div>
-  `);
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${title}</div>
+    <div class="form-group"><div class="form-label">${t('label_name')} <span class="req">必須</span></div><input class="form-input" id="f-name" value="${u?.name||''}" placeholder="例：山田 太郎"></div>
+    <div class="form-row"><div class="form-group"><div class="form-label">${t('label_role')} <span class="req">必須</span></div><select class="form-select" id="f-role"><option value="op" ${u?.role==='op'?'selected':''}>OP</option><option value="sl" ${u?.role==='sl'?'selected':''}>SL</option><option value="admin" ${u?.role==='admin'?'selected':''}>admin</option></select></div>
+    <div class="form-group"><div class="form-label">${t('label_shift')}</div><select class="form-select" id="f-shift"><option value="" ${!u?.shift?'selected':''}>—</option><option value="1" ${u?.shift==1?'selected':''}>1直</option><option value="2" ${u?.shift==2?'selected':''}>2直</option><option value="3" ${u?.shift==3?'selected':''}>3直</option></select></div></div>
+    ${!u?`<div class="form-group"><div class="form-label">${t('label_pin')} <span class="req">必須</span></div><input class="form-input" id="f-pin" type="text" maxlength="4" placeholder="0000" value="0000"></div>`:''}
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn-primary" onclick="saveUser(${id||'null'})">${t('save')}</button></div>`);
 }
 
 async function saveUser(id){
-  const name=document.getElementById('f-name').value.trim();
-  const role=document.getElementById('f-role').value;
-  const shift=document.getElementById('f-shift').value||null;
+  const name=document.getElementById('f-name').value.trim();const role=document.getElementById('f-role').value;const shift=document.getElementById('f-shift').value||null;
   if(!name){showToast('名前を入力してください','error');return}
-  try {
-    if(id){
-      await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name,role,shift})});
-    } else {
-      const pin=document.getElementById('f-pin')?.value||'0000';
-      await sbFetch('users',{method:'POST',body:JSON.stringify({name,role,shift,pin_hash:pin,is_active:true})});
-    }
+  try { if(id){ await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name,role,shift})}); } else { const pin=document.getElementById('f-pin')?.value||'0000'; await sbFetch('users',{method:'POST',body:JSON.stringify({name,role,shift,pin_hash:pin,is_active:true})}); }
     closeModal();await loadAll();showToast(t('user_saved'),'success');
   } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
+async function resetPin(id){ const u=USERS.find(x=>x.id===id);if(!u)return;if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`))return;try{await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({pin_hash:'0000',pin_fail_count:0,pin_lock_until:null})});await loadAll();showToast(t('pin_reset_done',u.name),'success')}catch(err){showToast('リセットに失敗','error')}}
+async function toggleActive(id){ const u=USERS.find(x=>x.id===id);if(!u)return;if(!confirm(u.is_active?t('deactivate_confirm'):t('activate_confirm')))return;try{await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!u.is_active})});await loadAll();showToast(t('user_saved'),'success')}catch(err){showToast('更新に失敗','error')}}
+async function deleteUser(id){ if(!confirm(t('delete_confirm')))return;try{await sbFetch(`users?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}}
 
-async function resetPin(id){
-  const u=USERS.find(x=>x.id===id);
-  if(!u) return;
-  if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`)) return;
-  try {
-    await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({pin_hash:'0000',pin_fail_count:0,pin_lock_until:null})});
-    await loadAll();showToast(t('pin_reset_done',u.name),'success');
-  } catch(err){showToast('リセットに失敗','error')}
-}
-
-async function toggleActive(id){
-  const u=USERS.find(x=>x.id===id);
-  if(!u) return;
-  const msg=u.is_active?t('deactivate_confirm'):t('activate_confirm');
-  if(!confirm(msg)) return;
-  try {
-    await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!u.is_active})});
-    await loadAll();showToast(t('user_saved'),'success');
-  } catch(err){showToast('更新に失敗','error')}
-}
-
-async function deleteUser(id){
-  if(!confirm(t('delete_confirm'))) return;
-  try {
-    await sbFetch(`users?id=eq.${id}`,{method:'DELETE'});
-    await loadAll();showToast(t('user_deleted'),'success');
-  } catch(err){showToast('削除に失敗','error')}
-}
-
-/* ===== Master ===== */
-function renderMaster(){
-  renderMachines();
-}
-
-function renderMachines(){
-  const q=(document.getElementById('machineSearch')?.value||'').toLowerCase();
-  const sf=document.getElementById('machineStatusFilter')?.value||'';
-  const lines=currentLinetab==='all'?['A','B','C']:[currentLinetab];
-  const content=document.getElementById('masterContent');
-  content.innerHTML=lines.map(line=>{
-    const machines=MACHINES.filter(m=>{
-      if(m.line!==line) return false;
-      if(q && !m.no.toLowerCase().includes(q) && !(m.memo||'').toLowerCase().includes(q)) return false;
-      if(sf==='active' && !m.is_active) return false;
-      if(sf==='inactive' && m.is_active) return false;
-      return true;
-    });
-    return `
-      <div class="master-section" style="margin-bottom:20px">
-        <div class="master-section-title" style="margin-bottom:8px">
-          <span style="color:var(--orange);font-size:14px">●</span>
-          ${line}ライン（${machines.length}台）
-          <button class="btn-add" style="margin-left:auto;font-size:11px;height:28px;padding:0 10px" onclick="openMachineModal(null,'${line}')">＋ 追加</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr>
-              <th>機番</th><th>ライン</th><th>紐づき品番</th><th>メモ</th><th>状態</th><th>操作</th>
-            </tr></thead>
-            <tbody>
-              ${machines.map(m=>{
-                const linked = MACHINE_PRODUCTS
-                  .filter(mp => mp.machine_id === m.id)
-                  .map(mp => PRODUCTS.find(p => p.id === mp.product_id))
-                  .filter(Boolean);
-                const pills = linked.map(p =>
-                  `<span class="product-pill">${p.code}<span class="pill-x" onclick="event.stopPropagation();unlinkProduct(${m.id},${p.id})" title="紐づけ解除">×</span></span>`
-                ).join('');
-                return `
-                <tr style="${!m.is_active?'opacity:.5':''}">
-                  <td style="font-weight:700">${m.no}号機</td>
-                  <td>${m.line}ライン</td>
-                  <td>
-                    <div class="product-pills">
-                      ${pills}
-                      <button class="link-btn" onclick="openLinkModal(${m.id})">+ 紐づけ</button>
-                    </div>
-                  </td>
-                  <td>
-                    <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px"
-                      value="${m.memo||''}"
-                      onfocus="this.style.borderBottomColor='var(--orange)'"
-                      onblur="this.style.borderBottomColor='transparent';updateMachineMemo(${m.id},this.value)"
-                      placeholder="メモを入力">
-                  </td>
-                  <td>${m.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
-                  <td>
-                    <div class="tbl-actions">
-                      <button class="tbl-btn primary" onclick="openMachineModal(${m.id},'${m.line}')">編集</button>
-                      <button class="tbl-btn" onclick="toggleMachine(${m.id})">${m.is_active?'無効化':'有効化'}</button>
-                      <button class="tbl-btn danger" onclick="deleteMachine(${m.id})">削除</button>
-                    </div>
-                  </td>
-                </tr>
-              `}).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+/* ===== Lines ===== */
+function renderLines(){
+  const body=document.getElementById('lineTableBody');
+  if(!body) return;
+  if(!LINES.length){body.innerHTML='<tr><td colspan="3" class="empty">ラインが登録されていません</td></tr>';return}
+  body.innerHTML=LINES.map(l=>{
+    const name=l.line_name||'';
+    const active=l.is_active!==false;
+    return `<tr style="${!active?'opacity:.5':''}"><td style="font-weight:700">${name}</td><td>${active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openLineModal(${l.id})">編集</button><button class="tbl-btn" onclick="toggleLine(${l.id})">${active?'無効化':'有効化'}</button><button class="tbl-btn danger" onclick="deleteLine(${l.id})">削除</button></div></td></tr>`;
   }).join('');
 }
 
-let productPage=1;
-const PRODUCTS_PER_PAGE=20;
+function openLineModal(id=null){
+  const l=id?LINES.find(x=>x.id===id):null;
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${l?'ライン編集':'ライン追加'}</div>
+    <div class="form-group"><div class="form-label">ライン名 <span class="req">必須</span></div><input class="form-input" id="l-name" value="${l?.line_name||''}" placeholder="例：Aライン"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-primary" onclick="saveLine(${id||'null'})">保存</button></div>`);
+}
+
+async function saveLine(id){
+  const name=document.getElementById('l-name').value.trim();
+  if(!name){showToast('ライン名を入力してください','error');return}
+  try { if(id){ await sbFetch(`lines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({line_name:name})}); } else { await sbFetch('lines',{method:'POST',body:JSON.stringify({line_name:name,is_active:true})}); }
+    closeModal();await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('保存に失敗: '+err.message,'error')}
+}
+async function toggleLine(id){ const l=LINES.find(x=>x.id===id);if(!l)return;try{await sbFetch(`lines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:l.is_active===false?true:false})});await loadAll()}catch(err){showToast('更新に失敗','error')}}
+async function deleteLine(id){ if(!confirm(t('delete_confirm')))return;try{await sbFetch(`lines?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}}
+
+/* ===== Machines (flat table with sort) ===== */
+function renderMachines(){
+  const q=(document.getElementById('machineSearch')?.value||'').toLowerCase();
+  const lf=document.getElementById('machineLineFilter')?.value||'';
+  const sf=document.getElementById('machineStatusFilter')?.value||'';
+
+  let filtered=MACHINES.filter(m=>{
+    if(q && !m.no.toLowerCase().includes(q) && !(m.memo||'').toLowerCase().includes(q)) return false;
+    if(lf && m.line!==lf) return false;
+    if(sf==='active' && !m.is_active) return false;
+    if(sf==='inactive' && m.is_active) return false;
+    return true;
+  });
+
+  filtered.sort((a,b)=>{
+    let va,vb;
+    if(machineSort.col==='no'){va=parseInt(a.no)||0;vb=parseInt(b.no)||0;}
+    else if(machineSort.col==='line'){va=a.line;vb=b.line;}
+    else {va=a[machineSort.col]||'';vb=b[machineSort.col]||'';}
+    let cmp=typeof va==='string'?va.localeCompare(vb,'ja'):va-vb;
+    return machineSort.dir==='desc'?-cmp:cmp;
+  });
+
+  updateSortIcons('machine');
+
+  const body=document.getElementById('machineTableBody');
+  if(!body) return;
+  if(!filtered.length){body.innerHTML='<tr><td colspan="5" class="empty">該当する機番がありません</td></tr>';return}
+  body.innerHTML=filtered.map(m=>`
+    <tr style="${!m.is_active?'opacity:.5':''}">
+      <td style="font-weight:700">#${m.no}</td>
+      <td><span class="line-badge">${m.line}ライン</span></td>
+      <td><input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px" value="${m.memo||''}" onfocus="this.style.borderBottomColor='var(--orange)'" onblur="this.style.borderBottomColor='transparent';updateMachineMemo(${m.id},this.value)" placeholder="—"></td>
+      <td>${m.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
+      <td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openMachineModal(${m.id})">編集</button><button class="tbl-btn danger" onclick="deleteMachine(${m.id})">削除</button></div></td>
+    </tr>`).join('');
+}
+
+function openMachineModal(id=null){
+  const m=id?MACHINES.find(x=>x.id===id):null;
+  const lineOpts=LINES.map(l=>{const letter=l.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase()||'';return `<option value="${letter}" ${(m?.line||'')=== letter?'selected':''}>${l.line_name}</option>`}).join('');
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${m?t('machine_edit'):t('machine_add')}</div>
+    <div class="form-row"><div class="form-group"><div class="form-label">${t('label_machine_no')} <span class="req">必須</span></div><input class="form-input" id="m-no" value="${m?.no||''}" placeholder="例：12"></div>
+    <div class="form-group"><div class="form-label">${t('label_line')} <span class="req">必須</span></div><select class="form-select" id="m-line">${lineOpts}</select></div></div>
+    <div class="form-group"><div class="form-label">${t('label_memo')}</div><input class="form-input" id="m-memo" value="${m?.memo||''}" placeholder="備考"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn-primary" onclick="saveMachine(${id||'null'})">${t('save')}</button></div>`);
+}
+
+async function saveMachine(id){
+  const no=document.getElementById('m-no').value.trim();const line=document.getElementById('m-line').value;const memo=document.getElementById('m-memo').value.trim();
+  if(!no){showToast('機番を入力してください','error');return}
+  const lineId=getLineId(line);if(!lineId){showToast('ライン情報が見つかりません','error');return}
+  try { if(id){ await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo})}); } else { await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo,is_active:true})}); }
+    closeModal();await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('保存に失敗: '+err.message,'error')}
+}
+async function updateMachineMemo(id,val){try{await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({memo:val})})}catch(err){console.error(err)}}
+async function deleteMachine(id){ if(!confirm(t('delete_confirm')))return;try{await sbFetch(`machine_products?machine_id=eq.${id}`,{method:'DELETE'});await sbFetch(`machines?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}}
+
+/* ===== Products (品番+機番+ラインの紐づけ一体型) ===== */
+function buildProductRows(){
+  const rows=[];
+  // 紐づき品番（machine_products の各行 = 1行）
+  MACHINE_PRODUCTS.forEach(mp=>{
+    const p=PRODUCTS.find(x=>x.id===mp.product_id);
+    const m=MACHINES.find(x=>x.id===mp.machine_id);
+    if(p) rows.push({ productId:p.id, code:p.code, name:p.name, is_active:p.is_active, machineId:m?.id||null, machineNo:m?.no||'', machineLine:m?.line||'', mpId:mp.id, linked:true });
+  });
+  // 未紐づけ品番
+  PRODUCTS.forEach(p=>{
+    if(!MACHINE_PRODUCTS.some(mp=>mp.product_id===p.id)){
+      rows.push({ productId:p.id, code:p.code, name:p.name, is_active:p.is_active, machineId:null, machineNo:'', machineLine:'', mpId:null, linked:false });
+    }
+  });
+  return rows;
+}
 
 function renderProducts(){
   const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
-  const sf=document.getElementById('productStatusFilter')?.value||'';
-  const filtered=PRODUCTS.filter(p=>{
-    if(q && !p.code.toLowerCase().includes(q) && !p.name.toLowerCase().includes(q)) return false;
-    if(sf==='active' && !p.is_active) return false;
-    if(sf==='inactive' && p.is_active) return false;
+  const lf=document.getElementById('productLineFilter')?.value||'';
+  let rows=buildProductRows();
+
+  // Filter
+  rows=rows.filter(r=>{
+    if(q && !r.code.toLowerCase().includes(q) && !r.name.toLowerCase().includes(q) && !r.machineNo.includes(q)) return false;
+    if(lf && r.machineLine!==lf) return false;
     return true;
   });
-  const total=filtered.length;
+
+  // Sort
+  rows.sort((a,b)=>{
+    let va,vb;
+    switch(productSort.col){
+      case 'code': va=a.code;vb=b.code;break;
+      case 'name': va=a.name;vb=b.name;break;
+      case 'machine': va=parseInt(a.machineNo)||9999;vb=parseInt(b.machineNo)||9999;break;
+      case 'line': va=a.machineLine||'zzz';vb=b.machineLine||'zzz';break;
+      default: va=a.code;vb=b.code;
+    }
+    let cmp=typeof va==='string'?va.localeCompare(vb,'ja'):va-vb;
+    return productSort.dir==='desc'?-cmp:cmp;
+  });
+
+  updateSortIcons('product');
+
+  // Pagination
+  const total=rows.length;
   const totalPages=Math.max(1,Math.ceil(total/PRODUCTS_PER_PAGE));
   if(productPage>totalPages) productPage=1;
   const start=(productPage-1)*PRODUCTS_PER_PAGE;
-  const pageItems=filtered.slice(start,start+PRODUCTS_PER_PAGE);
+  const pageItems=rows.slice(start,start+PRODUCTS_PER_PAGE);
 
   const info=document.getElementById('productPageInfo');
-  if(info) info.textContent=`${total}件中 ${start+1}〜${Math.min(start+PRODUCTS_PER_PAGE,total)}件を表示`;
+  if(info) info.textContent=total?`${total}件中 ${start+1}〜${Math.min(start+PRODUCTS_PER_PAGE,total)}件を表示`:'';
 
-  const container=document.getElementById('productGrid');
-  if(!container) return;
-  container.innerHTML=`
-    <div class="table-wrap" style="margin-bottom:8px">
-      <table>
-        <thead><tr>
-          <th>品番</th><th>品名</th><th>状態</th><th>操作</th>
-        </tr></thead>
-        <tbody>
-          ${pageItems.map(p=>`
-            <tr style="${!p.is_active?'opacity:.5':''}">
-              <td style="font-weight:700">${p.code}</td>
-              <td>
-                <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;color:var(--text1);width:100%;outline:none;padding:2px 4px"
-                  value="${p.name}"
-                  onfocus="this.style.borderBottomColor='var(--orange)'"
-                  onblur="this.style.borderBottomColor='transparent';updateProductName(${p.id},this.value)"
-                  placeholder="品名を入力">
-              </td>
-              <td>${p.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
-              <td>
-                <div class="tbl-actions">
-                  <button class="tbl-btn" onclick="openProductModal(${p.id})">${t('edit')}</button>
-                  <button class="tbl-btn danger" onclick="toggleProduct(${p.id})">${p.is_active?'無効化':'有効化'}</button>
-                </div>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
+  const body=document.getElementById('productTableBody');
+  if(!body) return;
+  if(!pageItems.length){body.innerHTML='<tr><td colspan="5" class="empty">該当する品番がありません</td></tr>';return}
 
-  // ページネーション
+  body.innerHTML=pageItems.map(r=>{
+    const machineCol=r.linked?`<td style="font-weight:700">#${r.machineNo}</td>`:`<td class="unlinked">—</td>`;
+    const lineCol=r.linked?`<td><span class="line-badge">${r.machineLine}ライン</span></td>`:`<td class="unlinked">—</td>`;
+    const editBtn=r.linked
+      ?`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},${r.mpId},${r.machineId})">編集</button><button class="tbl-btn danger" onclick="unlinkProduct(${r.mpId})">解除</button>`
+      :`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},null,null)">編集</button><button class="tbl-btn danger" onclick="deleteProduct(${r.productId})">削除</button>`;
+    return `<tr><td style="font-weight:700">${r.code}</td><td>${r.name}</td>${machineCol}${lineCol}<td><div class="tbl-actions">${editBtn}</div></td></tr>`;
+  }).join('');
+
+  // Pager
   const pager=document.getElementById('productPager');
   if(!pager) return;
   if(totalPages<=1){pager.innerHTML='';return}
-  let btns='';
-  btns+=`<button onclick="goProductPage(${productPage-1})" ${productPage===1?'disabled':''} style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-family:inherit">←</button>`;
-  for(let i=1;i<=totalPages;i++){
-    btns+=`<button onclick="goProductPage(${i})" style="background:${i===productPage?'var(--orange)':'var(--bg2)'};border:1px solid ${i===productPage?'var(--orange)':'var(--border)'};border-radius:6px;padding:5px 10px;cursor:pointer;color:${i===productPage?'var(--navy)':'var(--text2)'};font-family:inherit;font-weight:${i===productPage?'700':'400'}">${i}</button>`;
-  }
+  let btns=`<button onclick="goProductPage(${productPage-1})" ${productPage===1?'disabled':''} style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-family:inherit">←</button>`;
+  for(let i=1;i<=totalPages;i++) btns+=`<button onclick="goProductPage(${i})" style="background:${i===productPage?'var(--orange)':'var(--bg2)'};border:1px solid ${i===productPage?'var(--orange)':'var(--border)'};border-radius:6px;padding:5px 10px;cursor:pointer;color:${i===productPage?'var(--navy)':'var(--text2)'};font-family:inherit;font-weight:${i===productPage?'700':'400'}">${i}</button>`;
   btns+=`<button onclick="goProductPage(${productPage+1})" ${productPage===totalPages?'disabled':''} style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-family:inherit">→</button>`;
   pager.innerHTML=btns;
 }
 
-function goProductPage(p){
-  const totalPages=Math.ceil(PRODUCTS.length/PRODUCTS_PER_PAGE);
-  if(p<1||p>totalPages) return;
-  productPage=p;
-  renderProducts();
-  document.getElementById('scrollArea').scrollTo(0,0);
+function goProductPage(p){ const tp=Math.ceil(buildProductRows().length/PRODUCTS_PER_PAGE); if(p<1||p>tp)return; productPage=p; renderProducts(); document.getElementById('scrollArea').scrollTo(0,0); }
+
+/* ===== Product modals ===== */
+function openProductModal(){
+  // 新規追加: 品番+品名+機番
+  const machineOpts=`<option value="">— 未紐づけ —</option>`+MACHINES.filter(m=>m.is_active).map(m=>`<option value="${m.id}">#${m.no} ${m.line}ライン</option>`).join('');
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${t('product_add')}</div>
+    <div class="form-row"><div class="form-group"><div class="form-label">${t('label_code')} <span class="req">必須</span></div><input class="form-input" id="p-code" placeholder="例：AP2"></div>
+    <div class="form-group"><div class="form-label">${t('label_pname')} <span class="req">必須</span></div><input class="form-input" id="p-name" placeholder="例：AP2ユニット"></div></div>
+    <div class="form-group"><div class="form-label">${t('label_machine_no')}</div><select class="form-select" id="p-machine">${machineOpts}</select></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn-primary" onclick="saveNewProduct()">追加</button></div>`);
 }
 
-/* ===== Machine modal ===== */
-function openMachineModal(id=null, defaultLine='A'){
-  const m=id?MACHINES.find(x=>x.id===id):null;
-  const title=m?t('machine_edit'):t('machine_add');
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${title}</div>
-    <div class="form-row">
-      <div class="form-group">
-        <div class="form-label">${t('label_machine_no')} <span class="req">必須</span></div>
-        <input class="form-input" id="m-no" value="${m?.no||''}" placeholder="例：12">
-      </div>
-      <div class="form-group">
-        <div class="form-label">${t('label_line')} <span class="req">必須</span></div>
-        <select class="form-select" id="m-line">
-          <option value="A" ${(m?.line||defaultLine)==='A'?'selected':''}>Aライン</option>
-          <option value="B" ${(m?.line||defaultLine)==='B'?'selected':''}>Bライン</option>
-          <option value="C" ${(m?.line||defaultLine)==='C'?'selected':''}>Cライン</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="form-label">${t('label_memo')}</div>
-      <input class="form-input" id="m-memo" value="${m?.memo||''}" placeholder="備考">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
-      <button class="btn-primary" onclick="saveMachine(${id||'null'})">${t('save')}</button>
-    </div>
-  `);
-}
-
-async function saveMachine(id){
-  const no=document.getElementById('m-no').value.trim();
-  const line=document.getElementById('m-line').value;
-  const memo=document.getElementById('m-memo').value.trim();
-  if(!no){showToast('機番を入力してください','error');return}
-  const lineId=getLineId(line);
-  if(!lineId){showToast('ライン情報が見つかりません','error');return}
-  try {
-    if(id){
-      await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo})});
-    } else {
-      await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo,is_active:true})});
-    }
-    closeModal();await loadAll();showToast(t('user_saved'),'success');
-  } catch(err){showToast('保存に失敗: '+err.message,'error')}
-}
-
-async function toggleMachine(id){
-  const m=MACHINES.find(x=>x.id===id);
-  if(!m) return;
-  try {
-    await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!m.is_active})});
-    await loadAll();
-  } catch(err){showToast('更新に失敗','error')}
-}
-
-/* ===== Machine-Product Linking ===== */
-function openLinkModal(machineId){
-  const m = MACHINES.find(x => x.id === machineId);
-  if(!m) return;
-  const linkedIds = new Set(MACHINE_PRODUCTS.filter(mp => mp.machine_id === machineId).map(mp => mp.product_id));
-  const activeProducts = PRODUCTS.filter(p => p.is_active);
-
-  const checkboxes = activeProducts.map(p => {
-    const checked = linkedIds.has(p.id) ? 'checked' : '';
-    return `<label class="link-item">
-      <input type="checkbox" value="${p.id}" ${checked}>
-      <div class="link-item-info">
-        <div class="link-item-code">${p.code}</div>
-        <div class="link-item-name">${p.name}</div>
-      </div>
-    </label>`;
-  }).join('');
-
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${m.no}号機（${m.line}ライン）の品番紐づけ</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">紐づける品番にチェックを入れてください</div>
-    <input class="link-search" type="text" placeholder="品番・品名で絞り込み..." oninput="filterLinkItems(this.value)">
-    <div class="link-list" id="linkList">${checkboxes}</div>
-    <div style="font-size:11px;color:var(--text2);margin-top:4px" id="linkCount">選択中: ${linkedIds.size}件</div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-      <button class="btn-primary" onclick="saveMachineLinks(${machineId})">保存</button>
-    </div>
-  `, true);
-
-  // Update count on checkbox change
-  setTimeout(() => {
-    document.querySelectorAll('#linkList input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const cnt = document.querySelectorAll('#linkList input[type="checkbox"]:checked').length;
-        document.getElementById('linkCount').textContent = `選択中: ${cnt}件`;
-      });
-    });
-  }, 50);
-}
-
-function filterLinkItems(query){
-  const q = query.toLowerCase();
-  document.querySelectorAll('#linkList .link-item').forEach(item => {
-    const code = item.querySelector('.link-item-code')?.textContent.toLowerCase() || '';
-    const name = item.querySelector('.link-item-name')?.textContent.toLowerCase() || '';
-    item.style.display = (!q || code.includes(q) || name.includes(q)) ? '' : 'none';
-  });
-}
-
-async function saveMachineLinks(machineId){
-  const checkboxes = document.querySelectorAll('#linkList input[type="checkbox"]');
-  const newIds = new Set();
-  checkboxes.forEach(cb => { if(cb.checked) newIds.add(parseInt(cb.value)); });
-
-  const currentLinks = MACHINE_PRODUCTS.filter(mp => mp.machine_id === machineId);
-  const currentIds = new Set(currentLinks.map(mp => mp.product_id));
-
-  // Additions
-  const toAdd = [...newIds].filter(id => !currentIds.has(id));
-  // Removals
-  const toRemove = [...currentIds].filter(id => !newIds.has(id));
-
-  try {
-    for(const productId of toAdd){
-      await sbFetch('machine_products', {method:'POST', body:JSON.stringify({machine_id:machineId, product_id:productId})});
-    }
-    for(const productId of toRemove){
-      await sbFetch(`machine_products?machine_id=eq.${machineId}&product_id=eq.${productId}`, {method:'DELETE'});
-    }
-    closeModal();
-    await loadAll();
-    const msg = [];
-    if(toAdd.length) msg.push(`追加${toAdd.length}件`);
-    if(toRemove.length) msg.push(`解除${toRemove.length}件`);
-    showToast(msg.length ? `紐づけ更新: ${msg.join('・')}` : '変更なし', msg.length ? 'success' : 'info');
-  } catch(err){
-    showToast('紐づけの保存に失敗: ' + err.message, 'error');
-  }
-}
-
-async function unlinkProduct(machineId, productId){
-  if(!confirm('この品番の紐づけを解除しますか？')) return;
-  try {
-    await sbFetch(`machine_products?machine_id=eq.${machineId}&product_id=eq.${productId}`, {method:'DELETE'});
-    await loadAll();
-    showToast('紐づけを解除しました','success');
-  } catch(err){showToast('解除に失敗','error')}
-}
-
-/* ===== Product modal ===== */
-function openProductModal(id=null){
-  const p=id?PRODUCTS.find(x=>x.id===id):null;
-  const title=p?t('product_edit'):t('product_add');
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${title}</div>
-    <div class="form-row">
-      <div class="form-group">
-        <div class="form-label">${t('label_code')} <span class="req">必須</span></div>
-        <input class="form-input" id="p-code" value="${p?.code||''}" placeholder="例：AP2">
-      </div>
-      <div class="form-group">
-        <div class="form-label">${t('label_pname')} <span class="req">必須</span></div>
-        <input class="form-input" id="p-name" value="${p?.name||''}" placeholder="例：AP2ユニット">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button>
-      <button class="btn-primary" onclick="saveProduct(${id||'null'})">${t('save')}</button>
-    </div>
-  `);
-}
-
-async function saveProduct(id){
+async function saveNewProduct(){
   const code=document.getElementById('p-code').value.trim();
   const name=document.getElementById('p-name').value.trim();
+  const machineId=document.getElementById('p-machine').value;
   if(!code||!name){showToast('品番と品名を入力してください','error');return}
   try {
-    if(id){
-      await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({product_code:code,product_name:name})});
-    } else {
-      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:code,product_name:name,is_active:true})});
+    // 品番が既存か確認
+    let product=PRODUCTS.find(p=>p.code===code);
+    if(!product){
+      const res=await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:code,product_name:name,is_active:true})});
+      product=res?.[0];
+    }
+    // 機番が選択されていれば紐づけ作成
+    if(machineId && product){
+      const exists=MACHINE_PRODUCTS.some(mp=>mp.machine_id===parseInt(machineId)&&mp.product_id===product.id);
+      if(!exists) await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:parseInt(machineId),product_id:product.id})});
+    }
+    closeModal();await loadAll();showToast('追加しました','success');
+  } catch(err){showToast('追加に失敗: '+err.message,'error')}
+}
+
+function openProductEditModal(productId,mpId,machineId){
+  const p=PRODUCTS.find(x=>x.id===productId);if(!p)return;
+  const machineOpts=`<option value="">— 未紐づけ —</option>`+MACHINES.filter(m=>m.is_active).map(m=>`<option value="${m.id}" ${m.id===machineId?'selected':''}>#${m.no} ${m.line}ライン</option>`).join('');
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${t('product_edit')}</div>
+    <div class="form-row"><div class="form-group"><div class="form-label">${t('label_code')}</div><input class="form-input" id="pe-code" value="${p.code}" readonly style="opacity:.6"></div>
+    <div class="form-group"><div class="form-label">${t('label_pname')} <span class="req">必須</span></div><input class="form-input" id="pe-name" value="${p.name}"></div></div>
+    <div class="form-group"><div class="form-label">${t('label_machine_no')}</div><select class="form-select" id="pe-machine">${machineOpts}</select></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn-primary" onclick="saveProductEdit(${productId},${mpId||'null'})">${t('save')}</button></div>`);
+}
+
+async function saveProductEdit(productId,mpId){
+  const name=document.getElementById('pe-name').value.trim();
+  const newMachineId=document.getElementById('pe-machine').value;
+  if(!name){showToast('品名を入力してください','error');return}
+  try {
+    // 品名更新
+    await sbFetch(`products?id=eq.${productId}`,{method:'PATCH',body:JSON.stringify({product_name:name})});
+    // 紐づけ更新
+    if(mpId){
+      if(newMachineId){
+        // 機番変更
+        await sbFetch(`machine_products?id=eq.${mpId}`,{method:'PATCH',body:JSON.stringify({machine_id:parseInt(newMachineId)})});
+      } else {
+        // 紐づけ解除
+        await sbFetch(`machine_products?id=eq.${mpId}`,{method:'DELETE'});
+      }
+    } else if(newMachineId){
+      // 新規紐づけ
+      const exists=MACHINE_PRODUCTS.some(mp=>mp.machine_id===parseInt(newMachineId)&&mp.product_id===productId);
+      if(!exists) await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:parseInt(newMachineId),product_id:productId})});
     }
     closeModal();await loadAll();showToast(t('user_saved'),'success');
   } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
 
-async function toggleProduct(id){
-  const p=PRODUCTS.find(x=>x.id===id);
-  if(!p) return;
-  try {
-    await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!p.is_active})});
-    await loadAll();
-  } catch(err){showToast('更新に失敗','error')}
+async function unlinkProduct(mpId){
+  if(!confirm('この紐づけを解除しますか？（品番自体は残ります）'))return;
+  try{await sbFetch(`machine_products?id=eq.${mpId}`,{method:'DELETE'});await loadAll();showToast('紐づけを解除しました','success')}catch(err){showToast('解除に失敗','error')}
 }
 
+async function deleteProduct(productId){
+  if(!confirm(t('delete_confirm')))return;
+  try{await sbFetch(`machine_products?product_id=eq.${productId}`,{method:'DELETE'});await sbFetch(`products?id=eq.${productId}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}
+}
 
 /* ===== CSV Import (Users) ===== */
-function handleUserCsvImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const text = e.target.result;
-      const lines = text.split(/\r?\n/).filter(l => l.trim());
-      if (lines.length < 2) { showToast('データが見つかりません', 'error'); return; }
-
-      const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      const nameIdx = header.findIndex(h => /名前|name/i.test(h));
-      const roleIdx = header.findIndex(h => /ロール|role/i.test(h));
-      const shiftIdx = header.findIndex(h => /直|shift/i.test(h));
-
-      if (nameIdx < 0) { showToast('「名前」列が見つかりません', 'error'); return; }
-
-      const addList = [];
-      const updateList = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-        const name = cols[nameIdx];
-        if (!name) continue;
-
-        const roleRaw = roleIdx >= 0 ? cols[roleIdx].toLowerCase() : 'op';
-        const role = roleRaw === 'admin' ? 'admin' : roleRaw === 'sl' ? 'sl' : 'op';
-        const shift = shiftIdx >= 0 ? (parseInt(cols[shiftIdx]) || null) : null;
-
-        const existing = USERS.find(u => u.name === name);
-        if (existing) {
-          const changes = [];
-          if (roleIdx >= 0 && existing.role !== role) changes.push(`ロール: ${existing.role}→${role}`);
-          if (shiftIdx >= 0 && existing.shift !== shift) changes.push(`直: ${existing.shift || '—'}→${shift || '—'}`);
-          if (changes.length > 0) {
-            updateList.push({ id: existing.id, name, role, shift, changes });
-          }
-        } else {
-          addList.push({ id: nextUserId++, name, role, shift, is_active: true, locked: false });
-        }
+function handleUserCsvImport(event){
+  const file=event.target.files[0];if(!file)return;event.target.value='';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const text=e.target.result;const lines=text.split(/\r?\n/).filter(l=>l.trim());
+      if(lines.length<2){showToast('データが見つかりません','error');return}
+      const header=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+      const nameIdx=header.findIndex(h=>/名前|name/i.test(h));const roleIdx=header.findIndex(h=>/ロール|role/i.test(h));const shiftIdx=header.findIndex(h=>/直|shift/i.test(h));
+      if(nameIdx<0){showToast('「名前」列が見つかりません','error');return}
+      const addList=[],updateList=[];
+      let nextUserId=(USERS.length?Math.max(...USERS.map(u=>u.id)):0)+1;
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].split(',').map(c=>c.trim().replace(/^"|"$/g,''));const name=cols[nameIdx];if(!name)continue;
+        const roleRaw=roleIdx>=0?cols[roleIdx].toLowerCase():'op';const role=roleRaw==='admin'?'admin':roleRaw==='sl'?'sl':'op';
+        const shift=shiftIdx>=0?(parseInt(cols[shiftIdx])||null):null;
+        const existing=USERS.find(u=>u.name===name);
+        if(existing){const changes=[];if(roleIdx>=0&&existing.role!==role)changes.push(`ロール: ${existing.role}→${role}`);if(shiftIdx>=0&&existing.shift!==shift)changes.push(`直: ${existing.shift||'—'}→${shift||'—'}`);if(changes.length>0)updateList.push({id:existing.id,name,role,shift,changes})}
+        else addList.push({id:nextUserId++,name,role,shift,is_active:true,locked:false});
       }
-
-      if (addList.length === 0 && updateList.length === 0) {
-        showToast('変更対象のデータがありません', 'info');
-        return;
-      }
-
-      // プレビュー
-      const roleName = r => r === 'admin' ? 'admin' : r === 'sl' ? 'SL' : 'OP';
-      let html = '';
-
-      if (updateList.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 更新: ${updateList.length}件</div>
-          <div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>名前</th><th>変更内容</th></tr></thead><tbody>
-          ${updateList.map(u => `<tr><td>${u.name}</td><td style="font-size:11px;color:var(--text2)">${u.changes.join(', ')}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-
-      if (addList.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 新規追加: ${addList.length}件</div>
-          <div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>名前</th><th>ロール</th><th>直</th></tr></thead><tbody>
-          ${addList.map(u => `<tr><td>${u.name}</td><td>${roleName(u.role)}</td><td>${u.shift ? u.shift + '直' : '—'}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-
-      showModal(`
-        <div class="modal-title">CSVインポート プレビュー</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-          新規${addList.length}件 ・ 更新${updateList.length}件
-        </div>
-        ${html}
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-          <button class="btn-add" onclick="confirmUserImport()">インポート実行</button>
-        </div>
-      `, true);
-
-      window._pendingUserImport = { addList, updateList };
-
-    } catch (err) {
-      showToast('CSVの読み込みに失敗しました: ' + err.message, 'error');
-    }
-  };
-  reader.readAsText(file, 'UTF-8');
+      if(!addList.length&&!updateList.length){showToast('変更対象のデータがありません','info');return}
+      const roleName=r=>r==='admin'?'admin':r==='sl'?'SL':'OP';let html='';
+      if(updateList.length)html+=`<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 更新: ${updateList.length}件</div><div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%"><thead><tr><th>名前</th><th>変更</th></tr></thead><tbody>${updateList.map(u=>`<tr><td>${u.name}</td><td style="font-size:11px;color:var(--text2)">${u.changes.join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+      if(addList.length)html+=`<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 新規追加: ${addList.length}件</div><div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%"><thead><tr><th>名前</th><th>ロール</th><th>直</th></tr></thead><tbody>${addList.map(u=>`<tr><td>${u.name}</td><td>${roleName(u.role)}</td><td>${u.shift?u.shift+'直':'—'}</td></tr>`).join('')}</tbody></table></div>`;
+      showModal(`<div class="modal-title">CSVインポート プレビュー</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">新規${addList.length}件 ・ 更新${updateList.length}件</div>${html}<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-add" onclick="confirmUserImport()">インポート実行</button></div>`,true);
+      window._pendingUserImport={addList,updateList};
+    }catch(err){showToast('CSVの読み込みに失敗: '+err.message,'error')}
+  };reader.readAsText(file,'UTF-8');
 }
 
-async function confirmUserImport() {
-  const data = window._pendingUserImport;
-  if (!data) return;
-  try {
-    for (const u of data.addList) {
-      await sbFetch('users',{method:'POST',body:JSON.stringify({name:u.name,role:u.role,shift:u.shift,pin_hash:'0000',is_active:true})});
-    }
-    for (const u of data.updateList) {
-      await sbFetch(`users?id=eq.${u.id}`,{method:'PATCH',body:JSON.stringify({role:u.role,shift:u.shift})});
-    }
-    window._pendingUserImport = null;
-    closeModal();await loadAll();
-    const msgs = [];
-    if (data.addList.length) msgs.push(`追加 ${data.addList.length}件`);
-    if (data.updateList.length) msgs.push(`更新 ${data.updateList.length}件`);
-    showToast(`ユーザー ${msgs.join('・')}`, 'success');
-  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
+async function confirmUserImport(){
+  const d=window._pendingUserImport;if(!d)return;
+  try{for(const u of d.addList)await sbFetch('users',{method:'POST',body:JSON.stringify({name:u.name,role:u.role,shift:u.shift,pin_hash:'0000',is_active:true})});
+  for(const u of d.updateList)await sbFetch(`users?id=eq.${u.id}`,{method:'PATCH',body:JSON.stringify({role:u.role,shift:u.shift})});
+  window._pendingUserImport=null;closeModal();await loadAll();const msgs=[];if(d.addList.length)msgs.push(`追加 ${d.addList.length}件`);if(d.updateList.length)msgs.push(`更新 ${d.updateList.length}件`);showToast(`ユーザー ${msgs.join('・')}`,'success')}catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
-/* ===== Excel Import (Machines / Products) ===== */
-function handleMasterExcelImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const wb = XLSX.read(data, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-      if (rows.length < 2) { showToast('データが見つかりません', 'error'); return; }
-
-      const header = rows[0].map(h => String(h || '').trim());
-      const lineIdx = header.findIndex(h => /ライン|line/i.test(h));
-      const machineIdx = header.findIndex(h => /機番|machine/i.test(h));
-      const codeIdx = header.findIndex(h => /品番|code/i.test(h));
-      const nameIdx = header.findIndex(h => /品名|name|product/i.test(h));
-      const memoIdx = header.findIndex(h => /メモ|memo|備考/i.test(h));
-
-      if (machineIdx < 0) { showToast('「機番」列が見つかりません', 'error'); return; }
-
-      const addMachines = [], updateMachines = [];
-      const addProducts = [], updateProducts = [];
-      const linkPairs = []; // {line, machineNo, productCode} for machine_products
-      const seenMachineKeys = new Set();
-      const seenProductCodes = new Set();
-
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
-        if (!row || !row.length) continue;
-
-        let line = lineIdx >= 0 ? String(row[lineIdx] || '').trim() : '';
-        line = line.replace(/ライン|line/gi, '').trim().toUpperCase() || 'A';
-        const machineNo = String(row[machineIdx] || '').trim();
-        if (!machineNo) continue;
-        const memo = memoIdx >= 0 ? String(row[memoIdx] || '').trim() : '';
-
-        // 機番処理
-        const machineKey = line + '-' + machineNo;
-        if (!seenMachineKeys.has(machineKey)) {
-          seenMachineKeys.add(machineKey);
-          const existing = MACHINES.find(m => m.line === line && m.no === machineNo);
-          if (existing) {
-            const changes = [];
-            if (memoIdx >= 0 && memo && existing.memo !== memo) changes.push(`メモ: ${existing.memo || '—'}→${memo}`);
-            if (changes.length > 0) {
-              updateMachines.push({ id: existing.id, line, no: machineNo, memo, changes });
-            }
-          } else {
-            addMachines.push({ id: nextMachineId++, no: machineNo, line, memo, is_active: true });
-          }
-        }
-
-        // 品番処理
-        const code = codeIdx >= 0 ? String(row[codeIdx] || '').trim() : '';
-        const pname = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
-        if (code && !seenProductCodes.has(code)) {
-          seenProductCodes.add(code);
-          const existingP = PRODUCTS.find(p => p.code === code);
-          if (existingP) {
-            const changes = [];
-            if (pname && existingP.name !== pname) changes.push(`品名: ${existingP.name}→${pname}`);
-            if (changes.length > 0) {
-              updateProducts.push({ id: existingP.id, code, name: pname, changes });
-            }
-          } else {
-            addProducts.push({ id: nextProductId++, code, name: pname || code, is_active: true });
-          }
-        }
-
-        // 紐づけペア収集
-        if (code) {
-          linkPairs.push({ line, machineNo, productCode: code });
-        }
+/* ===== Machine Import (Excel) ===== */
+function handleMachineImport(event){
+  const file=event.target.files[0];if(!file)return;event.target.value='';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=new Uint8Array(e.target.result);const wb=XLSX.read(data,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1});
+      if(rows.length<2){showToast('データが見つかりません','error');return}
+      const header=rows[0].map(h=>String(h||'').trim());
+      const lineIdx=header.findIndex(h=>/ライン|line/i.test(h));const machineIdx=header.findIndex(h=>/機番|machine/i.test(h));
+      const memoIdx=header.findIndex(h=>/メモ|memo|備考/i.test(h));
+      if(machineIdx<0){showToast('「機番」列が見つかりません','error');return}
+      const addList=[],seenKeys=new Set();
+      let nextId=(MACHINES.length?Math.max(...MACHINES.map(m=>m.id)):0)+1;
+      for(let i=1;i<rows.length;i++){
+        const row=rows[i];if(!row||!row.length)continue;
+        let line=lineIdx>=0?String(row[lineIdx]||'').trim():'';line=line.replace(/ライン|line/gi,'').trim().toUpperCase()||'A';
+        const no=String(row[machineIdx]||'').trim();if(!no)continue;
+        const memo=memoIdx>=0?String(row[memoIdx]||'').trim():'';
+        const key=line+'-'+no;if(seenKeys.has(key))continue;seenKeys.add(key);
+        if(!MACHINES.find(m=>m.line===line&&m.no===no)) addList.push({id:nextId++,no,line,memo});
       }
-
-      const totalChanges = addMachines.length + updateMachines.length + addProducts.length + updateProducts.length + linkPairs.length;
-      if (totalChanges === 0) {
-        showToast('変更対象のデータがありません', 'info');
-        return;
-      }
-
-      // プレビュー
-      let html = '';
-
-      if (updateMachines.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 機番 更新: ${updateMachines.length}件</div>
-          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>ライン</th><th>機番</th><th>変更</th></tr></thead><tbody>
-          ${updateMachines.slice(0,20).map(m => `<tr><td>${m.line}</td><td>${m.no}</td><td style="font-size:11px;color:var(--text2)">${m.changes.join(', ')}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-      if (addMachines.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 機番 新規: ${addMachines.length}件</div>
-          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>ライン</th><th>機番</th></tr></thead><tbody>
-          ${addMachines.slice(0,20).map(m => `<tr><td>${m.line}ライン</td><td>${m.no}号機</td></tr>`).join('')}
-          </tbody></table></div>
-          ${addMachines.length > 20 ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ${addMachines.length - 20}件...</div>` : ''}`;
-      }
-      if (updateProducts.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 品番 更新: ${updateProducts.length}件</div>
-          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>品番</th><th>変更</th></tr></thead><tbody>
-          ${updateProducts.slice(0,20).map(p => `<tr><td>${p.code}</td><td style="font-size:11px;color:var(--text2)">${p.changes.join(', ')}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-      if (addProducts.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 品番 新規: ${addProducts.length}件</div>
-          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>品番</th><th>品名</th></tr></thead><tbody>
-          ${addProducts.slice(0,20).map(p => `<tr><td>${p.code}</td><td>${p.name}</td></tr>`).join('')}
-          </tbody></table></div>
-          ${addProducts.length > 20 ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ${addProducts.length - 20}件...</div>` : ''}`;
-      }
-      if (linkPairs.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:6px">🔗 紐づけ: ${linkPairs.length}件</div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">機番×品番の紐づけをインポートします（既存の紐づけと重複するものはスキップ）</div>`;
-      }
-
-      showModal(`
-        <div class="modal-title">Excelインポート プレビュー</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-          新規 ${addMachines.length + addProducts.length}件 ・ 更新 ${updateMachines.length + updateProducts.length}件 ・ 紐づけ ${linkPairs.length}件
-        </div>
-        ${html}
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-          <button class="btn-add" onclick="confirmMasterImport()">インポート実行</button>
-        </div>
-      `, true);
-
-      window._pendingMasterImport = { addMachines, updateMachines, addProducts, updateProducts, linkPairs };
-
-    } catch (err) {
-      showToast('ファイルの読み込みに失敗しました: ' + err.message, 'error');
-    }
-  };
-  reader.readAsArrayBuffer(file);
+      if(!addList.length){showToast('新規データがありません','info');return}
+      showModal(`<div class="modal-title">機番インポート プレビュー</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">新規 ${addList.length}件</div><div style="max-height:200px;overflow-y:auto;margin-bottom:12px"><table style="width:100%"><thead><tr><th>ライン</th><th>機番</th></tr></thead><tbody>${addList.slice(0,30).map(m=>`<tr><td>${m.line}ライン</td><td>#${m.no}</td></tr>`).join('')}</tbody></table></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-add" onclick="confirmMachineImport()">インポート実行</button></div>`,true);
+      window._pendingMachineImport=addList;
+    }catch(err){showToast('ファイルの読み込みに失敗: '+err.message,'error')}
+  };reader.readAsArrayBuffer(file);
 }
 
-async function confirmMasterImport() {
-  const d = window._pendingMasterImport;
-  if (!d) return;
-  try {
-    // 1. 機番の追加/更新
-    for (const m of d.addMachines) {
-      const lineId=getLineId(m.line);
-      if(lineId) await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(m.no),line_id:lineId,memo:m.memo,is_active:true})});
-    }
-    for (const m of d.updateMachines) {
-      await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({memo:m.memo})});
-    }
-    // 2. 品番の追加/更新
-    for (const p of d.addProducts) {
-      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
-    }
-    for (const p of d.updateProducts) {
-      await sbFetch(`products?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({product_name:p.name})});
-    }
-
-    // 3. 紐づけ作成 — まずデータをリロードして最新IDを取得
-    if (d.linkPairs && d.linkPairs.length > 0) {
-      // Reload machines and products to get IDs of newly created items
-      const freshMachines = await sbFetch('machines?select=*,lines(line_name)&order=machine_no');
-      const freshProducts = await sbFetch('products?select=*&order=product_code');
-      const freshMP = await sbFetch('machine_products?select=id,machine_id,product_id');
-
-      const existingLinks = new Set((freshMP||[]).map(mp => `${mp.machine_id}-${mp.product_id}`));
-      let linkCount = 0;
-
-      for (const pair of d.linkPairs) {
-        // Resolve machine ID
-        const machine = freshMachines.find(m => {
-          const mLine = m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() || 'A';
-          return mLine === pair.line && String(m.machine_no) === pair.machineNo;
-        });
-        // Resolve product ID
-        const product = freshProducts.find(p => p.product_code === pair.productCode);
-
-        if (machine && product) {
-          const linkKey = `${machine.id}-${product.id}`;
-          if (!existingLinks.has(linkKey)) {
-            await sbFetch('machine_products', {method:'POST', body:JSON.stringify({machine_id:machine.id, product_id:product.id})});
-            existingLinks.add(linkKey);
-            linkCount++;
-          }
-        }
-      }
-    }
-
-    window._pendingMasterImport = null;
-    closeModal();await loadAll();
-    const msgs = [];
-    const addTotal = d.addMachines.length + d.addProducts.length;
-    const updateTotal = d.updateMachines.length + d.updateProducts.length;
-    if (addTotal) msgs.push(`追加 ${addTotal}件`);
-    if (updateTotal) msgs.push(`更新 ${updateTotal}件`);
-    if (d.linkPairs?.length) msgs.push(`紐づけ処理 ${d.linkPairs.length}件`);
-    showToast(`マスタ ${msgs.join('・')}`, 'success');
-  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
+async function confirmMachineImport(){
+  const list=window._pendingMachineImport;if(!list)return;
+  try{for(const m of list){const lineId=getLineId(m.line);if(lineId)await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(m.no),line_id:lineId,memo:m.memo,is_active:true})})}
+  window._pendingMachineImport=null;closeModal();await loadAll();showToast(`機番 追加 ${list.length}件`,'success')}catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
-/* ===== Product Excel Import ===== */
-function handleProductExcelImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
+/* ===== Product Import (Excel: 品番/品名/機番/ライン) ===== */
+function handleProductImport(event){
+  const file=event.target.files[0];if(!file)return;event.target.value='';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=new Uint8Array(e.target.result);const wb=XLSX.read(data,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1});
+      if(rows.length<2){showToast('データが見つかりません','error');return}
+      const header=rows[0].map(h=>String(h||'').trim());
+      const codeIdx=header.findIndex(h=>/品番|code/i.test(h));const nameIdx=header.findIndex(h=>/品名|name|product/i.test(h));
+      const machineIdx=header.findIndex(h=>/機番|machine/i.test(h));const lineIdx=header.findIndex(h=>/ライン|line/i.test(h));
+      if(codeIdx<0){showToast('「品番」列が見つかりません','error');return}
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const wb = XLSX.read(data, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-      if (rows.length < 2) { showToast('データが見つかりません', 'error'); return; }
-
-      const header = rows[0].map(h => String(h || '').trim());
-      const codeIdx = header.findIndex(h => /品番|code/i.test(h));
-      const nameIdx = header.findIndex(h => /品名|name|product/i.test(h));
-
-      if (codeIdx < 0) { showToast('「品番」列が見つかりません', 'error'); return; }
-
-      const addList = [], updateList = [];
-      const seenCodes = new Set();
-
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
-        if (!row || !row.length) continue;
-        const code = String(row[codeIdx] || '').trim();
-        const pname = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
-        if (!code || seenCodes.has(code)) continue;
-        seenCodes.add(code);
-
-        const existing = PRODUCTS.find(p => p.code === code);
-        if (existing) {
-          const changes = [];
-          if (pname && existing.name !== pname) changes.push(`品名: ${existing.name}→${pname}`);
-          if (changes.length > 0) updateList.push({ id: existing.id, code, name: pname, changes });
-        } else {
-          addList.push({ code, name: pname || code });
+      const newProducts=[],linkPairs=[];const seenCodes=new Set();
+      for(let i=1;i<rows.length;i++){
+        const row=rows[i];if(!row||!row.length)continue;
+        const code=String(row[codeIdx]||'').trim();if(!code)continue;
+        const pname=nameIdx>=0?String(row[nameIdx]||'').trim():'';
+        if(!seenCodes.has(code)&&!PRODUCTS.find(p=>p.code===code)){newProducts.push({code,name:pname||code});seenCodes.add(code)}
+        // 紐づけペア
+        if(machineIdx>=0||lineIdx>=0){
+          let line=lineIdx>=0?String(row[lineIdx]||'').trim().replace(/ライン|line/gi,'').trim().toUpperCase():'';
+          const machineNo=machineIdx>=0?String(row[machineIdx]||'').trim().replace(/#|号機/g,''):'';
+          if(machineNo) linkPairs.push({code,line,machineNo});
         }
       }
-
-      if (addList.length === 0 && updateList.length === 0) {
-        showToast('変更対象のデータがありません', 'info'); return;
-      }
-
-      let html = '';
-      if (updateList.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 更新: ${updateList.length}件</div>
-          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>品番</th><th>変更</th></tr></thead><tbody>
-          ${updateList.map(p => `<tr><td>${p.code}</td><td style="font-size:11px;color:var(--text2)">${p.changes.join(', ')}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-      if (addList.length > 0) {
-        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 新規追加: ${addList.length}件</div>
-          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
-          <thead><tr><th>品番</th><th>品名</th></tr></thead><tbody>
-          ${addList.slice(0,30).map(p => `<tr><td>${p.code}</td><td>${p.name}</td></tr>`).join('')}
-          </tbody></table></div>`;
-      }
-
-      showModal(`
-        <div class="modal-title">品番インポート プレビュー</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">新規${addList.length}件 ・ 更新${updateList.length}件</div>
-        ${html}
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-          <button class="btn-add" onclick="confirmProductImport()">インポート実行</button>
-        </div>
-      `, true);
-      window._pendingProductImport = { addList, updateList };
-    } catch (err) { showToast('ファイルの読み込みに失敗: ' + err.message, 'error'); }
-  };
-  reader.readAsArrayBuffer(file);
+      const totalNew=newProducts.length;const totalLinks=linkPairs.length;
+      if(!totalNew&&!totalLinks){showToast('変更対象のデータがありません','info');return}
+      let html='';
+      if(totalNew)html+=`<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 品番 新規: ${totalNew}件</div><div style="max-height:140px;overflow-y:auto;margin-bottom:12px"><table style="width:100%"><thead><tr><th>品番</th><th>品名</th></tr></thead><tbody>${newProducts.slice(0,20).map(p=>`<tr><td>${p.code}</td><td>${p.name}</td></tr>`).join('')}</tbody></table></div>`;
+      if(totalLinks)html+=`<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:6px">🔗 紐づけ: ${totalLinks}件</div><div style="font-size:11px;color:var(--text2);margin-bottom:12px">機番×品番の紐づけをインポートします（重複はスキップ）</div>`;
+      showModal(`<div class="modal-title">品番インポート プレビュー</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">新規 ${totalNew}件 ・ 紐づけ ${totalLinks}件</div>${html}<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-add" onclick="confirmProductImport()">インポート実行</button></div>`,true);
+      window._pendingProductImport={newProducts,linkPairs};
+    }catch(err){showToast('ファイルの読み込みに失敗: '+err.message,'error')}
+  };reader.readAsArrayBuffer(file);
 }
 
-async function confirmProductImport() {
-  const d = window._pendingProductImport;
-  if (!d) return;
-  try {
-    for (const p of d.addList) {
-      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
+async function confirmProductImport(){
+  const d=window._pendingProductImport;if(!d)return;
+  try{
+    for(const p of d.newProducts) await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
+    // Reload to get new IDs
+    if(d.linkPairs.length){
+      const freshProducts=await sbFetch('products?select=*&order=product_code');
+      const freshMachines=await sbFetch('machines?select=*,lines(line_name)&order=machine_no');
+      const freshMP=await sbFetch('machine_products?select=id,machine_id,product_id');
+      const existingLinks=new Set((freshMP||[]).map(mp=>`${mp.machine_id}-${mp.product_id}`));
+      let linkCount=0;
+      for(const pair of d.linkPairs){
+        const machine=freshMachines.find(m=>{const ml=m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase()||'A';return(!pair.line||ml===pair.line)&&String(m.machine_no)===pair.machineNo});
+        const product=freshProducts.find(p=>p.product_code===pair.code);
+        if(machine&&product){const key=`${machine.id}-${product.id}`;if(!existingLinks.has(key)){await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:machine.id,product_id:product.id})});existingLinks.add(key);linkCount++}}
+      }
     }
-    for (const p of d.updateList) {
-      await sbFetch(`products?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({product_name:p.name})});
-    }
-    window._pendingProductImport = null;
-    closeModal();await loadAll();
-    const msgs = [];
-    if (d.addList.length) msgs.push(`追加 ${d.addList.length}件`);
-    if (d.updateList.length) msgs.push(`更新 ${d.updateList.length}件`);
-    showToast(`品番 ${msgs.join('・')}`, 'success');
-  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
+    window._pendingProductImport=null;closeModal();await loadAll();
+    const msgs=[];if(d.newProducts.length)msgs.push(`品番追加 ${d.newProducts.length}件`);if(d.linkPairs.length)msgs.push(`紐づけ処理 ${d.linkPairs.length}件`);
+    showToast(msgs.join('・'),'success');
+  }catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
 /* ===== Excel Export ===== */
-function exportImages(){
-  // ② 画像エクスポート：画像ファイル名一覧＋対応トラブル情報をExcel出力
-  // 実際はSupabaseから取得するが、モックデータで実装
-  const wb=XLSX.utils.book_new();
-  const headers=['ファイル名','日付','直','機番','品番','詳細内容'];
-  const mockRows=[
-    ['20260325_1直_機番8_AP2_001.jpg','2026/03/25','1','8号機','AP2','冷却ユニット異常'],
-    ['20260325_1直_機番8_AP2_002.jpg','2026/03/25','1','8号機','AP2','冷却ユニット異常'],
-    ['20260324_2直_機番33_940_001.jpg','2026/03/24','2','33号機','940','取出機アーム動作異常'],
-  ];
-  const ws=XLSX.utils.aoa_to_sheet([headers,...mockRows]);
-  ws['!cols']=[{wch:36},{wch:12},{wch:5},{wch:8},{wch:12},{wch:30}];
-  XLSX.utils.book_append_sheet(wb,ws,'画像一覧');
-  XLSX.writeFile(wb,'Traq_画像エクスポート.xlsx');
-  showToast('画像情報をExcel出力しました（実運用時は実データが出力されます）','success');
-}
-
 function exportUsers(){
-  const wb=XLSX.utils.book_new();
-  const headers=['ID','名前','ロール','デフォルト直','状態'];
-  const rows=USERS.map(u=>[
-    u.id, u.name,
-    u.role==='admin'?'admin':u.role==='sl'?'SL':'OP',
-    u.shift?`${u.shift}直`:'—',
-    u.is_active?'有効':'無効'
-  ]);
-  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-  ws['!cols']=[{wch:5},{wch:20},{wch:8},{wch:10},{wch:8}];
-  XLSX.utils.book_append_sheet(wb,ws,'ユーザー');
-  XLSX.writeFile(wb,'Traq_ユーザー一覧.xlsx');
-  showToast('ユーザー一覧をExcel出力しました','success');
+  const wb=XLSX.utils.book_new();const headers=['ID','名前','ロール','デフォルト直','状態'];
+  const rows=USERS.map(u=>[u.id,u.name,u.role==='admin'?'admin':u.role==='sl'?'SL':'OP',u.shift?`${u.shift}直`:'—',u.is_active?'有効':'無効']);
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);ws['!cols']=[{wch:5},{wch:20},{wch:8},{wch:10},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,'ユーザー');XLSX.writeFile(wb,'Traq_ユーザー一覧.xlsx');showToast('ユーザー一覧をExcel出力しました','success');
 }
 
-function exportMaster(){
-  const wb=XLSX.utils.book_new();
-  const headers=['ライン名','機番','品番','品名'];
-  const rows=[];
-  MACHINES.forEach(m=>{
-    const linkedProducts = MACHINE_PRODUCTS
-      .filter(mp => mp.machine_id === m.id)
-      .map(mp => PRODUCTS.find(p => p.id === mp.product_id))
-      .filter(Boolean);
-    if(linkedProducts.length){
-      linkedProducts.forEach(p => rows.push([m.line+'ライン', m.no, p.code, p.name]));
-    } else {
-      rows.push([m.line+'ライン', m.no, '', '']);
-    }
-  });
-  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-  ws['!cols']=[{wch:10},{wch:8},{wch:14},{wch:20}];
-  XLSX.utils.book_append_sheet(wb,ws,'マスタ');
-  XLSX.writeFile(wb,'Traq_マスタ_インポート用.xlsx');
-  showToast('マスタをExcel出力しました（インポートテンプレート形式）','success');
+function exportMachines(){
+  const wb=XLSX.utils.book_new();const headers=['ライン名','機番','備考','状態'];
+  const rows=MACHINES.map(m=>[m.line+'ライン',m.no,m.memo,m.is_active?'有効':'無効']);
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);ws['!cols']=[{wch:10},{wch:8},{wch:20},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,'機番マスタ');XLSX.writeFile(wb,'Traq_機番マスタ.xlsx');showToast('機番マスタをExcel出力しました','success');
 }
 
 function exportProducts(){
-  const wb=XLSX.utils.book_new();
-  const headers=['品番','品名','状態'];
-  const rows=PRODUCTS.map(p=>[p.code, p.name, p.is_active?'有効':'無効']);
-  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-  ws['!cols']=[{wch:14},{wch:20},{wch:8}];
-  XLSX.utils.book_append_sheet(wb,ws,'品番マスタ');
-  XLSX.writeFile(wb,'Traq_品番マスタ.xlsx');
-  showToast('品番マスタをExcel出力しました','success');
+  const wb=XLSX.utils.book_new();const headers=['品番','品名','機番','ライン'];const rows=[];
+  const allRows=buildProductRows();
+  allRows.forEach(r=>rows.push([r.code,r.name,r.linked?r.machineNo:'',r.linked?r.machineLine+'ライン':'']));
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);ws['!cols']=[{wch:14},{wch:20},{wch:8},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws,'品番マスタ');XLSX.writeFile(wb,'Traq_品番マスタ.xlsx');showToast('品番マスタをExcel出力しました','success');
+}
+
+function exportImages(){
+  const wb=XLSX.utils.book_new();const headers=['ファイル名','日付','直','機番','品番','詳細内容'];
+  const mockRows=[['20260325_1直_機番8_AP2_001.jpg','2026/03/25','1','8号機','AP2','冷却ユニット異常']];
+  const ws=XLSX.utils.aoa_to_sheet([headers,...mockRows]);ws['!cols']=[{wch:36},{wch:12},{wch:5},{wch:8},{wch:12},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,ws,'画像一覧');XLSX.writeFile(wb,'Traq_画像エクスポート.xlsx');showToast('画像情報をExcel出力しました','success');
 }
 
 /* ===== Modal ===== */
 function showModal(html,center=false){
   const el=document.getElementById('modalEl');
   el.innerHTML=`<div class="modal-overlay ${center?'center':''}" onclick="handleOverlay(event)"><div class="modal-sheet">${html}</div></div>`;
-  el.style.display='block';
-  setTimeout(()=>el.querySelector('.form-input')?.focus(),100);
+  el.style.display='block';setTimeout(()=>el.querySelector('.form-input')?.focus(),100);
 }
 function closeModal(){document.getElementById('modalEl').style.display='none'}
 function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal()}
 
-/* ===== Inline edit helpers ===== */
-async function updateMachineMemo(id, val){
-  try { await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({memo:val})}); }
-  catch(err){ console.error(err); }
-}
-async function updateProductName(id, val){
-  if(!val.trim()) return;
-  try { await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({product_name:val.trim()})}); }
-  catch(err){ console.error(err); }
-}
-async function deleteMachine(id){
-  if(!confirm(t('delete_confirm'))) return;
-  try {
-    // 紐づけも削除（FK cascadeがない場合に備えて）
-    await sbFetch(`machine_products?machine_id=eq.${id}`,{method:'DELETE'});
-    await sbFetch(`machines?id=eq.${id}`,{method:'DELETE'});
-    await loadAll();showToast(t('user_deleted'),'success');
-  } catch(err){showToast('削除に失敗','error')}
-}
-
 /* ===== Toast ===== */
 let toastTimer=null;
-function showToast(msg,type='info'){
-  const el=document.getElementById('toastEl');
-  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
-  el.style.display='block';
-  if(toastTimer)clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{el.style.display='none'},2500);
-}
+function showToast(msg,type='info'){const el=document.getElementById('toastEl');el.innerHTML=`<div class="toast ${type}">${msg}</div>`;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none'},2500)}
 
 /* ===== Init ===== */
 (async function init(){
   initTheme();
-  const sl=localStorage.getItem('traq_lang')||'ja';
-  currentLang=sl;
+  const sl=localStorage.getItem('traq_lang')||'ja';currentLang=sl;
   ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
   await loadAll();
 })();
 
-/* ===== Categories Master ===== */
-
+/* ===== Categories ===== */
 function renderCategories(){
   const eqQ=(document.getElementById('eqCatSearch')?.value||'').toLowerCase();
   const mdQ=(document.getElementById('mdCatSearch')?.value||'').toLowerCase();
-
-  const eqFiltered=EQ_CATEGORIES.filter(c=>!eqQ||c.name.toLowerCase().includes(eqQ));
-  document.getElementById('eqCategoryBody').innerHTML=
-    eqFiltered.length ? eqFiltered.map(c=>`
-      <tr style="${!c.is_active?'opacity:.5':''}">
-        <td style="color:var(--text2);width:60px">
-          <div style="display:flex;gap:3px">
-            <button class="tbl-btn" onclick="moveCat('eq',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button>
-            <button class="tbl-btn" onclick="moveCat('eq',${c.id},1)"  style="padding:0 6px;font-size:10px">↓</button>
-          </div>
-        </td>
-        <td>
-          <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%"
-            value="${c.name}"
-            onfocus="this.style.borderBottomColor='var(--orange)'"
-            onblur="this.style.borderBottomColor='transparent';updateCatName('eq',${c.id},this.value)">
-        </td>
-        <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
-        <td>
-          <div class="tbl-actions">
-            <button class="tbl-btn primary" onclick="openCategoryEditModal('eq',${c.id})">編集</button>
-            <button class="tbl-btn" onclick="toggleCat('eq',${c.id})">${c.is_active?'無効化':'有効化'}</button>
-            <button class="tbl-btn danger" onclick="deleteCat('eq',${c.id})">削除</button>
-          </div>
-        </td>
-      </tr>`).join('')
-    : `<tr><td colspan="4" class="empty">該当なし</td></tr>`;
-
-  const mdFiltered=MD_CATEGORIES.filter(c=>!mdQ||c.name.toLowerCase().includes(mdQ));
-  document.getElementById('mdCategoryBody').innerHTML=
-    mdFiltered.length ? mdFiltered.map(c=>`
-      <tr style="${!c.is_active?'opacity:.5':''}">
-        <td style="color:var(--text2);width:60px">
-          <div style="display:flex;gap:3px">
-            <button class="tbl-btn" onclick="moveCat('md',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button>
-            <button class="tbl-btn" onclick="moveCat('md',${c.id},1)"  style="padding:0 6px;font-size:10px">↓</button>
-          </div>
-        </td>
-        <td>
-          <input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%"
-            value="${c.name}"
-            onfocus="this.style.borderBottomColor='var(--orange)'"
-            onblur="this.style.borderBottomColor='transparent';updateCatName('md',${c.id},this.value)">
-        </td>
-        <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
-        <td>
-          <div class="tbl-actions">
-            <button class="tbl-btn primary" onclick="openCategoryEditModal('md',${c.id})">編集</button>
-            <button class="tbl-btn" onclick="toggleCat('md',${c.id})">${c.is_active?'無効化':'有効化'}</button>
-            <button class="tbl-btn danger" onclick="deleteCat('md',${c.id})">削除</button>
-          </div>
-        </td>
-      </tr>`).join('')
-    : `<tr><td colspan="4" class="empty">該当なし</td></tr>`;
+  const eqF=EQ_CATEGORIES.filter(c=>!eqQ||c.name.toLowerCase().includes(eqQ));
+  document.getElementById('eqCategoryBody').innerHTML=eqF.length?eqF.map(c=>`<tr style="${!c.is_active?'opacity:.5':''}"><td style="color:var(--text2);width:60px"><div style="display:flex;gap:3px"><button class="tbl-btn" onclick="moveCat('eq',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button><button class="tbl-btn" onclick="moveCat('eq',${c.id},1)" style="padding:0 6px;font-size:10px">↓</button></div></td><td><input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%" value="${c.name}" onfocus="this.style.borderBottomColor='var(--orange)'" onblur="this.style.borderBottomColor='transparent';updateCatName('eq',${c.id},this.value)"></td><td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openCategoryEditModal('eq',${c.id})">編集</button><button class="tbl-btn" onclick="toggleCat('eq',${c.id})">${c.is_active?'無効化':'有効化'}</button><button class="tbl-btn danger" onclick="deleteCat('eq',${c.id})">削除</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="empty">該当なし</td></tr>';
+  const mdF=MD_CATEGORIES.filter(c=>!mdQ||c.name.toLowerCase().includes(mdQ));
+  document.getElementById('mdCategoryBody').innerHTML=mdF.length?mdF.map(c=>`<tr style="${!c.is_active?'opacity:.5':''}"><td style="color:var(--text2);width:60px"><div style="display:flex;gap:3px"><button class="tbl-btn" onclick="moveCat('md',${c.id},-1)" style="padding:0 6px;font-size:10px">↑</button><button class="tbl-btn" onclick="moveCat('md',${c.id},1)" style="padding:0 6px;font-size:10px">↓</button></div></td><td><input style="background:transparent;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text1);outline:none;padding:2px 4px;width:100%" value="${c.name}" onfocus="this.style.borderBottomColor='var(--orange)'" onblur="this.style.borderBottomColor='transparent';updateCatName('md',${c.id},this.value)"></td><td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openCategoryEditModal('md',${c.id})">編集</button><button class="tbl-btn" onclick="toggleCat('md',${c.id})">${c.is_active?'無効化':'有効化'}</button><button class="tbl-btn danger" onclick="deleteCat('md',${c.id})">削除</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="empty">該当なし</td></tr>';
 }
 
 function openCategoryModal(type){
   const label=type==='equipment'?'設備 分類':'金型 異常内容';
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${label}を追加</div>
-    <div class="form-group">
-      <div class="form-label">名前 <span class="req">必須</span></div>
-      <input class="form-input" id="cat-name" placeholder="${type==='equipment'?'例：金属加工設備':'例：割れ・欠け'}">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-      <button class="btn-primary" onclick="saveCategory('${type}')">追加</button>
-    </div>
-  `);
+  showModal(`<div class="modal-handle"></div><div class="modal-title">${label}を追加</div><div class="form-group"><div class="form-label">名前 <span class="req">必須</span></div><input class="form-input" id="cat-name" placeholder="${type==='equipment'?'例：金属加工設備':'例：割れ・欠け'}"></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-primary" onclick="saveCategory('${type}')">追加</button></div>`);
 }
+async function saveCategory(type){const name=document.getElementById('cat-name')?.value.trim();if(!name){showToast('名前を入力してください','error');return}const arr=type==='equipment'?EQ_CATEGORIES:MD_CATEGORIES;const maxSort=arr.reduce((m,c)=>Math.max(m,c.sort),0);try{await sbFetch('categories',{method:'POST',body:JSON.stringify({type,name,sort_order:maxSort+1,is_active:true})});closeModal();await loadAll();showToast('追加しました','success')}catch(err){showToast('追加に失敗','error')}}
+async function updateCatName(type,id,val){if(!val.trim())return;try{await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:val.trim()})})}catch(err){console.error(err)}}
+function openCategoryEditModal(type,id){const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;const c=arr.find(x=>x.id===id);if(!c)return;const label=type==='eq'?'設備 分類':'金型 異常内容';showModal(`<div class="modal-handle"></div><div class="modal-title">${label}を編集</div><div class="form-group"><div class="form-label">名前 <span class="req">必須</span></div><input class="form-input" id="cat-edit-name" value="${c.name}"></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">キャンセル</button><button class="btn-primary" onclick="saveCategoryEdit('${type}',${id})">保存</button></div>`)}
+async function saveCategoryEdit(type,id){const name=document.getElementById('cat-edit-name')?.value.trim();if(!name){showToast('名前を入力してください','error');return}try{await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name})});closeModal();await loadAll();showToast('更新しました','success')}catch(err){showToast('更新に失敗','error')}}
+async function toggleCat(type,id){const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;const c=arr.find(x=>x.id===id);if(!c)return;try{await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!c.is_active})});await loadAll()}catch(err){showToast('更新に失敗','error')}}
+async function deleteCat(type,id){if(!confirm('削除しますか？'))return;try{await sbFetch(`categories?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast('削除しました','success')}catch(err){showToast('削除に失敗','error')}}
+async function moveCat(type,id,dir){const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;arr.sort((a,b)=>a.sort-b.sort);const idx=arr.findIndex(x=>x.id===id);const si=idx+dir;if(si<0||si>=arr.length)return;try{await sbFetch(`categories?id=eq.${arr[idx].id}`,{method:'PATCH',body:JSON.stringify({sort_order:arr[si].sort})});await sbFetch(`categories?id=eq.${arr[si].id}`,{method:'PATCH',body:JSON.stringify({sort_order:arr[idx].sort})});await loadAll()}catch(err){showToast('移動に失敗','error')}}
+function getActiveEqCategories(){return EQ_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort)}
+function getActiveMdCategories(){return MD_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort)}
 
-async function saveCategory(type){
-  const name=document.getElementById('cat-name')?.value.trim();
-  if(!name){showToast('名前を入力してください','error');return}
-  const arr=type==='equipment'?EQ_CATEGORIES:MD_CATEGORIES;
-  const maxSort=arr.reduce((m,c)=>Math.max(m,c.sort),0);
-  try {
-    await sbFetch('categories',{method:'POST',body:JSON.stringify({type,name,sort_order:maxSort+1,is_active:true})});
-    closeModal();await loadAll();showToast('追加しました','success');
-  } catch(err){showToast('追加に失敗','error')}
-}
-
-async function updateCatName(type,id,val){
-  if(!val.trim()) return;
-  try { await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:val.trim()})}); }
-  catch(err){ console.error(err); }
-}
-
-function openCategoryEditModal(type,id){
-  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
-  const c=arr.find(x=>x.id===id);
-  if(!c) return;
-  const label=type==='eq'?'設備 分類':'金型 異常内容';
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${label}を編集</div>
-    <div class="form-group">
-      <div class="form-label">名前 <span class="req">必須</span></div>
-      <input class="form-input" id="cat-edit-name" value="${c.name}">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-      <button class="btn-primary" onclick="saveCategoryEdit('${type}',${id})">保存</button>
-    </div>
-  `);
-}
-
-async function saveCategoryEdit(type,id){
-  const name=document.getElementById('cat-edit-name')?.value.trim();
-  if(!name){showToast('名前を入力してください','error');return}
-  try {
-    await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name})});
-    closeModal();await loadAll();showToast('更新しました','success');
-  } catch(err){showToast('更新に失敗','error')}
-}
-
-async function toggleCat(type,id){
-  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
-  const c=arr.find(x=>x.id===id);
-  if(!c) return;
-  try {
-    await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!c.is_active})});
-    await loadAll();
-  } catch(err){showToast('更新に失敗','error')}
-}
-
-async function deleteCat(type,id){
-  if(!confirm('削除しますか？入力フォームから削除されます。')) return;
-  try {
-    await sbFetch(`categories?id=eq.${id}`,{method:'DELETE'});
-    await loadAll();showToast('削除しました','success');
-  } catch(err){showToast('削除に失敗','error')}
-}
-
-async function moveCat(type,id,dir){
-  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
-  arr.sort((a,b)=>a.sort-b.sort);
-  const idx=arr.findIndex(x=>x.id===id);
-  const swapIdx=idx+dir;
-  if(swapIdx<0||swapIdx>=arr.length) return;
-  const tmpSort=arr[idx].sort;
-  const swapSort=arr[swapIdx].sort;
-  try {
-    await sbFetch(`categories?id=eq.${arr[idx].id}`,{method:'PATCH',body:JSON.stringify({sort_order:swapSort})});
-    await sbFetch(`categories?id=eq.${arr[swapIdx].id}`,{method:'PATCH',body:JSON.stringify({sort_order:tmpSort})});
-    await loadAll();
-  } catch(err){showToast('移動に失敗','error')}
-}
-
-/* 入力フォーム連携用：有効な分類一覧を取得 */
-function getActiveEqCategories(){ return EQ_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort); }
-function getActiveMdCategories(){ return MD_CATEGORIES.filter(c=>c.is_active).sort((a,b)=>a.sort-b.sort); }
-
-function initStorageBar2(){
-  const used=420, total=1024;
-  const pct=Math.round(used/total*100);
-  ['2'].forEach(suffix=>{
-    const fill=document.getElementById('storageFill'+suffix);
-    const label=document.getElementById('storageLabel'+suffix);
-    const detail=document.getElementById('storageDetail'+suffix);
-    if(!fill) return;
-    setTimeout(()=>{
-      fill.style.width=pct+'%';
-      fill.style.background=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
-      label.textContent=`${used}MB / ${total}MB (${pct}%)`;
-      label.style.color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
-      detail.textContent=pct>=70?'⚠️ 70%を超えています。不要な画像を削除してください。':`残り ${total-used}MB 利用可能`;
-      detail.style.color=pct>=70?'var(--danger)':'var(--text2)';
-    },200);
-  });
-}
-
-function initStorageBar(){
-  // モック: 使用量 420MB / 1024MB (41%)
-  const used=420, total=1024;
-  const pct=Math.round(used/total*100);
-  const fill=document.getElementById('storageFill');
-  const label=document.getElementById('storageLabel');
-  const detail=document.getElementById('storageDetail');
-  if(!fill) return;
-  setTimeout(()=>{
-    fill.style.width=pct+'%';
-    fill.style.background=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
-    label.textContent=`${used}MB / ${total}MB (${pct}%)`;
-    label.style.color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
-    detail.textContent=pct>=70?'⚠️ 70%を超えています。不要な画像を削除してください。'
-      :`残り ${total-used}MB 利用可能`;
-    detail.style.color=pct>=70?'var(--danger)':'var(--text2)';
-  },300);
-}
+function initStorageBar2(){const used=420,total=1024;const pct=Math.round(used/total*100);['2'].forEach(suffix=>{const fill=document.getElementById('storageFill'+suffix);const label=document.getElementById('storageLabel'+suffix);const detail=document.getElementById('storageDetail'+suffix);if(!fill)return;setTimeout(()=>{fill.style.width=pct+'%';fill.style.background=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';label.textContent=`${used}MB / ${total}MB (${pct}%)`;label.style.color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';detail.textContent=pct>=70?'⚠️ 70%を超えています。':`残り ${total-used}MB 利用可能`;detail.style.color=pct>=70?'var(--danger)':'var(--text2)'},200)})}
 </script>
 <script src="traq-version.js"></script>
 </body>
