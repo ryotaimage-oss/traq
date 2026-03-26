@@ -1,0 +1,22 @@
+{
+  "name": "Traq – TroubleTrack System",
+  "short_name": "Traq",
+  "description": "工場トラブル管理システム",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080d18",
+  "theme_color": "#EF9F27",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
