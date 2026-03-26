@@ -205,10 +205,11 @@ tr:hover td{background:rgba(239,159,39,.03)}
       </div>
 
       <!-- Import bar -->
-      <div class="import-bar" onclick="showToast('CSV一括インポートは開発中です','info')">
+      <div class="import-bar" onclick="document.getElementById('csvFileInput').click()">
         <div class="import-bar-left">📄 CSVで一括インポート</div>
         <div class="import-bar-right">選択 →</div>
       </div>
+      <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleUserCsvImport(event)">
 
       <!-- Search -->
       <div class="search-bar">
@@ -271,10 +272,11 @@ tr:hover td{background:rgba(239,159,39,.03)}
       </div>
 
       <!-- Import bar -->
-      <div class="import-bar" style="margin-bottom:12px" onclick="showToast('Excelインポートは開発中です','info')">
+      <div class="import-bar" style="margin-bottom:12px" onclick="document.getElementById('excelFileInput').click()">
         <div class="import-bar-left">📊 Excelで一括インポート（ライン名/機番/品番/品名）</div>
         <div class="import-bar-right">選択 →</div>
       </div>
+      <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleMasterExcelImport(event)">
 
       <div id="masterContent"></div>
     </div>
@@ -881,6 +883,245 @@ function toggleProduct(id){
   renderMaster();
 }
 
+
+/* ===== CSV Import (Users) ===== */
+function handleUserCsvImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) { showToast('データが見つかりません', 'error'); return; }
+
+      // ヘッダー解析
+      const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const nameIdx = header.findIndex(h => /名前|name/i.test(h));
+      const roleIdx = header.findIndex(h => /ロール|role/i.test(h));
+      const shiftIdx = header.findIndex(h => /直|shift/i.test(h));
+      const pinIdx = header.findIndex(h => /pin/i.test(h));
+
+      if (nameIdx < 0) { showToast('「名前」列が見つかりません', 'error'); return; }
+
+      const newUsers = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        const name = cols[nameIdx];
+        if (!name) continue;
+
+        const roleRaw = roleIdx >= 0 ? cols[roleIdx].toLowerCase() : 'op';
+        const role = roleRaw === 'admin' ? 'admin' : roleRaw === 'sl' ? 'sl' : 'op';
+        const shift = shiftIdx >= 0 ? (parseInt(cols[shiftIdx]) || null) : null;
+
+        // 重複チェック
+        if (USERS.some(u => u.name === name)) continue;
+
+        newUsers.push({
+          id: nextUserId++,
+          name: name,
+          role: role,
+          shift: shift,
+          is_active: true,
+          locked: false
+        });
+      }
+
+      if (newUsers.length === 0) {
+        showToast('新規ユーザーが見つかりません（重複除外済み）', 'info');
+        return;
+      }
+
+      // プレビュー表示
+      const previewRows = newUsers.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td><span class="role-pill role-${u.role}">${u.role === 'admin' ? 'admin' : u.role === 'sl' ? 'SL' : 'OP'}</span></td>
+          <td>${u.shift ? u.shift + '直' : '—'}</td>
+        </tr>
+      `).join('');
+
+      showModal(`
+        <div class="modal-title">CSVインポート プレビュー</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
+          ${newUsers.length}件の新規ユーザーをインポートします
+        </div>
+        <div style="max-height:300px;overflow-y:auto;margin-bottom:16px">
+          <table style="width:100%">
+            <thead><tr><th>名前</th><th>ロール</th><th>直</th></tr></thead>
+            <tbody>${previewRows}</tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+          <button class="btn-add" onclick="confirmUserImport()">インポート実行</button>
+        </div>
+      `, true);
+
+      // インポート確定用にデータを一時保存
+      window._pendingUserImport = newUsers;
+
+    } catch (err) {
+      showToast('CSVの読み込みに失敗しました: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function confirmUserImport() {
+  const newUsers = window._pendingUserImport;
+  if (!newUsers || !newUsers.length) return;
+  USERS.push(...newUsers);
+  window._pendingUserImport = null;
+  closeModal();
+  renderUsers();
+  showToast(`${newUsers.length}件のユーザーをインポートしました`, 'success');
+}
+
+/* ===== Excel Import (Machines / Products) ===== */
+function handleMasterExcelImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      if (rows.length < 2) { showToast('データが見つかりません', 'error'); return; }
+
+      // ヘッダー解析
+      const header = rows[0].map(h => String(h || '').trim());
+      const lineIdx = header.findIndex(h => /ライン|line/i.test(h));
+      const machineIdx = header.findIndex(h => /機番|machine/i.test(h));
+      const codeIdx = header.findIndex(h => /品番|code/i.test(h));
+      const nameIdx = header.findIndex(h => /品名|name|product/i.test(h));
+
+      if (machineIdx < 0) { showToast('「機番」列が見つかりません', 'error'); return; }
+
+      const newMachines = [];
+      const newProducts = [];
+      const seenMachines = new Set(MACHINES.map(m => m.line + '-' + m.no));
+      const seenProducts = new Set(PRODUCTS.map(p => p.code));
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row.length) continue;
+
+        // ライン名からアルファベットを抽出（「Aライン」→「A」）
+        let line = lineIdx >= 0 ? String(row[lineIdx] || '').trim() : '';
+        line = line.replace(/ライン|line/gi, '').trim().toUpperCase() || 'A';
+
+        const machineNo = String(row[machineIdx] || '').trim();
+        if (!machineNo) continue;
+
+        // 機番の重複チェック
+        const machineKey = line + '-' + machineNo;
+        if (!seenMachines.has(machineKey)) {
+          seenMachines.add(machineKey);
+          newMachines.push({
+            id: nextMachineId++,
+            no: machineNo,
+            line: line,
+            memo: '',
+            is_active: true
+          });
+        }
+
+        // 品番の処理
+        const code = codeIdx >= 0 ? String(row[codeIdx] || '').trim() : '';
+        const pname = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
+        if (code && !seenProducts.has(code)) {
+          seenProducts.add(code);
+          newProducts.push({
+            id: nextProductId++,
+            code: code,
+            name: pname || code,
+            is_active: true
+          });
+        }
+      }
+
+      if (newMachines.length === 0 && newProducts.length === 0) {
+        showToast('新規データが見つかりません（重複除外済み）', 'info');
+        return;
+      }
+
+      // プレビュー表示
+      let previewHtml = '';
+
+      if (newMachines.length > 0) {
+        const machineRows = newMachines.slice(0, 20).map(m => `
+          <tr><td>${m.line}ライン</td><td>${m.no}号機</td></tr>
+        `).join('');
+        previewHtml += `
+          <div style="font-size:13px;font-weight:700;margin-bottom:6px">機番: ${newMachines.length}件</div>
+          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px">
+            <table style="width:100%"><thead><tr><th>ライン</th><th>機番</th></tr></thead>
+            <tbody>${machineRows}</tbody></table>
+          </div>
+          ${newMachines.length > 20 ? '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ' + (newMachines.length - 20) + '件...</div>' : ''}
+        `;
+      }
+
+      if (newProducts.length > 0) {
+        const productRows = newProducts.slice(0, 20).map(p => `
+          <tr><td>${p.code}</td><td>${p.name}</td></tr>
+        `).join('');
+        previewHtml += `
+          <div style="font-size:13px;font-weight:700;margin-bottom:6px">品番: ${newProducts.length}件</div>
+          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px">
+            <table style="width:100%"><thead><tr><th>品番</th><th>品名</th></tr></thead>
+            <tbody>${productRows}</tbody></table>
+          </div>
+          ${newProducts.length > 20 ? '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ' + (newProducts.length - 20) + '件...</div>' : ''}
+        `;
+      }
+
+      showModal(`
+        <div class="modal-title">Excelインポート プレビュー</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
+          以下のデータをインポートします（既存データと重複するものは除外済み）
+        </div>
+        ${previewHtml}
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+          <button class="btn-add" onclick="confirmMasterImport()">インポート実行</button>
+        </div>
+      `, true);
+
+      window._pendingMasterImport = { machines: newMachines, products: newProducts };
+
+    } catch (err) {
+      showToast('ファイルの読み込みに失敗しました: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function confirmMasterImport() {
+  const data = window._pendingMasterImport;
+  if (!data) return;
+
+  if (data.machines.length) MACHINES.push(...data.machines);
+  if (data.products.length) PRODUCTS.push(...data.products);
+
+  window._pendingMasterImport = null;
+  closeModal();
+  renderMaster();
+  renderProducts();
+
+  const msgs = [];
+  if (data.machines.length) msgs.push(`機番 ${data.machines.length}件`);
+  if (data.products.length) msgs.push(`品番 ${data.products.length}件`);
+  showToast(`${msgs.join('・')}をインポートしました`, 'success');
+}
 
 /* ===== Excel Export ===== */
 function exportImages(){
