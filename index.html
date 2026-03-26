@@ -468,7 +468,7 @@ let USERS = [];
 
 async function loadUsers(){
   try {
-    const users = await sbFetch('users?select=*&order=name');
+    const users = await sbFetch('traq_users?select=*&order=name');
     USERS = (users||[]).filter(u=>u.is_active).map(u=>({
       id:           u.id,
       name:         u.name,
@@ -640,7 +640,7 @@ async function doLogin(){
   if(state.pinInput===u.pin_hash){
     // ✅ 成功 → fail_count / locked_until をリセット
     try {
-      await sbFetch(`users?id=eq.${u.id}`,{
+      await sbFetch(`traq_users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
         body: JSON.stringify({ fail_count:0, locked_until:null })
       });
@@ -660,7 +660,7 @@ async function doLogin(){
     } else {
       showError(t('pin_error_wrong',newCount));
       try {
-        await sbFetch(`users?id=eq.${u.id}`,{
+        await sbFetch(`traq_users?id=eq.${u.id}`,{
           method:'PATCH', prefer:'return=minimal',
           body: JSON.stringify({ fail_count:newCount })
         });
@@ -704,7 +704,7 @@ async function lockAccount(u){
   const until=new Date(Date.now()+5*60*1000).toISOString();
   u.locked_until=until; u.fail_count=3;
   try {
-    await sbFetch(`users?id=eq.${u.id}`,{
+    await sbFetch(`traq_users?id=eq.${u.id}`,{
       method:'PATCH', prefer:'return=minimal',
       body: JSON.stringify({ fail_count:3, locked_until:until })
     });
@@ -730,7 +730,7 @@ function showLockScreen(u){
       state.pinInput=''; updatePinDots();
       document.getElementById('loginBtn').disabled=true;
       renderUsers(document.getElementById('userSearch').value);
-      sbFetch(`users?id=eq.${u.id}`,{
+      sbFetch(`traq_users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
         body: JSON.stringify({ fail_count:0, locked_until:null })
       }).catch(err=>console.error('Unlock write failed:',err));
@@ -770,7 +770,7 @@ function checkLockState(u){
           document.getElementById('pinInputArea').style.display='block';
           state.pinInput=''; updatePinDots();
           document.getElementById('loginBtn').disabled=true;
-          sbFetch(`users?id=eq.${u.id}`,{
+          sbFetch(`traq_users?id=eq.${u.id}`,{
             method:'PATCH', prefer:'return=minimal',
             body: JSON.stringify({ fail_count:0, locked_until:null })
           }).catch(err=>console.error('Unlock write failed:',err));
