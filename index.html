@@ -987,9 +987,7 @@ function flashSuccess() {
   }));
   // ロール別ホームへ遷移
   setTimeout(() => {
-    if (u.role === 'admin') {
-      location.href = 'admin.html';
-    } else if (u.role === 'sl') {
+    if (u.role === 'sl') {
       location.href = 'home_sl.html';
     } else {
       location.href = 'home.html';

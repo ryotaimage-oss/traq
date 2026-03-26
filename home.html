@@ -565,6 +565,10 @@ html, body {
         <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
         <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
       </button>
+      <button class="snav-item" id="sb-admin-btn" style="display:none" onclick="location.href='admin.html'">
+        <span class="snav-icon">🔐</span>
+        <span>管理者画面</span>
+      </button>
       <button class="snav-item" onclick="location.href='settings.html'">
         <span class="snav-icon">⚙️</span>
         <span>設定</span>
@@ -682,6 +686,10 @@ html, body {
     <button class="nav-item" id="bnav-dashboard" onclick="setTab('dashboard')">
       <span class="nav-icon">📊</span>
       <span class="nav-label" data-i18n="nav_dashboard">集計</span>
+    </button>
+    <button class="nav-item" id="mob-admin-btn" style="display:none" onclick="location.href='admin.html'">
+      <span class="nav-icon">🔐</span>
+      <span class="nav-label">管理</span>
     </button>
     <button class="nav-item" onclick="location.href='settings.html'">
       <span class="nav-icon">⚙️</span>
@@ -1220,6 +1228,13 @@ function showToast(msg, type='') {
   applyI18n();
   renderUserInfo();
   renderList();
+  // adminなら管理者ボタンを表示
+  if(SESSION.role==='admin'){
+    const sb=document.getElementById('sb-admin-btn');
+    const mob=document.getElementById('mob-admin-btn');
+    if(sb) sb.style.display='';
+    if(mob) mob.style.display='';
+  }
 })();
 </script>
 <script src="traq-version.js"></script>
