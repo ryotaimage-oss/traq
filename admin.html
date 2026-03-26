@@ -697,6 +697,7 @@ function renderMachines(){
                   <td>${m.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
                   <td>
                     <div class="tbl-actions">
+                      <button class="tbl-btn primary" onclick="openMachineModal(${m.id},'${m.line}')">編集</button>
                       <button class="tbl-btn" onclick="toggleMachine(${m.id})">${m.is_active?'無効化':'有効化'}</button>
                       <button class="tbl-btn danger" onclick="deleteMachine(${m.id})">削除</button>
                     </div>
@@ -1321,6 +1322,7 @@ function renderCategories(){
         <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
         <td>
           <div class="tbl-actions">
+            <button class="tbl-btn primary" onclick="openCategoryEditModal('eq',${c.id})">編集</button>
             <button class="tbl-btn" onclick="toggleCat('eq',${c.id})">${c.is_active?'無効化':'有効化'}</button>
             <button class="tbl-btn danger" onclick="deleteCat('eq',${c.id})">削除</button>
           </div>
@@ -1348,6 +1350,7 @@ function renderCategories(){
         <td>${c.is_active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td>
         <td>
           <div class="tbl-actions">
+            <button class="tbl-btn primary" onclick="openCategoryEditModal('md',${c.id})">編集</button>
             <button class="tbl-btn" onclick="toggleCat('md',${c.id})">${c.is_active?'無効化':'有効化'}</button>
             <button class="tbl-btn danger" onclick="deleteCat('md',${c.id})">削除</button>
           </div>
@@ -1389,6 +1392,34 @@ function updateCatName(type,id,val){
   const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
   const c=arr.find(x=>x.id===id);
   if(c&&val.trim()) c.name=val.trim();
+}
+
+function openCategoryEditModal(type,id){
+  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
+  const c=arr.find(x=>x.id===id);
+  if(!c) return;
+  const label=type==='eq'?'設備 分類':'金型 異常内容';
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${label}を編集</div>
+    <div class="form-group">
+      <div class="form-label">名前 <span class="req">必須</span></div>
+      <input class="form-input" id="cat-edit-name" value="${c.name}">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn-primary" onclick="saveCategoryEdit('${type}',${id})">保存</button>
+    </div>
+  `);
+}
+
+function saveCategoryEdit(type,id){
+  const name=document.getElementById('cat-edit-name')?.value.trim();
+  if(!name){showToast('名前を入力してください','error');return}
+  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
+  const c=arr.find(x=>x.id===id);
+  if(c) c.name=name;
+  closeModal();renderCategories();showToast('更新しました','success');
 }
 
 function toggleCat(type,id){
