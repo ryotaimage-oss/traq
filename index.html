@@ -468,7 +468,7 @@ let USERS = [];
 
 async function loadUsers(){
   try {
-    const users = await sbFetch('users?select=id,name,role,shift,pin_hash,fail_count,locked_until,is_active&order=name');
+    const users = await sbFetch('users?select=*&order=name');
     USERS = (users||[]).filter(u=>u.is_active).map(u=>({
       id:           u.id,
       name:         u.name,
