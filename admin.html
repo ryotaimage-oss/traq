@@ -414,7 +414,7 @@ let EQ_CATEGORIES = [], MD_CATEGORIES = [];
 async function loadAll() {
   try {
     const users = await sbFetch('users?select=*&order=name');
-    USERS = users.map(u => ({ id:u.id, name:u.name, role:u.role, shift:u.default_shift||null, is_active:u.is_active, locked:!!u.pin_lock_until }));
+    USERS = users.map(u => ({ id:u.id, name:u.name, role:u.role, shift:u.default_shift||null, is_active:u.is_active, locked:false }));
 
     LINES = await sbFetch('lines?select=*&order=id');
 

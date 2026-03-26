@@ -793,8 +793,8 @@ async function loadUsers() {
       pin_hash: u.pin_hash || '0000',
       shift: u.default_shift ? parseInt(u.default_shift) : null,
       is_active: u.is_active,
-      pin_fail_count: u.pin_fail_count || 0,
-      pin_lock_until: u.pin_lock_until || null,
+      pin_fail_count: 0,
+      pin_lock_until: null,
     }));
   } catch (err) {
     console.error('ユーザー読み込み失敗:', err);
