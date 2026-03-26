@@ -559,8 +559,8 @@ function renderLines(){
   if(!LINES.length){body.innerHTML='<tr><td colspan="3" class="empty">ラインが登録されていません</td></tr>';return}
   body.innerHTML=LINES.map(l=>{
     const name=l.line_name||'';
-    const active=l.is_active!==false;
-    return `<tr style="${!active?'opacity:.5':''}"><td style="font-weight:700">${name}</td><td>${active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openLineModal(${l.id})">編集</button><button class="tbl-btn" onclick="toggleLine(${l.id})">${active?'無効化':'有効化'}</button><button class="tbl-btn danger" onclick="deleteLine(${l.id})">削除</button></div></td></tr>`;
+    const active=l.is_active===true||l.is_active===undefined||l.is_active===null;
+    return `<tr style="${!active?'opacity:.5':''}"><td style="font-weight:700">${name}</td><td>${active?'<span class="status-active">● 有効</span>':'<span class="status-inactive">○ 無効</span>'}</td><td><div class="tbl-actions"><button class="tbl-btn primary" onclick="openLineModal(${l.id})">編集</button><button class="tbl-btn" onclick="toggleLine(${l.id})">${active?'無効化':'有効化'}</button></div></td></tr>`;
   }).join('');
 }
 
@@ -578,8 +578,7 @@ async function saveLine(id){
     closeModal();await loadAll();showToast(t('user_saved'),'success');
   } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
-async function toggleLine(id){ const l=LINES.find(x=>x.id===id);if(!l)return;try{await sbFetch(`lines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:l.is_active===false?true:false})});await loadAll()}catch(err){showToast('更新に失敗','error')}}
-async function deleteLine(id){ if(!confirm(t('delete_confirm')))return;try{await sbFetch(`lines?id=eq.${id}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}}
+async function toggleLine(id){ const l=LINES.find(x=>x.id===id);if(!l)return;const current=l.is_active===true||l.is_active===undefined||l.is_active===null;try{await sbFetch(`lines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!current})});await loadAll()}catch(err){showToast('更新に失敗','error')}}
 
 /* ===== Machines (flat table with sort) ===== */
 function renderMachines(){
@@ -621,6 +620,7 @@ function renderMachines(){
 
 function openMachineModal(id=null){
   const m=id?MACHINES.find(x=>x.id===id):null;
+  if(!m && !LINES.length){showToast('先にラインタブでラインを登録してください','error');return}
   const lineOpts=LINES.map(l=>{const letter=l.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase()||'';return `<option value="${letter}" ${(m?.line||'')=== letter?'selected':''}>${l.line_name}</option>`}).join('');
   showModal(`<div class="modal-handle"></div><div class="modal-title">${m?t('machine_edit'):t('machine_add')}</div>
     <div class="form-row"><div class="form-group"><div class="form-label">${t('label_machine_no')} <span class="req">必須</span></div><input class="form-input" id="m-no" value="${m?.no||''}" placeholder="例：12"></div>
@@ -703,10 +703,11 @@ function renderProducts(){
   body.innerHTML=pageItems.map(r=>{
     const machineCol=r.linked?`<td style="font-weight:700">#${r.machineNo}</td>`:`<td class="unlinked">—</td>`;
     const lineCol=r.linked?`<td><span class="line-badge">${r.machineLine}ライン</span></td>`:`<td class="unlinked">—</td>`;
+    const toggleLabel=r.is_active?'無効化':'有効化';
     const editBtn=r.linked
-      ?`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},${r.mpId},${r.machineId})">編集</button><button class="tbl-btn danger" onclick="unlinkProduct(${r.mpId})">解除</button>`
-      :`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},null,null)">編集</button><button class="tbl-btn danger" onclick="deleteProduct(${r.productId})">削除</button>`;
-    return `<tr><td style="font-weight:700">${r.code}</td><td>${r.name}</td>${machineCol}${lineCol}<td><div class="tbl-actions">${editBtn}</div></td></tr>`;
+      ?`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},${r.mpId},${r.machineId})">編集</button><button class="tbl-btn" onclick="unlinkProduct(${r.mpId})">解除</button><button class="tbl-btn" onclick="toggleProduct(${r.productId})">${toggleLabel}</button>`
+      :`<button class="tbl-btn primary" onclick="openProductEditModal(${r.productId},null,null)">編集</button><button class="tbl-btn" onclick="toggleProduct(${r.productId})">${toggleLabel}</button>`;
+    return `<tr style="${!r.is_active?'opacity:.5':''}"><td style="font-weight:700">${r.code}</td><td>${r.name}</td>${machineCol}${lineCol}<td><div class="tbl-actions">${editBtn}</div></td></tr>`;
   }).join('');
 
   // Pager
@@ -738,18 +739,23 @@ async function saveNewProduct(){
   const machineId=document.getElementById('p-machine').value;
   if(!code||!name){showToast('品番と品名を入力してください','error');return}
   try {
-    // 品番が既存か確認
     let product=PRODUCTS.find(p=>p.code===code);
-    if(!product){
+    if(product){
+      // 既存品番がある場合：紐づけのみ追加
+      if(!machineId){showToast(`品番「${code}」は既に登録済みです`,'error');return}
+      const exists=MACHINE_PRODUCTS.some(mp=>mp.machine_id===parseInt(machineId)&&mp.product_id===product.id);
+      if(exists){showToast(`品番「${code}」はこの機番に既に紐づいています`,'error');return}
+      await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:parseInt(machineId),product_id:product.id})});
+      closeModal();await loadAll();showToast('紐づけを追加しました','success');
+    } else {
+      // 新規品番作成
       const res=await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:code,product_name:name,is_active:true})});
       product=res?.[0];
+      if(machineId && product){
+        await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:parseInt(machineId),product_id:product.id})});
+      }
+      closeModal();await loadAll();showToast('追加しました','success');
     }
-    // 機番が選択されていれば紐づけ作成
-    if(machineId && product){
-      const exists=MACHINE_PRODUCTS.some(mp=>mp.machine_id===parseInt(machineId)&&mp.product_id===product.id);
-      if(!exists) await sbFetch('machine_products',{method:'POST',body:JSON.stringify({machine_id:parseInt(machineId),product_id:product.id})});
-    }
-    closeModal();await loadAll();showToast('追加しました','success');
   } catch(err){showToast('追加に失敗: '+err.message,'error')}
 }
 
@@ -793,9 +799,11 @@ async function unlinkProduct(mpId){
   try{await sbFetch(`machine_products?id=eq.${mpId}`,{method:'DELETE'});await loadAll();showToast('紐づけを解除しました','success')}catch(err){showToast('解除に失敗','error')}
 }
 
-async function deleteProduct(productId){
-  if(!confirm(t('delete_confirm')))return;
-  try{await sbFetch(`machine_products?product_id=eq.${productId}`,{method:'DELETE'});await sbFetch(`products?id=eq.${productId}`,{method:'DELETE'});await loadAll();showToast(t('user_deleted'),'success')}catch(err){showToast('削除に失敗','error')}
+async function toggleProduct(productId){
+  const p=PRODUCTS.find(x=>x.id===productId);if(!p)return;
+  const msg=p.is_active?t('deactivate_confirm'):t('activate_confirm');
+  if(!confirm(msg))return;
+  try{await sbFetch(`products?id=eq.${productId}`,{method:'PATCH',body:JSON.stringify({is_active:!p.is_active})});await loadAll();showToast(t('user_saved'),'success')}catch(err){showToast('更新に失敗','error')}
 }
 
 /* ===== CSV Import (Users) ===== */
@@ -949,7 +957,7 @@ function exportMachines(){
 function exportProducts(){
   const wb=XLSX.utils.book_new();const headers=['品番','品名','機番','ライン'];const rows=[];
   const allRows=buildProductRows();
-  allRows.forEach(r=>rows.push([r.code,r.name,r.linked?r.machineNo:'',r.linked?r.machineLine+'ライン':'']));
+  allRows.forEach(r=>rows.push([r.code,r.name,r.linked?r.machineNo:'—',r.linked?r.machineLine+'ライン':'—']));
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);ws['!cols']=[{wch:14},{wch:20},{wch:8},{wch:10}];
   XLSX.utils.book_append_sheet(wb,ws,'品番マスタ');XLSX.writeFile(wb,'Traq_品番マスタ.xlsx');showToast('品番マスタをExcel出力しました','success');
 }
