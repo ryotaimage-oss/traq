@@ -470,7 +470,7 @@ let USERS = [];
 
 async function loadUsers(){
   try {
-    const users = await sbFetch('users?select=*&order=name');
+    const users = await sbFetch('traq_users?select=*&order=name');
     USERS = (users||[]).filter(u=>u.is_active).map(u=>({
       id:           u.id,
       name:         u.name,
@@ -641,7 +641,7 @@ async function doLogin(){
 
   try {
     // DBから最新のpin_hashを直接取得して照合
-    const rows = await sbFetch(`users?id=eq.${u.id}&select=id,pin_hash,pin_fail_count,pin_locked_until`);
+    const rows = await sbFetch(`traq_users?id=eq.${u.id}&select=id,pin_hash,pin_fail_count,pin_locked_until`);
     if(!rows||!rows.length) throw new Error('ユーザーが見つかりません');
     const fresh = rows[0];
 
@@ -656,7 +656,7 @@ async function doLogin(){
     const pinHash = (fresh.pin_hash || '').trim();
     if(state.pinInput === pinHash){
       // ✅ 成功
-      await sbFetch(`users?id=eq.${u.id}`,{
+      await sbFetch(`traq_users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
         body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
       });
@@ -673,7 +673,7 @@ async function doLogin(){
         await lockAccount(u);
       } else {
         showError(t('pin_error_wrong',newCount));
-        await sbFetch(`users?id=eq.${u.id}`,{
+        await sbFetch(`traq_users?id=eq.${u.id}`,{
           method:'PATCH', prefer:'return=minimal',
           body: JSON.stringify({ pin_fail_count:newCount })
         });
@@ -723,7 +723,7 @@ async function lockAccount(u){
   const until=new Date(Date.now()+5*60*1000).toISOString();
   u.pin_locked_until=until; u.pin_fail_count=3;
   try {
-    await sbFetch(`users?id=eq.${u.id}`,{
+    await sbFetch(`traq_users?id=eq.${u.id}`,{
       method:'PATCH', prefer:'return=minimal',
       body: JSON.stringify({ pin_fail_count:3, pin_locked_until:until })
     });
@@ -749,7 +749,7 @@ function showLockScreen(u){
       state.pinInput=''; updatePinDots();
       document.getElementById('loginBtn').disabled=true;
       renderUsers(document.getElementById('userSearch').value);
-      sbFetch(`users?id=eq.${u.id}`,{
+      sbFetch(`traq_users?id=eq.${u.id}`,{
         method:'PATCH', prefer:'return=minimal',
         body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
       }).catch(err=>console.error('Unlock write failed:',err));
@@ -789,7 +789,7 @@ function checkLockState(u){
           document.getElementById('pinInputArea').style.display='block';
           state.pinInput=''; updatePinDots();
           document.getElementById('loginBtn').disabled=true;
-          sbFetch(`users?id=eq.${u.id}`,{
+          sbFetch(`traq_users?id=eq.${u.id}`,{
             method:'PATCH', prefer:'return=minimal',
             body: JSON.stringify({ pin_fail_count:0, pin_locked_until:null })
           }).catch(err=>console.error('Unlock write failed:',err));
