@@ -301,6 +301,13 @@ tr:hover td{background:rgba(239,159,39,.03)}
         </select>
       </div>
 
+      <!-- Import bar -->
+      <div class="import-bar" style="margin-bottom:12px" onclick="document.getElementById('productFileInput').click()">
+        <div class="import-bar-left">📊 Excelで一括インポート（品番/品名）</div>
+        <div class="import-bar-right">選択 →</div>
+      </div>
+      <input type="file" id="productFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleProductExcelImport(event)">
+
       <!-- ページネーション情報 -->
       <div style="font-size:11px;color:var(--text2);margin-bottom:8px" id="productPageInfo"></div>
 
@@ -462,49 +469,84 @@ function setLang(lang){currentLang=lang;localStorage.setItem('traq_lang',lang);[
 function toggleTheme(){const html=document.documentElement;const d=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('traq_theme',d?'light':'dark')}
 function initTheme(){const s=localStorage.getItem('traq_theme');const p=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const th=s||p;document.documentElement.setAttribute('data-theme',th);document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️'}
 
-/* ===== Mock data ===== */
-let USERS=[
-  {id:1,name:'田中 管理',role:'admin',shift:null,is_active:true,locked:false},
-  {id:2,name:'山田 太郎',role:'sl',shift:1,is_active:true,locked:false},
-  {id:3,name:'佐藤 次郎',role:'sl',shift:2,is_active:true,locked:false},
-  {id:4,name:'鈴木 三郎',role:'sl',shift:3,is_active:true,locked:false},
-  {id:5,name:'高橋 A',role:'op',shift:1,is_active:true,locked:false},
-  {id:6,name:'伊藤 B',role:'op',shift:1,is_active:true,locked:false},
-  {id:7,name:'渡辺 C',role:'op',shift:1,is_active:true,locked:false},
-  {id:8,name:'中村 D',role:'op',shift:2,is_active:true,locked:false},
-  {id:9,name:'小林 E',role:'op',shift:2,is_active:false,locked:false},
-  {id:10,name:'加藤 F',role:'op',shift:2,is_active:true,locked:true},
-  {id:11,name:'Nguyen Van A',role:'op',shift:3,is_active:true,locked:false},
-  {id:12,name:'Tran Thi B',role:'op',shift:3,is_active:true,locked:false},
-  {id:13,name:'Le Van C',role:'op',shift:3,is_active:true,locked:false},
-];
-let nextUserId=14;
+/* ===== Supabase Config ===== */
+const SUPABASE_URL = 'https://avureyklkpslrjasrxuv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
 
-let MACHINES=[
-  {id:1,no:'1',line:'A',memo:'',is_active:true},
-  {id:2,no:'2',line:'A',memo:'',is_active:true},
-  {id:3,no:'3',line:'A',memo:'',is_active:true},
-  {id:4,no:'4',line:'A',memo:'',is_active:true},
-  {id:5,no:'5',line:'A',memo:'',is_active:true},
-  {id:6,no:'23',line:'B',memo:'',is_active:true},
-  {id:7,no:'24',line:'B',memo:'',is_active:true},
-  {id:8,no:'46',line:'C',memo:'',is_active:true},
-  {id:9,no:'47',line:'C',memo:'',is_active:false},
-];
-let nextMachineId=10;
+async function sbFetch(path, opts={}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+    },
+    ...opts,
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
 
-let PRODUCTS=[
-  {id:1,code:'948',name:'948ブラケット',is_active:true},
-  {id:2,code:'AP2',name:'AP2ユニット',is_active:true},
-  {id:3,code:'PE01',name:'PE01カバー',is_active:true},
-  {id:4,code:'690CP',name:'690カプラ',is_active:true},
-  {id:5,code:'EN200',name:'EN200ハウジング',is_active:true},
-  {id:6,code:'090CL',name:'090クランプ',is_active:true},
-  {id:7,code:'940',name:'940ベース',is_active:true},
-  {id:8,code:'880',name:'880プレート',is_active:true},
-  {id:9,code:'KH5T',name:'KH5Tブラケット',is_active:false},
-];
-let nextProductId=10;
+/* ===== Data (loaded from Supabase) ===== */
+let USERS = [];
+let MACHINES = [];
+let LINES = [];
+let PRODUCTS = [];
+let EQ_CATEGORIES = [];
+let MD_CATEGORIES = [];
+
+async function loadAll() {
+  try {
+    // Users
+    const users = await sbFetch('users?select=*&order=name');
+    USERS = users.map(u => ({
+      id: u.id, name: u.name, role: u.role,
+      shift: u.shift ? parseInt(u.shift) : null,
+      is_active: u.is_active, locked: !!u.pin_lock_until
+    }));
+
+    // Lines
+    LINES = await sbFetch('lines?select=*&order=id');
+
+    // Machines (join with lines)
+    const machines = await sbFetch('machines?select=*,lines(line_name)&order=machine_no');
+    MACHINES = machines.map(m => ({
+      id: m.id, no: String(m.machine_no),
+      line: m.lines?.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() || 'A',
+      line_id: m.line_id, memo: m.memo || '', is_active: m.is_active
+    }));
+
+    // Products
+    const products = await sbFetch('products?select=*&order=product_code');
+    PRODUCTS = products.map(p => ({
+      id: p.id, code: p.product_code, name: p.product_name,
+      memo: p.memo || '', is_active: p.is_active
+    }));
+
+    // Categories
+    const cats = await sbFetch('categories?select=*&order=sort_order');
+    EQ_CATEGORIES = cats.filter(c => c.type === 'equipment').map(c => ({
+      id: c.id, name: c.name, sort: c.sort_order, is_active: c.is_active
+    }));
+    MD_CATEGORIES = cats.filter(c => c.type === 'mold').map(c => ({
+      id: c.id, name: c.name, sort: c.sort_order, is_active: c.is_active
+    }));
+
+    renderUsers();
+    renderMaster();
+    renderProducts();
+    renderCategories();
+  } catch (err) {
+    console.error('Load error:', err);
+    showToast('データの読み込みに失敗しました', 'error');
+  }
+}
+
+function getLineId(lineLetter) {
+  const l = LINES.find(x => x.line_name?.replace(/ライン|line/gi,'').trim().toUpperCase() === lineLetter.toUpperCase());
+  return l ? l.id : null;
+}
 
 /* ===== State ===== */
 let currentTab='users';
@@ -614,42 +656,49 @@ function openUserModal(id=null){
   `);
 }
 
-function saveUser(id){
+async function saveUser(id){
   const name=document.getElementById('f-name').value.trim();
   const role=document.getElementById('f-role').value;
-  const shift=document.getElementById('f-shift').value;
+  const shift=document.getElementById('f-shift').value||null;
   if(!name){showToast('名前を入力してください','error');return}
-  if(id){
-    const u=USERS.find(x=>x.id===id);
-    if(u){u.name=name;u.role=role;u.shift=shift?Number(shift):null}
-  } else {
-    USERS.push({id:nextUserId++,name,role,shift:shift?Number(shift):null,is_active:true,locked:false});
-  }
-  closeModal();renderUsers();showToast(t('user_saved'),'success');
+  try {
+    if(id){
+      await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name,role,shift})});
+    } else {
+      const pin=document.getElementById('f-pin')?.value||'0000';
+      await sbFetch('users',{method:'POST',body:JSON.stringify({name,role,shift,pin_hash:pin,is_active:true})});
+    }
+    closeModal();await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
 
-function resetPin(id){
+async function resetPin(id){
   const u=USERS.find(x=>x.id===id);
   if(!u) return;
   if(!confirm(`${u.name} のPINを「0000」にリセットしますか？`)) return;
-  u.locked=false;
-  showToast(t('pin_reset_done',u.name),'success');
-  renderUsers();
+  try {
+    await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({pin_hash:'0000',pin_fail_count:0,pin_lock_until:null})});
+    await loadAll();showToast(t('pin_reset_done',u.name),'success');
+  } catch(err){showToast('リセットに失敗','error')}
 }
 
-function toggleActive(id){
+async function toggleActive(id){
   const u=USERS.find(x=>x.id===id);
   if(!u) return;
   const msg=u.is_active?t('deactivate_confirm'):t('activate_confirm');
   if(!confirm(msg)) return;
-  u.is_active=!u.is_active;
-  renderUsers();showToast(t('user_saved'),'success');
+  try {
+    await sbFetch(`users?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!u.is_active})});
+    await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('更新に失敗','error')}
 }
 
-function deleteUser(id){
+async function deleteUser(id){
   if(!confirm(t('delete_confirm'))) return;
-  USERS=USERS.filter(x=>x.id!==id);
-  renderUsers();showToast(t('user_deleted'),'success');
+  try {
+    await sbFetch(`users?id=eq.${id}`,{method:'DELETE'});
+    await loadAll();showToast(t('user_deleted'),'success');
+  } catch(err){showToast('削除に失敗','error')}
 }
 
 /* ===== Master ===== */
@@ -819,25 +868,30 @@ function openMachineModal(id=null, defaultLine='A'){
   `);
 }
 
-function saveMachine(id){
+async function saveMachine(id){
   const no=document.getElementById('m-no').value.trim();
   const line=document.getElementById('m-line').value;
   const memo=document.getElementById('m-memo').value.trim();
   if(!no){showToast('機番を入力してください','error');return}
-  if(id){
-    const m=MACHINES.find(x=>x.id===id);
-    if(m){m.no=no;m.line=line;m.memo=memo}
-  } else {
-    MACHINES.push({id:nextMachineId++,no,line,memo,is_active:true});
-  }
-  closeModal();renderMaster();showToast(t('user_saved'),'success');
+  const lineId=getLineId(line);
+  if(!lineId){showToast('ライン情報が見つかりません','error');return}
+  try {
+    if(id){
+      await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo})});
+    } else {
+      await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(no),line_id:lineId,memo,is_active:true})});
+    }
+    closeModal();await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
 
-function toggleMachine(id){
+async function toggleMachine(id){
   const m=MACHINES.find(x=>x.id===id);
   if(!m) return;
-  m.is_active=!m.is_active;
-  renderMaster();
+  try {
+    await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!m.is_active})});
+    await loadAll();
+  } catch(err){showToast('更新に失敗','error')}
 }
 
 /* ===== Product modal ===== */
@@ -864,24 +918,27 @@ function openProductModal(id=null){
   `);
 }
 
-function saveProduct(id){
+async function saveProduct(id){
   const code=document.getElementById('p-code').value.trim();
   const name=document.getElementById('p-name').value.trim();
   if(!code||!name){showToast('品番と品名を入力してください','error');return}
-  if(id){
-    const p=PRODUCTS.find(x=>x.id===id);
-    if(p){p.code=code;p.name=name}
-  } else {
-    PRODUCTS.push({id:nextProductId++,code,name,is_active:true});
-  }
-  closeModal();renderMaster();showToast(t('user_saved'),'success');
+  try {
+    if(id){
+      await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({product_code:code,product_name:name})});
+    } else {
+      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:code,product_name:name,is_active:true})});
+    }
+    closeModal();await loadAll();showToast(t('user_saved'),'success');
+  } catch(err){showToast('保存に失敗: '+err.message,'error')}
 }
 
-function toggleProduct(id){
+async function toggleProduct(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p) return;
-  p.is_active=!p.is_active;
-  renderMaster();
+  try {
+    await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!p.is_active})});
+    await loadAll();
+  } catch(err){showToast('更新に失敗','error')}
 }
 
 
@@ -976,29 +1033,23 @@ function handleUserCsvImport(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-function confirmUserImport() {
+async function confirmUserImport() {
   const data = window._pendingUserImport;
   if (!data) return;
-
-  // 新規追加
-  if (data.addList.length) USERS.push(...data.addList);
-
-  // 既存更新
-  data.updateList.forEach(u => {
-    const existing = USERS.find(x => x.id === u.id);
-    if (existing) {
-      existing.role = u.role;
-      existing.shift = u.shift;
+  try {
+    for (const u of data.addList) {
+      await sbFetch('users',{method:'POST',body:JSON.stringify({name:u.name,role:u.role,shift:u.shift,pin_hash:'0000',is_active:true})});
     }
-  });
-
-  window._pendingUserImport = null;
-  closeModal();
-  renderUsers();
-  const msgs = [];
-  if (data.addList.length) msgs.push(`追加 ${data.addList.length}件`);
-  if (data.updateList.length) msgs.push(`更新 ${data.updateList.length}件`);
-  showToast(`ユーザー ${msgs.join('・')}`, 'success');
+    for (const u of data.updateList) {
+      await sbFetch(`users?id=eq.${u.id}`,{method:'PATCH',body:JSON.stringify({role:u.role,shift:u.shift})});
+    }
+    window._pendingUserImport = null;
+    closeModal();await loadAll();
+    const msgs = [];
+    if (data.addList.length) msgs.push(`追加 ${data.addList.length}件`);
+    if (data.updateList.length) msgs.push(`更新 ${data.updateList.length}件`);
+    showToast(`ユーザー ${msgs.join('・')}`, 'success');
+  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
 /* ===== Excel Import (Machines / Products) ===== */
@@ -1136,35 +1187,129 @@ function handleMasterExcelImport(event) {
   reader.readAsArrayBuffer(file);
 }
 
-function confirmMasterImport() {
+async function confirmMasterImport() {
   const d = window._pendingMasterImport;
   if (!d) return;
+  try {
+    for (const m of d.addMachines) {
+      const lineId=getLineId(m.line);
+      if(lineId) await sbFetch('machines',{method:'POST',body:JSON.stringify({machine_no:parseInt(m.no),line_id:lineId,memo:m.memo,is_active:true})});
+    }
+    for (const m of d.updateMachines) {
+      await sbFetch(`machines?id=eq.${m.id}`,{method:'PATCH',body:JSON.stringify({memo:m.memo})});
+    }
+    for (const p of d.addProducts) {
+      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
+    }
+    for (const p of d.updateProducts) {
+      await sbFetch(`products?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({product_name:p.name})});
+    }
+    window._pendingMasterImport = null;
+    closeModal();await loadAll();
+    const msgs = [];
+    const addTotal = d.addMachines.length + d.addProducts.length;
+    const updateTotal = d.updateMachines.length + d.updateProducts.length;
+    if (addTotal) msgs.push(`追加 ${addTotal}件`);
+    if (updateTotal) msgs.push(`更新 ${updateTotal}件`);
+    showToast(`マスタ ${msgs.join('・')}`, 'success');
+  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
+}
 
-  // 新規追加
-  if (d.addMachines.length) MACHINES.push(...d.addMachines);
-  if (d.addProducts.length) PRODUCTS.push(...d.addProducts);
+/* ===== Product Excel Import ===== */
+function handleProductExcelImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
 
-  // 既存更新
-  d.updateMachines.forEach(u => {
-    const m = MACHINES.find(x => x.id === u.id);
-    if (m) { m.memo = u.memo; }
-  });
-  d.updateProducts.forEach(u => {
-    const p = PRODUCTS.find(x => x.id === u.id);
-    if (p) { p.name = u.name; }
-  });
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-  window._pendingMasterImport = null;
-  closeModal();
-  renderMaster();
-  renderProducts();
+      if (rows.length < 2) { showToast('データが見つかりません', 'error'); return; }
 
-  const msgs = [];
-  const addTotal = d.addMachines.length + d.addProducts.length;
-  const updateTotal = d.updateMachines.length + d.updateProducts.length;
-  if (addTotal) msgs.push(`追加 ${addTotal}件`);
-  if (updateTotal) msgs.push(`更新 ${updateTotal}件`);
-  showToast(`マスタ ${msgs.join('・')}`, 'success');
+      const header = rows[0].map(h => String(h || '').trim());
+      const codeIdx = header.findIndex(h => /品番|code/i.test(h));
+      const nameIdx = header.findIndex(h => /品名|name|product/i.test(h));
+
+      if (codeIdx < 0) { showToast('「品番」列が見つかりません', 'error'); return; }
+
+      const addList = [], updateList = [];
+      const seenCodes = new Set();
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row.length) continue;
+        const code = String(row[codeIdx] || '').trim();
+        const pname = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
+        if (!code || seenCodes.has(code)) continue;
+        seenCodes.add(code);
+
+        const existing = PRODUCTS.find(p => p.code === code);
+        if (existing) {
+          const changes = [];
+          if (pname && existing.name !== pname) changes.push(`品名: ${existing.name}→${pname}`);
+          if (changes.length > 0) updateList.push({ id: existing.id, code, name: pname, changes });
+        } else {
+          addList.push({ code, name: pname || code });
+        }
+      }
+
+      if (addList.length === 0 && updateList.length === 0) {
+        showToast('変更対象のデータがありません', 'info'); return;
+      }
+
+      let html = '';
+      if (updateList.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 更新: ${updateList.length}件</div>
+          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>品番</th><th>変更</th></tr></thead><tbody>
+          ${updateList.map(p => `<tr><td>${p.code}</td><td style="font-size:11px;color:var(--text2)">${p.changes.join(', ')}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+      if (addList.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 新規追加: ${addList.length}件</div>
+          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>品番</th><th>品名</th></tr></thead><tbody>
+          ${addList.slice(0,30).map(p => `<tr><td>${p.code}</td><td>${p.name}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+
+      showModal(`
+        <div class="modal-title">品番インポート プレビュー</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">新規${addList.length}件 ・ 更新${updateList.length}件</div>
+        ${html}
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+          <button class="btn-add" onclick="confirmProductImport()">インポート実行</button>
+        </div>
+      `, true);
+      window._pendingProductImport = { addList, updateList };
+    } catch (err) { showToast('ファイルの読み込みに失敗: ' + err.message, 'error'); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function confirmProductImport() {
+  const d = window._pendingProductImport;
+  if (!d) return;
+  try {
+    for (const p of d.addList) {
+      await sbFetch('products',{method:'POST',body:JSON.stringify({product_code:p.code,product_name:p.name,is_active:true})});
+    }
+    for (const p of d.updateList) {
+      await sbFetch(`products?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({product_name:p.name})});
+    }
+    window._pendingProductImport = null;
+    closeModal();await loadAll();
+    const msgs = [];
+    if (d.addList.length) msgs.push(`追加 ${d.addList.length}件`);
+    if (d.updateList.length) msgs.push(`更新 ${d.updateList.length}件`);
+    showToast(`品番 ${msgs.join('・')}`, 'success');
+  } catch(err){showToast('インポートに失敗: '+err.message,'error')}
 }
 
 /* ===== Excel Export ===== */
@@ -1246,19 +1391,21 @@ function closeModal(){document.getElementById('modalEl').style.display='none'}
 function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal()}
 
 /* ===== Inline edit helpers ===== */
-function updateMachineMemo(id, val){
-  const m=MACHINES.find(x=>x.id===id);
-  if(m) m.memo=val;
+async function updateMachineMemo(id, val){
+  try { await sbFetch(`machines?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({memo:val})}); }
+  catch(err){ console.error(err); }
 }
-function updateProductName(id, val){
-  const p=PRODUCTS.find(x=>x.id===id);
-  if(p&&val.trim()) p.name=val.trim();
+async function updateProductName(id, val){
+  if(!val.trim()) return;
+  try { await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({product_name:val.trim()})}); }
+  catch(err){ console.error(err); }
 }
-function deleteMachine(id){
+async function deleteMachine(id){
   if(!confirm(t('delete_confirm'))) return;
-  MACHINES=MACHINES.filter(x=>x.id!==id);
-  renderMaster();
-  showToast(t('user_deleted'),'success');
+  try {
+    await sbFetch(`machines?id=eq.${id}`,{method:'DELETE'});
+    await loadAll();showToast(t('user_deleted'),'success');
+  } catch(err){showToast('削除に失敗','error')}
 }
 
 /* ===== Toast ===== */
@@ -1272,37 +1419,20 @@ function showToast(msg,type='info'){
 }
 
 /* ===== Init ===== */
-(function init(){
+(async function init(){
   initTheme();
   const sl=localStorage.getItem('traq_lang')||'ja';
   currentLang=sl;
   ['ja','vi','en'].forEach(l=>document.getElementById('lang-'+l).classList.toggle('active',l===sl));
-  renderUsers();
+  await loadAll();
 })();
 
 /* ===== Categories Master ===== */
-let EQ_CATEGORIES = [
-  {id:1, name:'材料供給設備', sort:1, is_active:true},
-  {id:2, name:'成形機',       sort:2, is_active:true},
-  {id:3, name:'取出機',       sort:3, is_active:true},
-  {id:4, name:'付帯設備',     sort:4, is_active:true},
-];
-let MD_CATEGORIES = [
-  {id:1, name:'金型温度異常', sort:1, is_active:true},
-  {id:2, name:'金型動作異常', sort:2, is_active:true},
-  {id:3, name:'メンテ依頼',   sort:3, is_active:true},
-  {id:4, name:'油漏れ',       sort:4, is_active:true},
-  {id:5, name:'エアー漏れ',   sort:5, is_active:true},
-  {id:6, name:'バリ',         sort:6, is_active:true},
-  {id:7, name:'その他',       sort:7, is_active:true},
-];
-let nextEqCatId=5, nextMdCatId=8;
 
 function renderCategories(){
   const eqQ=(document.getElementById('eqCatSearch')?.value||'').toLowerCase();
   const mdQ=(document.getElementById('mdCatSearch')?.value||'').toLowerCase();
 
-  // 設備分類
   const eqFiltered=EQ_CATEGORIES.filter(c=>!eqQ||c.name.toLowerCase().includes(eqQ));
   document.getElementById('eqCategoryBody').innerHTML=
     eqFiltered.length ? eqFiltered.map(c=>`
@@ -1330,7 +1460,6 @@ function renderCategories(){
       </tr>`).join('')
     : `<tr><td colspan="4" class="empty">該当なし</td></tr>`;
 
-  // 金型分類
   const mdFiltered=MD_CATEGORIES.filter(c=>!mdQ||c.name.toLowerCase().includes(mdQ));
   document.getElementById('mdCategoryBody').innerHTML=
     mdFiltered.length ? mdFiltered.map(c=>`
@@ -1375,23 +1504,21 @@ function openCategoryModal(type){
   `);
 }
 
-function saveCategory(type){
+async function saveCategory(type){
   const name=document.getElementById('cat-name')?.value.trim();
   if(!name){showToast('名前を入力してください','error');return}
-  if(type==='equipment'){
-    const maxSort=EQ_CATEGORIES.reduce((m,c)=>Math.max(m,c.sort),0);
-    EQ_CATEGORIES.push({id:nextEqCatId++,name,sort:maxSort+1,is_active:true});
-  } else {
-    const maxSort=MD_CATEGORIES.reduce((m,c)=>Math.max(m,c.sort),0);
-    MD_CATEGORIES.push({id:nextMdCatId++,name,sort:maxSort+1,is_active:true});
-  }
-  closeModal();renderCategories();showToast('追加しました','success');
+  const arr=type==='equipment'?EQ_CATEGORIES:MD_CATEGORIES;
+  const maxSort=arr.reduce((m,c)=>Math.max(m,c.sort),0);
+  try {
+    await sbFetch('categories',{method:'POST',body:JSON.stringify({type,name,sort_order:maxSort+1,is_active:true})});
+    closeModal();await loadAll();showToast('追加しました','success');
+  } catch(err){showToast('追加に失敗','error')}
 }
 
-function updateCatName(type,id,val){
-  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
-  const c=arr.find(x=>x.id===id);
-  if(c&&val.trim()) c.name=val.trim();
+async function updateCatName(type,id,val){
+  if(!val.trim()) return;
+  try { await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:val.trim()})}); }
+  catch(err){ console.error(err); }
 }
 
 function openCategoryEditModal(type,id){
@@ -1413,40 +1540,46 @@ function openCategoryEditModal(type,id){
   `);
 }
 
-function saveCategoryEdit(type,id){
+async function saveCategoryEdit(type,id){
   const name=document.getElementById('cat-edit-name')?.value.trim();
   if(!name){showToast('名前を入力してください','error');return}
-  const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
-  const c=arr.find(x=>x.id===id);
-  if(c) c.name=name;
-  closeModal();renderCategories();showToast('更新しました','success');
+  try {
+    await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name})});
+    closeModal();await loadAll();showToast('更新しました','success');
+  } catch(err){showToast('更新に失敗','error')}
 }
 
-function toggleCat(type,id){
+async function toggleCat(type,id){
   const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
   const c=arr.find(x=>x.id===id);
-  if(c) c.is_active=!c.is_active;
-  renderCategories();
+  if(!c) return;
+  try {
+    await sbFetch(`categories?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({is_active:!c.is_active})});
+    await loadAll();
+  } catch(err){showToast('更新に失敗','error')}
 }
 
-function deleteCat(type,id){
+async function deleteCat(type,id){
   if(!confirm('削除しますか？入力フォームから削除されます。')) return;
-  if(type==='eq') EQ_CATEGORIES=EQ_CATEGORIES.filter(x=>x.id!==id);
-  else            MD_CATEGORIES=MD_CATEGORIES.filter(x=>x.id!==id);
-  renderCategories();showToast('削除しました','success');
+  try {
+    await sbFetch(`categories?id=eq.${id}`,{method:'DELETE'});
+    await loadAll();showToast('削除しました','success');
+  } catch(err){showToast('削除に失敗','error')}
 }
 
-function moveCat(type,id,dir){
+async function moveCat(type,id,dir){
   const arr=type==='eq'?EQ_CATEGORIES:MD_CATEGORIES;
   arr.sort((a,b)=>a.sort-b.sort);
   const idx=arr.findIndex(x=>x.id===id);
   const swapIdx=idx+dir;
   if(swapIdx<0||swapIdx>=arr.length) return;
   const tmpSort=arr[idx].sort;
-  arr[idx].sort=arr[swapIdx].sort;
-  arr[swapIdx].sort=tmpSort;
-  arr.sort((a,b)=>a.sort-b.sort);
-  renderCategories();
+  const swapSort=arr[swapIdx].sort;
+  try {
+    await sbFetch(`categories?id=eq.${arr[idx].id}`,{method:'PATCH',body:JSON.stringify({sort_order:swapSort})});
+    await sbFetch(`categories?id=eq.${arr[swapIdx].id}`,{method:'PATCH',body:JSON.stringify({sort_order:tmpSort})});
+    await loadAll();
+  } catch(err){showToast('移動に失敗','error')}
 }
 
 /* 入力フォーム連携用：有効な分類一覧を取得 */
