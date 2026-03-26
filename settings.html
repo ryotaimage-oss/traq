@@ -233,6 +233,34 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
+    <!-- 🔔 通知設定（SLのみ表示） -->
+    <div class="section" id="notificationSection" style="display:none;animation-delay:.15s">
+      <div class="section-label">通知設定</div>
+      <div class="setting-group">
+        <div class="setting-row" onclick="togglePushNotification()">
+          <div class="setting-row-left">
+            <div class="setting-icon" style="background:rgba(239,159,39,.1)">🔔</div>
+            <div>
+              <div class="setting-name">Push通知</div>
+              <div class="setting-desc">トラブル送信時にスマホに通知が届きます</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-value" id="pushStatusText" style="font-size:11px"></span>
+            <div class="toggle" id="pushToggle" onclick="event.stopPropagation();togglePushNotification()">
+              <div class="toggle-knob"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="pushDeniedGuide" style="display:none;margin-top:8px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.7">
+        <b style="color:var(--danger)">通知がブロックされています</b><br>
+        ブラウザの設定から通知を許可してください：<br>
+        ① アドレスバー左の🔒アイコンをタップ<br>
+        ② 「通知」→「許可」に変更<br>
+        ③ ページをリロード
+      </div>
+    </div>
 
     <!-- バージョン情報 -->
     <div class="section" style="animation-delay:.2s">
@@ -291,6 +319,13 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 <script>
 /* ===== Version ===== */
 const APP_VERSION = '1.0.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+
+/* ===== Supabase設定 ===== */
+const SUPABASE_URL = 'https://avureyklkpslrjasrxuv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
+
+/* ===== VAPID公開鍵 ===== */
+const VAPID_PUBLIC_KEY = 'BOrw-Aae2_xKmk849jaSo9J6A3Ps4X1T9kFj7T1reC3OAWLwXFQzZY5xlAS6KxGFntM4NOl7UQjRCBlGw7lyuNc';
 
 /* ===== Session ===== */
 const SESSION = JSON.parse(sessionStorage.getItem('traq_session')||'null') || {
@@ -542,6 +577,123 @@ function setBadgeLatest(){
   if(badge){ badge.textContent='最新版です'; badge.className='no-update-badge'; }
 }
 
+/* ===== Push Notification ===== */
+function initPushNotification() {
+  const session = JSON.parse(sessionStorage.getItem('traq_session') || 'null');
+  if (!session || session.role !== 'sl') return;
+  const section = document.getElementById('notificationSection');
+  if (section) section.style.display = 'block';
+  updatePushUI();
+}
+
+async function updatePushUI() {
+  const toggle = document.getElementById('pushToggle');
+  const statusText = document.getElementById('pushStatusText');
+  const deniedGuide = document.getElementById('pushDeniedGuide');
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    if (statusText) statusText.textContent = '非対応';
+    if (toggle) toggle.style.opacity = '0.3';
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    if (toggle) { toggle.classList.remove('on'); toggle.style.opacity = '0.3'; }
+    if (statusText) statusText.textContent = 'ブロック中';
+    if (deniedGuide) deniedGuide.style.display = 'block';
+    return;
+  }
+  if (deniedGuide) deniedGuide.style.display = 'none';
+  const registration = await navigator.serviceWorker.getRegistration();
+  const subscription = registration ? await registration.pushManager.getSubscription() : null;
+  if (subscription) {
+    if (toggle) toggle.classList.add('on');
+    if (statusText) statusText.textContent = '有効';
+  } else {
+    if (toggle) toggle.classList.remove('on');
+    if (statusText) statusText.textContent = '無効';
+  }
+}
+
+async function togglePushNotification() {
+  const toggle = document.getElementById('pushToggle');
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    showToast('このブラウザはPush通知に対応していません', 'error');
+    return;
+  }
+  if (Notification.permission === 'denied') return;
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    const currentSub = registration ? await registration.pushManager.getSubscription() : null;
+    if (currentSub) {
+      await unsubscribePush(currentSub);
+      if (toggle) toggle.classList.remove('on');
+      showToast('通知をオフにしました', 'info');
+    } else {
+      await subscribePush();
+      if (toggle) toggle.classList.add('on');
+      showToast('通知を有効にしました！', 'success');
+    }
+    updatePushUI();
+  } catch (err) {
+    console.error('Push toggle error:', err);
+    showToast('通知の設定に失敗しました', 'error');
+  }
+}
+
+async function subscribePush() {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') throw new Error('Notification permission denied');
+  const registration = await navigator.serviceWorker.register('./sw.js');
+  await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+  });
+  await savePushSubscription(subscription);
+}
+
+async function unsubscribePush(subscription) {
+  await subscription.unsubscribe();
+  await deletePushSubscription(subscription.endpoint);
+}
+
+async function savePushSubscription(subscription) {
+  const session = JSON.parse(sessionStorage.getItem('traq_session') || 'null');
+  if (!session) return;
+  const subJson = subscription.toJSON();
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Prefer': 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify({
+      user_id: session.id,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth: subJson.keys.auth,
+    }),
+  });
+  if (!response.ok) throw new Error('Failed to save subscription');
+}
+
+async function deletePushSubscription(endpoint) {
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/push_subscriptions?endpoint=eq.${encodeURIComponent(endpoint)}`,
+    { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+  );
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
 /* ===== Logout ===== */
 function doLogout(){
   sessionStorage.removeItem('traq_session');
@@ -570,6 +722,7 @@ function showToast(msg,type='info'){
   });
   initUserInfo();
   checkVersion();
+  initPushNotification();
 })();
 </script>
 <script src="traq-version.js"></script>
