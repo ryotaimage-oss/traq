@@ -897,16 +897,16 @@ function handleUserCsvImport(event) {
       const lines = text.split(/\r?\n/).filter(l => l.trim());
       if (lines.length < 2) { showToast('データが見つかりません', 'error'); return; }
 
-      // ヘッダー解析
       const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
       const nameIdx = header.findIndex(h => /名前|name/i.test(h));
       const roleIdx = header.findIndex(h => /ロール|role/i.test(h));
       const shiftIdx = header.findIndex(h => /直|shift/i.test(h));
-      const pinIdx = header.findIndex(h => /pin/i.test(h));
 
       if (nameIdx < 0) { showToast('「名前」列が見つかりません', 'error'); return; }
 
-      const newUsers = [];
+      const addList = [];
+      const updateList = [];
+
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
         const name = cols[nameIdx];
@@ -916,52 +916,57 @@ function handleUserCsvImport(event) {
         const role = roleRaw === 'admin' ? 'admin' : roleRaw === 'sl' ? 'sl' : 'op';
         const shift = shiftIdx >= 0 ? (parseInt(cols[shiftIdx]) || null) : null;
 
-        // 重複チェック
-        if (USERS.some(u => u.name === name)) continue;
-
-        newUsers.push({
-          id: nextUserId++,
-          name: name,
-          role: role,
-          shift: shift,
-          is_active: true,
-          locked: false
-        });
+        const existing = USERS.find(u => u.name === name);
+        if (existing) {
+          const changes = [];
+          if (roleIdx >= 0 && existing.role !== role) changes.push(`ロール: ${existing.role}→${role}`);
+          if (shiftIdx >= 0 && existing.shift !== shift) changes.push(`直: ${existing.shift || '—'}→${shift || '—'}`);
+          if (changes.length > 0) {
+            updateList.push({ id: existing.id, name, role, shift, changes });
+          }
+        } else {
+          addList.push({ id: nextUserId++, name, role, shift, is_active: true, locked: false });
+        }
       }
 
-      if (newUsers.length === 0) {
-        showToast('新規ユーザーが見つかりません（重複除外済み）', 'info');
+      if (addList.length === 0 && updateList.length === 0) {
+        showToast('変更対象のデータがありません', 'info');
         return;
       }
 
-      // プレビュー表示
-      const previewRows = newUsers.map(u => `
-        <tr>
-          <td>${u.name}</td>
-          <td><span class="role-pill role-${u.role}">${u.role === 'admin' ? 'admin' : u.role === 'sl' ? 'SL' : 'OP'}</span></td>
-          <td>${u.shift ? u.shift + '直' : '—'}</td>
-        </tr>
-      `).join('');
+      // プレビュー
+      const roleName = r => r === 'admin' ? 'admin' : r === 'sl' ? 'SL' : 'OP';
+      let html = '';
+
+      if (updateList.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 更新: ${updateList.length}件</div>
+          <div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>名前</th><th>変更内容</th></tr></thead><tbody>
+          ${updateList.map(u => `<tr><td>${u.name}</td><td style="font-size:11px;color:var(--text2)">${u.changes.join(', ')}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+
+      if (addList.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 新規追加: ${addList.length}件</div>
+          <div style="max-height:180px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>名前</th><th>ロール</th><th>直</th></tr></thead><tbody>
+          ${addList.map(u => `<tr><td>${u.name}</td><td>${roleName(u.role)}</td><td>${u.shift ? u.shift + '直' : '—'}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
 
       showModal(`
         <div class="modal-title">CSVインポート プレビュー</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-          ${newUsers.length}件の新規ユーザーをインポートします
+          新規${addList.length}件 ・ 更新${updateList.length}件
         </div>
-        <div style="max-height:300px;overflow-y:auto;margin-bottom:16px">
-          <table style="width:100%">
-            <thead><tr><th>名前</th><th>ロール</th><th>直</th></tr></thead>
-            <tbody>${previewRows}</tbody>
-          </table>
-        </div>
+        ${html}
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
           <button class="btn-add" onclick="confirmUserImport()">インポート実行</button>
         </div>
       `, true);
 
-      // インポート確定用にデータを一時保存
-      window._pendingUserImport = newUsers;
+      window._pendingUserImport = { addList, updateList };
 
     } catch (err) {
       showToast('CSVの読み込みに失敗しました: ' + err.message, 'error');
@@ -971,13 +976,28 @@ function handleUserCsvImport(event) {
 }
 
 function confirmUserImport() {
-  const newUsers = window._pendingUserImport;
-  if (!newUsers || !newUsers.length) return;
-  USERS.push(...newUsers);
+  const data = window._pendingUserImport;
+  if (!data) return;
+
+  // 新規追加
+  if (data.addList.length) USERS.push(...data.addList);
+
+  // 既存更新
+  data.updateList.forEach(u => {
+    const existing = USERS.find(x => x.id === u.id);
+    if (existing) {
+      existing.role = u.role;
+      existing.shift = u.shift;
+    }
+  });
+
   window._pendingUserImport = null;
   closeModal();
   renderUsers();
-  showToast(`${newUsers.length}件のユーザーをインポートしました`, 'success');
+  const msgs = [];
+  if (data.addList.length) msgs.push(`追加 ${data.addList.length}件`);
+  if (data.updateList.length) msgs.push(`更新 ${data.updateList.length}件`);
+  showToast(`ユーザー ${msgs.join('・')}`, 'success');
 }
 
 /* ===== Excel Import (Machines / Products) ===== */
@@ -996,107 +1016,117 @@ function handleMasterExcelImport(event) {
 
       if (rows.length < 2) { showToast('データが見つかりません', 'error'); return; }
 
-      // ヘッダー解析
       const header = rows[0].map(h => String(h || '').trim());
       const lineIdx = header.findIndex(h => /ライン|line/i.test(h));
       const machineIdx = header.findIndex(h => /機番|machine/i.test(h));
       const codeIdx = header.findIndex(h => /品番|code/i.test(h));
       const nameIdx = header.findIndex(h => /品名|name|product/i.test(h));
+      const memoIdx = header.findIndex(h => /メモ|memo|備考/i.test(h));
 
       if (machineIdx < 0) { showToast('「機番」列が見つかりません', 'error'); return; }
 
-      const newMachines = [];
-      const newProducts = [];
-      const seenMachines = new Set(MACHINES.map(m => m.line + '-' + m.no));
-      const seenProducts = new Set(PRODUCTS.map(p => p.code));
+      const addMachines = [], updateMachines = [];
+      const addProducts = [], updateProducts = [];
+      const seenMachineKeys = new Set();
+      const seenProductCodes = new Set();
 
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row || !row.length) continue;
 
-        // ライン名からアルファベットを抽出（「Aライン」→「A」）
         let line = lineIdx >= 0 ? String(row[lineIdx] || '').trim() : '';
         line = line.replace(/ライン|line/gi, '').trim().toUpperCase() || 'A';
-
         const machineNo = String(row[machineIdx] || '').trim();
         if (!machineNo) continue;
+        const memo = memoIdx >= 0 ? String(row[memoIdx] || '').trim() : '';
 
-        // 機番の重複チェック
+        // 機番処理
         const machineKey = line + '-' + machineNo;
-        if (!seenMachines.has(machineKey)) {
-          seenMachines.add(machineKey);
-          newMachines.push({
-            id: nextMachineId++,
-            no: machineNo,
-            line: line,
-            memo: '',
-            is_active: true
-          });
+        if (!seenMachineKeys.has(machineKey)) {
+          seenMachineKeys.add(machineKey);
+          const existing = MACHINES.find(m => m.line === line && m.no === machineNo);
+          if (existing) {
+            const changes = [];
+            if (memoIdx >= 0 && memo && existing.memo !== memo) changes.push(`メモ: ${existing.memo || '—'}→${memo}`);
+            if (changes.length > 0) {
+              updateMachines.push({ id: existing.id, line, no: machineNo, memo, changes });
+            }
+          } else {
+            addMachines.push({ id: nextMachineId++, no: machineNo, line, memo, is_active: true });
+          }
         }
 
-        // 品番の処理
+        // 品番処理
         const code = codeIdx >= 0 ? String(row[codeIdx] || '').trim() : '';
         const pname = nameIdx >= 0 ? String(row[nameIdx] || '').trim() : '';
-        if (code && !seenProducts.has(code)) {
-          seenProducts.add(code);
-          newProducts.push({
-            id: nextProductId++,
-            code: code,
-            name: pname || code,
-            is_active: true
-          });
+        if (code && !seenProductCodes.has(code)) {
+          seenProductCodes.add(code);
+          const existingP = PRODUCTS.find(p => p.code === code);
+          if (existingP) {
+            const changes = [];
+            if (pname && existingP.name !== pname) changes.push(`品名: ${existingP.name}→${pname}`);
+            if (changes.length > 0) {
+              updateProducts.push({ id: existingP.id, code, name: pname, changes });
+            }
+          } else {
+            addProducts.push({ id: nextProductId++, code, name: pname || code, is_active: true });
+          }
         }
       }
 
-      if (newMachines.length === 0 && newProducts.length === 0) {
-        showToast('新規データが見つかりません（重複除外済み）', 'info');
+      const totalChanges = addMachines.length + updateMachines.length + addProducts.length + updateProducts.length;
+      if (totalChanges === 0) {
+        showToast('変更対象のデータがありません', 'info');
         return;
       }
 
-      // プレビュー表示
-      let previewHtml = '';
+      // プレビュー
+      let html = '';
 
-      if (newMachines.length > 0) {
-        const machineRows = newMachines.slice(0, 20).map(m => `
-          <tr><td>${m.line}ライン</td><td>${m.no}号機</td></tr>
-        `).join('');
-        previewHtml += `
-          <div style="font-size:13px;font-weight:700;margin-bottom:6px">機番: ${newMachines.length}件</div>
-          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px">
-            <table style="width:100%"><thead><tr><th>ライン</th><th>機番</th></tr></thead>
-            <tbody>${machineRows}</tbody></table>
-          </div>
-          ${newMachines.length > 20 ? '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ' + (newMachines.length - 20) + '件...</div>' : ''}
-        `;
+      if (updateMachines.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 機番 更新: ${updateMachines.length}件</div>
+          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>ライン</th><th>機番</th><th>変更</th></tr></thead><tbody>
+          ${updateMachines.slice(0,20).map(m => `<tr><td>${m.line}</td><td>${m.no}</td><td style="font-size:11px;color:var(--text2)">${m.changes.join(', ')}</td></tr>`).join('')}
+          </tbody></table></div>`;
       }
-
-      if (newProducts.length > 0) {
-        const productRows = newProducts.slice(0, 20).map(p => `
-          <tr><td>${p.code}</td><td>${p.name}</td></tr>
-        `).join('');
-        previewHtml += `
-          <div style="font-size:13px;font-weight:700;margin-bottom:6px">品番: ${newProducts.length}件</div>
-          <div style="max-height:150px;overflow-y:auto;margin-bottom:12px">
-            <table style="width:100%"><thead><tr><th>品番</th><th>品名</th></tr></thead>
-            <tbody>${productRows}</tbody></table>
-          </div>
-          ${newProducts.length > 20 ? '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ' + (newProducts.length - 20) + '件...</div>' : ''}
-        `;
+      if (addMachines.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 機番 新規: ${addMachines.length}件</div>
+          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>ライン</th><th>機番</th></tr></thead><tbody>
+          ${addMachines.slice(0,20).map(m => `<tr><td>${m.line}ライン</td><td>${m.no}号機</td></tr>`).join('')}
+          </tbody></table></div>
+          ${addMachines.length > 20 ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ${addMachines.length - 20}件...</div>` : ''}`;
+      }
+      if (updateProducts.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:6px">📝 品番 更新: ${updateProducts.length}件</div>
+          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>品番</th><th>変更</th></tr></thead><tbody>
+          ${updateProducts.slice(0,20).map(p => `<tr><td>${p.code}</td><td style="font-size:11px;color:var(--text2)">${p.changes.join(', ')}</td></tr>`).join('')}
+          </tbody></table></div>`;
+      }
+      if (addProducts.length > 0) {
+        html += `<div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px">＋ 品番 新規: ${addProducts.length}件</div>
+          <div style="max-height:120px;overflow-y:auto;margin-bottom:12px"><table style="width:100%">
+          <thead><tr><th>品番</th><th>品名</th></tr></thead><tbody>
+          ${addProducts.slice(0,20).map(p => `<tr><td>${p.code}</td><td>${p.name}</td></tr>`).join('')}
+          </tbody></table></div>
+          ${addProducts.length > 20 ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">他 ${addProducts.length - 20}件...</div>` : ''}`;
       }
 
       showModal(`
         <div class="modal-title">Excelインポート プレビュー</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-          以下のデータをインポートします（既存データと重複するものは除外済み）
+          新規 ${addMachines.length + addProducts.length}件 ・ 更新 ${updateMachines.length + updateProducts.length}件
         </div>
-        ${previewHtml}
+        ${html}
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
           <button class="btn-add" onclick="confirmMasterImport()">インポート実行</button>
         </div>
       `, true);
 
-      window._pendingMasterImport = { machines: newMachines, products: newProducts };
+      window._pendingMasterImport = { addMachines, updateMachines, addProducts, updateProducts };
 
     } catch (err) {
       showToast('ファイルの読み込みに失敗しました: ' + err.message, 'error');
@@ -1106,11 +1136,22 @@ function handleMasterExcelImport(event) {
 }
 
 function confirmMasterImport() {
-  const data = window._pendingMasterImport;
-  if (!data) return;
+  const d = window._pendingMasterImport;
+  if (!d) return;
 
-  if (data.machines.length) MACHINES.push(...data.machines);
-  if (data.products.length) PRODUCTS.push(...data.products);
+  // 新規追加
+  if (d.addMachines.length) MACHINES.push(...d.addMachines);
+  if (d.addProducts.length) PRODUCTS.push(...d.addProducts);
+
+  // 既存更新
+  d.updateMachines.forEach(u => {
+    const m = MACHINES.find(x => x.id === u.id);
+    if (m) { m.memo = u.memo; }
+  });
+  d.updateProducts.forEach(u => {
+    const p = PRODUCTS.find(x => x.id === u.id);
+    if (p) { p.name = u.name; }
+  });
 
   window._pendingMasterImport = null;
   closeModal();
@@ -1118,9 +1159,11 @@ function confirmMasterImport() {
   renderProducts();
 
   const msgs = [];
-  if (data.machines.length) msgs.push(`機番 ${data.machines.length}件`);
-  if (data.products.length) msgs.push(`品番 ${data.products.length}件`);
-  showToast(`${msgs.join('・')}をインポートしました`, 'success');
+  const addTotal = d.addMachines.length + d.addProducts.length;
+  const updateTotal = d.updateMachines.length + d.updateProducts.length;
+  if (addTotal) msgs.push(`追加 ${addTotal}件`);
+  if (updateTotal) msgs.push(`更新 ${updateTotal}件`);
+  showToast(`マスタ ${msgs.join('・')}`, 'success');
 }
 
 /* ===== Excel Export ===== */
