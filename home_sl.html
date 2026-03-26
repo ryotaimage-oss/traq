@@ -792,7 +792,7 @@ function showToast(msg,type='info'){
 function doLogout(){
   sessionStorage.removeItem('traq_session');
   showToast(t('logout_done'),'info');
-  setTimeout(()=>{ location.href='login.html'; },1000);
+  setTimeout(()=>{ location.href='index.html'; },1000);
 }
 </script>
 <script src="traq-version.js"></script>

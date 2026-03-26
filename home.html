@@ -828,7 +828,7 @@ function applyI18n() {
 /* =============================================
    Mock Session
 ============================================= */
-// 実際はlogin.htmlからsessionStorageで引き継ぐ
+// 実際はindex.htmlからsessionStorageで引き継ぐ
 const SESSION = JSON.parse(sessionStorage.getItem('traq_session') || 'null') || {
   id: 5, name: '高橋 A', role: 'op', shift: 1
 };
