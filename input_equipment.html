@@ -583,7 +583,6 @@ async function doSubmit(){
       detail:document.getElementById('detail').value.trim()||null,
       reporter_id:session.userId
     };
-    alert('送信データ確認:\n'+JSON.stringify(td,null,2));
     var result=await sbFetch('troubles','POST',td);var tId=result[0].id;
     if(selectedImages.length>0){
       showOverlay('画像をアップロード中...');
@@ -600,20 +599,16 @@ async function doSubmit(){
           if(ur.ok){
             await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
           }else{
-            hideOverlay();
-            alert('画像アップロード失敗\n\nステータス: '+ur.status+'\nURL: '+uploadUrl+'\nレスポンス: '+respText);
-            showOverlay('残りを処理中...');
+            console.warn('Storage upload failed:',ur.status,respText);
           }
         }catch(upErr){
-          hideOverlay();
-          alert('画像アップロード例外\n\n'+upErr.message+'\nURL: '+uploadUrl);
-          showOverlay('残りを処理中...');
+          console.warn('Image upload error:',upErr);
         }
       }
     }
     await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
     hideOverlay();showToast('送信しました','success');setTimeout(function(){goHome();},1200);
-  }catch(e){hideOverlay();btn.disabled=false;alert('送信エラー全文:\n\n'+e.message);}
+  }catch(e){hideOverlay();btn.disabled=false;showToast('送信失敗: '+e.message,'error');}
 }
 
 /* ── Util ── */

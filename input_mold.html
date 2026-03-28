@@ -599,14 +599,10 @@ async function doSubmit(){
           if(ur.ok){
             await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
           }else{
-            hideOverlay();
-            alert('画像アップロード失敗\n\nステータス: '+ur.status+'\nURL: '+uploadUrl+'\nレスポンス: '+respText);
-            showOverlay('残りを処理中...');
+            console.warn('Storage upload failed:',ur.status,respText);
           }
         }catch(upErr){
-          hideOverlay();
-          alert('画像アップロード例外\n\n'+upErr.message+'\nURL: '+uploadUrl);
-          showOverlay('残りを処理中...');
+          console.warn('Image upload error:',upErr);
         }
       }
     }
