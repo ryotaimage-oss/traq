@@ -1,406 +1,610 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Traq">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Traq – ダッシュボード</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg:      #080d18;
-  --surface: #111827;
-  --surface2:#16213a;
-  --border:  #1e293b;
-  --orange:  #EF9F27;
-  --text:    #f1f5f9;
-  --muted:   #64748b;
-  --error:   #ef4444;
-  --success: #22c55e;
-  --radius:  8px;
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
+  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
+  --text1:#e8eaf0;--text2:#8b90a0;
+  --border:rgba(255,255,255,0.08);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --eq:#3b82f6;--md:#a855f7;
+  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+  --nav-h:64px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
+[data-theme="light"]{
+  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --text1:#1a1f2e;--text2:#666666;
+  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
 
-.header { background: #080d18; padding: 12px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
-.logo-text { font-size: 18px; font-weight: 700; color: var(--orange); }
-.logo-sub  { font-size: 10px; color: var(--muted); }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.user-info { font-size: 12px; color: var(--muted); }
-.back-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
-.back-btn:hover { border-color: var(--orange); color: var(--text); }
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--text2);transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar-title{font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-.main { flex: 1; padding: 24px 16px; max-width: 1000px; margin: 0 auto; width: 100%; }
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:16px 16px 32px}
+.inner{max-width:900px;margin:0 auto}
 
-/* フィルター */
-.filter-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.filter-label { font-size: 12px; color: var(--muted); font-weight: 500; white-space: nowrap; }
-.filter-select, .filter-input { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; color: var(--text); font-family: inherit; font-size: 13px; }
-.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--orange); }
-.filter-select option { background: var(--surface); }
-.filter-btn { background: var(--orange); color: #000; border: none; border-radius: var(--radius); padding: 8px 16px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.filter-btn:hover { opacity: .85; }
+/* Filters */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.period-tabs{display:flex;gap:4px}
+.ptab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.ptab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
+.ptab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.type-tabs{display:flex;gap:4px}
+.ttab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.ttab.active.eq{background:rgba(59,130,246,.15);border-color:var(--eq);color:var(--eq)}
+.ttab.active.md{background:rgba(168,85,247,.15);border-color:var(--md);color:var(--md)}
+.ttab.active.all{background:var(--orange);border-color:var(--orange);color:var(--navy)}
+.ttab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
 
-/* KPIカード */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-@media (max-width: 640px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
-.kpi-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
-.kpi-value { font-size: 28px; font-weight: 700; color: var(--text); }
-.kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
-.kpi-value.orange { color: var(--orange); }
-.kpi-value.green  { color: var(--success); }
-.kpi-value.red    { color: var(--error); }
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.kpi-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+.kpi-value{font-size:24px;font-weight:700;line-height:1}
+.kpi-value.eq{color:var(--eq)}
+.kpi-value.md{color:var(--md)}
+.kpi-value.stop{color:var(--warning)}
 
-/* グラフグリッド */
-.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-@media (max-width: 640px) { .chart-grid { grid-template-columns: 1fr; } }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
-.chart-card.full { grid-column: 1 / -1; }
-.chart-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 12px; }
-.chart-wrap { position: relative; height: 220px; }
+/* Chart grid */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.chart-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;animation:fadeUp .3s ease both}
+.chart-card.wide{grid-column:span 2}
+@media(max-width:600px){.chart-card.wide{grid-column:span 1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.chart-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;margin-bottom:12px}
+.chart-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chart-wrap{position:relative;height:200px}
+.chart-wrap.tall{height:240px}
+.chart-wrap.short{height:180px}
 
-/* テーブル */
-.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-.table-title { font-size: 13px; font-weight: 700; color: var(--muted); padding: 14px 16px; border-bottom: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { background: var(--surface2); padding: 10px 14px; text-align: left; font-size: 11px; color: var(--muted); font-weight: 600; }
-td { padding: 10px 14px; border-top: 1px solid var(--border); }
-tr:hover td { background: var(--surface2); }
+/* Ranking list */
+.rank-list{display:flex;flex-direction:column;gap:6px}
+.rank-item{display:flex;align-items:center;gap:8px}
+.rank-num{font-size:11px;font-weight:700;color:var(--text2);width:20px;text-align:right;flex-shrink:0}
+.rank-num.top{color:var(--orange)}
+.rank-bar-wrap{flex:1;background:var(--bg3);border-radius:4px;height:22px;overflow:hidden;position:relative}
+.rank-bar{height:100%;border-radius:4px;min-width:4px;transition:width .4s ease}
+.rank-label{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 40px)}
+.rank-count{font-size:11px;font-weight:700;flex-shrink:0;width:28px;text-align:right;color:var(--text2)}
 
-.badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-.badge-equipment { background: #1e2a4a; color: #93c5fd; }
-.badge-mold      { background: #2a1a3a; color: #c4b5fd; }
-.badge-approved  { background: #1a3a1a; color: #4ade80; }
-.badge-rejected  { background: #2a1a1a; color: #f87171; }
-.badge-pending   { background: #2a2000; color: #fbbf24; }
+/* Pie legend */
+.pie-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px}
+.pie-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.pie-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
-.loading { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin .6s linear infinite; margin-right: 8px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.hidden { display: none !important; }
+/* Loading / empty */
+.loading-overlay{text-align:center;padding:40px;color:var(--text2);font-size:14px}
+.empty-state{text-align:center;padding:30px;color:var(--text2);font-size:13px}
+
+/* Toast */
+.toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 20px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:400;white-space:nowrap;animation:fadeUp .2s ease}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
 <body>
+<div class="app">
 
-<header class="header">
-  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-    <rect width="36" height="36" rx="6" fill="#080d18"/>
-    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
-    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
-    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
-    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
-    <rect x="8" y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <circle cx="9" cy="6" r="2" fill="#EF9F27" opacity=".8"/>
-    <circle cx="19" cy="4" r="2" fill="#EF9F27" opacity=".8"/>
-  </svg>
-  <div>
-    <div class="logo-text">Traq</div>
-    <div class="logo-sub">ダッシュボード</div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <span class="topbar-title">📊 <span data-i18n="page_title">ダッシュボード</span></span>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" id="lang-ja" onclick="setLang('ja')">JP</button>
+      <button class="lang-btn" id="lang-vi" onclick="setLang('vi')">VN</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </header>
+
+  <div class="scroll-area">
+  <div class="inner">
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="period-tabs">
+        <button class="ptab active" data-p="7"  onclick="setPeriod(7)"  data-i18n="p7">直近7日</button>
+        <button class="ptab"        data-p="30" onclick="setPeriod(30)" data-i18n="p30">直近30日</button>
+        <button class="ptab"        data-p="90" onclick="setPeriod(90)" data-i18n="p90">直近90日</button>
+        <button class="ptab"        data-p="0"  onclick="setPeriod(0)"  data-i18n="p_all">全期間</button>
+      </div>
+      <div class="type-tabs">
+        <button class="ttab active all" data-t="all" onclick="setType('all')" data-i18n="t_all">すべて</button>
+        <button class="ttab" data-t="eq"  onclick="setType('eq')"  data-i18n="t_eq">設備</button>
+        <button class="ttab" data-t="md"  onclick="setType('md')"  data-i18n="t_md">金型</button>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card"><div class="kpi-label" data-i18n="kpi_total">総件数</div><div class="kpi-value" id="kpiTotal">–</div></div>
+      <div class="kpi-card"><div class="kpi-label" data-i18n="kpi_eq">設備</div><div class="kpi-value eq" id="kpiEq">–</div></div>
+      <div class="kpi-card"><div class="kpi-label" data-i18n="kpi_md">金型</div><div class="kpi-value md" id="kpiMd">–</div></div>
+      <div class="kpi-card"><div class="kpi-label" data-i18n="kpi_stop">停止時間(分)</div><div class="kpi-value stop" id="kpiStop">–</div></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid" id="chartGrid">
+
+      <!-- 1: 日別件数 -->
+      <div class="chart-card wide" style="animation-delay:.02s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--orange)"></div>
+          <span data-i18n="chart1_title">日別件数推移</span>
+        </div>
+        <div class="chart-wrap tall"><canvas id="chart1"></canvas></div>
+      </div>
+
+      <!-- 2: 停止時間推移 -->
+      <div class="chart-card wide" style="animation-delay:.04s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--warning)"></div>
+          <span data-i18n="chart2_title">停止時間合計推移（分）</span>
+        </div>
+        <div class="chart-wrap tall"><canvas id="chart2"></canvas></div>
+      </div>
+
+      <!-- 3: 初発・再発 -->
+      <div class="chart-card" style="animation-delay:.06s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--success)"></div>
+          <span data-i18n="chart3_title">初発・再発比率</span>
+        </div>
+        <div class="chart-wrap short"><canvas id="chart3"></canvas></div>
+        <div class="pie-legend" id="legend3"></div>
+      </div>
+
+      <!-- 4: 設備分類別 -->
+      <div class="chart-card" style="animation-delay:.08s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--eq)"></div>
+          <span data-i18n="chart4_title">設備 分類別件数</span>
+        </div>
+        <div class="chart-wrap short"><canvas id="chart4"></canvas></div>
+        <div class="pie-legend" id="legend4"></div>
+      </div>
+
+      <!-- 5: 金型分類別 -->
+      <div class="chart-card" style="animation-delay:.10s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--md)"></div>
+          <span data-i18n="chart5_title">金型 異常内容別件数</span>
+        </div>
+        <div class="chart-wrap short"><canvas id="chart5"></canvas></div>
+        <div class="pie-legend" id="legend5"></div>
+      </div>
+
+      <!-- 6: 再発率 -->
+      <div class="chart-card" style="animation-delay:.12s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--danger)"></div>
+          <span data-i18n="chart6_title">再発率（設備 / 金型）</span>
+        </div>
+        <div class="chart-wrap short"><canvas id="chart6"></canvas></div>
+      </div>
+
+      <!-- 7: 機番別 -->
+      <div class="chart-card wide" style="animation-delay:.14s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--orange)"></div>
+          <span data-i18n="chart7_title">機番別件数ランキング（上位10）</span>
+        </div>
+        <div class="rank-list" id="rankMachine"></div>
+      </div>
+
+      <!-- 8: 品番別 -->
+      <div class="chart-card wide" style="animation-delay:.16s">
+        <div class="chart-title">
+          <div class="chart-dot" style="background:var(--success)"></div>
+          <span data-i18n="chart8_title">品番別件数ランキング（上位10）</span>
+        </div>
+        <div class="rank-list" id="rankProduct"></div>
+      </div>
+
+    </div>
   </div>
-  <div class="header-right">
-    <span class="user-info" id="header-user"></span>
-    <button class="back-btn" onclick="goBack()">← 戻る</button>
   </div>
-</header>
-
-<main class="main">
-
-  <!-- フィルター -->
-  <div class="filter-bar">
-    <span class="filter-label">期間</span>
-    <input class="filter-input" type="date" id="filter-from">
-    <span class="filter-label">〜</span>
-    <input class="filter-input" type="date" id="filter-to">
-    <select class="filter-select" id="filter-type">
-      <option value="">全種別</option>
-      <option value="equipment">設備</option>
-      <option value="mold">金型</option>
-    </select>
-    <select class="filter-select" id="filter-line">
-      <option value="">全ライン</option>
-    </select>
-    <button class="filter-btn" onclick="loadData()">表示</button>
-  </div>
-
-  <!-- KPI -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">総件数</div>
-      <div class="kpi-value orange" id="kpi-total">-</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">承認済み</div>
-      <div class="kpi-value green" id="kpi-approved">-</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">承認待ち</div>
-      <div class="kpi-value" id="kpi-pending">-</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">平均停止時間</div>
-      <div class="kpi-value" id="kpi-avg-stop">-</div>
-      <div class="kpi-sub">分</div>
-    </div>
-  </div>
-
-  <!-- グラフ -->
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-title">📅 日別件数</div>
-      <div class="chart-wrap"><canvas id="chart-daily"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">🏷️ 分類別件数</div>
-      <div class="chart-wrap"><canvas id="chart-category"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">🏭 ライン別件数</div>
-      <div class="chart-wrap"><canvas id="chart-line"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">⚙️ 設備 vs 🔧 金型</div>
-      <div class="chart-wrap"><canvas id="chart-type"></canvas></div>
-    </div>
-  </div>
-
-  <!-- 直近トラブル一覧 -->
-  <div class="table-wrap">
-    <div class="table-title">直近トラブル一覧</div>
-    <div id="trouble-table-wrap">
-      <div class="loading"><span class="spinner"></span>読込中...</div>
-    </div>
-  </div>
-
-</main>
+</div>
+<div id="toastEl" style="display:none"></div>
 
 <script>
-var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-
-async function sbFetch(path) {
-  var res = await fetch(SB_URL + '/rest/v1/' + path, {
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-var session = null;
-(function() {
-  var s = localStorage.getItem('traq_session');
-  if (!s) { location.href = 'index.html'; return; }
-  session = JSON.parse(s);
-  if (Date.now() > session.expiresAt) { location.href = 'index.html'; return; }
-  document.getElementById('header-user').textContent = session.name;
-
-  // デフォルト期間: 過去30日
-  var to   = new Date();
-  var from = new Date();
-  from.setDate(from.getDate() - 30);
-  document.getElementById('filter-from').value = fmt(from);
-  document.getElementById('filter-to').value   = fmt(to);
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+  var btn=document.getElementById('themeBtn');
+  if(btn) btn.textContent=(saved||pref)==='dark'?'🌙':'☀️';
 })();
 
-function fmt(d) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+/* ===== Supabase ===== */
+const SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+  if(!res.ok) throw new Error(await res.text());
+  const text=await res.text();
+  return text?JSON.parse(text):[];
 }
 
-function goBack() {
-  var dest = session.role === 'sl' ? 'home_sl.html' : 'home.html';
-  location.href = dest;
+/* ===== i18n ===== */
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+const I18N={
+  ja:{page_title:'ダッシュボード',p7:'直近7日',p30:'直近30日',p90:'直近90日',p_all:'全期間',t_all:'すべて',t_eq:'設備',t_md:'金型',kpi_total:'総件数',kpi_eq:'設備',kpi_md:'金型',kpi_stop:'停止時間(分)',chart1_title:'日別件数推移',chart2_title:'停止時間合計推移（分）',chart3_title:'初発・再発比率',chart4_title:'設備 分類別件数',chart5_title:'金型 異常内容別件数',chart6_title:'再発率（設備 / 金型）',chart7_title:'機番別件数ランキング（上位10）',chart8_title:'品番別件数ランキング（上位10）',first:'初発',rec:'再発',no_data:'データなし'},
+  vi:{page_title:'Thống kê',p7:'7 ngày',p30:'30 ngày',p90:'90 ngày',p_all:'Tất cả',t_all:'Tất cả',t_eq:'Thiết bị',t_md:'Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Tỷ lệ tái phát',chart7_title:'Top 10 máy',chart8_title:'Top 10 sản phẩm',first:'Lần đầu',rec:'Tái phát',no_data:'Không có dữ liệu'},
+  en:{page_title:'Dashboard',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',first:'First',rec:'Recurrence',no_data:'No data'}
+};
+function t(k){return(I18N[currentLang]||I18N.ja)[k]||(I18N.ja[k]||k)}
+function setLang(l){
+  currentLang=l;localStorage.setItem('traq_lang',l);
+  ['ja','vi','en'].forEach(x=>{document.getElementById('lang-'+x)?.classList.toggle('active',x===l);});
+  applyI18n();
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
 }
 
-var allLines = [], allCategories = [], allUsers = [];
-var chartInstances = {};
+/* ===== State ===== */
+let currentPeriod=7, currentType='all';
+let RAW=[];
+const chartInstances={};
 
-async function loadMasters() {
-  var results = await Promise.all([
-    sbFetch('lines?select=id,name&order=name.asc'),
-    sbFetch('categories?select=id,name,type&order=type.asc,sort_order.asc'),
-    sbFetch('traq_users?select=id,name')
-  ]);
-  allLines      = results[0] || [];
-  allCategories = results[1] || [];
-  allUsers      = results[2] || [];
+/* ===== Colors ===== */
+const PIE_COLORS=['#EF9F27','#3b82f6','#10b981','#a855f7','#ef4444','#f59e0b','#06b6d4','#84cc16','#f97316','#ec4899'];
 
-  var lineFilter = document.getElementById('filter-line');
-  lineFilter.innerHTML = '<option value="">全ライン</option>' +
-    allLines.map(function(l) { return '<option value="' + l.id + '">' + l.name + '</option>'; }).join('');
-}
+/* ===== CSS var helper ===== */
+function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
 
-async function loadData() {
-  var from   = document.getElementById('filter-from').value;
-  var to     = document.getElementById('filter-to').value;
-  var type   = document.getElementById('filter-type').value;
-  var lineId = document.getElementById('filter-line').value;
+/* ===== Init ===== */
+(async function init(){
+  applyI18n();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>{document.getElementById('lang-'+l)?.classList.toggle('active',l===sl);});
 
-  var query = 'troubles?select=*&order=occurred_date.desc';
-  if (from) query += '&occurred_date=gte.' + from;
-  if (to)   query += '&occurred_date=lte.' + to;
-  if (type) query += '&trouble_type=eq.' + type;
-  if (lineId) query += '&line_id=eq.' + lineId;
+  // テーマ・ランゲージ反映
+  const th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',th);
+  const btn=document.getElementById('themeBtn');
+  if(btn) btn.textContent=th==='dark'?'🌙':'☀️';
 
-  document.getElementById('trouble-table-wrap').innerHTML =
-    '<div class="loading"><span class="spinner"></span>読込中...</div>';
+  await loadData();
+})();
 
-  try {
-    var rows = await sbFetch(query) || [];
-    updateKPI(rows);
-    updateCharts(rows);
-    updateTable(rows);
-  } catch(e) {
-    document.getElementById('trouble-table-wrap').innerHTML =
-      '<div class="loading" style="color:var(--error);">読込失敗: ' + e.message + '</div>';
+/* ===== Load ===== */
+async function loadData(){
+  try{
+    const rows=await sbFetch(
+      'troubles?select=id,trouble_type,status,occurred_date,stop_minutes,occurrence,categories(name),machines(machine_no),products(product_code,product_name)'+
+      '&status=neq.draft&order=occurred_date.desc&limit=2000'
+    );
+    RAW=(rows||[]).filter(r=>r.status!=='draft');
+    render();
+  }catch(e){
+    showToast('データ読込エラー: '+e.message,'error');
+    RAW=[];
+    render();
   }
 }
 
-function updateKPI(rows) {
-  var total    = rows.length;
-  var approved = rows.filter(function(r) { return r.status === 'approved'; }).length;
-  var pending  = rows.filter(function(r) { return r.status === 'pending'; }).length;
-  var stops    = rows.filter(function(r) { return r.stop_minutes != null; });
-  var avgStop  = stops.length ? Math.round(stops.reduce(function(s,r) { return s + r.stop_minutes; }, 0) / stops.length) : 0;
-
-  document.getElementById('kpi-total').textContent    = total;
-  document.getElementById('kpi-approved').textContent = approved;
-  document.getElementById('kpi-pending').textContent  = pending;
-  document.getElementById('kpi-avg-stop').textContent = avgStop;
-}
-
-function destroyChart(id) {
-  if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
-}
-
-var CHART_COLORS = ['#EF9F27','#60a5fa','#4ade80','#f87171','#c4b5fd','#fbbf24','#34d399','#fb923c'];
-
-function updateCharts(rows) {
-  // 日別
-  destroyChart('daily');
-  var byDate = {};
-  rows.forEach(function(r) { byDate[r.occurred_date] = (byDate[r.occurred_date] || 0) + 1; });
-  var dates = Object.keys(byDate).sort();
-  chartInstances['daily'] = new Chart(document.getElementById('chart-daily'), {
-    type: 'bar',
-    data: {
-      labels: dates,
-      datasets: [{ label: '件数', data: dates.map(function(d) { return byDate[d]; }), backgroundColor: '#EF9F27', borderRadius: 4 }]
-    },
-    options: chartOpts()
-  });
-
-  // 分類別
-  destroyChart('category');
-  var byCat = {};
-  rows.forEach(function(r) {
-    var cat = allCategories.find(function(c) { return c.id === r.category_id; });
-    var name = cat ? cat.name : '未分類';
-    byCat[name] = (byCat[name] || 0) + 1;
-  });
-  var catKeys = Object.keys(byCat);
-  chartInstances['category'] = new Chart(document.getElementById('chart-category'), {
-    type: 'doughnut',
-    data: {
-      labels: catKeys,
-      datasets: [{ data: catKeys.map(function(k) { return byCat[k]; }), backgroundColor: CHART_COLORS, borderWidth: 0 }]
-    },
-    options: doughnutOpts()
-  });
-
-  // ライン別
-  destroyChart('line');
-  var byLine = {};
-  rows.forEach(function(r) {
-    var line = allLines.find(function(l) { return l.id === r.line_id; });
-    var name = line ? line.name : '不明';
-    byLine[name] = (byLine[name] || 0) + 1;
-  });
-  var lineKeys = Object.keys(byLine);
-  chartInstances['line'] = new Chart(document.getElementById('chart-line'), {
-    type: 'bar',
-    data: {
-      labels: lineKeys,
-      datasets: [{ label: '件数', data: lineKeys.map(function(k) { return byLine[k]; }), backgroundColor: '#60a5fa', borderRadius: 4 }]
-    },
-    options: chartOpts()
-  });
-
-  // 種別
-  destroyChart('type');
-  var eqCount   = rows.filter(function(r) { return r.trouble_type === 'equipment'; }).length;
-  var moldCount = rows.filter(function(r) { return r.trouble_type === 'mold'; }).length;
-  chartInstances['type'] = new Chart(document.getElementById('chart-type'), {
-    type: 'doughnut',
-    data: {
-      labels: ['設備', '金型'],
-      datasets: [{ data: [eqCount, moldCount], backgroundColor: ['#93c5fd','#c4b5fd'], borderWidth: 0 }]
-    },
-    options: doughnutOpts()
-  });
-}
-
-function chartOpts() {
-  return {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' } },
-      y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' }, beginAtZero: true }
+/* ===== Filter ===== */
+function getFiltered(){
+  const now=new Date();
+  return RAW.filter(r=>{
+    // 期間フィルター
+    if(currentPeriod>0){
+      const d=new Date(r.occurred_date||r.created_at||'');
+      const diff=(now-d)/(1000*60*60*24);
+      if(diff>currentPeriod) return false;
     }
-  };
+    // 種別フィルター
+    if(currentType==='eq'&&r.trouble_type!=='equipment') return false;
+    if(currentType==='md'&&r.trouble_type!=='mold') return false;
+    return true;
+  });
 }
 
-function doughnutOpts() {
-  return {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } }
-    }
-  };
+/* ===== Controls ===== */
+function setPeriod(p){
+  currentPeriod=p;
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.toggle('active',+b.dataset.p===p));
+  render();
+}
+function setType(tp){
+  currentType=tp;
+  document.querySelectorAll('.ttab').forEach(b=>{
+    b.classList.remove('active','all','eq','md');
+    if(b.dataset.t===tp){b.classList.add('active',tp);}
+  });
+  render();
 }
 
-function updateTable(rows) {
-  var wrap = document.getElementById('trouble-table-wrap');
-  if (!rows.length) {
-    wrap.innerHTML = '<div class="loading" style="color:var(--muted);">データがありません</div>';
-    return;
+/* ===== Render ===== */
+function render(){
+  const data=getFiltered();
+  renderKPI(data);
+  renderChart1(data);
+  renderChart2(data);
+  renderChart3(data);
+  renderChart4(data);
+  renderChart5(data);
+  renderChart6(data);
+  renderRank('rankMachine', data, r=>r.machines?r.machines.machine_no+'号機':'不明');
+  renderRank('rankProduct', data, r=>r.products?(r.products.product_code+' '+r.products.product_name).trim():'不明');
+}
+
+/* ===== KPI ===== */
+function renderKPI(data){
+  const total=data.length;
+  const eq=data.filter(r=>r.trouble_type==='equipment').length;
+  const md=data.filter(r=>r.trouble_type==='mold').length;
+  const stop=data.reduce((s,r)=>s+(r.stop_minutes||0),0);
+  document.getElementById('kpiTotal').textContent=total;
+  document.getElementById('kpiEq').textContent=eq;
+  document.getElementById('kpiMd').textContent=md;
+  document.getElementById('kpiStop').textContent=stop;
+}
+
+/* ===== Chart helpers ===== */
+function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function gridColor(){return isDark()?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';}
+function tickColor(){return isDark()?'#8b90a0':'#666666';}
+
+/* last N days array */
+function lastNDays(n){
+  const days=[];const now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
   }
-  var STATUS_BADGE = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected' };
-  var STATUS_LABEL = { pending: '承認待ち', approved: '承認済み', rejected: '差戻し' };
-  wrap.innerHTML = '<table><thead><tr>' +
-    '<th>日付</th><th>直</th><th>種別</th><th>ライン</th><th>機番</th><th>報告者</th><th>停止(分)</th><th>状態</th>' +
-    '</tr></thead><tbody>' +
-    rows.slice(0, 50).map(function(r) {
-      var line    = allLines.find(function(l) { return l.id === r.line_id; });
-      var user    = allUsers.find(function(u) { return u.id === r.reporter_id; });
-      var typeBadge = r.trouble_type === 'equipment'
-        ? '<span class="badge badge-equipment">設備</span>'
-        : '<span class="badge badge-mold">金型</span>';
-      var statusBadge = '<span class="badge ' + (STATUS_BADGE[r.status]||'') + '">' + (STATUS_LABEL[r.status]||r.status) + '</span>';
-      return '<tr>' +
-        '<td>' + (r.occurred_date||'-') + '</td>' +
-        '<td>' + r.shift + '直</td>' +
-        '<td>' + typeBadge + '</td>' +
-        '<td>' + (line ? line.name : '-') + '</td>' +
-        '<td>' + (r.machine_id || '-') + '</td>' +
-        '<td>' + (user ? user.name : '-') + '</td>' +
-        '<td>' + (r.stop_minutes != null ? r.stop_minutes : '-') + '</td>' +
-        '<td>' + statusBadge + '</td>' +
-        '</tr>';
-    }).join('') +
-    '</tbody></table>';
+  return days;
+}
+function getDateKey(r){return(r.occurred_date||'').slice(0,10)||null;}
+
+/* ===== Chart 1: 日別件数 ===== */
+function renderChart1(data){
+  destroyChart('c1');
+  const days=currentPeriod>0?lastNDays(currentPeriod):getDayRange(data);
+  const labels=days.map(d=>d.slice(5));
+  let datasets=[];
+  if(currentType==='all'||currentType==='eq'){
+    const eqMap={};days.forEach(d=>{eqMap[d]=0;});
+    data.filter(r=>r.trouble_type==='equipment').forEach(r=>{const d=getDateKey(r);if(d&&eqMap[d]!==undefined)eqMap[d]++;});
+    datasets.push({label:t('t_eq'),data:days.map(d=>eqMap[d]),backgroundColor:'rgba(59,130,246,.7)',borderRadius:3});
+  }
+  if(currentType==='all'||currentType==='md'){
+    const mdMap={};days.forEach(d=>{mdMap[d]=0;});
+    data.filter(r=>r.trouble_type==='mold').forEach(r=>{const d=getDateKey(r);if(d&&mdMap[d]!==undefined)mdMap[d]++;});
+    datasets.push({label:t('t_md'),data:days.map(d=>mdMap[d]),backgroundColor:'rgba(168,85,247,.7)',borderRadius:3});
+  }
+  const ctx=document.getElementById('chart1').getContext('2d');
+  chartInstances['c1']=new Chart(ctx,{type:'bar',data:{labels,datasets},options:barOpts()});
 }
 
-// 初期化
-loadMasters().then(function() { loadData(); });
+/* ===== Chart 2: 停止時間推移 ===== */
+function renderChart2(data){
+  destroyChart('c2');
+  const days=currentPeriod>0?lastNDays(currentPeriod):getDayRange(data);
+  const stopMap={};days.forEach(d=>{stopMap[d]=0;});
+  data.forEach(r=>{
+    const d=getDateKey(r);
+    if(d&&stopMap[d]!==undefined) stopMap[d]+=(r.stop_minutes||0);
+  });
+  const labels=days.map(d=>d.slice(5));
+  const ctx=document.getElementById('chart2').getContext('2d');
+  chartInstances['c2']=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{
+      label:t('kpi_stop'),data:days.map(d=>stopMap[d]),
+      borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',
+      tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'#f59e0b'
+    }]},
+    options:lineOpts()
+  });
+}
+
+/* ===== Chart 3: 初発・再発 ===== */
+function renderChart3(data){
+  destroyChart('c3');
+  const first=data.filter(r=>r.occurrence==='first').length;
+  const rec=data.filter(r=>r.occurrence==='recurrence'||r.occurrence==='repeat').length;
+  const ctx=document.getElementById('chart3').getContext('2d');
+  chartInstances['c3']=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:[t('first'),t('rec')],
+      datasets:[{data:[first,rec],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]
+    },
+    options:pieOpts()
+  });
+  renderPieLegend('legend3',[t('first'),t('rec')],[first,rec],['#10b981','#ef4444']);
+}
+
+/* ===== Chart 4: 設備分類別 ===== */
+function renderChart4(data){
+  destroyChart('c4');
+  const el=document.getElementById('chart4').closest('.chart-card');
+  if(currentType==='md'){if(el)el.style.display='none';return;}
+  if(el)el.style.display='';
+  const eq=data.filter(r=>r.trouble_type==='equipment');
+  const map={};
+  eq.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
+  renderPieChart('chart4','legend4',map);
+}
+
+/* ===== Chart 5: 金型分類別 ===== */
+function renderChart5(data){
+  destroyChart('c5');
+  const el=document.getElementById('chart5').closest('.chart-card');
+  if(currentType==='eq'){if(el)el.style.display='none';return;}
+  if(el)el.style.display='';
+  const md=data.filter(r=>r.trouble_type==='mold');
+  const map={};
+  md.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
+  renderPieChart('chart5','legend5',map);
+}
+
+function renderPieChart(canvasId,legendId,map){
+  const keys=Object.keys(map);const vals=keys.map(k=>map[k]);
+  const colors=keys.map((_,i)=>PIE_COLORS[i%PIE_COLORS.length]);
+  destroyChart(canvasId);
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  chartInstances[canvasId]=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:keys,datasets:[{data:vals,backgroundColor:colors,borderWidth:0}]},
+    options:pieOpts()
+  });
+  renderPieLegend(legendId,keys,vals,colors);
+}
+
+function renderPieLegend(id,keys,vals,colors){
+  const el=document.getElementById(id);if(!el)return;
+  const total=vals.reduce((s,v)=>s+v,0)||1;
+  el.innerHTML=keys.map((k,i)=>
+    `<div class="pie-legend-item">
+      <div class="pie-legend-dot" style="background:${colors[i]}"></div>
+      <span>${k} ${Math.round(vals[i]/total*100)}%</span>
+    </div>`
+  ).join('');
+}
+
+/* ===== Chart 6: 再発率 ===== */
+function renderChart6(data){
+  destroyChart('c6');
+  const types=currentType==='all'?['equipment','mold']:currentType==='eq'?['equipment']:['mold'];
+  const labels=types.map(tp=>tp==='equipment'?t('t_eq'):t('t_md'));
+  const colors=types.map(tp=>tp==='equipment'?'rgba(59,130,246,.7)':'rgba(168,85,247,.7)');
+  const rates=types.map(tp=>{
+    const sub=data.filter(r=>r.trouble_type===tp);
+    if(!sub.length) return 0;
+    const rec=sub.filter(r=>r.occurrence==='recurrence'||r.occurrence==='repeat').length;
+    return Math.round(rec/sub.length*100);
+  });
+  const ctx=document.getElementById('chart6').getContext('2d');
+  chartInstances['c6']=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[{label:'再発率(%)',data:rates,backgroundColor:colors,borderRadius:4}]},
+    options:{
+      ...barOpts(),
+      scales:{y:{...barOpts().scales.y,max:100,ticks:{...barOpts().scales.y.ticks,callback:v=>v+'%'}}}
+    }
+  });
+}
+
+/* ===== Ranking ===== */
+function renderRank(containerId,data,keyFn){
+  const el=document.getElementById(containerId);if(!el)return;
+  const map={};
+  data.forEach(r=>{const k=keyFn(r);map[k]=(map[k]||0)+1;});
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(!sorted.length){el.innerHTML=`<div class="empty-state">${t('no_data')}</div>`;return;}
+  const max=sorted[0][1]||1;
+  el.innerHTML=sorted.map(([name,cnt],i)=>`
+    <div class="rank-item">
+      <span class="rank-num ${i<3?'top':''}">${i+1}</span>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar" style="width:${Math.round(cnt/max*100)}%;background:${i===0?'#EF9F27':i===1?'#8b90a0':i===2?'#c97d10':'var(--bg3)'}"></div>
+        <span class="rank-label" style="color:${isDark()?'#e8eaf0':'#1a1f2e'}">${name}</span>
+      </div>
+      <span class="rank-count">${cnt}</span>
+    </div>`).join('');
+}
+
+/* ===== Chart option presets ===== */
+function barOpts(){
+  return{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,labels:{color:tickColor(),font:{size:11,family:'Noto Sans JP'}}},tooltip:{mode:'index',intersect:false}},
+    scales:{
+      x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:10,family:'Noto Sans JP'},maxRotation:0}},
+      y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:10,family:'Noto Sans JP'}},beginAtZero:true}
+    }
+  };
+}
+function lineOpts(){
+  return{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+    scales:{
+      x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:10,family:'Noto Sans JP'},maxRotation:0}},
+      y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:10,family:'Noto Sans JP'}},beginAtZero:true}
+    }
+  };
+}
+function pieOpts(){
+  return{
+    responsive:true,maintainAspectRatio:false,
+    cutout:'60%',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}件`}}}
+  };
+}
+
+/* ===== Utils ===== */
+function getDayRange(data){
+  if(!data.length) return lastNDays(30);
+  const dates=data.map(r=>(r.occurred_date||'').slice(0,10)).filter(Boolean).sort();
+  const start=new Date(dates[0]);const end=new Date(dates[dates.length-1]);
+  const days=[];const cur=new Date(start);
+  while(cur<=end){days.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1);}
+  return days;
+}
+
+/* ===== Theme ===== */
+function toggleTheme(){
+  const h=document.documentElement;const isDk=h.getAttribute('data-theme')==='dark';
+  const next=isDk?'light':'dark';h.setAttribute('data-theme',next);
+  localStorage.setItem('traq_theme',next);
+  document.getElementById('themeBtn').textContent=next==='dark'?'🌙':'☀️';
+  // チャート再描画
+  if(RAW.length) render();
+}
+
+/* ===== Back ===== */
+function goBack(){
+  try{
+    const s=JSON.parse(localStorage.getItem('traq_session')||'{}');
+    const r=s.role||'';
+    if(r==='leader'||r==='sl') location.href='home_sl.html';
+    else if(r==='admin') location.href='admin.html';
+    else location.href='home.html';
+  }catch(e){location.href='home.html';}
+}
+
+/* ===== Toast ===== */
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toastEl');
+  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
+  el.style.display='block';
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{el.style.display='none';},2500);
+}
 </script>
 </body>
 </html>
