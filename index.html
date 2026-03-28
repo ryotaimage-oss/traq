@@ -336,8 +336,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 })();
 
 /* ===== Supabase ===== */
-const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+const SB_URL = 'https://ptwqdlgcrdqefsfnoies.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0d3FkbGdjcmRxZWZzZm5vaWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzgwNjQsImV4cCI6MjA5MDAxNDA2NH0.82v4bj1BIj5M4uHmOBPvX1a7EcQ12LkHvWQmqDrGRzQ';
 async function sbFetch(path, method='GET', body=null) {
   const opts = { method, headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
@@ -417,8 +417,21 @@ const state = {
 let ALL_USERS = [];
 
 /* ===== Init ===== */
-(async function init() {
+(function init() {
+  // テーマ・言語を確実に適用
+  const savedTheme = localStorage.getItem('traq_theme') ||
+    (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+  const savedLang = localStorage.getItem('traq_lang') || 'ja';
+  currentLang = savedLang;
+  ['ja','vi','en'].forEach(l => {
+    document.getElementById('lang-'+l)?.classList.toggle('active', l===savedLang);
+  });
   applyI18n();
+
   // 既にセッションがあればホームへ
   try {
     const s = localStorage.getItem('traq_session');
@@ -432,7 +445,11 @@ let ALL_USERS = [];
     }
   } catch(e) {}
 
-  // ユーザー一覧を事前取得
+  // ユーザー一覧をバックグラウンドで事前取得（失敗しても画面は動く）
+  loadUsers();
+})();
+
+async function loadUsers() {
   try {
     const rows = await sbFetch('traq_users?select=id,name,role,is_active&is_active=eq.true&order=name');
     ALL_USERS = (rows || []).sort((a, b) => {
@@ -441,10 +458,10 @@ let ALL_USERS = [];
       return rd !== 0 ? rd : a.name.localeCompare(b.name, 'ja');
     });
   } catch(e) {
-    showToast(t('load_error'), 'error');
+    console.warn('ユーザー取得エラー:', e.message);
     ALL_USERS = [];
   }
-})();
+}
 
 /* ===== Theme ===== */
 function toggleTheme() {
@@ -465,13 +482,21 @@ function goStep(n) {
 }
 
 /* ===== Step 1: Shift ===== */
-function selectShift(s) {
+async function selectShift(s) {
   state.selectedShift = s;
   [1,2,3].forEach(i => {
     document.getElementById('shift'+i)?.classList.toggle('active', i===s);
   });
   const sb = document.getElementById('shiftBadge');
   if (sb) sb.textContent = t('shift_badge', s);
+
+  // ユーザーがまだ取得できていなければ再取得
+  if (ALL_USERS.length === 0) {
+    const grid = document.getElementById('userGrid');
+    if (grid) grid.innerHTML = '<div class="loading">読み込み中...</div>';
+    await loadUsers();
+  }
+
   renderUsers('');
   document.getElementById('userSearch').value = '';
   goStep(2);
