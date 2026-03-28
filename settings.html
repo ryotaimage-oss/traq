@@ -414,6 +414,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <span class="nav-icon">📊</span>
       <span class="nav-label">ダッシュボード</span>
     </button>
+    <button class="nav-item" onclick="goMaster()">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label">マスタ</span>
+    </button>
   </nav>
 </div>
 <div id="toastEl" style="display:none"></div>
@@ -776,6 +780,11 @@ function goHome(){
     if(r==='leader'||r==='admin') location.href='home_sl.html';
     else location.href='home.html';
   }catch(e){location.href='home.html';}
+}
+function goMaster(){
+  var r=SESSION&&SESSION.role;
+  if(r==='worker'||r==='op'||!r){showToast('マスタはSL・管理者のみ利用できます','error');return;}
+  location.href='admin.html';
 }
 
 /* ===== Toast ===== */

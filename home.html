@@ -634,6 +634,10 @@ html, body {
       <span class="nav-icon">📊</span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
+    <button class="nav-item" onclick="goMaster()">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+    </button>
   </nav>
 
 </div><!-- /app -->
@@ -654,8 +658,8 @@ html, body {
 ============================================= */
 const I18N = {
   ja: {
-    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_settings:'設定',
-    nav_theme:'テーマ切替', nav_logout:'ログアウト',
+    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
+    nav_theme:'テーマ切替', nav_logout:'ログアウト', master_denied:'マスタはSL・管理者のみ利用できます',
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
     section_list:'投稿一覧', show_all:'すべて表示',
@@ -684,8 +688,8 @@ const I18N = {
     logout_msg:'ログアウトしました',
   },
   vi: {
-    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_settings:'Cài đặt',
-    nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
+    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Cài đặt',
+    nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất', master_denied:'Chỉ SL và Admin mới dùng được Master',
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
     draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
     section_list:'Danh sách', show_all:'Xem tất cả',
@@ -713,8 +717,8 @@ const I18N = {
     logout_msg:'Đã đăng xuất',
   },
   en: {
-    nav_list:'List', nav_dashboard:'Dashboard', nav_settings:'Settings',
-    nav_theme:'Toggle theme', nav_logout:'Logout',
+    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
+    nav_theme:'Toggle theme', nav_logout:'Logout', master_denied:'Master is for SL and Admin only',
     btn_eq:'Equipment\nTrouble', btn_md:'Mold\nTrouble',
     draft_label:'draft(s) unsent', draft_confirm:'Review →',
     section_list:'Post List', show_all:'Show all',
@@ -1059,6 +1063,16 @@ function showModal(html, center=false) {
 }
 function closeModal() { document.getElementById('modalEl').style.display = 'none'; }
 function handleOverlayClick(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
+
+/* ===== Master nav ===== */
+function goMaster() {
+  var role = SESSION && SESSION.role;
+  if (role === 'worker' || role === 'op' || !role) {
+    showToast(t('master_denied'), 'error');
+    return;
+  }
+  location.href = 'admin.html';
+}
 
 /* ===== Toast ===== */
 let toastTimer = null;
