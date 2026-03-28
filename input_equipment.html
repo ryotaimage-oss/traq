@@ -188,11 +188,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">⚙️ 基本情報</div>
-    <div class="form-group">
-      <label class="form-label">発生日<span class="req">*</span></label>
-      <input class="form-input" type="date" id="occurred-date">
-    </div>
-    <div class="form-row" style="grid-template-columns:68px 1fr 1fr">
+    <div class="form-row" style="grid-template-columns:1fr 68px 1fr">
+      <div class="form-group">
+        <label class="form-label">発生日<span class="req">*</span></label>
+        <input class="form-input" type="date" id="occurred-date" style="min-width:0">
+      </div>
       <div class="form-group">
         <label class="form-label">シフト<span class="req">*</span></label>
         <select class="form-select" id="shift-select" style="padding:12px 6px;text-align:center">
@@ -203,25 +203,25 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
       </div>
       <div class="form-group">
         <label class="form-label">ライン<span class="req">*</span></label>
-        <select class="form-select" id="line-select" onchange="onLineChange()">
+        <select class="form-select" id="line-select" onchange="onLineChange()" style="min-width:0">
           <option value="">選択</option>
         </select>
       </div>
+    </div>
+    <div class="form-row" style="grid-template-columns:1fr 100px 1fr">
       <div class="form-group">
         <label class="form-label">報告者</label>
-        <input class="form-input" id="reporter-display" disabled>
+        <input class="form-input" id="reporter-display" disabled style="min-width:0">
       </div>
-    </div>
-    <div class="form-row" style="grid-template-columns:100px 1fr">
       <div class="form-group">
         <label class="form-label">機番<span class="req">*</span></label>
-        <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled>
+        <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled style="min-width:0">
           <option value="">—</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">品番<span class="req">*</span></label>
-        <select class="form-select" id="product-select" disabled>
+        <select class="form-select" id="product-select" disabled style="min-width:0">
           <option value="">—</option>
         </select>
       </div>
@@ -231,17 +231,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- トラブル詳細 -->
   <div class="section">
     <div class="section-title">📋 トラブル詳細</div>
-    <div class="form-group">
-      <label class="form-label">分類<span class="req">*</span></label>
-      <select class="form-select" id="category-select">
-        <option value="">選択</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">初発 / 再発<span class="req">*</span></label>
-      <div class="occurrence-group">
-        <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
-        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label class="form-label">分類<span class="req">*</span></label>
+        <select class="form-select" id="category-select">
+          <option value="">選択</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">初発 / 再発<span class="req">*</span></label>
+        <div class="occurrence-group">
+          <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
+          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
+        </div>
       </div>
     </div>
     <div class="form-group">
