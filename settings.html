@@ -58,6 +58,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}}
 
+/* Lang buttons */
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+
 
 /* Scroll */
 .scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px}
@@ -308,6 +312,46 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
+    <!-- PIN変更セクション（非表示→setSection('pin')で表示） -->
+    <div id="section-pin" style="display:none">
+      <div class="pin-section">
+        <div class="pin-step-label" id="pinStepLabel">ステップ 1 / 3</div>
+        <div class="pin-step-title" id="pinTitle">現在のPINを入力してください</div>
+        <div class="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-error" id="pinError"></div>
+        <div id="pinKeypadArea">
+          <div class="pin-keypad">
+            <button class="key-btn" onclick="pinKey('1')">1</button>
+            <button class="key-btn" onclick="pinKey('2')">2</button>
+            <button class="key-btn" onclick="pinKey('3')">3</button>
+            <button class="key-btn" onclick="pinKey('4')">4</button>
+            <button class="key-btn" onclick="pinKey('5')">5</button>
+            <button class="key-btn" onclick="pinKey('6')">6</button>
+            <button class="key-btn" onclick="pinKey('7')">7</button>
+            <button class="key-btn" onclick="pinKey('8')">8</button>
+            <button class="key-btn" onclick="pinKey('9')">9</button>
+            <button class="key-btn" onclick="pinClear()" style="font-size:13px;color:var(--text2)">C</button>
+            <button class="key-btn" onclick="pinKey('0')">0</button>
+            <button class="key-btn" onclick="pinDel()" style="font-size:15px">⌫</button>
+          </div>
+        </div>
+        <div id="pinSuccessArea" style="display:none">
+          <div class="pin-success-wrap">
+            <div class="pin-success-icon">✅</div>
+            <div class="pin-success-text">PINを変更しました</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:10px">
+          <button onclick="setSection(null)" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit">キャンセル</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- バージョン情報 -->
     <div class="section" style="animation-delay:.2s">
@@ -447,6 +491,8 @@ function setLang(lang){
   ['ja','vi','en'].forEach(l=>{
     var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===lang);
   });
+  var labels={ja:'日本語に変更しました',vi:'Đã chuyển sang tiếng Việt',en:'Switched to English'};
+  showToast(labels[lang]||labels.ja,'success');
 }
 
 
