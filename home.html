@@ -318,29 +318,10 @@ html, body {
 .empty-icon { font-size: 36px; margin-bottom: 8px; }
 
 /* ===== Common Bottom Nav ===== */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: var(--nav-h);
-  background: var(--bg2);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center;
-  padding: 0 4px;
-  z-index: 100;
-}
-.nav-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; padding: 6px 4px;
-  cursor: pointer; position: relative;
-  transition: all .15s;
-  border: none; background: none; font-family: inherit;
-}
-.nav-icon { font-size: 20px; line-height: 1; }
-.nav-label { font-size: 10px; font-weight: 500; color: var(--text2); }
-.nav-item.active .nav-label { color: var(--orange); }
-.nav-item.active .nav-icon { filter: drop-shadow(0 0 4px rgba(239,159,39,.5)); }
+
 /* ===== PC sidebar layout ===== */
 @media (min-width: 768px) {
-  .bottom-nav { display: none; }
+  
   .app { flex-direction: row; }
   .sidebar {
     display: flex;
@@ -489,8 +470,9 @@ html, body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+.role-op .role-sl .role-admin [data-theme="light"] .role-op [data-theme="light"] .role-sl [data-theme="light"] .role-admin 
 
-/* ===== Topbar (new F-style) ===== */
+/* ===== Topbar (F-style unified) ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
@@ -507,6 +489,15 @@ html, body {
 [data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 [data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+
+/* ===== Bottom Nav (2-tab unified) ===== */
+.bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.nav-item.active{color:var(--orange)}
+.nav-item:hover:not(.active){color:var(--text1)}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
+@media(min-width:768px){.bottom-nav{display:none}}
 
 </style>
 </head>

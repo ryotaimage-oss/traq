@@ -41,23 +41,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 
 .chip-role-op   .chip-role-op   .chip-role-sl   .chip-role-sl   .chip-role-admin .chip-role-admin [data-theme="light"] .chip-role-op   [data-theme="light"] .chip-role-op   [data-theme="light"] .chip-role-sl   [data-theme="light"] .chip-role-sl   [data-theme="light"] .chip-role-admin [data-theme="light"] .chip-role-admin 
-/* ===== Bottom Nav ===== */
-.bottom-nav {
-  display: flex; height: var(--nav-h); background: var(--bg2);
-  border-top: 1px solid var(--border); flex-shrink: 0;
-}
-.nav-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; background: none; border: none; color: var(--text2);
-  font-family: inherit; font-size: 10px; cursor: pointer; transition: color .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.nav-item.active { color: var(--orange); }
-.nav-item:hover:not(.active) { color: var(--text1); }
-.nav-icon { font-size: 18px; line-height: 1; }
-.nav-label { font-weight: 500; }
-@media(min-width:768px){ .bottom-nav { display: none; } }
-
 
 /* Scroll */
 .scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px}
@@ -172,7 +155,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .add-home-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
 .add-home-close-btn{width:100%;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
 
-/* ===== Topbar (new F-style) ===== */
+
+.role-op .role-sl .role-admin [data-theme="light"] .role-op [data-theme="light"] .role-sl [data-theme="light"] .role-admin 
+
+/* ===== Topbar (F-style unified) ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
@@ -189,6 +175,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 [data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 [data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+
+/* ===== Bottom Nav (2-tab unified) ===== */
+.bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.nav-item.active{color:var(--orange)}
+.nav-item:hover:not(.active){color:var(--text1)}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
+@media(min-width:768px){.bottom-nav{display:none}}
 
 </style>
 </head>
