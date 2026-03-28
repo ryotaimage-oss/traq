@@ -1,324 +1,626 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Traq">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Traq – 設定</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:      #080d18;
-  --surface: #111827;
-  --surface2:#16213a;
-  --border:  #1e293b;
-  --orange:  #EF9F27;
-  --text:    #f1f5f9;
-  --muted:   #64748b;
-  --error:   #ef4444;
-  --success: #22c55e;
-  --radius:  8px;
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
+  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
+  --text1:#e8eaf0;--text2:#8b90a0;
+  --border:rgba(255,255,255,0.08);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
+[data-theme="light"]{
+  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --text1:#1a1f2e;--text2:#666666;
+  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column}
 
-.header { background: #080d18; padding: 12px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
-.logo-text { font-size: 18px; font-weight: 700; color: var(--orange); }
-.logo-sub  { font-size: 10px; color: var(--muted); }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.user-info { font-size: 12px; color: var(--muted); }
-.back-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
-.back-btn:hover { border-color: var(--orange); color: var(--text); }
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text2);transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar-title{font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-.main { flex: 1; padding: 24px 16px; max-width: 480px; margin: 0 auto; width: 100%; }
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px}
+.inner{max-width:520px;margin:0 auto}
 
-.section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-.section-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+/* User card */
+.user-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:slideUp .3s ease}
+.user-avatar-lg{width:52px;height:52px;border-radius:50%;background:var(--orange);color:var(--navy);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-info-name{font-size:16px;font-weight:700;margin-bottom:3px}
+.user-info-meta{font-size:12px;color:var(--text2)}
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:5px}
+.role-op{background:rgba(96,165,250,.12);color:#60a5fa}
+.role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
+.role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
 
-/* PIN変更 */
-.pin-step { display: none; }
-.pin-step.active { display: block; }
-.pin-label { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-.pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: transparent; }
-.pin-dot.filled { background: var(--orange); border-color: var(--orange); }
-.pin-dot.error  { background: var(--error); border-color: var(--error); }
-.pin-dot.success { background: var(--success); border-color: var(--success); }
-.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.pin-key { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; font-size: 18px; font-weight: 700; color: var(--text); cursor: pointer; text-align: center; user-select: none; font-family: inherit; }
-.pin-key:active { background: var(--border); }
-.pin-key.cancel { font-size: 12px; font-weight: 500; color: var(--muted); }
-.pin-error { text-align: center; font-size: 12px; color: var(--error); margin-bottom: 8px; min-height: 18px; }
-.pin-success { text-align: center; font-size: 13px; color: var(--success); padding: 16px; }
+/* Section */
+.section{margin-bottom:20px;animation:slideUp .3s ease both}
+.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
 
-/* 情報行 */
-.info-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-.info-row:last-child { border-bottom: none; }
-.info-label { color: var(--muted); }
-.info-value { font-weight: 500; }
+/* Setting rows */
+.setting-group{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;gap:12px}
+.setting-row:last-child{border-bottom:none}
+.setting-row:hover{background:rgba(239,159,39,.04)}
+.setting-row-left{display:flex;align-items:center;gap:12px}
+.setting-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.setting-name{font-size:14px;font-weight:500}
+.setting-desc{font-size:11px;color:var(--text2);margin-top:2px}
+.setting-row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.setting-value{font-size:13px;color:var(--text2)}
+.setting-arrow{font-size:18px;color:var(--text2)}
 
-.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; font-size: 13px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.4); white-space: nowrap; }
-.toast.success { border-color: var(--success); }
-.toast.error   { border-color: var(--error); }
-.hidden { display: none !important; }
+/* Toggle switch */
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
+.toggle.on{background:var(--orange);border-color:var(--orange)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle.on .toggle-knob{transform:translateX(20px)}
+
+/* PIN section */
+.pin-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:16px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--orange);border-color:var(--orange);transform:scale(1.1)}
+.pin-dot.success{background:var(--success);border-color:var(--success)}
+.pin-dot.error{background:var(--danger);border-color:var(--danger);animation:shake .3s ease}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.key-btn{height:52px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:20px;font-weight:700;color:var(--text1);cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center}
+.key-btn:active{transform:scale(.95);background:var(--bg1)}
+.key-btn:disabled{opacity:.3;pointer-events:none}
+.pin-step-label{text-align:center;font-size:13px;color:var(--text2);margin-bottom:4px}
+.pin-step-title{text-align:center;font-size:15px;font-weight:700;margin-bottom:2px}
+.pin-error{text-align:center;font-size:13px;color:var(--danger);min-height:20px;margin-top:4px}
+.pin-success-wrap{text-align:center;padding:20px 0}
+.pin-success-icon{font-size:48px;margin-bottom:10px;animation:popIn .4s cubic-bezier(.17,.67,.38,1.4)}
+.pin-success-text{font-size:16px;font-weight:700;color:var(--success)}
+
+/* Add to home screen card */
+.add-home-card{background:linear-gradient(135deg,rgba(239,159,39,.12),rgba(239,159,39,.05));border:1px solid rgba(239,159,39,.25);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px}
+.add-home-icon{font-size:36px;flex-shrink:0}
+.add-home-info{}
+.add-home-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.add-home-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.btn-add-home{margin-top:10px;height:40px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:13px;font-weight:700;padding:0 16px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-add-home:hover{background:var(--orange-dark)}
+.btn-add-home:disabled{opacity:.5;cursor:not-allowed}
+
+/* Version card */
+.version-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.version-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.version-logo{width:40px;height:40px;border-radius:10px;background:var(--orange);display:flex;align-items:center;justify-content:center}
+.version-name{font-size:15px;font-weight:700}
+.version-num{font-size:12px;color:var(--text2)}
+.version-rows{}
+.version-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.version-row:last-child{border-bottom:none}
+.version-key{color:var(--text2)}
+.version-val{font-weight:500}
+.update-badge{background:rgba(16,185,129,.12);color:var(--success);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.no-update-badge{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:400;white-space:nowrap}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
 <body>
+<div class="app">
 
-<header class="header">
-  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-    <rect width="36" height="36" rx="6" fill="#080d18"/>
-    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
-    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
-    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
-    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
-    <rect x="8" y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <circle cx="9" cy="6" r="2" fill="#EF9F27" opacity=".8"/>
-    <circle cx="19" cy="4" r="2" fill="#EF9F27" opacity=".8"/>
-  </svg>
-  <div>
-    <div class="logo-text">Traq</div>
-    <div class="logo-sub">設定</div>
-  </div>
-  <div class="header-right">
-    <span class="user-info" id="header-user"></span>
-    <button class="back-btn" onclick="goBack()">← 戻る</button>
-  </div>
-</header>
-
-<main class="main">
-
-  <!-- アカウント情報 -->
-  <div class="section">
-    <div class="section-title">👤 アカウント情報</div>
-    <div class="info-row"><span class="info-label">名前</span><span class="info-value" id="info-name">-</span></div>
-    <div class="info-row"><span class="info-label">ロール</span><span class="info-value" id="info-role">-</span></div>
-    <div class="info-row"><span class="info-label">シフト</span><span class="info-value" id="info-shift">-</span></div>
-  </div>
-
-  <!-- PIN変更 -->
-  <div class="section">
-    <div class="section-title">🔑 PIN変更</div>
-
-    <!-- Step1: 現在のPIN -->
-    <div class="pin-step active" id="pin-step1">
-      <div class="pin-label">現在のPINを入力してください</div>
-      <div class="pin-dots">
-        <div class="pin-dot" id="c0"></div>
-        <div class="pin-dot" id="c1"></div>
-        <div class="pin-dot" id="c2"></div>
-        <div class="pin-dot" id="c3"></div>
-      </div>
-      <div class="pin-error" id="current-error"></div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="pinKey('current','1')">1</button>
-        <button class="pin-key" onclick="pinKey('current','2')">2</button>
-        <button class="pin-key" onclick="pinKey('current','3')">3</button>
-        <button class="pin-key" onclick="pinKey('current','4')">4</button>
-        <button class="pin-key" onclick="pinKey('current','5')">5</button>
-        <button class="pin-key" onclick="pinKey('current','6')">6</button>
-        <button class="pin-key" onclick="pinKey('current','7')">7</button>
-        <button class="pin-key" onclick="pinKey('current','8')">8</button>
-        <button class="pin-key" onclick="pinKey('current','9')">9</button>
-        <button class="pin-key cancel" onclick="pinDel('current')">⌫</button>
-        <button class="pin-key" onclick="pinKey('current','0')">0</button>
-        <button class="pin-key cancel" onclick="resetPinFlow()">取消</button>
-      </div>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="(()=>{ const s=JSON.parse(localStorage.getItem('traq_session')||'null'); location.href=s&&s.role==='op'?'home.html':s&&s.role==='admin'?'admin.html':'home_sl.html'; })()">←</button>
+      <span class="topbar-title">⚙️ 設定</span>
     </div>
-
-    <!-- Step2: 新しいPIN -->
-    <div class="pin-step" id="pin-step2">
-      <div class="pin-label">新しいPINを入力してください</div>
-      <div class="pin-dots">
-        <div class="pin-dot" id="n0"></div>
-        <div class="pin-dot" id="n1"></div>
-        <div class="pin-dot" id="n2"></div>
-        <div class="pin-dot" id="n3"></div>
-      </div>
-      <div class="pin-error" id="new-error"></div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="pinKey('new','1')">1</button>
-        <button class="pin-key" onclick="pinKey('new','2')">2</button>
-        <button class="pin-key" onclick="pinKey('new','3')">3</button>
-        <button class="pin-key" onclick="pinKey('new','4')">4</button>
-        <button class="pin-key" onclick="pinKey('new','5')">5</button>
-        <button class="pin-key" onclick="pinKey('new','6')">6</button>
-        <button class="pin-key" onclick="pinKey('new','7')">7</button>
-        <button class="pin-key" onclick="pinKey('new','8')">8</button>
-        <button class="pin-key" onclick="pinKey('new','9')">9</button>
-        <button class="pin-key cancel" onclick="pinDel('new')">⌫</button>
-        <button class="pin-key" onclick="pinKey('new','0')">0</button>
-        <button class="pin-key cancel" onclick="resetPinFlow()">取消</button>
-      </div>
-    </div>
-
-    <!-- Step3: 確認入力 -->
-    <div class="pin-step" id="pin-step3">
-      <div class="pin-label">新しいPINをもう一度入力してください</div>
-      <div class="pin-dots">
-        <div class="pin-dot" id="r0"></div>
-        <div class="pin-dot" id="r1"></div>
-        <div class="pin-dot" id="r2"></div>
-        <div class="pin-dot" id="r3"></div>
-      </div>
-      <div class="pin-error" id="repeat-error"></div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="pinKey('repeat','1')">1</button>
-        <button class="pin-key" onclick="pinKey('repeat','2')">2</button>
-        <button class="pin-key" onclick="pinKey('repeat','3')">3</button>
-        <button class="pin-key" onclick="pinKey('repeat','4')">4</button>
-        <button class="pin-key" onclick="pinKey('repeat','5')">5</button>
-        <button class="pin-key" onclick="pinKey('repeat','6')">6</button>
-        <button class="pin-key" onclick="pinKey('repeat','7')">7</button>
-        <button class="pin-key" onclick="pinKey('repeat','8')">8</button>
-        <button class="pin-key" onclick="pinKey('repeat','9')">9</button>
-        <button class="pin-key cancel" onclick="pinDel('repeat')">⌫</button>
-        <button class="pin-key" onclick="pinKey('repeat','0')">0</button>
-        <button class="pin-key cancel" onclick="resetPinFlow()">取消</button>
-      </div>
-    </div>
-
-    <!-- 完了 -->
-    <div class="pin-step" id="pin-step4">
-      <div class="pin-success">✅ PINを変更しました</div>
-      <div style="text-align:center;margin-top:8px;">
-        <button onclick="resetPinFlow()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 20px;cursor:pointer;font-family:inherit;font-size:13px;">もう一度変更する</button>
-      </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
     </div>
   </div>
 
-</main>
+  <!-- アップデートバナー（新バージョン検知時に表示） -->
+  <div id="updateBanner" style="display:none;background:rgba(239,159,39,.12);border-bottom:2px solid var(--orange);padding:10px 16px;flex-shrink:0;animation:fadeIn .3s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:520px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🆕</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--orange)" id="updateBannerTitle">新しいバージョンがあります</div>
+          <div style="font-size:11px;color:var(--text2)" id="updateBannerSub"></div>
+        </div>
+      </div>
+      <button onclick="forceReload()" style="background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;flex-shrink:0;margin-left:10px">
+        今すぐ更新
+      </button>
+    </div>
+  </div>
 
-<div class="toast hidden" id="toast"></div>
+  <div class="scroll-area">
+  <div class="inner">
+
+    <!-- ユーザーカード -->
+    <div class="user-card">
+      <div class="user-avatar-lg" id="userAvatar">高</div>
+      <div>
+        <div class="user-info-name" id="userName">高橋 A</div>
+        <div class="user-info-meta">
+          <span class="role-badge role-op" id="userRoleBadge">OP</span>
+          <span id="userShiftLabel">1直</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表示設定 -->
+    <div class="section" style="animation-delay:.05s">
+      <div class="section-label">表示設定</div>
+      <div class="setting-group">
+        <div class="setting-row" onclick="toggleTheme()">
+          <div class="setting-row-left">
+            <div class="setting-icon" style="background:rgba(139,144,160,.1)">🌙</div>
+            <div>
+              <div class="setting-name">ダークモード</div>
+              <div class="setting-desc">画面の明暗を切り替えます</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <div class="toggle" id="themeToggle" onclick="event.stopPropagation();toggleTheme()">
+              <div class="toggle-knob"></div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-left">
+            <div class="setting-icon" style="background:rgba(96,165,250,.1)">🌐</div>
+            <div>
+              <div class="setting-name">言語</div>
+              <div class="setting-desc">アプリの表示言語</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <div style="display:flex;gap:5px">
+              <button class="lang-btn active" onclick="setLang('ja')" id="s-lang-ja">JP</button>
+              <button class="lang-btn" onclick="setLang('vi')" id="s-lang-vi">VN</button>
+              <button class="lang-btn" onclick="setLang('en')" id="s-lang-en">EN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- アカウント設定 -->
+    <div class="section" style="animation-delay:.1s">
+      <div class="section-label">アカウント</div>
+      <div class="setting-group">
+
+        <div class="setting-row" onclick="setSection('pin')">
+          <div class="setting-row-left">
+            <div class="setting-icon" style="background:rgba(239,68,68,.1)">🔑</div>
+            <div>
+              <div class="setting-name">PIN変更</div>
+              <div class="setting-desc">ログイン用4桁PINを変更します</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-arrow">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- バージョン情報 -->
+    <div class="section" style="animation-delay:.2s">
+      <div class="section-label">バージョン情報</div>
+      <div class="version-card">
+        <div class="version-header">
+          <div class="version-logo">
+            <svg width="28" height="28" viewBox="0 0 56 56" fill="none">
+              <rect x="2" y="32" width="52" height="20" rx="3" fill="rgba(255,255,255,0.15)"/>
+              <rect x="8" y="10" width="10" height="24" rx="2" fill="rgba(255,255,255,0.2)"/>
+              <rect x="24" y="16" width="10" height="18" rx="2" fill="rgba(255,255,255,0.2)"/>
+              <rect x="40" y="20" width="10" height="14" rx="2" fill="rgba(255,255,255,0.2)"/>
+              <circle cx="13" cy="6" r="4" fill="white" opacity=".9"/>
+              <circle cx="29" cy="11" r="3.5" fill="white" opacity=".7"/>
+              <circle cx="45" cy="15" r="3" fill="white" opacity=".6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="version-name">Traq – TroubleTrack System</div>
+            <div class="version-num" id="versionNum">v1.0.0</div>
+          </div>
+        </div>
+        <div class="version-rows">
+          <div class="version-row">
+            <span class="version-key">バージョン</span>
+            <span class="version-val" id="versionVal">v1.0.0</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key">リリース日</span>
+            <span class="version-val">2026/03/26</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key">アップデート</span>
+            <span class="version-val" id="updateStatus">
+              <span class="no-update-badge" id="updateBadge">確認中...</span>
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ログアウト -->
+    <div class="section" style="animation-delay:.25s">
+      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s">
+        🚪 ログアウト
+      </button>
+    </div>
+
+  </div>
+  </div>
+
+</div>
+<div id="toastEl" style="display:none"></div>
 
 <script>
-var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
+/* ===== Version ===== */
+const APP_VERSION = '1.0.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
-async function sbFetch(path, method, body) {
-  var opts = { method: method || 'GET', headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' } };
+/* ===== Session ===== */
+/* ===== Supabase ===== */
+const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path, method='GET', body=null) {
+  const opts = { method, headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' } };
   if (body) opts.body = JSON.stringify(body);
-  var res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
   if (!res.ok) throw new Error(await res.text());
-  var text = await res.text();
+  const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
 
-var session = null;
-var currentUserPin = '';
-
-(function() {
-  var s = localStorage.getItem('traq_session');
-  if (!s) { location.href = 'index.html'; return; }
-  session = JSON.parse(s);
-  if (Date.now() > session.expiresAt) { location.href = 'index.html'; return; }
-  document.getElementById('header-user').textContent = session.name;
-
-  var roleLabel = { op: 'OP（作業者）', sl: 'SL（シフトリーダー）', admin: 'Admin（管理者）' };
-  document.getElementById('info-name').textContent  = session.name;
-  document.getElementById('info-role').textContent  = roleLabel[session.role] || session.role;
-  document.getElementById('info-shift').textContent = session.shift + '直';
-
-  // 現在のPINをDBから取得
-  sbFetch('traq_users?id=eq.' + session.userId + '&select=pin')
-    .then(function(rows) { if (rows && rows[0]) currentUserPin = rows[0].pin; })
-    .catch(function() {});
+/* ===== Session ===== */
+const SESSION = (() => {
+  try {
+    const s = localStorage.getItem('traq_session');
+    if (!s) return null;
+    const o = JSON.parse(s);
+    if (o.expiresAt && Date.now() > o.expiresAt) { localStorage.removeItem('traq_session'); return null; }
+    return o;
+  } catch(e) { return null; }
 })();
 
-function goBack() {
-  var dest = session.role === 'sl' ? 'home_sl.html' : 'home.html';
-  location.href = dest;
+/* ===== Theme ===== */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  const icon=isDark?'☀️':'🌙';
+  document.getElementById('themeBtn').textContent=icon;
+  localStorage.setItem('traq_theme',isDark?'light':'dark');
+  updateThemeToggle();
+}
+function initTheme(){
+  const saved=localStorage.getItem('traq_theme');
+  const pref=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  const theme=saved||pref;
+  document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';
+  updateThemeToggle();
+}
+function updateThemeToggle(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.getElementById('themeToggle').classList.toggle('on',isDark);
+  document.getElementById('themeBtn').textContent=isDark?'🌙':'☀️';
 }
 
-// PIN入力状態
-var pinState = { current: '', new: '', repeat: '' };
-var prefixMap = { current: 'c', new: 'n', repeat: 'r' };
-var errorMap  = { current: 'current-error', new: 'new-error', repeat: 'repeat-error' };
-
-function pinKey(type, k) {
-  if (pinState[type].length >= 4) return;
-  pinState[type] += k;
-  renderDots(type);
-  document.getElementById(errorMap[type]).textContent = '';
-  if (pinState[type].length === 4) setTimeout(function() { onPinComplete(type); }, 80);
-}
-
-function pinDel(type) {
-  pinState[type] = pinState[type].slice(0, -1);
-  renderDots(type);
-  document.getElementById(errorMap[type]).textContent = '';
-}
-
-function renderDots(type, mode) {
-  var prefix = prefixMap[type];
-  for (var i = 0; i < 4; i++) {
-    var dot = document.getElementById(prefix + i);
-    dot.className = 'pin-dot' + (i < pinState[type].length ? (mode === 'error' ? ' error' : ' filled') : '');
-  }
-}
-
-function onPinComplete(type) {
-  if (type === 'current') {
-    if (pinState.current === currentUserPin) {
-      showStep(2);
-    } else {
-      renderDots('current', 'error');
-      document.getElementById('current-error').textContent = 'PINが違います';
-      setTimeout(function() { pinState.current = ''; renderDots('current'); }, 800);
-    }
-  } else if (type === 'new') {
-    showStep(3);
-  } else if (type === 'repeat') {
-    if (pinState.new === pinState.repeat) {
-      saveNewPin();
-    } else {
-      renderDots('repeat', 'error');
-      document.getElementById('repeat-error').textContent = 'PINが一致しません';
-      setTimeout(function() { pinState.repeat = ''; renderDots('repeat'); }, 800);
-    }
-  }
-}
-
-function showStep(n) {
-  [1,2,3,4].forEach(function(i) {
-    document.getElementById('pin-step' + i).classList.toggle('active', i === n);
+/* ===== Lang ===== */
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+function setLang(lang){
+  currentLang=lang;
+  localStorage.setItem('traq_lang',lang);
+  ['ja','vi','en'].forEach(l=>{
+    document.getElementById('lang-'+l)?.classList.toggle('active',l===lang);
+    document.getElementById('s-lang-'+l)?.classList.toggle('active',l===lang);
   });
 }
 
-function resetPinFlow() {
-  pinState = { current: '', new: '', repeat: '' };
-  ['current','new','repeat'].forEach(function(t) { renderDots(t); document.getElementById(errorMap[t]).textContent = ''; });
-  showStep(1);
+/* ===== Init user info ===== */
+function initUserInfo(){
+  const u=SESSION;
+  document.getElementById('userAvatar').textContent=u.name[0];
+  document.getElementById('userName').textContent=u.name;
+  const roleEl=document.getElementById('userRoleBadge');
+  roleEl.textContent=u.role==='admin'?'admin':u.role==='sl'?'SL':'OP';
+  roleEl.className='role-badge role-'+u.role;
+  const shiftLabel=u.shift?`${u.shift}直`:'未設定';
+  const shiftEl=document.getElementById('userShiftLabel');
+  if(shiftEl) shiftEl.textContent=shiftLabel;
 }
 
-async function saveNewPin() {
-  try {
-    await sbFetch('traq_users?id=eq.' + session.userId, 'PATCH', { pin: pinState.new });
-    currentUserPin = pinState.new;
-    showStep(4);
-    showToast('PINを変更しました', 'success');
-  } catch(e) {
-    document.getElementById('repeat-error').textContent = '保存失敗: ' + e.message;
-    pinState.repeat = '';
-    renderDots('repeat');
+/* ===== Section toggle ===== */
+let currentSection=null;
+function setSection(name){
+  ['pin'].forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el) el.style.display=s===name?'block':'none';
+  });
+  currentSection=name;
+  if(name==='pin') resetPinFlow();
+}
+
+/* ===== Default shift ===== */
+
+/* ===== PIN change flow ===== */
+// 3ステップ: 現在PIN確認 → 新PIN入力 → 新PIN確認
+let pinStep=1; // 1=現在PIN確認 2=新PIN入力 3=新PIN確認
+let pinInput='';
+let newPin='';
+// PIN照合はSupabase DB（traq_usersテーブルのpinカラム）で行う
+
+const PIN_STEPS={
+  ja:['現在のPINを入力してください','新しいPINを入力してください（4桁）','新しいPINをもう一度入力してください'],
+  vi:['Nhập PIN hiện tại','Nhập PIN mới (4 số)','Nhập lại PIN mới'],
+  en:['Enter your current PIN','Enter new PIN (4 digits)','Confirm new PIN'],
+};
+
+function resetPinFlow(){
+  pinStep=1; pinInput=''; newPin='';
+  updatePinUI();
+}
+
+function updatePinUI(){
+  const steps=PIN_STEPS[currentLang]||PIN_STEPS.ja;
+  document.getElementById('pinTitle').textContent=steps[pinStep-1];
+  document.getElementById('pinStepLabel').textContent=`ステップ ${pinStep} / 3`;
+  document.getElementById('pinError').textContent='';
+  document.getElementById('pinSuccessArea').style.display='none';
+  document.getElementById('pinKeypadArea').style.display='block';
+  updatePinDots();
+}
+
+function pinKey(k){
+  if(pinInput.length>=4) return;
+  pinInput+=k;
+  updatePinDots();
+  if(pinInput.length===4) setTimeout(handlePinComplete,150);
+}
+function pinDel(){pinInput=pinInput.slice(0,-1);updatePinDots()}
+function pinClear(){pinInput='';updatePinDots()}
+
+function updatePinDots(state=''){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.className='pin-dot'+(i<pinInput.length?' filled':'');
+    if(state==='error') d.className='pin-dot error';
+    if(state==='success') d.className='pin-dot success';
   }
 }
 
-var toastTimer = null;
-function showToast(msg, type) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast ' + (type || '');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() { el.classList.add('hidden'); }, 3000);
+function handlePinComplete(){
+  if(pinStep===1){
+    // 現在PIN確認 → Supabase照合
+    verifyCurrentPin(pinInput);
+    return;
+  } else if(pinStep===2){
+    // 新PIN記憶
+    if(pinInput==='0000'||pinInput==='1234'){
+      updatePinDots('error');
+      document.getElementById('pinError').textContent='簡単すぎるPINは使用できません';
+      setTimeout(()=>{pinInput='';updatePinDots();},700);
+      return;
+    }
+    newPin=pinInput; pinStep=3; pinInput='';
+    updatePinUI();
+  } else if(pinStep===3){
+    // 新PIN確認
+    if(pinInput===newPin){
+      updatePinDots('success');
+      saveNewPin(newPin);
+    } else {
+      updatePinDots('error');
+      document.getElementById('pinError').textContent='PINが一致しません。もう一度入力してください';
+      setTimeout(()=>{pinInput='';pinStep=2;newPin='';updatePinUI();},800);
+    }
+  }
 }
+
+/* ===== Supabase PIN処理 ===== */
+async function verifyCurrentPin(pin) {
+  if (!SESSION) { showToast('セッションエラー','error'); return; }
+  try {
+    const rows = await sbFetch('traq_users?id=eq.' + SESSION.userId + '&select=pin');
+    if (!rows || rows.length === 0) throw new Error('ユーザーが見つかりません');
+    const dbPin = rows[0].pin;
+    if (pin === dbPin) {
+      pinStep = 2; pinInput = '';
+      updatePinUI();
+    } else {
+      updatePinDots('error');
+      document.getElementById('pinError').textContent = 'PINが違います';
+      setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
+    }
+  } catch(e) {
+    updatePinDots('error');
+    document.getElementById('pinError').textContent = 'エラー: ' + e.message;
+    setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
+  }
+}
+
+async function saveNewPin(pin) {
+  if (!SESSION) { showToast('セッションエラー','error'); return; }
+  try {
+    await sbFetch('traq_users?id=eq.' + SESSION.userId, 'PATCH', { pin: pin });
+    document.getElementById('pinKeypadArea').style.display = 'none';
+    document.getElementById('pinSuccessArea').style.display = 'block';
+    showToast('PINを変更しました', 'success');
+    setTimeout(() => setSection(null), 2000);
+  } catch(e) {
+    showToast('保存エラー: ' + e.message, 'error');
+    setTimeout(() => { pinInput = ''; pinStep = 1; updatePinUI(); }, 800);
+  }
+}
+
+/* ===== Add to home screen ===== */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById('addHomeBtn').disabled=false;
+});
+
+function addToHomeScreen(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(result=>{
+      if(result.outcome==='accepted') showToast('ホーム画面に追加しました！','success');
+      deferredPrompt=null;
+    });
+    return;
+  }
+  // PWAプロンプトが使えない場合はマニュアルガイドを表示
+  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid=/android/i.test(navigator.userAgent);
+  const guide=document.getElementById('addHomeGuide');
+  guide.style.display='block';
+  if(isIos){
+    guide.innerHTML='<b>iPhoneの場合：</b><br>① Safari下部の <b>共有ボタン（□↑）</b> をタップ<br>② 「ホーム画面に追加」を選択<br>③「追加」をタップ';
+  } else if(isAndroid){
+    guide.innerHTML='<b>Androidの場合：</b><br>① Chromeのメニュー（⋮）をタップ<br>② 「ホーム画面に追加」を選択<br>③「追加」をタップ';
+  } else {
+    guide.innerHTML='<b>PCの場合：</b><br>① Chromeのアドレスバー右端の <b>インストールアイコン（⊕）</b> をクリック<br>② 「インストール」をクリック';
+  }
+}
+
+/* ===== Force reload ===== */
+function forceReload(){
+  showToast('最新版に更新しています...','info');
+  // 新バージョンとして保存（次回起動で「最新版」と表示される）
+  localStorage.setItem('traq_last_version', APP_VERSION);
+  // Service Worker のキャッシュをクリアして強制リロード
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      regs.forEach(reg=>reg.unregister());
+    });
+  }
+  // キャッシュAPI をクリア
+  if('caches' in window){
+    caches.keys().then(keys=>{
+      keys.forEach(key=>caches.delete(key));
+    });
+  }
+  setTimeout(()=>{
+    location.reload(true);
+  },600);
+}
+
+/* ===== Version check (mock) ===== */
+function checkVersion(){
+  // バージョン表示を更新
+  const vn=document.getElementById('versionNum');
+  const vv=document.getElementById('versionVal');
+  if(vn) vn.textContent='v'+APP_VERSION;
+  if(vv) vv.textContent='v'+APP_VERSION;
+
+  // 前回起動時のバージョンと比較
+  const lastVersion=localStorage.getItem('traq_last_version');
+
+  if(!lastVersion){
+    // 初回アクセス：バージョンを保存してスキップ
+    localStorage.setItem('traq_last_version', APP_VERSION);
+    setBadgeLatest();
+    return;
+  }
+
+  if(lastVersion !== APP_VERSION){
+    // 新バージョン検知！バナーを表示
+    showUpdateBanner(lastVersion, APP_VERSION);
+  } else {
+    setBadgeLatest();
+  }
+}
+
+function showUpdateBanner(oldVer, newVer){
+  const banner=document.getElementById('updateBanner');
+  const sub=document.getElementById('updateBannerSub');
+  const badge=document.getElementById('updateBadge');
+  if(banner){
+    banner.style.display='block';
+    if(sub) sub.textContent=`v${oldVer} → v${newVer}`;
+  }
+  if(badge){
+    badge.textContent=`v${newVer} に更新可能`;
+    badge.className='update-badge';
+  }
+}
+
+function setBadgeLatest(){
+  const badge=document.getElementById('updateBadge');
+  if(badge){ badge.textContent='最新版です'; badge.className='no-update-badge'; }
+}
+
+/* ===== Logout ===== */
+function doLogout(){
+  localStorage.removeItem('traq_session');
+  showToast('ログアウトしました','info');
+  setTimeout(()=>{location.href='index.html'},1000);
+}
+
+/* ===== Toast ===== */
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toastEl');
+  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
+  el.style.display='block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{el.style.display='none'},2500);
+}
+
+/* ===== Init ===== */
+(function init(){
+  if (!SESSION) { location.href = 'index.html'; return; }
+  initTheme();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>{
+    document.getElementById('lang-'+l)?.classList.toggle('active',l===sl);
+    document.getElementById('s-lang-'+l)?.classList.toggle('active',l===sl);
+  });
+  initUserInfo();
+  checkVersion();
+})();
 </script>
+<script src="traq-version.js"></script>
 </body>
 </html>
