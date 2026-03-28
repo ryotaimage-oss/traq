@@ -218,7 +218,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       <label class="form-label">初発 / 再発<span class="required">*</span></label>
       <div class="occurrence-group">
         <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
-        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('repeat')">再発</button>
+        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
       </div>
     </div>
     <div class="form-group">
@@ -341,7 +341,7 @@ async function loadMasters() {
       sbFetch('machines?is_active=eq.true&order=machine_no.asc&select=*'),
       sbFetch('products?is_active=eq.true&order=product_code.asc&select=*'),
       sbFetch('categories?is_active=eq.true&type=eq.mold&order=sort_order.asc&select=*'),
-      sbFetch('machine_products?select=*')
+      sbFetch('machine_products?select=*').catch(function() { return []; })
     ]);
     allLines      = results[0] || [];
     allMachines   = results[1] || [];
@@ -417,43 +417,23 @@ var selectedOccurrence = null;
 function selectOccurrence(val) {
   selectedOccurrence = val;
   document.getElementById('btn-first').classList.toggle('selected', val === 'first');
-  document.getElementById('btn-repeat').classList.toggle('selected', val === 'repeat');
+  document.getElementById('btn-repeat').classList.toggle('selected', val === 'recurrence');
   saveDraft();
 }
 
-// ── ドラムロール ─────────────────────────────────────────
-var ITEM_H = 40;
-var drumState = { sh:0, sm:0, eh:-1, em:-1 }; // -1 = 未設定
-var endTimeSet = false;
-
-var drumDefs = [
-  { id:'dSH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'sh' },
-  { id:'dSM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'sm' },
-  { id:'dEH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'eh' },
-  { id:'dEM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'em' }
-];
-
-function initDrums() {
-  var now = new Date();
-  var sh = now.getHours();
-  var sm = Math.floor(now.getMinutes() / 5);
-  drumState.sh = sh;
-  drumState.sm = sm;
-
-  drumDefs.forEach(function(d) {
-    var el = document.getElementById(d.id);
-    el.innerHTML = '';
-    d.items.forEach(function(label) {
-      var div = document.createElement('div');
-      div.className = 'drum-item';
-      div.textContent = label;
-      el.appendChild(div);
-    });
-    var idx = (d.key === 'sh') ? sh : (d.key === 'sm') ? sm : 0;
-    setDrumPos(d.id, idx, false);
-    initDrumDrag(d);
-  });
-  updateStopResult();
+// ── 停止時間自動計算 ──────────────────────────────────────
+function calcStopMinutes() {
+  var startVal = document.getElementById('stop-start').value;
+  var endVal   = document.getElementById('stop-end').value;
+  if (!startVal || !endVal) return;
+  var startParts = startVal.split(':');
+  var endParts   = endVal.split(':');
+  var startMins  = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+  var endMins    = parseInt(endParts[0])   * 60 + parseInt(endParts[1]);
+  if (endMins < startMins) endMins += 1440; // 日またぎ対応
+  var diff = endMins - startMins;
+  document.getElementById('stop-minutes').value = diff > 0 ? diff : '';
+  saveDraft();
 }
 
 // ── 画像 ──────────────────────────────────────────────────
@@ -528,7 +508,7 @@ async function _saveDraft() {
   try {
     await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.mold', 'DELETE');
     await sbFetch('drafts', 'POST', {
-      user_id: session.userId, trouble_type: 'equipment', data: data
+      user_id: session.userId, trouble_type: 'mold', data: data
     });
     document.getElementById('draft-dot').className = 'draft-dot saved';
     document.getElementById('draft-status-text').textContent = '下書き保存済み（' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'}) + '）';
@@ -545,8 +525,8 @@ function getDraftData() {
     product_id:     document.getElementById('product-select').value,
     category_id:    document.getElementById('category-select').value,
     occurrence:     selectedOccurrence,
-    stop_start_h:   drumState ? drumState.sh : 0,
-    stop_start_m:   drumState ? drumState.sm : 0,
+    stop_start:     document.getElementById('stop-start').value,
+    stop_end:       document.getElementById('stop-end').value,
     stop_minutes:   document.getElementById('stop-minutes').value,
     detail:         document.getElementById('detail').value
   };
@@ -569,6 +549,8 @@ async function loadDraft() {
     if (d.product_id)  document.getElementById('product-select').value  = d.product_id;
     if (d.category_id) document.getElementById('category-select').value = d.category_id;
     if (d.occurrence)  selectOccurrence(d.occurrence);
+    if (d.stop_start) document.getElementById('stop-start').value = d.stop_start;
+    if (d.stop_end)   document.getElementById('stop-end').value   = d.stop_end;
     if (d.stop_minutes) document.getElementById('stop-minutes').value = d.stop_minutes;
     if (d.detail)      document.getElementById('detail').value = d.detail;
     showToast('下書きを読み込みました', 'success');
@@ -618,8 +600,8 @@ async function doSubmit() {
       product_id:    parseInt(document.getElementById('product-select').value) || null,
       category_id:   parseInt(document.getElementById('category-select').value) || null,
       occurrence:    selectedOccurrence,
-      stop_start:    (function(){ var sh=drumState.sh,sm=drumState.sm*5; return String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0')+':00'; })(),
-      stop_end:      endTimeSet && drumState.eh >= 0 ? (function(){ var eh=drumState.eh,em=drumState.em*5; return String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0')+':00'; })() : null,
+      stop_start:    (function(){ var v=document.getElementById('stop-start').value; return v ? v+':00' : null; })(),
+      stop_end:      (function(){ var v=document.getElementById('stop-end').value; return v ? v+':00' : null; })(),
       stop_minutes:  (function(){ var v=document.getElementById('stop-minutes').value; return v ? parseInt(v) : null; })(),
       detail:        document.getElementById('detail').value.trim() || null,
       reporter_id:   session.userId
@@ -634,7 +616,11 @@ async function doSubmit() {
       for (var i = 0; i < selectedImages.length; i++) {
         var img = selectedImages[i];
         var dateStr = troubleData.occurred_date.replace(/-/g, '');
-        var fileName = dateStr + '_' + session.shift + 'shift_' + troubleId + '_' + (i + 1) + '.jpg';
+        var machSel = document.getElementById('machine-select');
+        var machText = machSel.options[machSel.selectedIndex] ? machSel.options[machSel.selectedIndex].text : 'XX';
+        var prodSel = document.getElementById('product-select');
+        var prodText = prodSel.options[prodSel.selectedIndex] ? prodSel.options[prodSel.selectedIndex].text.split('(')[0].trim() : 'unknown';
+        var fileName = dateStr + '_' + session.shift + '直_機番' + machText + '_' + prodText + '_' + (i + 1) + '.jpg';
         var storagePath = 'troubles/' + troubleId + '/' + fileName;
 
         // Supabase StorageへアップロードTroubles バケット必要
@@ -683,7 +669,6 @@ function showToast(msg, type) {
 
 // ── 初期化 ────────────────────────────────────────────────
 loadMasters();
-initDrums();
 
 function toggleTheme() {
   var h = document.documentElement;
