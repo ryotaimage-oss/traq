@@ -866,6 +866,15 @@ function toggleTheme(){
   document.getElementById('themeBtn').textContent=next==='dark'?'🌙':'☀️';
 }
 
+/* ===== Force Reload ===== */
+function forceReload(){
+  if('caches' in window){
+    caches.keys().then(function(keys){
+      return Promise.all(keys.map(function(k){return caches.delete(k);}));
+    }).then(function(){location.reload(true);});
+  } else { location.reload(true); }
+}
+
 /* ===== Utils ===== */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
