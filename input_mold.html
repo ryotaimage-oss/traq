@@ -82,6 +82,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .form-input:disabled,.form-select:disabled{opacity:.4;cursor:not-allowed}
 
 .form-row{display:grid;gap:10px}
+.form-row>*{min-width:0}
 .form-row-2{grid-template-columns:1fr 1fr}
 .form-row-3{grid-template-columns:1fr 1fr 1fr}
 
@@ -187,14 +188,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">🔧 基本情報</div>
-    <div class="form-row" style="grid-template-columns:1fr 64px">
+    <div class="form-row" style="grid-template-columns:1fr 68px">
       <div class="form-group">
         <label class="form-label">発生日<span class="req">*</span></label>
-        <input class="form-input" type="date" id="occurred-date">
+        <input class="form-input" type="date" id="occurred-date" style="min-width:0">
       </div>
       <div class="form-group">
         <label class="form-label">シフト<span class="req">*</span></label>
-        <select class="form-select" id="shift-select" style="padding:12px 8px">
+        <select class="form-select" id="shift-select" style="padding:12px 6px;text-align:center">
           <option value="1">１S</option>
           <option value="2">２S</option>
           <option value="3">３S</option>
