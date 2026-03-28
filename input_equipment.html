@@ -185,17 +185,25 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">⚙️ 基本情報</div>
-    <div class="form-row form-row-3">
+    <div class="form-row" style="grid-template-columns:1fr 64px">
       <div class="form-group">
         <label class="form-label">発生日<span class="req">*</span></label>
         <input class="form-input" type="date" id="occurred-date">
       </div>
       <div class="form-group">
         <label class="form-label">シフト<span class="req">*</span></label>
-        <select class="form-select" id="shift-select">
-          <option value="1">1直</option>
-          <option value="2">2直</option>
-          <option value="3">3直</option>
+        <select class="form-select" id="shift-select" style="padding:12px 8px">
+          <option value="1">１S</option>
+          <option value="2">２S</option>
+          <option value="3">３S</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="grid-template-columns:100px 1fr">
+      <div class="form-group">
+        <label class="form-label">ライン<span class="req">*</span></label>
+        <select class="form-select" id="line-select" onchange="onLineChange()">
+          <option value="">選択</option>
         </select>
       </div>
       <div class="form-group">
@@ -203,23 +211,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
         <input class="form-input" id="reporter-display" disabled>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">ライン<span class="req">*</span></label>
-      <select class="form-select" id="line-select" onchange="onLineChange()">
-        <option value="">選択してください</option>
-      </select>
-    </div>
-    <div class="form-row form-row-2">
+    <div class="form-row" style="grid-template-columns:90px 1fr">
       <div class="form-group">
         <label class="form-label">機番<span class="req">*</span></label>
         <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled>
-          <option value="">ライン選択後</option>
+          <option value="">—</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">品番<span class="req">*</span></label>
         <select class="form-select" id="product-select" disabled>
-          <option value="">機番選択後</option>
+          <option value="">—</option>
         </select>
       </div>
     </div>
@@ -228,11 +230,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- トラブル詳細 -->
   <div class="section">
     <div class="section-title">📋 トラブル詳細</div>
-    <div class="form-row form-row-2">
+    <div class="form-row" style="grid-template-columns:1fr 130px">
       <div class="form-group">
         <label class="form-label">分類<span class="req">*</span></label>
         <select class="form-select" id="category-select">
-          <option value="">選択してください</option>
+          <option value="">選択</option>
         </select>
       </div>
       <div class="form-group">
@@ -387,29 +389,29 @@ async function loadMasters(){
       sbFetch('machine_products?select=*').catch(function(){return[];})
     ]);
     allLines=r[0]||[];allMachines=r[1]||[];allProducts=r[2]||[];allCategories=r[3]||[];machineProducts=r[4]||[];
-    document.getElementById('line-select').innerHTML='<option value="">選択してください</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
-    document.getElementById('category-select').innerHTML='<option value="">選択してください</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+    document.getElementById('line-select').innerHTML='<option value="">選択</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
+    document.getElementById('category-select').innerHTML='<option value="">選択</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
   }catch(e){showToast('マスタ読込失敗: '+e.message,'error');}
 }
 
 function onLineChange(){
   var lineId=parseInt(document.getElementById('line-select').value);
   var ms=document.getElementById('machine-select'),ps=document.getElementById('product-select');
-  ms.innerHTML='<option value="">選択してください</option>';ps.innerHTML='<option value="">機番選択後</option>';ps.disabled=true;
+  ms.innerHTML='<option value="">選択</option>';ps.innerHTML='<option value="">—</option>';ps.disabled=true;
   if(!lineId){ms.disabled=true;return;}
   var f=allMachines.filter(function(m){return m.line_id===lineId;});
   f.sort(function(a,b){var na=parseInt(a.machine_no),nb=parseInt(b.machine_no);if(!isNaN(na)&&!isNaN(nb))return na-nb;return a.machine_no.localeCompare(b.machine_no);});
-  ms.innerHTML='<option value="">選択してください</option>'+f.map(function(m){return '<option value="'+m.id+'">'+m.machine_no+'</option>';}).join('');
+  ms.innerHTML='<option value="">選択</option>'+f.map(function(m){return '<option value="'+m.id+'">'+m.machine_no+'</option>';}).join('');
   ms.disabled=false;saveDraft();
 }
 function onMachineChange(){
   var mid=parseInt(document.getElementById('machine-select').value);
   var ps=document.getElementById('product-select');
-  ps.innerHTML='<option value="">選択してください</option>';
+  ps.innerHTML='<option value="">選択</option>';
   if(!mid){ps.disabled=true;return;}
   var linked=machineProducts.filter(function(mp){return mp.machine_id===mid;}).map(function(mp){return mp.product_id;});
   var f=linked.length>0?allProducts.filter(function(p){return linked.includes(p.id);}):allProducts;
-  ps.innerHTML='<option value="">選択してください</option>'+f.map(function(p){return '<option value="'+p.id+'">'+p.product_code+'('+p.product_name+')</option>';}).join('');
+  ps.innerHTML='<option value="">選択</option>'+f.map(function(p){return '<option value="'+p.id+'">'+p.product_code+'('+p.product_name+')</option>';}).join('');
   ps.disabled=false;saveDraft();
 }
 
@@ -585,7 +587,7 @@ async function doSubmit(){
         var img=selectedImages[i],ds=td.occurred_date.replace(/-/g,'');
         var ms=document.getElementById('machine-select'),mt=ms.options[ms.selectedIndex]?ms.options[ms.selectedIndex].text:'XX';
         var ps=document.getElementById('product-select'),pt=ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text.split('(')[0].trim():'unknown';
-        var fn=ds+'_'+selectedShift+'直_機番'+mt+'_'+pt+'_'+(i+1)+'.jpg';
+        var fn=ds+'_'+selectedShift+'S_機番'+mt+'_'+pt+'_'+(i+1)+'.jpg';
         var sp='troubles/'+tId+'/'+fn;
         var ur=await fetch(SB_URL+'/storage/v1/object/trouble-images/'+sp,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type},body:img.file});
         if(ur.ok) await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
