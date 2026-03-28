@@ -137,6 +137,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
 .form-input{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--orange)}
 .form-select{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);outline:none;cursor:pointer}
+.cb-grid{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;background:var(--bg3)}
+.cb-grid label{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text1);cursor:pointer}
+.cb-grid label:hover{color:var(--orange)}
+.cb-grid input[type="checkbox"]{width:16px;height:16px;accent-color:var(--orange);cursor:pointer;flex-shrink:0}
 .modal-btns{display:flex;gap:10px;margin-top:20px}
 .btn-cancel{flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
 .btn-save{flex:1;padding:12px;background:var(--orange);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit}
@@ -437,7 +441,7 @@ function setLang(l){
 }
 
 /* ===== Data stores ===== */
-let USERS=[],MACHINES=[],PRODUCTS=[],LINES=[],CATEGORIES=[];
+let USERS=[],MACHINES=[],PRODUCTS=[],LINES=[],CATEGORIES=[],MACHINE_PRODUCTS=[];
 const PAGE_SIZE=20;
 let userPage=1,machinePage=1,productPage=1;
 
@@ -455,15 +459,16 @@ let userPage=1,machinePage=1,productPage=1;
 
 async function loadAll(){
   try{
-    const [users,machines,products,lines,cats]=await Promise.all([
+    const [users,machines,products,lines,cats,mp]=await Promise.all([
       sbFetch('traq_users?select=*&order=name'),
       sbFetch('machines?select=*,lines(name)&order=machine_no'),
       sbFetch('products?select=*&order=product_code'),
       sbFetch('lines?select=*&order=name'),
       sbFetch('categories?select=*&order=sort_order'),
+      sbFetch('machine_products?select=*'),
     ]);
     USERS=users||[];MACHINES=machines||[];PRODUCTS=products||[];
-    LINES=lines||[];CATEGORIES=cats||[];
+    LINES=lines||[];CATEGORIES=cats||[];MACHINE_PRODUCTS=mp||[];
     // ラインフィルターを動的生成
     const sel=document.getElementById('machineLineFilter');
     LINES.forEach(l=>{
@@ -593,10 +598,17 @@ function renderMachines(){
 function openMachineModal(id){
   const m=id?MACHINES.find(x=>String(x.id)===String(id)):null;
   const lineOpts=(m?'':'<option value="">選択してください</option>')+LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+  const linked=m?MACHINE_PRODUCTS.filter(mp=>String(mp.machine_id)===String(m.id)).map(mp=>mp.product_id):[];
+  const activeProducts=PRODUCTS.filter(p=>p.is_active!==false);
+  const cbHtml=activeProducts.map(p=>{
+    const checked=linked.some(pid=>String(pid)===String(p.id))?'checked':'';
+    return '<label><input type="checkbox" value="'+p.id+'" '+checked+'>'+esc(p.product_code)+' ('+esc(p.product_name)+')</label>';
+  }).join('');
   showModal(`
     <div class="modal-title">${m?'機番編集':'機番追加'}</div>
     <div class="form-group"><label class="form-label">機番</label><input class="form-input" id="m-no" type="number" value="${m?m.machine_no:''}" placeholder="例: 12"></div>
     <div class="form-group"><label class="form-label">ライン</label><select class="form-select" id="m-line">${lineOpts}</select></div>
+    <div class="form-group"><label class="form-label">対応品番</label><div class="cb-grid" id="m-products">${cbHtml||'<span style="color:var(--text2);font-size:12px">品番が未登録です</span>'}</div></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-save" onclick="saveMachine('${m?m.id:''}')">保存</button>
@@ -607,14 +619,28 @@ async function saveMachine(id){
   const lineId=parseInt(document.getElementById('m-line').value);
   if(!no){showToast('機番を入力してください','error');return;}
   if(!lineId){showToast('ラインを選択してください','error');return;}
+  // チェックされた品番IDを取得
+  const checkedIds=Array.from(document.querySelectorAll('#m-products input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
   try{
+    var machineId;
     if(id){
       const updated=await sbFetch('machines?id=eq.'+id,'PATCH',{machine_no:no,line_id:lineId});
       const idx=MACHINES.findIndex(m=>String(m.id)===String(id));
       if(idx>=0&&updated&&updated[0])MACHINES[idx]={...MACHINES[idx],...updated[0],lines:LINES.find(l=>l.id===lineId)};
+      machineId=id;
     }else{
       const created=await sbFetch('machines','POST',{machine_no:no,line_id:lineId,is_active:true});
-      if(created&&created[0])MACHINES.push({...created[0],lines:LINES.find(l=>l.id===lineId)});
+      if(created&&created[0]){MACHINES.push({...created[0],lines:LINES.find(l=>l.id===lineId)});machineId=created[0].id;}
+    }
+    // 紐付け更新：既存を削除→チェック分をINSERT
+    if(machineId){
+      await sbFetch('machine_products?machine_id=eq.'+machineId,'DELETE');
+      MACHINE_PRODUCTS=MACHINE_PRODUCTS.filter(mp=>String(mp.machine_id)!==String(machineId));
+      if(checkedIds.length>0){
+        const rows=checkedIds.map(pid=>({machine_id:parseInt(machineId),product_id:pid}));
+        const inserted=await sbFetch('machine_products','POST',rows);
+        if(inserted)MACHINE_PRODUCTS=MACHINE_PRODUCTS.concat(inserted);
+      }
     }
     closeModal();renderMachines();showToast('保存しました','success');
   }catch(e){showToast('エラー: '+e.message,'error');}
