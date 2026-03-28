@@ -134,6 +134,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
 /* ===== Add Home Modal ===== */
+.hidden{display:none!important}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
 .modal-sheet{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:85vh;overflow-y:auto}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
@@ -555,7 +556,8 @@ function openAddHomeModal(){
   document.getElementById('addHomeIos').classList.toggle('hidden', !isIos);
   document.getElementById('addHomeAndroid').classList.toggle('hidden', !isAndroid);
   document.getElementById('addHomePc').classList.toggle('hidden', isIos||isAndroid);
-  var baseUrl=location.origin+location.pathname.replace(/\/[^/]*\.html$/, '/');
+  var baseUrl=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
+  if(!baseUrl.endsWith('/')) baseUrl+='/';
   document.getElementById('addHomeUrl').textContent=baseUrl;
   document.getElementById('addHomeCopyBtn').textContent='コピー';
   document.getElementById('addHomeModal').classList.remove('hidden');
@@ -569,7 +571,8 @@ function closeAddHomeModalDirect(){
   document.body.style.overflow='';
 }
 function copyUrl(){
-  const url=location.origin+location.pathname.replace(/\/[^/]*$/, '/')||location.href;
+  var url=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
+  if(!url.endsWith('/')) url+='/';
   navigator.clipboard.writeText(url).then(()=>{
     document.getElementById('addHomeCopyBtn').textContent='コピー済み ✓';
     setTimeout(()=>{ document.getElementById('addHomeCopyBtn').textContent='コピー'; },2000);
