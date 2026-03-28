@@ -20,9 +20,12 @@
   --border:rgba(255,255,255,0.08);
   --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
   --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+  --nav-h:56px;
+  --factory:#1e293b; --roof:#334155;
 }
 [data-theme="light"]{
   --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --factory:#c8c4bc; --roof:#b0aca4;
   --text1:#1a1f2e;--text2:#666666;
   --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
 }
@@ -41,6 +44,51 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
 .icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 @media(max-width:767px){.topbar-right .lang-btn{display:none}}
+/* ===== Common Header Components ===== */
+.mini-logo svg { display: block; }
+.user-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 8px 4px 4px; white-space: nowrap;
+}
+.user-chip-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-chip-name { font-size: 12px; font-weight: 700; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-chip-role {
+  font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+}
+.chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-sl   .user-chip-avatar { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-sl   .user-chip-role   { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.25); color: #f87171; }
+.chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.25); color: #f87171; }
+[data-theme="light"] .chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-sl   .user-chip-avatar { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-sl   .user-chip-role   { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.15); color: #c53030; }
+[data-theme="light"] .chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.15); color: #c53030; }
+
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+  display: flex; height: var(--nav-h); background: var(--bg2);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; background: none; border: none; color: var(--text2);
+  font-family: inherit; font-size: 10px; cursor: pointer; transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-item:hover { color: var(--text1); }
+.bnav-icon { font-size: 18px; line-height: 1; }
+.bnav-label { font-weight: 500; }
+@media(min-width:768px){ .bottom-nav { display: none; } }
+
 
 /* Tab bar */
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
@@ -143,18 +191,31 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
   <header class="topbar">
     <div class="topbar-left">
-      <div class="logo">
-        <span style="font-size:18px">🏭</span>
-        <span class="logo-text">Traq</span>
+      <svg class="mini-logo" width="72" height="26" viewBox="0 0 200 56" fill="none">
+        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+        <rect x="4" y="33" width="48" height="3"  rx="1" fill="var(--roof)"/>
+        <rect x="9"  y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="8"  y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+        <rect x="6"  y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+        <circle cx="26" cy="14" r="3"   fill="var(--orange)" opacity=".8"/>
+        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+        <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
+      </svg>
+      <div class="user-chip chip-role-admin" id="mob-chip">
+        <div class="user-chip-avatar" id="mob-avatar"></div>
+        <span class="user-chip-name" id="mob-name"></span>
+        <span class="user-chip-role" id="mob-role">Admin</span>
       </div>
-      <span style="font-size:12px;font-weight:700;color:var(--text2)">管理者画面</span>
     </div>
     <div class="topbar-right">
-      <button class="lang-btn active" id="lang-ja" onclick="setLang('ja')">JP</button>
-      <button class="lang-btn" id="lang-vi" onclick="setLang('vi')">VN</button>
-      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
       <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-      <button class="btn btn-secondary btn-sm" onclick="location.href='home_sl.html'">← ホーム</button>
     </div>
   </header>
 
@@ -166,7 +227,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')">💾 ストレージ</button>
   </div>
 
-  <div class="scroll-area">
+  <div class="scroll-area" id="scrollArea">
   <div class="inner">
 
     <!-- ===== USERS ===== -->
@@ -340,6 +401,22 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
   </div>
   </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="bnav-item" onclick="location.href='home_sl.html'">
+      <span class="bnav-icon">📋</span>
+      <span class="bnav-label">一覧</span>
+    </button>
+    <button class="bnav-item" onclick="location.href='dashboard.html'">
+      <span class="bnav-icon">📊</span>
+      <span class="bnav-label">分析</span>
+    </button>
+    <button class="bnav-item" onclick="location.href='settings.html'">
+      <span class="bnav-icon">⚙️</span>
+      <span class="bnav-label">設定</span>
+    </button>
+  </nav>
 </div>
 
 <!-- Modal -->
@@ -378,11 +455,25 @@ async function sbFetch(path,method='GET',body=null){
   }catch(e){location.href='index.html';}
 })();
 
+
+/* ===== Header Chip ===== */
+function initChip(){
+  try{
+    const s=JSON.parse(localStorage.getItem('traq_session')||'{}');
+    const name=s.name||'';
+    const chip=document.getElementById('mob-chip');
+    const av=document.getElementById('mob-avatar');
+    const nm=document.getElementById('mob-name');
+    if(av) av.textContent=name?name.charAt(0):'?';
+    if(nm) nm.textContent=name;
+  }catch(e){}
+}
+
 /* ===== i18n ===== */
 let currentLang=localStorage.getItem('traq_lang')||'ja';
 function setLang(l){
   currentLang=l;localStorage.setItem('traq_lang',l);
-  ['ja','vi','en'].forEach(x=>{document.getElementById('lang-'+x)?.classList.toggle('active',x===l);});
+  // lang buttons removed from header
 }
 
 /* ===== Data stores ===== */
@@ -395,8 +486,9 @@ let userPage=1,machinePage=1,productPage=1;
   const th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',th);
   document.getElementById('themeBtn').textContent=th==='dark'?'🌙':'☀️';
+  initChip();
   const l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
-  ['ja','vi','en'].forEach(x=>{document.getElementById('lang-'+x)?.classList.toggle('active',x===l);});
+  // lang buttons removed from header
   await loadAll();
   initStorage();
 })();
@@ -800,12 +892,6 @@ function toggleTheme(){
 /* ===== Utils ===== */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW登録失敗:', e));
-  });
-}
-</script>
+<script src="./update_banner.js"></script>
 </body>
 </html>
