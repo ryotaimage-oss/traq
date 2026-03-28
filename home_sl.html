@@ -901,6 +901,9 @@ async function loadTroubleImages(troubleId){
   try{
     var rows=await sbFetch('trouble_images?trouble_id=eq.'+troubleId+'&select=id,storage_path&order=created_at.asc');
     if(loadingEl) loadingEl.style.display='none';
+
+    alert('trouble_images結果:\ntroubleId='+troubleId+'\n件数='+(rows?rows.length:0)+'\n内容='+JSON.stringify(rows,null,1));
+
     if(!rows||rows.length===0){
       if(areaEl) areaEl.innerHTML='<div class="detail-images-title">📷 写真</div><div style="font-size:12px;color:var(--text2)">添付写真なし</div>';
       return;
@@ -913,19 +916,22 @@ async function loadTroubleImages(troubleId){
         headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},
         body:JSON.stringify({expiresIn:3600})
       });
+      var signText=await signRes.text();
+
       if(signRes.ok){
-        var signData=await signRes.json();
+        var signData=JSON.parse(signText);
         var signedUrl=SB_URL+'/storage/v1'+signData.signedURL;
         imgHtmlArr.push('<img class="detail-img-thumb" src="'+signedUrl+'" onclick="openFullImage(\''+signedUrl.replace(/'/g,"\\'")+'\')" alt="写真">');
       }else{
+        alert('署名URL失敗:\npath='+sp+'\nstatus='+signRes.status+'\n'+signText);
         var pubUrl=SB_URL+'/storage/v1/object/public/trouble-images/'+sp.split('/').map(encodeURIComponent).join('/');
         imgHtmlArr.push('<img class="detail-img-thumb" src="'+pubUrl+'" onclick="openFullImage(\''+pubUrl+'\')" alt="写真">');
       }
     }
     gridEl.innerHTML=imgHtmlArr.join('');
   }catch(e){
+    alert('loadTroubleImages例外:\n'+e.message);
     if(loadingEl) loadingEl.textContent='写真の読み込みに失敗';
-    console.warn('trouble_images load error:',e);
   }
 }
 
