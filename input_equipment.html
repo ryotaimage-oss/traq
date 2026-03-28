@@ -188,7 +188,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">⚙️ 基本情報</div>
-    <div class="form-row" style="grid-template-columns:1fr 68px">
+    <div class="form-row" style="grid-template-columns:1fr 68px;gap:16px">
       <div class="form-group">
         <label class="form-label">発生日<span class="req">*</span></label>
         <input class="form-input" type="date" id="occurred-date" style="min-width:0">
@@ -233,19 +233,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- トラブル詳細 -->
   <div class="section">
     <div class="section-title">📋 トラブル詳細</div>
-    <div class="form-row" style="grid-template-columns:1fr 130px">
-      <div class="form-group">
-        <label class="form-label">分類<span class="req">*</span></label>
-        <select class="form-select" id="category-select">
-          <option value="">選択</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">初発 / 再発<span class="req">*</span></label>
-        <div class="occurrence-group">
-          <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
-          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
-        </div>
+    <div class="form-group">
+      <label class="form-label">分類<span class="req">*</span></label>
+      <select class="form-select" id="category-select">
+        <option value="">選択</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">初発 / 再発<span class="req">*</span></label>
+      <div class="occurrence-group">
+        <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
+        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
       </div>
     </div>
     <div class="form-group">
@@ -459,7 +457,7 @@ function clearEndTime(){endTimeSet=false;drumState.eh=-1;drumState.em=-1;setDrum
 function updateStopResult(){
   var sh=drumState.sh,sm=drumState.sm*5,startStr=String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0');
   var el=document.getElementById('stop-result');
-  if(!endTimeSet||drumState.eh<0){el.textContent='開始: '+startStr+' ／ 終了: 未定（承認者が入力）';document.getElementById('stop-minutes').value='';return;}
+  if(!endTimeSet||drumState.eh<0){el.textContent='開始: '+startStr+' ／ 終了: 未定';document.getElementById('stop-minutes').value='';return;}
   var eh=drumState.eh,em=drumState.em*5,endStr=String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0');
   var sMins=sh*60+sm,eMins=eh*60+em;if(eMins<sMins)eMins+=1440;var diff=eMins-sMins;
   el.textContent=startStr+' → '+endStr+'　'+diff+'分';document.getElementById('stop-minutes').value=diff;
