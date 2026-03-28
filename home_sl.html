@@ -30,7 +30,7 @@
   --warning:     #f59e0b;
   --radius:      8px;
   --shadow:      0 4px 24px rgba(0,0,0,0.4);
-  --nav-h:       64px;
+  --nav-h:       56px;
 }
 [data-theme="light"] {
   --bg1:    #e8e6e2;
@@ -49,10 +49,23 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:10px}
 .topbar-right{display:flex;align-items:center;gap:6px}
-.user-chip{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 5px}
-.user-chip-avatar{width:26px;height:26px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.user-chip-name{font-size:12px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.user-chip-role{font-size:10px;color:var(--warning)}
+.user-chip{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 8px 4px 4px;white-space:nowrap}
+.user-chip-avatar{width:22px;height:22px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-chip-name{font-size:11px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip-role{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+/* Role colors: OP=紺 SL=オレンジ admin=赤 */
+.role-op .user-chip-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+.role-op .user-chip-role{background:rgba(30,58,110,0.35);color:#6b8ec5}
+.role-sl .user-chip-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+.role-sl .user-chip-role{background:rgba(239,159,39,0.25);color:#e8a520}
+.role-admin .user-chip-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+.role-admin .user-chip-role{background:rgba(239,68,68,0.25);color:#f87171}
+[data-theme="light"] .role-op .user-chip-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+[data-theme="light"] .role-op .user-chip-role{background:rgba(30,58,110,0.15);color:#2c4a80}
+[data-theme="light"] .role-sl .user-chip-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+[data-theme="light"] .role-sl .user-chip-role{background:rgba(200,130,20,0.18);color:#b07a10}
+[data-theme="light"] .role-admin .user-chip-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+[data-theme="light"] .role-admin .user-chip-role{background:rgba(239,68,68,0.15);color:#c53030}
 .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
@@ -207,7 +220,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:767px){.topbar-right .lang-btn{display:none}}
 </style>
 </head>
 <body>
@@ -234,7 +246,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
       </svg>
     </div>
-    <div class="sidebar-user">
+    <div class="sidebar-user" id="sb-user-wrap">
       <div class="sidebar-avatar" id="sb-avatar">山</div>
       <div>
         <div class="sidebar-name" id="sb-name">山田 太郎</div>
@@ -309,18 +321,13 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
           <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
         </svg>
-        <div class="user-chip">
-          <div class="user-chip-avatar">山</div>
-          <div>
-            <div class="user-chip-name">山田 太郎</div>
-            <div class="user-chip-role">SL</div>
-          </div>
+        <div class="user-chip" id="mob-chip">
+          <div class="user-chip-avatar" id="mob-avatar"></div>
+          <span class="user-chip-name" id="mob-name"></span>
+          <span class="user-chip-role" id="mob-role"></span>
         </div>
       </div>
       <div class="topbar-right">
-        <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
-        <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
-        <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
         <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
       </div>
     </div>
@@ -372,32 +379,19 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     </div>
   </div>
 
-  <!-- Bottom nav (mobile) -->
+  <!-- Common Bottom Nav (mobile) — 3 tabs -->
   <nav class="bottom-nav">
-    <button class="nav-item active" id="bnav-pending" onclick="setTab('pending')">
-      <span class="nav-icon">⏳</span>
-      <span class="nav-label" data-i18n="nav_pending">承認待ち</span>
-      <span class="nav-badge" id="mob-badge">0</span>
-    </button>
-    <button class="nav-item" id="bnav-all" onclick="setTab('all')">
+    <button class="nav-item active" onclick="void(0)">
       <span class="nav-icon">📋</span>
-      <span class="nav-label" data-i18n="nav_all">全件</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
-    <button class="nav-item" id="bnav-input" onclick="setTab('input')">
-      <span class="nav-icon">✏️</span>
-      <span class="nav-label" data-i18n="nav_input">異常入力</span>
-    </button>
-    <button class="nav-item" id="bnav-excel" onclick="setTab('excel')">
-      <span class="nav-icon">📥</span>
-      <span class="nav-label" data-i18n="nav_excel">Excel</span>
+    <button class="nav-item" onclick="location.href='dashboard.html'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label" data-i18n="nav_dashboard">分析</span>
     </button>
     <button class="nav-item" onclick="location.href='settings.html'">
       <span class="nav-icon">⚙️</span>
-      <span class="nav-label">設定</span>
-    </button>
-    <button class="nav-item" onclick="doLogout()" style="color:var(--danger)">
-      <span class="nav-icon">🚪</span>
-      <span class="nav-label" style="color:var(--danger)" data-i18n="nav_logout">ログアウト</span>
+      <span class="nav-label" data-i18n="nav_settings">設定</span>
     </button>
   </nav>
 
@@ -417,6 +411,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 const I18N = {
   ja:{
     nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'異常入力',
+    nav_list:'一覧', nav_settings:'設定',
     nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
     pending_label:'件の承認待ち', btn_review:'承認待ちを確認',
@@ -447,6 +442,7 @@ const I18N = {
   },
   vi:{
     nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
+    nav_list:'Danh sách', nav_settings:'Cài đặt',
     nav_dashboard:'Thống kê', nav_excel:'Tải Excel',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
     pending_label:'đang chờ duyệt', btn_review:'Xem chờ duyệt',
@@ -477,6 +473,7 @@ const I18N = {
   },
   en:{
     nav_pending:'Pending', nav_all:'All Data', nav_input:'入力',
+    nav_list:'List', nav_settings:'Settings',
     nav_dashboard:'Dashboard', nav_excel:'Excel Download',
     nav_theme:'Toggle Theme', nav_logout:'Logout',
     pending_label:'pending approval', btn_review:'Review pending',
@@ -511,9 +508,7 @@ function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(.
 function setLang(lang){
   currentLang=lang; localStorage.setItem('traq_lang',lang);
   ['ja','vi','en'].forEach(l=>{
-    const b1=document.getElementById('lang-'+l);
     const b2=document.getElementById('sb-lang-'+l);
-    if(b1) b1.classList.toggle('active',l===lang);
     if(b2) b2.classList.toggle('active',l===lang);
   });
   applyI18n(); renderList();
@@ -560,25 +555,34 @@ let typeFilter = 'all';
   const savedLang = localStorage.getItem('traq_lang') || 'ja';
   currentLang = savedLang;
   ['ja','vi','en'].forEach(l => {
-    const b1 = document.getElementById('lang-'+l);
     const b2 = document.getElementById('sb-lang-'+l);
-    if(b1) b1.classList.toggle('active', l===savedLang);
     if(b2) b2.classList.toggle('active', l===savedLang);
   });
 
   // ユーザー情報をセット
   const name = SESSION.name || '';
   const initial = name.charAt(0) || '?';
-  const rl = SESSION.role === 'leader' || SESSION.role === 'sl' ? 'SL' : SESSION.role === 'admin' ? 'Admin' : 'SL';
-  const shiftStr = (SESSION.shift || '') + '直';
+  const roleKey = SESSION.role === 'admin' ? 'admin' : (SESSION.role === 'leader' || SESSION.role === 'sl') ? 'sl' : 'op';
+  const roleLabel = roleKey === 'admin' ? 'admin' : roleKey === 'sl' ? 'SL' : 'OP';
+  const roleClass = 'role-' + roleKey;
+
+  // Mobile chip
+  const mobChip = document.getElementById('mob-chip');
+  if (mobChip) mobChip.className = 'user-chip ' + roleClass;
+  const mobAvatar = document.getElementById('mob-avatar');
+  if (mobAvatar) mobAvatar.textContent = initial;
+  const mobName = document.getElementById('mob-name');
+  if (mobName) mobName.textContent = name;
+  const mobRole = document.getElementById('mob-role');
+  if (mobRole) mobRole.textContent = roleLabel;
+
+  // PC sidebar
+  const sbWrap = document.getElementById('sb-user-wrap');
+  if (sbWrap) sbWrap.className = 'sidebar-user ' + roleClass;
   const sbAvatar = document.getElementById('sb-avatar');
   if (sbAvatar) sbAvatar.textContent = initial;
   const sbName = document.getElementById('sb-name');
   if (sbName) sbName.textContent = name;
-  // topbar user chip
-  document.querySelectorAll('.user-chip-avatar').forEach(el => el.textContent = initial);
-  document.querySelectorAll('.user-chip-name').forEach(el => el.textContent = name);
-  document.querySelectorAll('.user-chip-role').forEach(el => el.textContent = rl);
 
   applyI18n();
   await loadTroubles();
@@ -666,8 +670,8 @@ function updateBadges(){
   const cnt=TROUBLES.filter(tr=>tr.status==='pending').length;
   document.getElementById('pendingCount').textContent=cnt;
   document.getElementById('tab-badge-pending').textContent=cnt;
-  document.getElementById('mob-badge').textContent=cnt;
-  document.getElementById('sb-badge').textContent=cnt;
+  const sbBadge=document.getElementById('sb-badge');
+  if(sbBadge) sbBadge.textContent=cnt;
   document.getElementById('pendingBanner').style.display=cnt>0?'flex':'none';
 }
 
@@ -924,13 +928,31 @@ function doLogout(){
   setTimeout(() => { location.href = 'index.html'; }, 1000);
 }
 </script>
-<script src="traq-version.js"></script>
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW登録失敗:', e));
+/* ===== Swipe navigation (loop: 一覧→分析→設定→一覧) ===== */
+(function(){
+  var PAGES = ['home_sl.html','dashboard.html','settings.html'];
+  var CURRENT = 0;
+  var el = document.getElementById('scrollArea');
+  if (!el) return;
+  var sx=0, sy=0, dragging=false;
+  el.addEventListener('touchstart', function(e){
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true;
+  }, {passive:true});
+  el.addEventListener('touchmove', function(e){
+    if(!dragging) return;
+    var dx=e.touches[0].clientX-sx, dy=Math.abs(e.touches[0].clientY-sy);
+    if(dy>Math.abs(dx)) dragging=false;
+  }, {passive:true});
+  el.addEventListener('touchend', function(e){
+    if(!dragging) return;
+    dragging=false;
+    var dx=e.changedTouches[0].clientX-sx;
+    if(dx<-50){ location.href=PAGES[(CURRENT+1)%PAGES.length]; }
+    else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
   });
-}
+})();
 </script>
+<script src="./update_banner.js"></script>
 </body>
 </html>
