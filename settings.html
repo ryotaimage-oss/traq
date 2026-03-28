@@ -383,15 +383,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   <nav class="bottom-nav">
     <button class="nav-item" onclick="goHome()">
       <span class="nav-icon">📋</span>
-      <span class="nav-label">一覧</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">分析</span>
-    </button>
-    <button class="nav-item active" onclick="void(0)">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">設定</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
   </nav>
 </div>
@@ -845,33 +841,7 @@ function showToast(msg,type='info'){
   </div>
 </div>
 
-<!-- Swipe Navigation -->
-<script>
-(function(){
-  var sess=(function(){try{return JSON.parse(localStorage.getItem('traq_session')||'{}')}catch(e){return{}}})();
-  var homePage=(sess.role==='leader'||sess.role==='admin')?'home_sl.html':'home.html';
-  var PAGES = [homePage,'dashboard.html','settings.html'];
-  var CURRENT = 2; // settings = index 2
-  var el = document.getElementById('scrollArea');
-  if(!el) return;
-  var sx=0, sy=0, dragging=false;
-  el.addEventListener('touchstart', function(e){
-    sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true;
-  }, {passive:true});
-  el.addEventListener('touchmove', function(e){
-    if(!dragging) return;
-    var dx=e.touches[0].clientX-sx, dy=Math.abs(e.touches[0].clientY-sy);
-    if(dy>Math.abs(dx)) dragging=false;
-  }, {passive:true});
-  el.addEventListener('touchend', function(e){
-    if(!dragging) return;
-    dragging=false;
-    var dx=e.changedTouches[0].clientX-sx;
-    if(dx<-50){ location.href=PAGES[(CURRENT+1)%PAGES.length]; }
-    else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
-  });
-})();
-</script>
+
 <script src="./update_banner.js"></script>
 </body>
 </html>

@@ -553,7 +553,7 @@ html, body {
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
         <span class="snav-icon">📊</span>
-        <span data-i18n="nav_dashboard">分析</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
         <span class="snav-icon">⚙️</span>
@@ -682,11 +682,7 @@ html, body {
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label" data-i18n="nav_dashboard">分析</span>
-    </button>
-    <button class="nav-item" onclick="location.href='settings.html'">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label" data-i18n="nav_settings">設定</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
   </nav>
 
@@ -708,7 +704,7 @@ html, body {
 ============================================= */
 const I18N = {
   ja: {
-    nav_list:'一覧', nav_dashboard:'分析', nav_settings:'設定',
+    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_settings:'設定',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
@@ -738,7 +734,7 @@ const I18N = {
     logout_msg:'ログアウトしました',
   },
   vi: {
-    nav_list:'Danh sách', nav_dashboard:'Thống kê', nav_settings:'Cài đặt',
+    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_settings:'Cài đặt',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
     draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
@@ -1179,29 +1175,7 @@ async function loadTroubles() {
 })();
 </script>
 <script>
-/* ===== Swipe navigation (loop: 一覧→分析→設定→一覧) ===== */
-(function(){
-  var PAGES = ['home.html','dashboard.html','settings.html'];
-  var CURRENT = 0; // home.html = index 0
-  var el = document.getElementById('scrollArea');
-  if (!el) return;
-  var sx=0, sy=0, dragging=false;
-  el.addEventListener('touchstart', function(e){
-    sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true;
-  }, {passive:true});
-  el.addEventListener('touchmove', function(e){
-    if(!dragging) return;
-    var dx=e.touches[0].clientX-sx, dy=Math.abs(e.touches[0].clientY-sy);
-    if(dy>Math.abs(dx)) dragging=false;
-  }, {passive:true});
-  el.addEventListener('touchend', function(e){
-    if(!dragging) return;
-    dragging=false;
-    var dx=e.changedTouches[0].clientX-sx;
-    if(dx<-50){ location.href=PAGES[(CURRENT+1)%PAGES.length]; }
-    else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
-  });
-})();
+
 </script>
 <script src="./update_banner.js"></script>
 </body>

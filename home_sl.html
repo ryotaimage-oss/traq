@@ -388,11 +388,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label" data-i18n="nav_dashboard">分析</span>
-    </button>
-    <button class="nav-item" onclick="location.href='settings.html'">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label" data-i18n="nav_settings">設定</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
   </nav>
 
@@ -444,7 +440,7 @@ const I18N = {
   vi:{
     nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
     nav_list:'Danh sách', nav_settings:'Cài đặt',
-    nav_dashboard:'Thống kê', nav_excel:'Tải Excel',
+    nav_dashboard:'Dashboard', nav_excel:'Tải Excel',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
     pending_label:'đang chờ duyệt', btn_review:'Xem chờ duyệt',
     tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
@@ -926,29 +922,7 @@ function doLogout(){
 }
 </script>
 <script>
-/* ===== Swipe navigation (loop: 一覧→分析→設定→一覧) ===== */
-(function(){
-  var PAGES = ['home_sl.html','dashboard.html','settings.html'];
-  var CURRENT = 0;
-  var el = document.getElementById('scrollArea');
-  if (!el) return;
-  var sx=0, sy=0, dragging=false;
-  el.addEventListener('touchstart', function(e){
-    sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true;
-  }, {passive:true});
-  el.addEventListener('touchmove', function(e){
-    if(!dragging) return;
-    var dx=e.touches[0].clientX-sx, dy=Math.abs(e.touches[0].clientY-sy);
-    if(dy>Math.abs(dx)) dragging=false;
-  }, {passive:true});
-  el.addEventListener('touchend', function(e){
-    if(!dragging) return;
-    dragging=false;
-    var dx=e.changedTouches[0].clientX-sx;
-    if(dx<-50){ location.href=PAGES[(CURRENT+1)%PAGES.length]; }
-    else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
-  });
-})();
+
 </script>
 <script src="./update_banner.js"></script>
 </body>

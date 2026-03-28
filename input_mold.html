@@ -336,19 +336,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <button class="bnav-item" onclick="goHome()">
-    <span class="bnav-icon">📋</span>
-    <span class="bnav-label">一覧</span>
-  </button>
-  <button class="bnav-item" onclick="location.href='dashboard.html'">
-    <span class="bnav-icon">📊</span>
-    <span class="bnav-label">分析</span>
-  </button>
-  <button class="bnav-item" onclick="location.href='settings.html'">
-    <span class="bnav-icon">⚙️</span>
-    <span class="bnav-label">設定</span>
-  </button>
-</nav>
+    <button class="nav-item" onclick="goHome()">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
+    </button>
+    <button class="nav-item" onclick="location.href='dashboard.html'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
+    </button>
+  </nav>
 
 <!-- ローディング -->
 <div class="overlay hidden" id="overlay">
