@@ -45,31 +45,10 @@
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
 .app{height:100%;display:flex;flex-direction:column}.sidebar{display:none}
 
-/* Topbar */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.topbar-right{display:flex;align-items:center;gap:6px}
-.user-chip{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 8px 4px 4px;white-space:nowrap}
-.user-chip-avatar{width:22px;height:22px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.user-chip-name{font-size:11px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.user-chip-role{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+
 /* Role colors: OP=紺 SL=オレンジ admin=赤 */
-.role-op .user-chip-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
-.role-op .user-chip-role{background:rgba(30,58,110,0.35);color:#6b8ec5}
-.role-sl .user-chip-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
-.role-sl .user-chip-role{background:rgba(239,159,39,0.25);color:#e8a520}
-.role-admin .user-chip-avatar{background:rgba(239,68,68,0.25);color:#f87171}
-.role-admin .user-chip-role{background:rgba(239,68,68,0.25);color:#f87171}
-[data-theme="light"] .role-op .user-chip-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
-[data-theme="light"] .role-op .user-chip-role{background:rgba(30,58,110,0.15);color:#2c4a80}
-[data-theme="light"] .role-sl .user-chip-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
-[data-theme="light"] .role-sl .user-chip-role{background:rgba(200,130,20,0.18);color:#b07a10}
-[data-theme="light"] .role-admin .user-chip-avatar{background:rgba(239,68,68,0.15);color:#c53030}
-[data-theme="light"] .role-admin .user-chip-role{background:rgba(239,68,68,0.15);color:#c53030}
-.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.role-op .role-op .role-sl .role-sl .role-admin .role-admin [data-theme="light"] .role-op [data-theme="light"] .role-op [data-theme="light"] .role-sl [data-theme="light"] .role-sl [data-theme="light"] .role-admin [data-theme="light"] .role-admin .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
-.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
 /* Pending banner */
 .pending-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.25);flex-shrink:0}
@@ -166,8 +145,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .snav-icon{font-size:18px;width:24px;text-align:center}
   .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
-  .topbar{display:none}
-  .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden}
   .scroll-area{padding-bottom:24px}
 }
 
@@ -220,6 +198,25 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ===== Topbar (new F-style) ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
+.topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.mini-logo svg{display:block}
+.topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
+.topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-icon-btn{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+.hdr-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+.role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+.role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+[data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+[data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+[data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+
 </style>
 </head>
 <body>
@@ -304,7 +301,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     <!-- Topbar (mobile) -->
     <div class="topbar">
       <div class="topbar-left">
-        <svg width="72" height="26" viewBox="0 0 200 56" fill="none">
+        <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
           <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
           <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
           <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
@@ -319,14 +316,18 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
           <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
           <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-          <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
         </svg>
-        <div class="user-chip" id="mob-chip">
-          <div class="user-chip-avatar" id="mob-avatar"></div>
-          <span class="user-chip-name" id="mob-name"></span>
-          <span class="user-chip-role" id="mob-role"></span>
-        </div>
+        <span class="topbar-logo-text">Traq</span>
+        <span class="topbar-sep"></span>
+        <span class="topbar-sub">Trouble Tracking System</span>
       </div>
+      <div class="topbar-right">
+        <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
+        <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
+        <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
+        <div class="hdr-avatar" id="mob-avatar"></div>
+      </div>
+    </div>
       <div class="topbar-right">
         <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
       </div>
@@ -567,14 +568,10 @@ let typeFilter = 'all';
   const roleClass = 'role-' + roleKey;
 
   // Mobile chip
-  const mobChip = document.getElementById('mob-chip');
-  if (mobChip) mobChip.className = 'user-chip ' + roleClass;
+  var topbar = document.querySelector('.topbar');
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(roleClass);}
   const mobAvatar = document.getElementById('mob-avatar');
   if (mobAvatar) mobAvatar.textContent = initial;
-  const mobName = document.getElementById('mob-name');
-  if (mobName) mobName.textContent = name;
-  const mobRole = document.getElementById('mob-role');
-  if (mobRole) mobRole.textContent = roleLabel;
 
   // PC sidebar
   const sbWrap = document.getElementById('sb-user-wrap');
