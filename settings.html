@@ -132,6 +132,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ===== Add Home Modal ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-sheet{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit}
+.modal-close:hover{color:var(--text1)}
+.add-home-device-label{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.add-home-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--text1)}
+.add-home-step-done{margin-top:4px}
+.add-home-step-num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.add-home-step-num-done{background:var(--success);color:#fff}
+.add-home-highlight{color:var(--orange);font-weight:700}
+.add-home-divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.add-home-url-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+.add-home-url-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.add-home-url-text{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4}
+.add-home-copy-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s}
+.add-home-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
+.add-home-close-btn{width:100%;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -230,6 +251,19 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
             <div>
               <div class="setting-name">PIN変更</div>
               <div class="setting-desc">ログイン用4桁PINを変更します</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="setting-row" onclick="openAddHomeModal()">
+          <div class="setting-row-left">
+            <div class="setting-icon" style="background:rgba(239,159,39,.12)">📱</div>
+            <div>
+              <div class="setting-name">ホーム画面に追加する</div>
+              <div class="setting-desc">アプリとしてショートカット登録</div>
             </div>
           </div>
           <div class="setting-row-right">
@@ -503,10 +537,10 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   deferredPrompt=e;
-  document.getElementById('addHomeBtn').disabled=false;
 });
-
-function addToHomeScreen(){
+/* ===== Add Home Modal ===== */
+function openAddHomeModal(){
+  // Androidの場合はシステムプロンプトを優先
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(result=>{
@@ -515,19 +549,33 @@ function addToHomeScreen(){
     });
     return;
   }
-  // PWAプロンプトが使えない場合はマニュアルガイドを表示
-  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isAndroid=/android/i.test(navigator.userAgent);
-  const guide=document.getElementById('addHomeGuide');
-  guide.style.display='block';
-  if(isIos){
-    guide.innerHTML='<b>iPhoneの場合：</b><br>① Safari下部の <b>共有ボタン（□↑）</b> をタップ<br>② 「ホーム画面に追加」を選択<br>③「追加」をタップ';
-  } else if(isAndroid){
-    guide.innerHTML='<b>Androidの場合：</b><br>① Chromeのメニュー（⋮）をタップ<br>② 「ホーム画面に追加」を選択<br>③「追加」をタップ';
-  } else {
-    guide.innerHTML='<b>PCの場合：</b><br>① Chromeのアドレスバー右端の <b>インストールアイコン（⊕）</b> をクリック<br>② 「インストール」をクリック';
-  }
+  const ua=navigator.userAgent.toLowerCase();
+  const isIos=/iphone|ipad|ipod/.test(ua);
+  const isAndroid=/android/.test(ua);
+  document.getElementById('addHomeIos').classList.toggle('hidden', !isIos);
+  document.getElementById('addHomeAndroid').classList.toggle('hidden', !isAndroid);
+  document.getElementById('addHomePc').classList.toggle('hidden', isIos||isAndroid);
+  var baseUrl=location.origin+location.pathname.replace(/\/[^/]*\.html$/, '/');
+  document.getElementById('addHomeUrl').textContent=baseUrl;
+  document.getElementById('addHomeCopyBtn').textContent='コピー';
+  document.getElementById('addHomeModal').classList.remove('hidden');
 }
+function closeAddHomeModal(e){
+  if(e.target===document.getElementById('addHomeModal')) closeAddHomeModalDirect();
+}
+function closeAddHomeModalDirect(){
+  document.getElementById('addHomeModal').classList.add('hidden');
+}
+function copyUrl(){
+  const url=location.origin+location.pathname.replace(/\/[^/]*$/, '/')||location.href;
+  navigator.clipboard.writeText(url).then(()=>{
+    document.getElementById('addHomeCopyBtn').textContent='コピー済み ✓';
+    setTimeout(()=>{ document.getElementById('addHomeCopyBtn').textContent='コピー'; },2000);
+  }).catch(()=>{
+    showToast('コピーできませんでした','error');
+  });
+}
+
 
 /* ===== Force reload ===== */
 function forceReload(){
@@ -628,5 +676,76 @@ function showToast(msg,type='info'){
 })();
 </script>
 <script src="traq-version.js"></script>
+
+<!-- ホーム画面追加モーダル -->
+<div class="modal-overlay hidden" id="addHomeModal" onclick="closeAddHomeModal(event)">
+  <div class="modal-sheet" id="addHomeSheet">
+    <div class="modal-header">
+      <div class="modal-title">ホーム画面に追加</div>
+      <button class="modal-close" onclick="closeAddHomeModalDirect()">✕</button>
+    </div>
+
+    <!-- iOS手順 -->
+    <div id="addHomeIos">
+      <div class="add-home-device-label">📱 iPhoneでのホーム画面追加手順</div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div>Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">2</div>
+        <div>メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">3</div>
+        <div>名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div style="color:var(--success)">ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。</div>
+      </div>
+    </div>
+
+    <!-- Android手順 -->
+    <div id="addHomeAndroid" class="hidden">
+      <div class="add-home-device-label">🤖 Androidでのホーム画面追加手順</div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div>Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">2</div>
+        <div><span class="add-home-highlight">「ホーム画面に追加」</span> を選択</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div style="color:var(--success)">「追加」をタップすれば完了です！</div>
+      </div>
+    </div>
+
+    <!-- PC手順 -->
+    <div id="addHomePc" class="hidden">
+      <div class="add-home-device-label">💻 PCでのインストール手順</div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div>Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div style="color:var(--success)">「インストール」をクリックすれば完了です！</div>
+      </div>
+    </div>
+
+    <div class="add-home-divider"></div>
+
+    <div class="add-home-url-label">URLをコピー</div>
+    <div class="add-home-url-row">
+      <div class="add-home-url-text" id="addHomeUrl"></div>
+      <button class="add-home-copy-btn" id="addHomeCopyBtn" onclick="copyUrl()">コピー</button>
+    </div>
+
+    <button class="add-home-close-btn" onclick="closeAddHomeModalDirect()">閉じる</button>
+  </div>
+</div>
 </body>
 </html>
