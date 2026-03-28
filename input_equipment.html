@@ -337,6 +337,11 @@ function onLineChange() {
   if (!lineId) { machSel.disabled = true; return; }
 
   var filtered = allMachines.filter(function(m) { return m.line_id === lineId; });
+  filtered.sort(function(a, b) {
+    var na = parseInt(a.machine_no); var nb = parseInt(b.machine_no);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return a.machine_no.localeCompare(b.machine_no);
+  });
   machSel.innerHTML = '<option value="">選択してください</option>' +
     filtered.map(function(m) { return '<option value="' + m.id + '">' + m.machine_no + '</option>'; }).join('');
   machSel.disabled = false;
