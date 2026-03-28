@@ -302,6 +302,9 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <button class="btn btn-primary btn-sm" onclick="openCategoryModal()">＋ 追加</button>
         </div>
       </div>
+      <div class="search-bar">
+        <input class="search-input" type="text" id="catSearch" placeholder="分類名で検索..." oninput="renderCategories()">
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">⚙️ 設備分類</div>
@@ -708,8 +711,13 @@ async function saveProduct(id){
 
 /* ===== CATEGORIES ===== */
 function renderCategories(){
-  const eq=CATEGORIES.filter(c=>c.type==='equipment').sort((a,b)=>a.sort_order-b.sort_order);
-  const md=CATEGORIES.filter(c=>c.type==='mold').sort((a,b)=>a.sort_order-b.sort_order);
+  const q=(document.getElementById('catSearch').value||'').toLowerCase();
+  const filtered=CATEGORIES.filter(c=>{
+    if(q&&!c.name.toLowerCase().includes(q))return false;
+    return true;
+  });
+  const eq=filtered.filter(c=>c.type==='equipment').sort((a,b)=>a.sort_order-b.sort_order);
+  const md=filtered.filter(c=>c.type==='mold').sort((a,b)=>a.sort_order-b.sort_order);
   renderCatTable('catEqTable',eq);
   renderCatTable('catMdTable',md);
 }
