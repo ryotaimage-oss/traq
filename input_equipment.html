@@ -27,9 +27,12 @@
   --border:  #1e293b;
   --text:    #f1f5f9;
   --muted:   #64748b;
+  --nav-h:56px;
+  --factory:#1e293b; --roof:#334155;
 }
 [data-theme="light"] {
   --bg:      #e8e6e2;
+  --factory:#c8c4bc; --roof:#b0aca4;
   --surface: #ffffff;
   --surface2:#f0ede8;
   --border:  rgba(0,0,0,0.18);
@@ -40,14 +43,71 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
 
-/* ヘッダー */
-.header { background: #080d18; padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; }
-.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
-.logo-text { font-size: 18px; font-weight: 700; color: var(--orange); }
-.logo-sub  { font-size: 10px; color: #64748b; }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.user-info { font-size: 12px; color: #94a3b8; }
-.back-btn { background: none; border: 1px solid #1e293b; color: #94a3b8; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 13px; }
+/* ===== Common Header ===== */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: 52px; background: var(--surface);
+  border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10;
+}
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-right { display: flex; align-items: center; gap: 6px; }
+.mini-logo svg { display: block; }
+.user-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 8px 4px 4px; white-space: nowrap;
+}
+.user-chip-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-chip-name { font-size: 12px; font-weight: 700; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-chip-role { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+.chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-sl   .user-chip-avatar { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-sl   .user-chip-role   { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.25); color: #f87171; }
+.chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.25); color: #f87171; }
+[data-theme="light"] .chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-sl   .user-chip-avatar { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-sl   .user-chip-role   { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.15); color: #c53030; }
+[data-theme="light"] .chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.15); color: #c53030; }
+.icon-btn { background: none; border: 1px solid var(--border); border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; color: var(--muted); transition: all .15s; }
+.icon-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ===== Page Title Bar ===== */
+.page-title-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.page-back-btn {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; color: var(--muted); transition: all .15s;
+}
+.page-back-btn:hover { border-color: var(--orange); color: var(--orange); }
+.page-title-text { font-size: 15px; font-weight: 700; }
+
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+  display: flex; height: var(--nav-h); background: var(--surface);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; background: none; border: none; color: var(--muted);
+  font-family: inherit; font-size: 10px; cursor: pointer; transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-item:hover { color: var(--text); }
+.bnav-icon { font-size: 18px; line-height: 1; }
+.bnav-label { font-weight: 500; }
+@media(min-width:768px){ .bottom-nav { display: none; } }
 
 /* メイン */
 .main { flex: 1; padding: 20px 16px; max-width: 600px; margin: 0 auto; width: 100%; }
@@ -114,7 +174,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 /* 下書きバー */
 .draft-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: relative;
   background: var(--surface); border-top: 1px solid var(--border);
   padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
   font-size: 13px; color: var(--muted); z-index: 10;
@@ -148,27 +208,39 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 </head>
 <body>
 
-<header class="header">
-  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-    <rect width="36" height="36" rx="6" fill="#080d18"/>
-    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
-    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
-    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
-    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
-    <rect x="8" y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <circle cx="9" cy="6" r="2" fill="#EF9F27" opacity=".8"/>
-    <circle cx="19" cy="4" r="2" fill="#EF9F27" opacity=".8"/>
-  </svg>
-  <div>
-    <div class="logo-text">Traq</div>
-    <div class="logo-sub">設備トラブル入力</div>
+<header class="topbar">
+  <div class="topbar-left">
+    <svg class="mini-logo" width="72" height="26" viewBox="0 0 200 56" fill="none">
+      <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+      <rect x="4" y="33" width="48" height="3"  rx="1" fill="var(--roof)"/>
+      <rect x="9"  y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+      <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+      <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+      <rect x="8"  y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+      <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+      <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+      <rect x="6"  y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+      <circle cx="26" cy="14" r="3"   fill="var(--orange)" opacity=".8"/>
+      <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+      <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
+    </svg>
+    <div class="user-chip" id="mob-chip">
+      <div class="user-chip-avatar" id="mob-avatar"></div>
+      <span class="user-chip-name" id="mob-name"></span>
+      <span class="user-chip-role" id="mob-role"></span>
+    </div>
   </div>
-  <div class="header-right">
-    <span class="user-info" id="header-user"></span>
-    <button class="back-btn" onclick="goBack()">← 戻る</button>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
   </div>
 </header>
+<div class="page-title-bar">
+  <button class="page-back-btn" onclick="goBack()">←</button>
+  <span class="page-title-text">⚙️ 設備トラブル入力</span>
+</div>
 
 <main class="main">
 
@@ -267,8 +339,6 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <button class="submit-btn" id="submit-btn" onclick="doSubmit()">送信する</button>
   </div>
 
-  <!-- 下部余白（下書きバー分） -->
-  <div style="height:52px;"></div>
 
 </main>
 
@@ -280,6 +350,22 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   </div>
   <button onclick="loadDraft()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;">下書きを読込</button>
 </div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="bnav-item" onclick="goHome()">
+    <span class="bnav-icon">📋</span>
+    <span class="bnav-label">一覧</span>
+  </button>
+  <button class="bnav-item" onclick="location.href='dashboard.html'">
+    <span class="bnav-icon">📊</span>
+    <span class="bnav-label">分析</span>
+  </button>
+  <button class="bnav-item" onclick="location.href='settings.html'">
+    <span class="bnav-icon">⚙️</span>
+    <span class="bnav-label">設定</span>
+  </button>
+</nav>
 
 <!-- ローディング -->
 <div class="overlay hidden" id="overlay">
@@ -318,12 +404,36 @@ var session = null;
   if (!s) { location.href = 'index.html'; return; }
   session = JSON.parse(s);
   if (Date.now() > session.expiresAt) { location.href = 'index.html'; return; }
-  document.getElementById('header-user').textContent = session.name + ' (' + session.shift + '直)';
   document.getElementById('shift-display').value = session.shift + '直';
   setDefaultDate();
+  initChip();
 })();
 
 function goBack() { history.back(); }
+// ── ヘッダーチップ初期化 ──
+function initChip(){
+  if(!session) return;
+  var name=session.name||'';
+  var role=session.role||'worker';
+  var roleMap={worker:'OP',leader:'SL',admin:'Admin'};
+  var classMap={worker:'chip-role-op',leader:'chip-role-sl',admin:'chip-role-admin'};
+  var chip=document.getElementById('mob-chip');
+  if(chip) chip.className='user-chip '+(classMap[role]||'chip-role-op');
+  var av=document.getElementById('mob-avatar');
+  if(av) av.textContent=name?name.charAt(0):'?';
+  var nm=document.getElementById('mob-name');
+  if(nm) nm.textContent=name;
+  var rl=document.getElementById('mob-role');
+  if(rl) rl.textContent=roleMap[role]||'OP';
+}
+function goHome(){
+  try{
+    var r=session?session.role:'';
+    if(r==='leader'||r==='admin') location.href='home_sl.html';
+    else location.href='home.html';
+  }catch(e){location.href='home.html';}
+}
+
 
 // ── 発生日のデフォルト設定（3直は前日）────────────────────
 function setDefaultDate() {
@@ -789,12 +899,6 @@ function toggleTheme() {
   if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
 }
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW登録失敗:', e));
-  });
-}
-</script>
+<script src="./update_banner.js"></script>
 </body>
 </html>
