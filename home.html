@@ -502,6 +502,7 @@ html, body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+@media(max-width:767px){.topbar-right .lang-btn{display:none}}
 </style>
 </head>
 <body>
@@ -632,12 +633,12 @@ html, body {
       <div class="action-grid">
         <div class="action-card" onclick="goInput('equipment')">
           <div class="action-icon">⚙️</div>
-          <div class="action-label" data-i18n="btn_eq">設備トラブル<br>を入力</div>
+          <div class="action-label" data-i18n="btn_eq">設備異常 入力</div>
           <div class="action-arrow">›</div>
         </div>
         <div class="action-card" onclick="goInput('mold')">
           <div class="action-icon">🔧</div>
-          <div class="action-label" data-i18n="btn_md">金型トラブル<br>を入力</div>
+          <div class="action-label" data-i18n="btn_md">金型異常 入力</div>
           <div class="action-arrow">›</div>
         </div>
       </div>
@@ -709,6 +710,11 @@ html, body {
 <div id="toastEl" style="display:none"></div>
 
 <script>
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
 /* =============================================
    i18n
 ============================================= */
@@ -716,7 +722,7 @@ const I18N = {
   ja: {
     nav_home:'ホーム', nav_list:'投稿一覧', nav_dashboard:'ダッシュボード',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
-    btn_eq:'設備トラブル\nを入力', btn_md:'金型トラブル\nを入力',
+    btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
     section_list:'投稿一覧', show_all:'すべて表示',
     filter_all:'すべて', filter_draft:'下書き', filter_pending:'承認待ち',

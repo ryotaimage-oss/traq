@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,22 +21,20 @@
 
 /* ライト/ダーク自動切替 */
 :root {
-  --bg:      #f0f2f5;
-  --surface: #ffffff;
-  --surface2:#f8f9fb;
-  --border:  #e2e8f0;
-  --text:    #0f172a;
+  --bg:      #080d18;
+  --surface: #111827;
+  --surface2:#16213a;
+  --border:  #1e293b;
+  --text:    #f1f5f9;
   --muted:   #64748b;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:      #080d18;
-    --surface: #111827;
-    --surface2:#16213a;
-    --border:  #1e293b;
-    --text:    #f1f5f9;
-    --muted:   #64748b;
-  }
+[data-theme="light"] {
+  --bg:      #e8e6e2;
+  --surface: #ffffff;
+  --surface2:#f0ede8;
+  --border:  rgba(0,0,0,0.18);
+  --text:    #1a1f2e;
+  --muted:   #666666;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -293,6 +291,11 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 <div class="toast hidden" id="toast"></div>
 
 <script>
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
 var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
 
@@ -769,6 +772,16 @@ function showToast(msg, type) {
 // ── 初期化 ────────────────────────────────────────────────
 loadMasters();
 initDrums();
+
+function toggleTheme() {
+  var h = document.documentElement;
+  var isDark = h.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  h.setAttribute('data-theme', next);
+  localStorage.setItem('traq_theme', next);
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
+}
 </script>
 </body>
 </html>
