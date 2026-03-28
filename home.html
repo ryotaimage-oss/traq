@@ -59,34 +59,10 @@ html, body {
 .sidebar { display: none; }
 
 
-.topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 12px;
-  height: 52px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 10;
-}
-.topbar-left { display: flex; align-items: center; gap: 8px; }
-.topbar-right { display: flex; align-items: center; gap: 6px; }
-
 /* Mini logo */
 
 /* User chip */
 /* Role badge colors: OP=紺 SL=オレンジ admin=赤 */
-.role-op   .role-op   .role-sl   .role-sl   .role-admin .role-admin /* Light mode overrides */
-[data-theme="light"] .role-op   [data-theme="light"] .role-op   [data-theme="light"] .role-sl   [data-theme="light"] .role-sl   [data-theme="light"] .role-admin [data-theme="light"] .role-admin 
-/* Icon buttons */
-.icon-btn {
-  background: none; border: 1px solid var(--border);
-  border-radius: 6px; width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; cursor: pointer; color: var(--text2);
-  transition: all .15s;
-}
-.icon-btn:hover { border-color: var(--orange); color: var(--orange); }
 
 /* Lang btns */
 .lang-btn {
@@ -604,10 +580,6 @@ html, body {
         <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
         <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
         <div class="hdr-avatar" id="mob-avatar"></div>
-      </div>
-    </div>
-      <div class="topbar-right">
-        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
       </div>
     </div>
 
