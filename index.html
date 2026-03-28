@@ -1,407 +1,621 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Traq">
-<title>Traq – TroubleTrack System</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Traq – ログイン</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:      #080d18;
-    --surface: #111827;
-    --border:  #1e293b;
-    --orange:  #EF9F27;
-    --text:    #f1f5f9;
-    --muted:   #64748b;
-    --error:   #ef4444;
-    --radius:  8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-  }
-  .header {
-    background: #080d18;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-icon { width: 36px; height: 36px; flex-shrink: 0; }
-  .logo-text { font-size: 20px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
-  .logo-sub  { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
-  .main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    width: 100%;
-    max-width: 420px;
-    padding: 28px 24px;
-  }
-  .steps { display: flex; align-items: center; margin-bottom: 24px; }
-  .step-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-  .step-dot {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 2px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--muted); background: var(--bg);
-  }
-  .step-dot.active { border-color: var(--orange); color: var(--orange); }
-  .step-dot.done   { border-color: var(--orange); background: var(--orange); color: #000; }
-  .step-label { font-size: 10px; color: var(--muted); }
-  .step-label.active { color: var(--orange); }
-  .step-line { flex: 1; height: 2px; background: var(--border); margin-bottom: 16px; }
-  .step-line.done { background: var(--orange); }
-  .section-title { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
-  .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .shift-btn {
-    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 16px 8px; cursor: pointer; text-align: center; color: var(--text); font-family: inherit;
-  }
-  .shift-btn:hover { border-color: var(--orange); }
-  .shift-no   { font-size: 22px; font-weight: 700; color: var(--orange); }
-  .shift-time { font-size: 10px; color: var(--muted); margin-top: 4px; white-space: nowrap; }
-  .user-list { display: flex; flex-direction: column; gap: 6px; }
-  .user-btn {
-    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px;
-    color: var(--text); text-align: left; width: 100%; font-family: inherit;
-  }
-  .user-btn:hover { border-color: var(--orange); }
-  .user-btn:disabled { opacity: .5; cursor: not-allowed; }
-  .user-avatar {
-    width: 36px; height: 36px; border-radius: 50%; background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; flex-shrink: 0; color: var(--orange);
-  }
-  .user-name { font-size: 14px; font-weight: 500; }
-  .user-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .role-badge { margin-left: auto; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; flex-shrink: 0; }
-  .badge-admin  { background: #1e3a5f; color: #60a5fa; }
-  .badge-leader { background: #1a3a1a; color: #4ade80; }
-  .badge-worker { background: #2a1a00; color: var(--orange); }
-  .pin-user {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-    padding: 12px 16px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border);
-  }
-  .pin-user-avatar {
-    width: 40px; height: 40px; border-radius: 50%; background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 700; color: var(--orange); flex-shrink: 0;
-  }
-  .pin-user-name { font-size: 15px; font-weight: 600; }
-  .pin-user-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
-  .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: transparent; }
-  .pin-dot.filled { background: var(--orange); border-color: var(--orange); }
-  .pin-dot.error  { background: var(--error);  border-color: var(--error); }
-  .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .pin-key {
-    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 16px; font-size: 20px; font-weight: 700; color: var(--text);
-    cursor: pointer; text-align: center; user-select: none; font-family: inherit;
-  }
-  .pin-key:active { background: var(--border); }
-  .pin-key.cancel { font-size: 13px; font-weight: 500; color: var(--muted); }
-  .pin-error { text-align: center; font-size: 12px; color: var(--error); margin-bottom: 12px; min-height: 18px; }
-  .back-btn {
-    display: flex; align-items: center; gap: 6px; background: none; border: none;
-    color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; margin-bottom: 16px; font-family: inherit;
-  }
-  .back-btn:hover { color: var(--text); }
-  .loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 40px; color: var(--muted); font-size: 14px; }
-  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin .6s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .hidden { display: none !important; }
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
+  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
+  --factory:#2e3a52;--roof:#3d4e6e;
+  --text1:#e8eaf0;--text2:#8b90a0;
+  --border:rgba(255,255,255,0.08);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+[data-theme="light"]{
+  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --text1:#1a1f2e;--text2:#666666;
+  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent}
+.app{min-height:100%;display:flex;flex-direction:column}
+
+/* ===== Topbar ===== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:52px;
+  background:#080d18;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-shrink:0;
+}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-text{font-size:15px;font-weight:700;color:var(--orange)}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:3px 7px;font-family:inherit;font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:rgba(255,255,255,0.5);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ===== Main ===== */
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:400px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.card-hint{font-size:12px;color:var(--text2);margin-bottom:18px}
+
+/* ===== Step indicator ===== */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:22px}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
+.step-dot.active{border-color:var(--orange);background:var(--orange);color:var(--navy)}
+.step-dot.done{border-color:var(--success);background:var(--success);color:#fff}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 4px;transition:background .2s}
+.step-line.done{background:var(--success)}
+
+/* ===== Shift buttons ===== */
+.shift-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
+.shift-btn{
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:var(--radius);padding:16px 8px;
+  cursor:pointer;font-family:inherit;transition:all .15s;
+  text-align:center;
+}
+.shift-btn:hover{border-color:var(--orange)}
+.shift-btn.active{border-color:var(--orange);background:rgba(239,159,39,0.1)}
+.shift-num{font-size:22px;font-weight:700;color:var(--orange);display:block;line-height:1;margin-bottom:4px}
+.shift-name{font-size:13px;font-weight:700;color:var(--text1);display:block;margin-bottom:3px}
+.shift-time{font-size:10px;color:var(--text2);display:block}
+
+/* ===== User grid ===== */
+.user-search{
+  width:100%;padding:10px 12px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius);
+  font-family:inherit;font-size:14px;color:var(--text1);
+  outline:none;margin-bottom:12px;
+  transition:border-color .15s;
+}
+.user-search:focus{border-color:var(--orange)}
+.user-search::placeholder{color:var(--text2)}
+.user-grid{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.user-grid::-webkit-scrollbar{width:4px}
+.user-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.user-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:var(--radius);
+  cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;
+  width:100%;
+}
+.user-btn:hover{border-color:var(--orange);background:rgba(239,159,39,0.06)}
+.user-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--orange);color:var(--navy);
+  font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.user-avatar.sl{background:var(--warning)}
+.user-avatar.adm{background:var(--danger)}
+.user-name{font-size:14px;font-weight:600;color:var(--text1)}
+.user-role{font-size:11px;color:var(--text2);margin-top:1px}
+.user-role.sl{color:var(--warning)}
+.user-role.adm{color:var(--danger)}
+
+/* ===== PIN ===== */
+.pin-user-info{
+  display:flex;align-items:center;gap:12px;
+  padding:12px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:20px;
+}
+.pin-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--orange);color:var(--navy);
+  font-size:16px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.pin-avatar.sl{background:var(--warning)}
+.pin-avatar.adm{background:var(--danger)}
+.pin-user-name{font-size:15px;font-weight:700}
+.pin-user-role{font-size:11px;color:var(--text2);margin-top:2px}
+.pin-user-role.sl{color:var(--warning)}
+.pin-user-role.adm{color:var(--danger)}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:20px}
+.pin-dot{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid var(--border);background:transparent;
+  transition:all .15s;
+}
+.pin-dot.filled{background:var(--orange);border-color:var(--orange);transform:scale(1.1)}
+.pin-dot.success{background:var(--success);border-color:var(--success)}
+.pin-dot.error{background:var(--danger);border-color:var(--danger);animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.key-btn{
+  height:54px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius);font-family:inherit;font-size:22px;font-weight:700;
+  color:var(--text1);cursor:pointer;transition:all .1s;
+  display:flex;align-items:center;justify-content:center;
+}
+.key-btn:active{transform:scale(.94);background:var(--bg1)}
+.key-btn:disabled{opacity:.3;pointer-events:none}
+.key-clear{font-size:12px;font-weight:600;color:var(--text2)}
+.pin-error{text-align:center;font-size:13px;color:var(--danger);min-height:20px;margin-bottom:10px}
+.pin-lock{text-align:center;font-size:13px;color:var(--warning);min-height:20px;margin-bottom:10px}
+
+/* ===== Buttons ===== */
+.btn-primary{
+  width:100%;height:52px;
+  background:var(--orange);border:none;border-radius:var(--radius);
+  font-family:inherit;font-size:16px;font-weight:700;color:var(--navy);
+  cursor:pointer;transition:all .15s;
+}
+.btn-primary:hover{background:var(--orange-dark)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;height:44px;margin-top:10px;
+  background:none;border:1px solid var(--border);border-radius:var(--radius);
+  font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all .15s;
+}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ===== Loading ===== */
+.loading{text-align:center;padding:24px;color:var(--text2);font-size:14px}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:64px;left:50%;transform:translateX(-50%);
+  border-radius:20px;padding:8px 20px;font-size:13px;font-weight:500;
+  box-shadow:var(--shadow);z-index:400;white-space:nowrap;
+  animation:fadeIn .2s ease;
+}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
 <body>
+<div class="app">
 
-<header class="header">
-  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-    <rect width="36" height="36" rx="6" fill="#080d18"/>
-    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
-    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
-    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
-    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
-    <rect x="8" y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
-    <circle cx="9" cy="6" r="2" fill="#EF9F27" opacity=".8"/>
-    <circle cx="11" cy="4" r="1.5" fill="#EF9F27" opacity=".5"/>
-    <circle cx="19" cy="4" r="2" fill="#EF9F27" opacity=".8"/>
-    <circle cx="21" cy="2" r="1.5" fill="#EF9F27" opacity=".5"/>
-  </svg>
-  <div>
-    <div class="logo-text">Traq</div>
-    <div class="logo-sub">TROUBLETRACK SYSTEM</div>
-  </div>
-</header>
-
-<main class="main">
-  <div class="card">
-    <div class="steps">
-      <div class="step-item">
-        <div class="step-dot active" id="dot1">1</div>
-        <div class="step-label active" id="lbl1">シフト</div>
-      </div>
-      <div class="step-line" id="line1"></div>
-      <div class="step-item">
-        <div class="step-dot" id="dot2">2</div>
-        <div class="step-label" id="lbl2">ユーザー</div>
-      </div>
-      <div class="step-line" id="line2"></div>
-      <div class="step-item">
-        <div class="step-dot" id="dot3">3</div>
-        <div class="step-label" id="lbl3">PIN</div>
-      </div>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="logo">
+      <svg width="80" height="26" viewBox="0 0 200 56" fill="none">
+        <rect x="4" y="34" width="48" height="18" rx="2" fill="#2e3a52"/>
+        <rect x="4" y="33" width="48" height="3" rx="1" fill="#3d4e6e"/>
+        <rect x="9" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".7"/>
+        <rect x="20" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".5"/>
+        <rect x="31" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".7"/>
+        <rect x="8" y="18" width="8" height="18" rx="1" fill="#2e3a52"/>
+        <rect x="22" y="22" width="8" height="14" rx="1" fill="#2e3a52"/>
+        <rect x="36" y="25" width="8" height="11" rx="1" fill="#2e3a52"/>
+        <rect x="6" y="16" width="12" height="4" rx="1" fill="#3d4e6e"/>
+        <rect x="20" y="20" width="12" height="4" rx="1" fill="#3d4e6e"/>
+        <rect x="34" y="23" width="12" height="4" rx="1" fill="#3d4e6e"/>
+        <circle cx="12" cy="10" r="3.5" fill="#EF9F27" opacity=".9"/>
+        <circle cx="26" cy="14" r="3" fill="#EF9F27" opacity=".8"/>
+        <circle cx="40" cy="17" r="2.5" fill="#EF9F27" opacity=".7"/>
+        <text x="58" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="#EF9F27">Traq</text>
+      </svg>
     </div>
+    <div class="topbar-right">
+      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </header>
 
-    <div id="step1">
-      <div class="section-title">シフトを選択</div>
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Step 1: シフト選択 -->
+    <div class="card" id="step1">
+      <div class="steps">
+        <div class="step-dot active" id="sdot1">1</div>
+        <div class="step-line" id="sline1"></div>
+        <div class="step-dot" id="sdot2">2</div>
+        <div class="step-line" id="sline2"></div>
+        <div class="step-dot" id="sdot3">3</div>
+      </div>
+      <div class="card-title" data-i18n="shift_title">シフトを選択してください</div>
+      <div class="card-hint" data-i18n="shift_hint">本日のシフトを選んでください</div>
       <div class="shift-grid">
-        <button class="shift-btn" onclick="selectShift(1)">
-          <div class="shift-no">1直</div>
-          <div class="shift-time">08:00–16:00</div>
+        <button class="shift-btn" onclick="selectShift(1)" id="shift1">
+          <span class="shift-num">1</span>
+          <span class="shift-name" data-i18n="shift1_name">1直</span>
+          <span class="shift-time">08:00–16:00</span>
         </button>
-        <button class="shift-btn" onclick="selectShift(2)">
-          <div class="shift-no">2直</div>
-          <div class="shift-time">16:00–00:00</div>
+        <button class="shift-btn" onclick="selectShift(2)" id="shift2">
+          <span class="shift-num">2</span>
+          <span class="shift-name" data-i18n="shift2_name">2直</span>
+          <span class="shift-time">16:00–24:00</span>
         </button>
-        <button class="shift-btn" onclick="selectShift(3)">
-          <div class="shift-no">3直</div>
-          <div class="shift-time">00:00–08:00</div>
+        <button class="shift-btn" onclick="selectShift(3)" id="shift3">
+          <span class="shift-num">3</span>
+          <span class="shift-name" data-i18n="shift3_name">3直</span>
+          <span class="shift-time">00:00–08:00</span>
         </button>
       </div>
     </div>
 
-    <div id="step2" class="hidden">
-      <button class="back-btn" onclick="goStep(1)">← 戻る</button>
-      <div class="section-title" id="step2-title">ユーザーを選択</div>
-      <div id="user-list-wrap">
-        <div class="loading"><div class="spinner"></div>読込中...</div>
+    <!-- Step 2: ユーザー選択 -->
+    <div class="card" id="step2" style="display:none">
+      <div class="steps">
+        <div class="step-dot done" id="sdot1b">✓</div>
+        <div class="step-line done" id="sline1b"></div>
+        <div class="step-dot active" id="sdot2b">2</div>
+        <div class="step-line" id="sline2b"></div>
+        <div class="step-dot" id="sdot3b">3</div>
       </div>
+      <div class="card-title" data-i18n="user_title">ユーザーを選択してください</div>
+      <div class="card-hint" id="shiftBadge"></div>
+      <input class="user-search" type="text" id="userSearch"
+             placeholder="名前で検索..." data-i18n-ph="search_ph"
+             oninput="filterUsers()">
+      <div class="user-grid" id="userGrid">
+        <div class="loading">読み込み中...</div>
+      </div>
+      <button class="btn-secondary" onclick="goStep(1)">← <span data-i18n="back">もどる</span></button>
     </div>
 
-    <div id="step3" class="hidden">
-      <button class="back-btn" onclick="goStep(2)">← 戻る</button>
-      <div class="pin-user">
-        <div class="pin-user-avatar" id="pin-avatar"></div>
+    <!-- Step 3: PIN入力 -->
+    <div class="card" id="step3" style="display:none">
+      <div class="steps">
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">3</div>
+      </div>
+      <div class="pin-user-info">
+        <div class="pin-avatar" id="pinAvatar"></div>
         <div>
-          <div class="pin-user-name" id="pin-name"></div>
-          <div class="pin-user-role" id="pin-role"></div>
+          <div class="pin-user-name" id="pinName"></div>
+          <div class="pin-user-role" id="pinRole"></div>
         </div>
       </div>
-      <div class="pin-dots">
-        <div class="pin-dot" id="pd0"></div>
-        <div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div>
-        <div class="pin-dot" id="pd3"></div>
+      <div class="pin-error" id="pinErrorEl"></div>
+      <div id="pinInputArea">
+        <div class="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-keypad">
+          <button class="key-btn" onclick="pinKey('1')">1</button>
+          <button class="key-btn" onclick="pinKey('2')">2</button>
+          <button class="key-btn" onclick="pinKey('3')">3</button>
+          <button class="key-btn" onclick="pinKey('4')">4</button>
+          <button class="key-btn" onclick="pinKey('5')">5</button>
+          <button class="key-btn" onclick="pinKey('6')">6</button>
+          <button class="key-btn" onclick="pinKey('7')">7</button>
+          <button class="key-btn" onclick="pinKey('8')">8</button>
+          <button class="key-btn" onclick="pinKey('9')">9</button>
+          <button class="key-btn key-clear" onclick="pinClear()" data-i18n="pin_clear">クリア</button>
+          <button class="key-btn" onclick="pinKey('0')">0</button>
+          <button class="key-btn" onclick="pinDel()">⌫</button>
+        </div>
+        <button class="btn-primary" id="loginBtn" onclick="doLogin()" disabled data-i18n="login_btn">ログイン</button>
       </div>
-      <div class="pin-error" id="pin-error"></div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="pinKey('1')">1</button>
-        <button class="pin-key" onclick="pinKey('2')">2</button>
-        <button class="pin-key" onclick="pinKey('3')">3</button>
-        <button class="pin-key" onclick="pinKey('4')">4</button>
-        <button class="pin-key" onclick="pinKey('5')">5</button>
-        <button class="pin-key" onclick="pinKey('6')">6</button>
-        <button class="pin-key" onclick="pinKey('7')">7</button>
-        <button class="pin-key" onclick="pinKey('8')">8</button>
-        <button class="pin-key" onclick="pinKey('9')">9</button>
-        <button class="pin-key cancel" onclick="pinCancel()">取消</button>
-        <button class="pin-key" onclick="pinKey('0')">0</button>
-        <button class="pin-key" onclick="pinDel()">⌫</button>
-      </div>
+      <button class="btn-secondary" onclick="goStep(2)">← <span data-i18n="back">もどる</span></button>
     </div>
-  </div>
-</main>
+
+  </main>
+</div>
+
+<div id="toastEl" style="display:none"></div>
 
 <script>
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+  var icon=document.getElementById('themeBtn');
+  if(icon) icon.textContent=(saved||pref)==='dark'?'🌙':'☀️';
+})();
+
+/* ===== Supabase ===== */
 const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-
-async function sbFetch(path) {
-  const res = await fetch(SB_URL + '/rest/v1/' + path, {
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-  });
+async function sbFetch(path, method='GET', body=null) {
+  const opts = { method, headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
-var allUsers = [], selectedShift = null, selectedUser = null, pinInput = '';
-var lockState = {};
-var ROLE_LABELS = { worker: 'OP', leader: 'SL', admin: 'Admin' };
-var ROLE_DEST   = { worker: 'home.html', leader: 'home_sl.html', admin: 'home.html' };
-
-sbFetch('traq_users?is_active=eq.true&select=id,name,role,shift,pin&order=role.asc,name.asc')
-  .then(function(data) { allUsers = data; })
-  .catch(function(e) { console.error('ユーザー取得失敗:', e); });
-
-function goStep(n) {
-  document.getElementById('step1').className = n === 1 ? '' : 'hidden';
-  document.getElementById('step2').className = n === 2 ? '' : 'hidden';
-  document.getElementById('step3').className = n === 3 ? '' : 'hidden';
-  for (var i = 1; i <= 3; i++) {
-    document.getElementById('dot' + i).className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
-    document.getElementById('lbl' + i).className = 'step-label' + (i === n ? ' active' : '');
-    if (i < 3) document.getElementById('line' + i).className = 'step-line' + (i < n ? ' done' : '');
+/* ===== i18n ===== */
+let currentLang = localStorage.getItem('traq_lang') || 'ja';
+const I18N = {
+  ja:{
+    shift_title:'シフトを選択してください', shift_hint:'本日のシフトを選んでください',
+    shift1_name:'1直', shift2_name:'2直', shift3_name:'3直',
+    shift_badge: s => `${s}直のユーザー`,
+    user_title:'ユーザーを選択してください', search_ph:'名前で検索...',
+    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    pin_clear:'クリア', login_btn:'ログイン',
+    back:'もどる',
+    pin_error:'PINが違います',
+    login_ok: name => `${name} でログインしました`,
+    load_error:'ユーザー情報の取得に失敗しました',
+  },
+  vi:{
+    shift_title:'Chọn ca làm việc', shift_hint:'Vui lòng chọn ca hôm nay',
+    shift1_name:'Ca 1', shift2_name:'Ca 2', shift3_name:'Ca 3',
+    shift_badge: s => `Nhân viên ca ${s}`,
+    user_title:'Chọn người dùng', search_ph:'Tìm theo tên...',
+    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    pin_clear:'Xóa', login_btn:'Đăng nhập',
+    back:'Quay lại',
+    pin_error:'PIN không đúng',
+    login_ok: name => `Đã đăng nhập: ${name}`,
+    load_error:'Không thể tải dữ liệu người dùng',
+  },
+  en:{
+    shift_title:'Select your shift', shift_hint:'Choose your shift for today',
+    shift1_name:'Shift 1', shift2_name:'Shift 2', shift3_name:'Shift 3',
+    shift_badge: s => `Shift ${s} users`,
+    user_title:'Select user', search_ph:'Search by name...',
+    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    pin_clear:'Clear', login_btn:'Login',
+    back:'Back',
+    pin_error:'Incorrect PIN',
+    login_ok: name => `Logged in as ${name}`,
+    load_error:'Failed to load users',
+  }
+};
+function t(key, ...args) {
+  const v = (I18N[currentLang] || I18N.ja)[key] || I18N.ja[key] || key;
+  return typeof v === 'function' ? v(...args) : v;
+}
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('traq_lang', lang);
+  ['ja','vi','en'].forEach(l => {
+    document.getElementById('lang-'+l)?.classList.toggle('active', l===lang);
+  });
+  applyI18n();
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  if (state.selectedShift) {
+    const sb = document.getElementById('shiftBadge');
+    if (sb) sb.textContent = t('shift_badge', state.selectedShift);
   }
 }
 
-function selectShift(shift) {
-  selectedShift = shift;
-  renderUserList();
+/* ===== State ===== */
+const state = {
+  selectedShift: null,
+  selectedUser: null,
+  pinInput: '',
+};
+let ALL_USERS = [];
+
+/* ===== Init ===== */
+(async function init() {
+  applyI18n();
+  // 既にセッションがあればホームへ
+  try {
+    const s = localStorage.getItem('traq_session');
+    if (s) {
+      const o = JSON.parse(s);
+      if (o.expiresAt && Date.now() < o.expiresAt) {
+        redirectByRole(o.role);
+        return;
+      }
+      localStorage.removeItem('traq_session');
+    }
+  } catch(e) {}
+
+  // ユーザー一覧を事前取得
+  try {
+    const rows = await sbFetch('traq_users?select=id,name,role,is_active&is_active=eq.true&order=name');
+    ALL_USERS = (rows || []).sort((a, b) => {
+      const ro = { admin:0, leader:0, sl:1, worker:2, op:2 };
+      const rd = (ro[a.role]||2) - (ro[b.role]||2);
+      return rd !== 0 ? rd : a.name.localeCompare(b.name, 'ja');
+    });
+  } catch(e) {
+    showToast(t('load_error'), 'error');
+    ALL_USERS = [];
+  }
+})();
+
+/* ===== Theme ===== */
+function toggleTheme() {
+  const h = document.documentElement;
+  const isDark = h.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  h.setAttribute('data-theme', next);
+  localStorage.setItem('traq_theme', next);
+  document.getElementById('themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
+/* ===== Step nav ===== */
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('step'+i);
+    if (el) el.style.display = i === n ? 'block' : 'none';
+  });
+}
+
+/* ===== Step 1: Shift ===== */
+function selectShift(s) {
+  state.selectedShift = s;
+  [1,2,3].forEach(i => {
+    document.getElementById('shift'+i)?.classList.toggle('active', i===s);
+  });
+  const sb = document.getElementById('shiftBadge');
+  if (sb) sb.textContent = t('shift_badge', s);
+  renderUsers('');
+  document.getElementById('userSearch').value = '';
   goStep(2);
 }
 
-function renderUserList() {
-  var wrap = document.getElementById('user-list-wrap');
-  document.getElementById('step2-title').textContent = selectedShift + '直 — ユーザーを選択';
-  if (!allUsers.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:32px;color:#ef4444;font-size:13px;">ユーザーを取得できませんでした<br><button onclick="retryLoad()" style="margin-top:12px;background:none;border:1px solid #ef4444;color:#ef4444;border-radius:8px;padding:8px 20px;cursor:pointer;font-family:inherit;font-size:13px;">再読込</button></div>';
+/* ===== Step 2: Users ===== */
+function renderUsers(filter) {
+  const filtered = ALL_USERS.filter(u =>
+    !filter || u.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  const grid = document.getElementById('userGrid');
+  if (!grid) return;
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="loading">該当なし</div>';
     return;
   }
-  var roleOrder = { admin: 0, leader: 1, worker: 2 };
-  var sorted = allUsers.slice().sort(function(a, b) {
-    var sa = a.shift === selectedShift ? 0 : 1;
-    var sb = b.shift === selectedShift ? 0 : 1;
-    if (sa !== sb) return sa - sb;
-    return (roleOrder[a.role] || 9) - (roleOrder[b.role] || 9);
+  grid.innerHTML = '';
+  filtered.forEach(u => {
+    const btn = document.createElement('button');
+    const role = u.role;
+    const isSL = role === 'leader' || role === 'sl';
+    const isAdmin = role === 'admin';
+    btn.className = 'user-btn';
+    btn.onclick = () => selectUser(u);
+    const roleLabel = isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
+    const avatarClass = isAdmin ? 'adm' : isSL ? 'sl' : '';
+    const roleClass = isAdmin ? 'adm' : isSL ? 'sl' : '';
+    btn.innerHTML =
+      `<div class="user-avatar ${avatarClass}">${u.name.charAt(0)}</div>` +
+      `<div><div class="user-name">${u.name}</div>` +
+      `<div class="user-role ${roleClass}">${roleLabel}</div></div>`;
+    grid.appendChild(btn);
   });
-  var badgeClass = { admin: 'badge-admin', leader: 'badge-leader', worker: 'badge-worker' };
-  var html = '<div class="user-list">';
-  for (var i = 0; i < sorted.length; i++) {
-    var u = sorted[i];
-    var locked = isLocked(u.id);
-    html += '<button class="user-btn" onclick="selectUser(' + u.id + ')"' + (locked ? ' disabled' : '') + '>';
-    html += '<div class="user-avatar">' + u.name.charAt(0) + '</div>';
-    html += '<div><div class="user-name">' + u.name + '</div>';
-    html += '<div class="user-sub">' + u.shift + '直' + (locked ? ' — ロック中' : '') + '</div></div>';
-    html += '<span class="role-badge ' + (badgeClass[u.role] || 'badge-worker') + '">' + (ROLE_LABELS[u.role] || u.role) + '</span>';
-    html += '</button>';
-  }
-  html += '</div>';
-  wrap.innerHTML = html;
+}
+function filterUsers() {
+  renderUsers(document.getElementById('userSearch').value);
 }
 
-function retryLoad() {
-  document.getElementById('user-list-wrap').innerHTML = '<div class="loading"><div class="spinner"></div>読込中...</div>';
-  sbFetch('traq_users?is_active=eq.true&select=id,name,role,shift,pin&order=role.asc,name.asc')
-    .then(function(data) { allUsers = data; renderUserList(); })
-    .catch(function() {
-      document.getElementById('user-list-wrap').innerHTML = '<div style="text-align:center;padding:32px;color:#ef4444;font-size:13px;">取得失敗<br><button onclick="retryLoad()" style="margin-top:12px;background:none;border:1px solid #ef4444;color:#ef4444;border-radius:8px;padding:8px 20px;cursor:pointer;font-family:inherit;font-size:13px;">再読込</button></div>';
-    });
-}
-
-function selectUser(userId) {
-  for (var i = 0; i < allUsers.length; i++) {
-    if (allUsers[i].id === userId) { selectedUser = allUsers[i]; break; }
-  }
-  if (!selectedUser) return;
-  pinInput = '';
-  document.getElementById('pin-avatar').textContent = selectedUser.name.charAt(0);
-  document.getElementById('pin-name').textContent   = selectedUser.name;
-  document.getElementById('pin-role').textContent   = ROLE_LABELS[selectedUser.role] || selectedUser.role;
-  document.getElementById('pin-error').textContent  = '';
-  renderPinDots(false);
+/* ===== Step 3: PIN ===== */
+function selectUser(u) {
+  state.selectedUser = u;
+  state.pinInput = '';
+  updatePinDots();
+  const role = u.role;
+  const isSL = role === 'leader' || role === 'sl';
+  const isAdmin = role === 'admin';
+  const avatarEl = document.getElementById('pinAvatar');
+  avatarEl.textContent = u.name.charAt(0);
+  avatarEl.className = 'pin-avatar' + (isAdmin ? ' adm' : isSL ? ' sl' : '');
+  document.getElementById('pinName').textContent = u.name;
+  const roleEl = document.getElementById('pinRole');
+  roleEl.textContent = isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
+  roleEl.className = 'pin-user-role' + (isAdmin ? ' adm' : isSL ? ' sl' : '');
+  clearError();
+  document.getElementById('loginBtn').disabled = true;
   goStep(3);
 }
 
-function renderPinDots(shake) {
-  for (var i = 0; i < 4; i++) {
-    document.getElementById('pd' + i).className = 'pin-dot' + (i < pinInput.length ? (shake ? ' error' : ' filled') : '');
-  }
-}
-
 function pinKey(k) {
-  if (pinInput.length >= 4) return;
-  pinInput += k;
-  renderPinDots(false);
-  document.getElementById('pin-error').textContent = '';
-  if (pinInput.length === 4) setTimeout(verifyPin, 80);
+  if (state.pinInput.length >= 4) return;
+  state.pinInput += k;
+  updatePinDots();
+  if (state.pinInput.length === 4) {
+    document.getElementById('loginBtn').disabled = false;
+  }
 }
-
 function pinDel() {
-  pinInput = pinInput.slice(0, -1);
-  renderPinDots(false);
-  document.getElementById('pin-error').textContent = '';
+  state.pinInput = state.pinInput.slice(0,-1);
+  updatePinDots();
+  document.getElementById('loginBtn').disabled = true;
 }
-
-function pinCancel() {
-  pinInput = '';
-  renderPinDots(false);
-  document.getElementById('pin-error').textContent = '';
-  goStep(2);
+function pinClear() {
+  state.pinInput = '';
+  updatePinDots();
+  document.getElementById('loginBtn').disabled = true;
 }
-
-function isLocked(userId) {
-  var s = lockState[userId];
-  if (!s || !s.lockedUntil) return false;
-  return new Date() < new Date(s.lockedUntil);
-}
-
-function recordFail(userId) {
-  if (!lockState[userId]) lockState[userId] = { failCount: 0, lockedUntil: null };
-  lockState[userId].failCount++;
-  if (lockState[userId].failCount >= 3) {
-    lockState[userId].lockedUntil = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    lockState[userId].failCount = 0;
-    return true;
+function updatePinDots(dotState) {
+  for (let i=0; i<4; i++) {
+    const d = document.getElementById('pd'+i);
+    if (!d) continue;
+    if (dotState === 'error') { d.className = 'pin-dot error'; continue; }
+    if (dotState === 'success') { d.className = 'pin-dot success'; continue; }
+    d.className = 'pin-dot' + (i < state.pinInput.length ? ' filled' : '');
   }
-  return false;
+}
+function clearError() {
+  document.getElementById('pinErrorEl').textContent = '';
 }
 
-function clearFail(userId) { delete lockState[userId]; }
 
-function verifyPin() {
-  if (isLocked(selectedUser.id)) {
-    document.getElementById('pin-error').textContent = 'アカウントがロックされています';
-    pinInput = '';
-    renderPinDots(false);
-    return;
-  }
-  var ok = (pinInput === selectedUser.pin);
-  if (ok) {
-    clearFail(selectedUser.id);
-    var roleMap = { worker: 'op', leader: 'sl', admin: 'admin' };
-    var role = roleMap[selectedUser.role] || 'op';
+/* ===== Login ===== */
+async function doLogin() {
+  const u = state.selectedUser;
+  if (!u) return;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  clearError();
+    // Supabase からPINを取得して照合
+    const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,default_shift,pin');
+    if (!rows || rows.length === 0) throw new Error('user not found');
+    const dbUser = rows[0];
+
+    if (state.pinInput !== dbUser.pin) {
+      // 失敗
+      updatePinDots('error');
+      document.getElementById('pinErrorEl').textContent = t('pin_error');
+      setTimeout(() => {
+        state.pinInput = '';
+        updatePinDots();
+        clearError();
+        btn.disabled = false;
+      }, 700);
+      return;
+    }
+
+    // 成功
+    updatePinDots('success');
+
+    // セッション保存
+    const role = dbUser.role; // worker/leader/admin
     localStorage.setItem('traq_session', JSON.stringify({
-      userId: selectedUser.id, name: selectedUser.name,
-      role: role, shift: selectedShift,
+      userId: dbUser.id,
+      name: dbUser.name,
+      role: role,
+      shift: state.selectedShift,
       expiresAt: Date.now() + 8 * 60 * 60 * 1000
     }));
-    location.href = ROLE_DEST[selectedUser.role] || 'home.html';
-  } else {
-    var locked = recordFail(selectedUser.id);
-    pinInput = '';
-    renderPinDots(true);
-    if (locked) {
-      document.getElementById('pin-error').textContent = '3回失敗しました。5分間ロックします';
-      renderUserList();
-    } else {
-      document.getElementById('pin-error').textContent = 'PINが違います（' + lockState[selectedUser.id].failCount + '/3回）';
-    }
+
+    showToast(t('login_ok', dbUser.name), 'success');
+    setTimeout(() => { redirectByRole(role); }, 800);
+
+  } catch(e) {
+    showToast('エラー: ' + e.message, 'error');
+    btn.disabled = false;
   }
+}
+
+function redirectByRole(role) {
+  if (role === 'admin') { location.href = 'admin.html'; }
+  else if (role === 'leader' || role === 'sl') { location.href = 'home_sl.html'; }
+  else { location.href = 'home.html'; }
+}
+
+/* ===== Toast ===== */
+let toastTimer = null;
+function showToast(msg, type='info') {
+  const el = document.getElementById('toastEl');
+  el.innerHTML = `<div class="toast ${type}">${msg}</div>`;
+  el.style.display = 'block';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 </script>
 </body>
