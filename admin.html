@@ -563,7 +563,7 @@ function openMachineModal(id){
     <div class="modal-title">${m?'機番編集':'機番追加'}</div>
     <div class="form-group"><label class="form-label">機番</label><input class="form-input" id="m-no" type="number" value="${m?m.machine_no:''}" placeholder="例: 12"></div>
     <div class="form-group"><label class="form-label">ライン</label><select class="form-select" id="m-line">${lineOpts}</select></div>
-    <div class="form-group"><label class="form-label">メモ</label><input class="form-input" id="m-memo" value="${m?esc(m.memo||'):''}"></div>
+    <div class="form-group"><label class="form-label">メモ</label><input class="form-input" id="m-memo" value="${m?esc(m.memo||''):''}"></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-save" onclick="saveMachine('${m?m.id:''}')">保存</button>
@@ -624,9 +624,9 @@ function openProductModal(id){
   const p=id?PRODUCTS.find(x=>x.id===id):null;
   showModal(`
     <div class="modal-title">${p?'品番編集':'品番追加'}</div>
-    <div class="form-group"><label class="form-label">品番コード</label><input class="form-input" id="m-code" value="${p?esc(p.product_code||'):''}"></div>
-    <div class="form-group"><label class="form-label">品名</label><input class="form-input" id="m-pname" value="${p?esc(p.product_name||'):''}"></div>
-    <div class="form-group"><label class="form-label">メモ</label><input class="form-input" id="m-memo" value="${p?esc(p.memo||'):''}"></div>
+    <div class="form-group"><label class="form-label">品番コード</label><input class="form-input" id="m-code" value="${p?esc(p.product_code||''):''}"></div>
+    <div class="form-group"><label class="form-label">品名</label><input class="form-input" id="m-pname" value="${p?esc(p.product_name||''):''}"></div>
+    <div class="form-group"><label class="form-label">メモ</label><input class="form-input" id="m-memo" value="${p?esc(p.memo||''):''}"></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-save" onclick="saveProduct('${p?p.id:''}')">保存</button>
