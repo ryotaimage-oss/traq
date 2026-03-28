@@ -185,7 +185,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label">品番</label>
+      <label class="form-label">品番<span class="required">*</span></label>
       <select class="form-select" id="product-select" disabled>
         <option value="">機番を先に選択</option>
       </select>
@@ -226,7 +226,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">詳細内容</label>
+      <label class="form-label">詳細内容<span class="required">*</span></label>
       <textarea class="form-textarea" id="detail" placeholder="トラブルの内容を入力してください"></textarea>
     </div>
   </div>
@@ -573,8 +573,10 @@ function validate() {
   if (!document.getElementById('occurred-date').value) { showToast('発生日を入力してください', 'error'); return false; }
   if (!document.getElementById('line-select').value)    { showToast('ラインを選択してください', 'error'); return false; }
   if (!document.getElementById('machine-select').value) { showToast('機番を選択してください', 'error'); return false; }
+  if (!document.getElementById('product-select').value) { showToast('品番を選択してください', 'error'); return false; }
   if (!document.getElementById('category-select').value){ showToast('分類を選択してください', 'error'); return false; }
   if (!selectedOccurrence)                              { showToast('初発/再発を選択してください', 'error'); return false; }
+  if (!document.getElementById('detail').value.trim())  { showToast('詳細内容を入力してください', 'error'); return false; }
   return true;
 }
 
