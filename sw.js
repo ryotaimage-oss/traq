@@ -1,6 +1,5 @@
-const CACHE_NAME = 'traq-v1';
+const CACHE_NAME = 'traq-v2';
 
-// キャッシュするファイル（静的リソース）
 const STATIC_ASSETS = [
   './index.html',
   './home.html',
@@ -10,6 +9,7 @@ const STATIC_ASSETS = [
   './dashboard.html',
   './settings.html',
   './admin.html',
+  './excel_download.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -27,14 +27,21 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// アクティベート：古いキャッシュを削除
+// アクティベート：古いキャッシュを削除 → 全クライアントに更新通知
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
-    )
+    ).then(() => {
+      // 全クライアントに更新完了を通知
+      return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'UPDATE_AVAILABLE', version: CACHE_NAME });
+        });
+      });
+    })
   );
   self.clients.claim();
 });
@@ -43,9 +50,9 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Supabase API はキャッシュしない（常にネットワーク）
+  // Supabase API はキャッシュしない
   if (url.hostname.includes('supabase.co')) {
-    return; // デフォルトのネットワークフェッチに任せる
+    return;
   }
 
   // Google Fonts はキャッシュ優先
@@ -92,7 +99,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Push通知受信（将来実装用）
+// Push通知受信
 self.addEventListener('push', event => {
   if (!event.data) return;
   const data = event.data.json();
