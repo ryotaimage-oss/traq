@@ -636,8 +636,7 @@ async function doLogin() {
 }
 
 function redirectByRole(role) {
-  if (role === 'admin') { location.href = 'admin.html'; }
-  else if (role === 'leader' || role === 'sl') { location.href = 'home_sl.html'; }
+  if (role === 'admin' || role === 'leader' || role === 'sl') { location.href = 'home_sl.html'; }
   else { location.href = 'home.html'; }
 }
 
