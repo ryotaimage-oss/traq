@@ -56,6 +56,7 @@ html, body {
 
 /* ===== Layout ===== */
 .app { height: 100%; display: flex; flex-direction: column; }
+.sidebar { display: none; }
 
 /* ===== Topbar ===== */
 .topbar {
@@ -363,6 +364,7 @@ html, body {
   .bottom-nav { display: none; }
   .app { flex-direction: row; }
   .sidebar {
+    display: flex;
     width: 220px; flex-shrink: 0;
     background: var(--bg2);
     border-right: 1px solid var(--border);
