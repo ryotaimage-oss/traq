@@ -287,6 +287,7 @@ html, body {
 .da-edit  { background: var(--bg3); color: var(--text1); border: 1px solid var(--border); }
 .da-del   { background: rgba(239,68,68,.1); color: var(--danger); border: 1px solid rgba(239,68,68,.2); }
 .da-send  { background: var(--orange); color: var(--navy); }
+.da-resubmit { background: var(--orange); color: var(--navy); flex: 1; }
 .da-btn:hover { opacity: .85; transform: scale(.98); }
 
 /* Reject reason */
@@ -684,7 +685,7 @@ const I18N = {
     stop_min:(n)=>`${n}分`,
     stop_none:'不明',
     shift_label:(s)=>`${s}直`,
-    da_edit:'編集', da_del:'削除', da_send:'承認待ちへ送信',
+    da_edit:'編集', da_del:'削除', da_send:'承認待ちへ送信', da_resubmit:'修正して再送信',
     del_title:'下書きを削除', del_msg:'この下書きを削除しますか？\nこの操作は取り消せません。',
     del_confirm:'削除する', del_cancel:'キャンセル',
     send_done:'承認待ちに送信しました',
@@ -713,7 +714,7 @@ const I18N = {
     occurrence_first:'Lần đầu', occurrence_rec:'Tái phát',
     stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
     shift_label:(s)=>`Ca ${s}`,
-    da_edit:'Sửa', da_del:'Xoá', da_send:'Gửi duyệt',
+    da_edit:'Sửa', da_del:'Xoá', da_send:'Gửi duyệt', da_resubmit:'Sửa và gửi lại',
     del_title:'Xoá bản nháp', del_msg:'Bạn có chắc muốn xoá bản nháp này?\nKhông thể hoàn tác.',
     del_confirm:'Xoá', del_cancel:'Huỷ',
     send_done:'Đã gửi chờ duyệt',
@@ -742,7 +743,7 @@ const I18N = {
     occurrence_first:'First', occurrence_rec:'Recurrence',
     stop_min:(n)=>`${n} min`, stop_none:'Unknown',
     shift_label:(s)=>`Shift ${s}`,
-    da_edit:'Edit', da_del:'Delete', da_send:'Submit',
+    da_edit:'Edit', da_del:'Delete', da_send:'Submit', da_resubmit:'Fix & Resubmit',
     del_title:'Delete Draft', del_msg:'Delete this draft?\nThis cannot be undone.',
     del_confirm:'Delete', del_cancel:'Cancel',
     send_done:'Submitted for approval',
@@ -904,6 +905,11 @@ function buildCard(tr, idx) {
         <button class="da-btn da-del"   onclick="event.stopPropagation();confirmDelete('${tr.id}')">${t('da_del')}</button>
         <button class="da-btn da-send"  onclick="event.stopPropagation();sendDraft('${tr.id}')">${t('da_send')}</button>
       </div>`;
+  } else if (tr.status === 'rejected') {
+    draftActionsHTML = `
+      <div class="draft-actions">
+        <button class="da-btn da-resubmit" onclick="event.stopPropagation();editRejected('${tr.id}')">${t('da_resubmit')}</button>
+      </div>`;
   }
   let rejectHTML = '';
   if (tr.status === 'rejected' && tr.reject_reason) {
@@ -1032,6 +1038,12 @@ function editDraft(id) {
   const tr = TROUBLES.find(x => String(x.id) === String(id));
   if (!tr) return;
   location.href = (tr.type === 'equipment' ? 'input_equipment' : 'input_mold') + '.html' + (tr._draftId ? '?draft=' + tr._draftId : '');
+}
+
+function editRejected(id) {
+  const tr = TROUBLES.find(x => String(x.id) === String(id));
+  if (!tr) return;
+  location.href = (tr.type === 'equipment' ? 'input_equipment' : 'input_mold') + '.html?edit=' + tr.id;
 }
 
 function confirmDelete(id) {
@@ -1175,6 +1187,9 @@ async function loadTroubles() {
       approved_by: r.approver_id ? '承認済み' : null,
       approved_at: r.approved_at ? r.approved_at.slice(0,16).replace('T',' ') : null,
       reject_reason: r.reject_reason || null,
+      line_id: r.line_id, machine_id: r.machine_id,
+      product_id: r.product_id, category_id: r.category_id,
+      stop_start: r.stop_start || null, stop_end: r.stop_end || null,
     }));
   } catch(e) { showToast('データ読込エラー', 'error'); }
   try {

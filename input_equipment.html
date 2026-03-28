@@ -499,7 +499,7 @@ function removeImage(i){selectedImages.splice(i,1);renderPreviews();}
 var draftTimer=null;
 function saveDraft(){if(draftTimer)clearTimeout(draftTimer);draftTimer=setTimeout(function(){_saveDraft();},1000);}
 async function _saveDraft(){
-  if(!session)return;
+  if(!session||editTroubleId)return;
   try{
     await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
     await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'equipment',data:getDraftData()});
@@ -583,7 +583,17 @@ async function doSubmit(){
       detail:document.getElementById('detail').value.trim()||null,
       reporter_id:session.userId
     };
-    var result=await sbFetch('troubles','POST',td);var tId=result[0].id;
+    var result, tId;
+    if (editTroubleId) {
+      td.reject_reason = null;
+      td.approver_id = null;
+      td.approved_at = null;
+      await sbFetch('troubles?id=eq.' + editTroubleId, 'PATCH', td);
+      tId = editTroubleId;
+    } else {
+      result = await sbFetch('troubles', 'POST', td);
+      tId = result[0].id;
+    }
     if(selectedImages.length>0){
       showOverlay('画像をアップロード中...');
       for(var i=0;i<selectedImages.length;i++){
@@ -606,8 +616,8 @@ async function doSubmit(){
         }
       }
     }
-    await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
-    hideOverlay();showToast('送信しました','success');setTimeout(function(){goHome();},1200);
+    if(!editTroubleId) await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
+    hideOverlay();showToast(editTroubleId?'再送信しました':'送信しました','success');setTimeout(function(){goHome();},1200);
   }catch(e){hideOverlay();btn.disabled=false;showToast('送信失敗: '+e.message,'error');}
 }
 
@@ -618,8 +628,65 @@ var toastTimer=null;
 function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3000);}
 function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';}
 
+/* ── Edit mode (rejected resubmit) ── */
+var editTroubleId = null;
+(function(){
+  var params = new URLSearchParams(location.search);
+  if (params.get('edit')) editTroubleId = params.get('edit');
+})();
+
+async function loadEditData() {
+  if (!editTroubleId) return;
+  try {
+    var rows = await sbFetch('troubles?id=eq.' + editTroubleId + '&select=*');
+    if (!rows || !rows.length) { showToast('データが見つかりません','error'); return; }
+    var r = rows[0];
+    if (r.occurred_date) document.getElementById('occurred-date').value = r.occurred_date.slice(0,10);
+    if (r.shift) document.getElementById('shift-select').value = String(r.shift);
+    if (r.line_id) {
+      document.getElementById('line-select').value = r.line_id;
+      onLineChange();
+      if (r.machine_id) {
+        document.getElementById('machine-select').value = r.machine_id;
+        onMachineChange();
+        if (r.product_id) document.getElementById('product-select').value = r.product_id;
+      }
+    }
+    if (r.category_id) document.getElementById('category-select').value = r.category_id;
+    if (r.occurrence) selectOccurrence(r.occurrence);
+    if (r.stop_start) {
+      var sp = r.stop_start.split(':');
+      var sh = parseInt(sp[0]), sm = Math.round(parseInt(sp[1]) / 5);
+      drumState.sh = sh; drumState.sm = sm;
+      setDrumPos('dSH', sh, false); setDrumPos('dSM', sm, false);
+    }
+    if (r.stop_end) {
+      var ep = r.stop_end.split(':');
+      var eh = parseInt(ep[0]), em = Math.round(parseInt(ep[1]) / 5);
+      endTimeSet = true; drumState.eh = eh; drumState.em = em;
+      setDrumPos('dEH', eh, false); setDrumPos('dEM', em, false);
+    }
+    updateStopResult();
+    if (r.detail) document.getElementById('detail').value = r.detail;
+    // UI: change submit button label
+    var btn = document.getElementById('submit-btn');
+    if (btn) btn.textContent = '修正して再送信';
+    // Show reject reason banner if present
+    if (r.reject_reason) {
+      var banner = document.createElement('div');
+      banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#ef4444;';
+      banner.innerHTML = '<strong style="display:block;font-size:11px;margin-bottom:2px">差し戻し理由：</strong>' + r.reject_reason;
+      var form = document.querySelector('.form-body');
+      if (form) form.insertBefore(banner, form.firstChild);
+    }
+    // Hide draft bar in edit mode
+    var dbar = document.querySelector('.draft-bar');
+    if (dbar) dbar.style.display = 'none';
+  } catch(e) { showToast('読込失敗: ' + e.message, 'error'); }
+}
+
 /* ── Init ── */
-loadMasters();initDrums();
+loadMasters().then(function(){ loadEditData(); });initDrums();
 </script>
 <script src="./update_banner.js"></script>
 </body>
