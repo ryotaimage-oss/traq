@@ -514,7 +514,7 @@ function renderUsers(){
   renderPagination('userPagination',total,userPage,'user');
 }
 function openUserModal(id){
-  const u=id?USERS.find(x=>x.id===id):null;
+  const u=id?USERS.find(x=>String(x.id)===String(id)):null;
   showModal(`
     <div class="modal-title">${u?'ユーザー編集':'ユーザー追加'}</div>
     <div class="form-group"><label class="form-label">名前</label><input class="form-input" id="m-name" value="${u?esc(u.name):''}"></div>
@@ -537,7 +537,7 @@ async function saveUser(id){
   try{
     if(id){
       const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role});
-      const idx=USERS.findIndex(u=>u.id===id);
+      const idx=USERS.findIndex(u=>String(u.id)===String(id));
       if(idx>=0&&updated&&updated[0])USERS[idx]={...USERS[idx],...updated[0]};
     }else{
       const pin=document.getElementById('m-pin')?.value||'0000';
@@ -592,7 +592,7 @@ function renderMachines(){
   renderPagination('machinePagination',total,machinePage,'machine');
 }
 function openMachineModal(id){
-  const m=id?MACHINES.find(x=>x.id===id):null;
+  const m=id?MACHINES.find(x=>String(x.id)===String(id)):null;
   const lineOpts=(m?'':'<option value="">選択してください</option>')+LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
   showModal(`
     <div class="modal-title">${m?'機番編集':'機番追加'}</div>
@@ -613,7 +613,7 @@ async function saveMachine(id){
   try{
     if(id){
       const updated=await sbFetch('machines?id=eq.'+id,'PATCH',{machine_no:no,line_id:lineId,memo});
-      const idx=MACHINES.findIndex(m=>m.id===id);
+      const idx=MACHINES.findIndex(m=>String(m.id)===String(id));
       if(idx>=0&&updated&&updated[0])MACHINES[idx]={...MACHINES[idx],...updated[0],lines:LINES.find(l=>l.id===lineId)};
     }else{
       const created=await sbFetch('machines','POST',{machine_no:no,line_id:lineId,memo,is_active:true});
@@ -657,7 +657,7 @@ function renderProducts(){
   renderPagination('productPagination',total,productPage,'product');
 }
 function openProductModal(id){
-  const p=id?PRODUCTS.find(x=>x.id===id):null;
+  const p=id?PRODUCTS.find(x=>String(x.id)===String(id)):null;
   showModal(`
     <div class="modal-title">${p?'品番編集':'品番追加'}</div>
     <div class="form-group"><label class="form-label">品番コード</label><input class="form-input" id="m-code" value="${p?esc(p.product_code||''):''}"></div>
@@ -676,7 +676,7 @@ async function saveProduct(id){
   try{
     if(id){
       const updated=await sbFetch('products?id=eq.'+id,'PATCH',{product_code:code,product_name:name,memo});
-      const idx=PRODUCTS.findIndex(p=>p.id===id);
+      const idx=PRODUCTS.findIndex(p=>String(p.id)===String(id));
       if(idx>=0&&updated&&updated[0])PRODUCTS[idx]={...PRODUCTS[idx],...updated[0]};
     }else{
       const created=await sbFetch('products','POST',{product_code:code,product_name:name,memo,is_active:true});
@@ -710,7 +710,7 @@ function renderCatTable(tbodyId,list){
   }).join('');
 }
 function openCategoryModal(id){
-  const c=id?CATEGORIES.find(x=>x.id===id):null;
+  const c=id?CATEGORIES.find(x=>String(x.id)===String(id)):null;
   showModal(`
     <div class="modal-title">${c?'分類編集':'分類追加'}</div>
     <div class="form-group"><label class="form-label">種別</label>
@@ -733,7 +733,7 @@ async function saveCategory(id){
   try{
     if(id){
       const updated=await sbFetch('categories?id=eq.'+id,'PATCH',{name,sort_order:sort});
-      const idx=CATEGORIES.findIndex(c=>c.id===id);
+      const idx=CATEGORIES.findIndex(c=>String(c.id)===String(id));
       if(idx>=0&&updated&&updated[0])CATEGORIES[idx]={...CATEGORIES[idx],...updated[0]};
     }else{
       const created=await sbFetch('categories','POST',{type,name,sort_order:sort,is_active:true});
@@ -751,7 +751,7 @@ async function toggleActive(table, id, currentActive, dataKey, renderFn) {
   try {
     await sbFetch(table + '?id=eq.' + id, 'PATCH', { is_active: newVal });
     const arr = DATA_MAP[dataKey]();
-    const idx = arr.findIndex(x => x.id === id);
+    const idx = arr.findIndex(x => String(x.id) === String(id));
     if (idx >= 0) arr[idx].is_active = newVal;
     RENDER_MAP[renderFn]();
     showToast(newVal ? '有効にしました' : '無効にしました', 'success');
