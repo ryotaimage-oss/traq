@@ -188,11 +188,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">⚙️ 基本情報</div>
-    <div class="form-row" style="grid-template-columns:1fr 68px;gap:16px">
-      <div class="form-group">
-        <label class="form-label">発生日<span class="req">*</span></label>
-        <input class="form-input" type="date" id="occurred-date" style="min-width:0">
-      </div>
+    <div class="form-group">
+      <label class="form-label">発生日<span class="req">*</span></label>
+      <input class="form-input" type="date" id="occurred-date">
+    </div>
+    <div class="form-row" style="grid-template-columns:68px 1fr 1fr">
       <div class="form-group">
         <label class="form-label">シフト<span class="req">*</span></label>
         <select class="form-select" id="shift-select" style="padding:12px 6px;text-align:center">
@@ -201,8 +201,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
           <option value="3">３S</option>
         </select>
       </div>
-    </div>
-    <div class="form-row" style="grid-template-columns:110px 1fr">
       <div class="form-group">
         <label class="form-label">ライン<span class="req">*</span></label>
         <select class="form-select" id="line-select" onchange="onLineChange()">
