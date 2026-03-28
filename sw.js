@@ -1,73 +1,115 @@
-// ============================================
-// Traq Service Worker — Web Push 通知受信
-// ファイル配置: リポジトリのルート（index.html と同じ階層）
-// ============================================
+const CACHE_NAME = 'traq-v1';
 
-// Push 通知を受信した時
-self.addEventListener('push', (event) => {
-  let data = { title: 'Traq', body: 'トラブルが送信されました', url: './home_sl.html' };
+// キャッシュするファイル（静的リソース）
+const STATIC_ASSETS = [
+  './index.html',
+  './home.html',
+  './home_sl.html',
+  './input_equipment.html',
+  './input_mold.html',
+  './dashboard.html',
+  './settings.html',
+  './admin.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+];
 
-  try {
-    if (event.data) {
-      data = event.data.json();
-    }
-  } catch (e) {
-    // JSON パース失敗時はデフォルト値を使用
-  }
-
-  const options = {
-    body: data.body || 'トラブルが送信されました',
-    icon: data.icon || './icon-192.png',
-    badge: data.badge || './badge-72.png',
-    tag: data.tag || 'traq-trouble-' + Date.now(),
-    renotify: true,
-    vibrate: [200, 100, 200],
-    data: {
-      url: data.url || './home_sl.html'
-    },
-    actions: [
-      { action: 'open', title: '確認する' },
-      { action: 'close', title: '閉じる' }
-    ]
-  };
-
+// インストール：静的リソースをキャッシュ
+self.addEventListener('install', event => {
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Traq', options)
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(STATIC_ASSETS).catch(err => {
+        console.warn('SW: 一部ファイルのキャッシュに失敗:', err);
+      });
+    })
   );
+  self.skipWaiting();
 });
 
-// 通知をタップした時
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  if (event.action === 'close') return;
-
-  const targetUrl = event.notification.data?.url || './home_sl.html';
-
+// アクティベート：古いキャッシュを削除
+self.addEventListener('activate', event => {
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // 既にTraqが開いていればそのタブにフォーカス
-      for (const client of windowClients) {
-        if (client.url.includes('home_sl.html') && 'focus' in client) {
-          client.focus();
-          client.navigate(targetUrl);
-          return;
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+// フェッチ戦略
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Supabase API はキャッシュしない（常にネットワーク）
+  if (url.hostname.includes('supabase.co')) {
+    return; // デフォルトのネットワークフェッチに任せる
+  }
+
+  // Google Fonts はキャッシュ優先
+  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return res;
+        });
+      })
+    );
+    return;
+  }
+
+  // HTMLファイルはネットワーク優先（オフライン時はキャッシュ）
+  if (event.request.destination === 'document' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // その他（JS・CSS・画像等）はキャッシュ優先
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         }
-      }
-      // 開いていなければ新しいタブで開く
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
+        return res;
+      });
     })
   );
 });
 
-// Service Worker インストール時
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
+// Push通知受信（将来実装用）
+self.addEventListener('push', event => {
+  if (!event.data) return;
+  const data = event.data.json();
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Traq', {
+      body: data.body || '',
+      icon: './icons/icon-192.png',
+      badge: './icons/icon-192.png',
+      data: data.url || './home_sl.html',
+    })
+  );
 });
 
-// Service Worker アクティベート時
-self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+// Push通知タップ時
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data || './home_sl.html')
+  );
 });
