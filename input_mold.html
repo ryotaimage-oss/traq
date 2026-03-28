@@ -200,8 +200,21 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">停止時間（分）</label>
-      <input class="form-input" type="number" id="stop-minutes" placeholder="0" min="0">
+      <label class="form-label">停止時間</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">開始時刻</div>
+          <input class="form-input" type="time" id="stop-start" onchange="calcStopMinutes()">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">終了時刻</div>
+          <input class="form-input" type="time" id="stop-end" onchange="calcStopMinutes()">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input class="form-input" type="number" id="stop-minutes" placeholder="0" min="0" style="width:120px;">
+        <span style="font-size:13px;color:var(--muted);">分（自動計算・手動変更可）</span>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">詳細内容</label>
@@ -379,6 +392,21 @@ function selectOccurrence(val) {
   document.getElementById('btn-first').classList.toggle('selected', val === 'first');
   document.getElementById('btn-repeat').classList.toggle('selected', val === 'repeat');
   saveDraft();
+}
+
+// ── 停止時間自動計算 ──────────────────────────────────────
+function calcStopMinutes() {
+  var start = document.getElementById('stop-start').value;
+  var end   = document.getElementById('stop-end').value;
+  if (!start || !end) return;
+  var sm = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
+  var em = parseInt(end.split(':')[0])   * 60 + parseInt(end.split(':')[1]);
+  if (em < sm) em += 24 * 60;
+  var diff = em - sm;
+  if (diff >= 0) {
+    document.getElementById('stop-minutes').value = diff;
+    saveDraft();
+  }
 }
 
 // ── 画像 ──────────────────────────────────────────────────
