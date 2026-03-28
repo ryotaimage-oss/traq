@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+<script src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"></script>
 <style>
   :root {
     --bg:        #080d18;
@@ -624,7 +624,8 @@ async function verifyPin() {
   }
 
   try {
-    const ok = await dcodeIO.bcrypt.compare(pinInput, selectedUser.pin_hash);
+    const _bcrypt = (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) ? dcodeIO.bcrypt : window.bcrypt;
+    const ok = await _bcrypt.compare(pinInput, selectedUser.pin_hash);
     if (ok) {
       clearFail(selectedUser.id);
       doLogin();
