@@ -1,1419 +1,602 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="dark">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="manifest" href="./manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Traq">
 <title>Traq – 設備トラブル入力</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --orange:      #EF9F27;
-  --orange-dark: #c97d10;
-  --navy:        #080d18;
-  --bg1:         #080d18;
-  --bg2:         #111827;
-  --bg3:         #1e2d45;
-  --factory:     #2e3a52;
-  --roof:        #3d4e6e;
-  --text1:       #e8eaf0;
-  --text2:       #8b90a0;
-  --border:      rgba(255,255,255,0.08);
-  --success:     #10b981;
-  --danger:      #ef4444;
-  --warning:     #f59e0b;
-  --radius:      8px;
-  --shadow:      0 4px 24px rgba(0,0,0,0.4);
+  --bg:      #080d18;
+  --surface: #111827;
+  --surface2:#16213a;
+  --border:  #1e293b;
+  --orange:  #EF9F27;
+  --text:    #f1f5f9;
+  --muted:   #64748b;
+  --error:   #ef4444;
+  --success: #22c55e;
+  --radius:  8px;
 }
-[data-theme="light"] {
-  --bg1:    #e8e6e2;
-  --bg2:    #ffffff;
-  --bg3:    #f0ede8;
-  --text1:  #1a1f2e;
-  --text2:  #666666;
-  --border: rgba(0,0,0,0.18);
-  --shadow: 0 4px 24px rgba(0,0,0,0.12);
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* ヘッダー */
+.header { background: #080d18; padding: 12px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.logo-text { font-size: 18px; font-weight: 700; color: var(--orange); }
+.logo-sub  { font-size: 10px; color: var(--muted); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.user-info { font-size: 12px; color: var(--muted); }
+.back-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
+.back-btn:hover { border-color: var(--orange); color: var(--text); }
+
+/* メイン */
+.main { flex: 1; padding: 24px 16px; max-width: 640px; margin: 0 auto; width: 100%; }
+
+/* セクション */
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+
+/* フォーム */
+.form-group { margin-bottom: 16px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.form-label .required { color: var(--error); margin-left: 2px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 12px; color: var(--text);
+  font-family: inherit; font-size: 14px;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%;
-  font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg1);
-  color: var(--text1);
-  -webkit-tap-highlight-color: transparent;
-  overflow: hidden;
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--orange); }
+.form-select option { background: var(--surface); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-input:disabled, .form-select:disabled { opacity: .5; cursor: not-allowed; }
+
+/* 2カラム */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* 初発/再発ボタン */
+.occurrence-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.occurrence-btn {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px; text-align: center; cursor: pointer; font-family: inherit;
+  font-size: 14px; font-weight: 500; color: var(--muted); transition: all .15s;
 }
-.app { height: 100%; display: flex; flex-direction: column; }
-.topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; height: 52px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0; z-index: 10;
+.occurrence-btn.selected { border-color: var(--orange); color: var(--orange); background: rgba(239,159,39,.08); }
+
+/* 画像アップロード */
+.image-area {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 20px; text-align: center; cursor: pointer; transition: border-color .15s;
 }
-.topbar-left { display: flex; align-items: center; gap: 10px; }
-.back-btn {
-  background: none; border: 1px solid var(--border);
-  border-radius: 6px; width: 34px; height: 34px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; cursor: pointer; color: var(--text2); transition: all .15s;
-}
-.back-btn:hover { border-color: var(--orange); color: var(--orange); }
-.topbar-title { font-size: 15px; font-weight: 700; }
-.topbar-right { display: flex; align-items: center; gap: 6px; }
-.icon-btn {
-  background: none; border: 1px solid var(--border);
-  border-radius: 6px; width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; cursor: pointer; color: var(--text2); transition: all .15s;
-}
-.icon-btn:hover { border-color: var(--orange); color: var(--orange); }
-.lang-btn {
-  background: none; border: 1px solid var(--border);
-  border-radius: 5px; padding: 3px 6px;
-  font-family: inherit; font-size: 11px; font-weight: 500;
-  color: var(--text2); cursor: pointer; transition: all .15s;
-}
-.lang-btn.active, .lang-btn:hover { border-color: var(--orange); color: var(--orange); }
-.progress-wrap {
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 16px 10px;
-  flex-shrink: 0;
-}
-.progress-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
-.prog-label {
-  font-size: 10px; font-weight: 500; color: var(--text2);
-  display: flex; align-items: center; gap: 4px;
-}
-.prog-label.active { color: var(--orange); }
-.prog-label.done   { color: var(--success); }
-.prog-dot {
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 8px; font-weight: 700; background: var(--bg2);
-}
-.prog-label.active .prog-dot { border-color: var(--orange); color: var(--orange); }
-.prog-label.done   .prog-dot { background: var(--success); border-color: var(--success); color: #fff; }
-.progress-bar-track { height: 4px; background: var(--border); border-radius: 2px; }
-.progress-bar-fill { height: 100%; background: var(--orange); border-radius: 2px; transition: width .3s ease; }
-.scroll-area { flex: 1; overflow-y: auto; padding: 0 0 100px; }
-.screen { display: none; }
-.screen.active { display: block; animation: slideUp .25s ease; }
-.form-section { padding: 16px 16px 0; animation: fadeIn .2s ease both; }
-.field-label {
-  font-size: 11px; font-weight: 700;
-  color: var(--text2); text-transform: uppercase; letter-spacing: 1px;
-  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-}
-.required-mark {
-  background: var(--danger); color: #fff;
-  border-radius: 3px; padding: 1px 5px;
-  font-size: 9px; font-weight: 700; letter-spacing: 0;
-}
-.optional-mark {
-  background: var(--bg3); color: var(--text2);
-  border-radius: 3px; padding: 1px 5px;
-  font-size: 9px; font-weight: 500; letter-spacing: 0;
-}
-.field-error { font-size: 12px; color: var(--danger); margin-top: 5px; display: none; }
-.field-error.show { display: block; }
-.divider { height: 1px; background: var(--border); margin: 16px 0 0; }
-.date-shift-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
-.date-input {
-  width: 100%; height: 48px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 15px; font-weight: 500;
-  color: var(--text1); padding: 0 14px;
-  outline: none; transition: border-color .15s;
-}
-.date-input:focus { border-color: var(--orange); }
-.shift-btns { display: flex; gap: 6px; }
-.shift-sel-btn {
-  width: 44px; height: 48px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 14px; font-weight: 700;
-  color: var(--text2); cursor: pointer; transition: all .15s;
-}
-.shift-sel-btn.selected { background: rgba(239,159,39,.12); border-color: var(--orange); color: var(--orange); }
-.choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.choice-btn {
-  flex: 1; min-width: 80px; height: 48px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 13px; font-weight: 500;
-  color: var(--text2); cursor: pointer; transition: all .15s;
-  white-space: nowrap; padding: 0 10px;
-}
-.choice-btn:hover { border-color: rgba(239,159,39,.4); color: var(--text1); }
-.choice-btn.selected { background: rgba(239,159,39,.12); border-color: var(--orange); color: var(--orange); font-weight: 700; }
-.choice-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.machine-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
-@media (min-width: 400px) { .machine-grid { grid-template-columns: repeat(6, 1fr); } }
-@media (min-width: 600px) { .machine-grid { grid-template-columns: repeat(8, 1fr); } }
-.machine-btn {
-  height: 46px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 13px; font-weight: 700;
-  color: var(--text2); cursor: pointer; transition: all .12s;
-}
-.machine-btn:hover { border-color: rgba(239,159,39,.4); color: var(--text1); }
-.machine-btn.selected { background: rgba(239,159,39,.15); border-color: var(--orange); color: var(--orange); }
-.machine-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-.machine-empty { font-size: 12px; color: var(--text2); padding: 12px 0; }
-.product-select {
-  width: 100%; height: 52px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 14px; font-weight: 500;
-  color: var(--text1); padding: 0 14px;
-  outline: none; cursor: pointer; transition: border-color .15s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b90a0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center;
-}
-.product-select:focus { border-color: var(--orange); }
-.product-select:disabled { opacity: 0.35; cursor: not-allowed; }
-.stop-row { display: flex; align-items: center; gap: 10px; }
-.stop-input {
-  width: 120px; height: 52px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 20px; font-weight: 700;
-  color: var(--text1); text-align: center;
-  outline: none; transition: border-color .15s;
-}
-.stop-input:focus { border-color: var(--orange); }
-.stop-unit { font-size: 14px; color: var(--text2); font-weight: 500; }
-.detail-textarea {
-  width: 100%; min-height: 100px;
-  background: var(--bg3); border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: inherit; font-size: 14px; line-height: 1.6;
-  color: var(--text1); padding: 12px 14px;
-  outline: none; resize: vertical; transition: border-color .15s;
-}
-.detail-textarea:focus { border-color: var(--orange); }
-.detail-textarea::placeholder { color: var(--text2); }
-.char-count { font-size: 11px; color: var(--text2); text-align: right; margin-top: 4px; }
-.char-count.over { color: var(--danger); }
-.image-upload-area {
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 20px; text-align: center;
-  cursor: pointer; transition: all .15s; position: relative;
-}
-.image-upload-area:hover { border-color: var(--orange); }
-.image-upload-area input[type=file] {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-}
-.upload-icon { font-size: 28px; margin-bottom: 6px; }
-.upload-text { font-size: 13px; color: var(--text2); }
-.upload-hint { font-size: 11px; color: var(--text2); margin-top: 3px; }
-.image-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.preview-item { position: relative; width: 72px; height: 72px; }
-.preview-img { width: 72px; height: 72px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
-.preview-del {
+.image-area:hover { border-color: var(--orange); }
+.image-area-text { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.image-area-sub  { font-size: 11px; color: var(--muted); }
+.image-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.image-preview { position: relative; width: 80px; height: 80px; }
+.image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+.image-preview .del-btn {
   position: absolute; top: -6px; right: -6px;
   width: 20px; height: 20px; border-radius: 50%;
-  background: var(--danger); color: #fff;
-  border: none; font-size: 12px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; line-height: 1;
+  background: var(--error); color: #fff; border: none;
+  font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  line-height: 1;
 }
-.autosave-bar {
-  padding: 6px 16px; font-size: 11px; color: var(--text2);
-  display: flex; align-items: center; gap: 6px;
-  border-top: 1px solid var(--border); background: var(--bg2);
+
+/* 送信ボタン */
+.submit-area { padding: 16px 0; }
+.submit-btn {
+  width: 100%; padding: 16px; background: var(--orange); color: #000;
+  border: none; border-radius: var(--radius); font-family: inherit;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .15s;
 }
-.autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
-.autosave-dot.saving { background: var(--warning); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-.bottom-bar {
+.submit-btn:hover { opacity: .85; }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* 下書きバー */
+.draft-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--bg2); border-top: 1px solid var(--border);
-  padding: 10px 16px 16px;
-  display: flex; gap: 10px; z-index: 50;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--muted); z-index: 10;
 }
-.btn-primary {
-  flex: 2; height: 52px;
-  background: var(--orange); border: none;
-  border-radius: var(--radius); color: var(--navy);
-  font-family: inherit; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: all .15s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.btn-primary:hover { background: var(--orange-dark); }
-.btn-primary:active { transform: scale(.97); }
-.btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-.btn-secondary {
-  flex: 1; height: 52px;
-  background: transparent; border: 1px solid var(--border);
-  border-radius: var(--radius); color: var(--text2);
-  font-family: inherit; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
-}
-.btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
-.confirm-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 12px; margin: 16px; overflow: hidden;
-}
-.confirm-card-header {
-  background: rgba(239,159,39,.08);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 16px;
-  display: flex; align-items: center; gap: 8px;
-}
-.confirm-type-badge {
-  background: rgba(59,130,246,.15); color: #60a5fa;
-  border-radius: 4px; padding: 3px 8px;
-  font-size: 11px; font-weight: 700;
-}
-.confirm-no { font-size: 12px; color: var(--text2); }
-.confirm-rows { padding: 4px 0; }
-.confirm-row {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 10px 16px; border-bottom: 1px solid var(--border);
-}
-.confirm-row:last-child { border-bottom: none; }
-.confirm-key { font-size: 11px; font-weight: 500; color: var(--text2); width: 76px; flex-shrink: 0; padding-top: 2px; }
-.confirm-val { font-size: 14px; color: var(--text1); flex: 1; word-break: break-all; }
-.confirm-notice {
-  margin: 0 16px 16px;
-  background: rgba(245,158,11,.08);
-  border: 1px solid rgba(245,158,11,.25);
-  border-radius: var(--radius); padding: 10px 14px;
-  font-size: 12px; color: var(--warning);
-  display: flex; align-items: flex-start; gap: 6px;
-}
-.complete-wrap {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; min-height: 60vh;
-  padding: 40px 24px; text-align: center;
-}
-.complete-icon {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: rgba(16,185,129,.15);
-  border: 2px solid var(--success);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px; margin-bottom: 20px;
-  animation: popIn .4s cubic-bezier(.17,.67,.38,1.4) both;
-}
-@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
-.complete-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; animation: fadeIn .3s .2s ease both; }
-.complete-sub { font-size: 13px; color: var(--text2); margin-bottom: 32px; line-height: 1.6; animation: fadeIn .3s .3s ease both; }
-.complete-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
-.btn-success {
-  width: 100%; height: 52px;
-  background: var(--success); border: none;
-  border-radius: var(--radius); color: #fff;
-  font-family: inherit; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: all .15s;
-}
-.btn-outline {
-  width: 100%; height: 48px;
-  background: transparent; border: 1px solid var(--border);
-  border-radius: var(--radius); color: var(--text2);
-  font-family: inherit; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
-}
-.btn-outline:hover { border-color: var(--orange); color: var(--orange); }
-/* Loading overlay */
-.loading-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.6);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 999; gap: 12px;
-}
-.loading-spinner {
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 3px solid var(--border); border-top-color: var(--orange);
-  animation: spin .7s linear infinite;
-}
+.draft-status { display: flex; align-items: center; gap: 6px; }
+.draft-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.draft-dot.saved { background: var(--success); }
+
+/* トースト */
+.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; font-size: 13px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.4); white-space: nowrap; }
+.toast.success { border-color: var(--success); }
+.toast.error   { border-color: var(--error); }
+.hidden { display: none !important; }
+
+/* ローディング overlay */
+.overlay { position: fixed; inset: 0; background: rgba(8,13,24,.8); z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin .6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 13px; color: var(--text2); }
-@keyframes fadeIn  { from{opacity:0}    to{opacity:1} }
-@keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
-@media (min-width: 768px) {
-  .scroll-area { display: flex; justify-content: center; }
-  .screen { max-width: 600px; width: 100%; }
-  .bottom-bar { justify-content: center; }
-  .bottom-bar > * { max-width: 280px; }
-}
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.overlay-text { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
-<div class="app" id="app">
 
-  <!-- Loading overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">データを読み込み中...</div>
+<header class="header">
+  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="6" fill="#080d18"/>
+    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
+    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
+    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
+    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
+    <rect x="8" y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
+    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
+    <circle cx="9" cy="6" r="2" fill="#EF9F27" opacity=".8"/>
+    <circle cx="19" cy="4" r="2" fill="#EF9F27" opacity=".8"/>
+  </svg>
+  <div>
+    <div class="logo-text">Traq</div>
+    <div class="logo-sub">設備トラブル入力</div>
+  </div>
+  <div class="header-right">
+    <span class="user-info" id="header-user"></span>
+    <button class="back-btn" onclick="goBack()">← 戻る</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 基本情報 -->
+  <div class="section">
+    <div class="section-title">⚙️ 基本情報</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">発生日<span class="required">*</span></label>
+        <input class="form-input" type="date" id="occurred-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">シフト</label>
+        <input class="form-input" id="shift-display" disabled>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ライン<span class="required">*</span></label>
+      <select class="form-select" id="line-select" onchange="onLineChange()">
+        <option value="">選択してください</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">機番<span class="required">*</span></label>
+      <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled>
+        <option value="">ラインを先に選択</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">品番</label>
+      <select class="form-select" id="product-select" disabled>
+        <option value="">機番を先に選択</option>
+      </select>
+    </div>
   </div>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="back-btn" onclick="handleBack()">←</button>
-      <span class="topbar-title" id="topbarTitle">⚙️ 設備トラブル入力</span>
+  <!-- トラブル詳細 -->
+  <div class="section">
+    <div class="section-title">📋 トラブル詳細</div>
+    <div class="form-group">
+      <label class="form-label">分類<span class="required">*</span></label>
+      <select class="form-select" id="category-select">
+        <option value="">選択してください</option>
+      </select>
     </div>
-    <div class="topbar-right">
-      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
-      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
-      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
-      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
-    </div>
-  </div>
-
-  <!-- Progress -->
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-labels">
-      <div class="prog-label active" id="prog1">
-        <div class="prog-dot">1</div>
-        <span data-i18n="prog_input">入力</span>
-      </div>
-      <div class="prog-label" id="prog2">
-        <div class="prog-dot">2</div>
-        <span data-i18n="prog_confirm">確認</span>
-      </div>
-      <div class="prog-label" id="prog3">
-        <div class="prog-dot">3</div>
-        <span data-i18n="prog_done">完了</span>
+    <div class="form-group">
+      <label class="form-label">初発 / 再発<span class="required">*</span></label>
+      <div class="occurrence-group">
+        <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
+        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('repeat')">再発</button>
       </div>
     </div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progressFill" style="width:16%"></div>
+    <div class="form-group">
+      <label class="form-label">停止時間（分）</label>
+      <input class="form-input" type="number" id="stop-minutes" placeholder="0" min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">詳細内容</label>
+      <textarea class="form-textarea" id="detail" placeholder="トラブルの内容を入力してください"></textarea>
     </div>
   </div>
 
-  <!-- Scroll area -->
-  <div class="scroll-area" id="scrollArea">
-
-    <!-- SCREEN 1: 入力 -->
-    <div class="screen active" id="screen1">
-
-      <!-- 日付・直 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_date">日付・直</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <div class="date-shift-row">
-          <input class="date-input" type="date" id="dateInput">
-          <div>
-            <div class="field-label" style="margin-bottom:5px;font-size:10px" data-i18n="label_shift">直</div>
-            <div class="shift-btns">
-              <button class="shift-sel-btn" id="sh1" onclick="selectShift(1)">1</button>
-              <button class="shift-sel-btn" id="sh2" onclick="selectShift(2)">2</button>
-              <button class="shift-sel-btn" id="sh3" onclick="selectShift(3)">3</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- ライン -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_line">ライン</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <div class="choice-row" id="lineRow">
-          <div class="machine-empty">読み込み中...</div>
-        </div>
-        <div class="field-error" id="err_line">ラインを選択してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 機番 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_machine">機番</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <div class="machine-grid" id="machineGrid">
-          <div class="machine-empty" data-i18n="machine_hint">ラインを選択すると表示されます</div>
-        </div>
-        <div class="field-error" id="err_machine">機番を選択してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 品名 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_product">品名</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <select class="product-select" id="productSelect" disabled onchange="selectProduct()">
-          <option value="">機番を選択してください</option>
-        </select>
-        <div class="field-error" id="err_product">品名を選択してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 停止時間 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_stop">停止時間</span>
-          <span class="optional-mark">任意</span>
-        </div>
-        <div class="stop-row">
-          <input class="stop-input" type="number" id="stopInput"
-                 min="0" max="9999" placeholder="—"
-                 oninput="validateStop()">
-          <span class="stop-unit" data-i18n="stop_unit">分（不明の場合は空白）</span>
-        </div>
-        <div class="field-error" id="err_stop">0〜9999の数値を入力してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 分類 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_category">分類</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <div class="choice-row" id="categoryRow">
-          <div class="machine-empty">読み込み中...</div>
-        </div>
-        <div class="field-error" id="err_category">分類を選択してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 詳細内容 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_detail">詳細内容</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <textarea class="detail-textarea" id="detailInput"
-                  maxlength="1000" rows="4"
-                  placeholder="トラブルの状況を具体的に入力してください"
-                  oninput="updateCharCount()"></textarea>
-        <div class="char-count" id="charCount">0 / 1000</div>
-        <div class="field-error" id="err_detail">詳細内容を入力してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 初発・再発 -->
-      <div class="form-section">
-        <div class="field-label">
-          <span data-i18n="label_occurrence">初発・再発</span>
-          <span class="required-mark">必須</span>
-        </div>
-        <div class="choice-row">
-          <button class="choice-btn" id="occ_first" onclick="selectOccurrence('first')">初発</button>
-          <button class="choice-btn" id="occ_rec"   onclick="selectOccurrence('recurrence')">再発</button>
-        </div>
-        <div class="field-error" id="err_occurrence">選択してください</div>
-      </div>
-      <div class="divider"></div>
-
-      <!-- 画像 -->
-      <div class="form-section" style="padding-bottom:16px">
-        <div class="field-label">
-          <span data-i18n="label_image">画像</span>
-          <span class="optional-mark">任意</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="image-upload-area" style="position:relative">
-            <input type="file" accept="image/jpeg,image/png,image/heic"
-                   multiple onchange="handleImageUpload(event)"
-                   style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
-            <div class="upload-icon">🖼️</div>
-            <div class="upload-text">ギャラリーから選択</div>
-            <div class="upload-hint">JPG・PNG・HEIC / 10MB以下</div>
-          </div>
-          <div class="image-upload-area" style="position:relative">
-            <input type="file" accept="image/jpeg,image/png,image/heic"
-                   capture="environment" onchange="handleImageUpload(event)"
-                   style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
-            <div class="upload-icon">📷</div>
-            <div class="upload-text">カメラで撮影</div>
-            <div class="upload-hint">JPG・PNG・HEIC / 10MB以下</div>
-          </div>
-        </div>
-        <div class="image-preview" id="imagePreview"></div>
-        <div class="field-error" id="err_image"></div>
-      </div>
-
-      <!-- Autosave -->
-      <div class="autosave-bar">
-        <div class="autosave-dot" id="autosaveDot"></div>
-        <span id="autosaveText">下書き自動保存済み</span>
-      </div>
+  <!-- 画像 -->
+  <div class="section">
+    <div class="section-title">📷 写真</div>
+    <div class="image-area" onclick="document.getElementById('image-input').click()">
+      <div class="image-area-text">タップして写真を追加</div>
+      <div class="image-area-sub">カメラ撮影またはギャラリーから選択 / 最大200KB</div>
+      <input type="file" id="image-input" accept="image/*" multiple class="hidden" onchange="onImageSelect(event)">
     </div>
-    <!-- /screen1 -->
-
-    <!-- SCREEN 2: 確認 -->
-    <div class="screen" id="screen2">
-      <div class="confirm-card">
-        <div class="confirm-card-header">
-          <span class="confirm-type-badge">設備</span>
-          <span class="confirm-no">送信前に内容を確認してください</span>
-        </div>
-        <div class="confirm-rows" id="confirmRows"></div>
-      </div>
-      <div class="confirm-notice">
-        <span>⚠️</span>
-        <span>送信するとシフトリーダー（SL）に通知されます。承認待ちになります。</span>
-      </div>
-    </div>
-
-    <!-- SCREEN 3: 完了 -->
-    <div class="screen" id="screen3">
-      <div class="complete-wrap">
-        <div class="complete-icon">✓</div>
-        <div class="complete-title">送信しました！</div>
-        <div class="complete-sub">
-          SLが確認・承認するまでお待ちください。<br>ホーム画面の投稿一覧で状況を確認できます。
-        </div>
-        <div class="complete-actions">
-          <button class="btn-success" onclick="goAnother()">続けてトラブルを入力する</button>
-          <button class="btn-outline"  onclick="goHome()">ホームに戻る</button>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /scroll-area -->
-
-  <!-- Bottom bar -->
-  <div class="bottom-bar" id="bottomBar">
-    <button class="btn-secondary" id="btnBack"  onclick="handleBack()" style="display:none">← 修正する</button>
-    <button class="btn-secondary" id="btnDraft" onclick="saveDraft()">下書き保存</button>
-    <button class="btn-primary"   id="btnNext"  onclick="handleNext()">
-      <span id="btnNextLabel">確認画面へ →</span>
-    </button>
+    <div class="image-previews" id="image-previews"></div>
   </div>
 
-</div><!-- /app -->
+  <!-- 送信 -->
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" onclick="doSubmit()">送信する</button>
+  </div>
+
+  <!-- 下部余白（下書きバー分） -->
+  <div style="height:52px;"></div>
+
+</main>
+
+<!-- 下書きバー -->
+<div class="draft-bar">
+  <div class="draft-status">
+    <div class="draft-dot" id="draft-dot"></div>
+    <span id="draft-status-text">下書き未保存</span>
+  </div>
+  <button onclick="loadDraft()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;">下書きを読込</button>
+</div>
+
+<!-- ローディング -->
+<div class="overlay hidden" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-text" id="overlay-text">送信中...</div>
+</div>
+
+<!-- トースト -->
+<div class="toast hidden" id="toast"></div>
 
 <script>
-/* =============================================
-   Supabase
-============================================= */
-const SUPABASE_URL     = 'https://avureyklkpslrjasrxuv.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
-const STORAGE_BUCKET   = 'trouble-images';
+var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
 
-async function sbFetch(path, opts = {}) {
-  const headers = {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-    'Content-Type': 'application/json',
+async function sbFetch(path, method, body) {
+  var opts = {
+    method: method || 'GET',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }
   };
-  if (opts.prefer) headers['Prefer'] = opts.prefer;
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...opts,
-    headers: { ...headers, ...(opts.extraHeaders || {}) },
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  const text = await res.text();
+  if (body) opts.body = JSON.stringify(body);
+  var res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  var text = await res.text();
   return text ? JSON.parse(text) : null;
 }
 
-async function sbStorageUpload(filePath, file) {
-  const res = await fetch(
-    `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${filePath}`,
-    {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': file.type || 'application/octet-stream',
-      },
-      body: file,
-    }
-  );
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  return filePath;
-}
-
-/* =============================================
-   Session
-============================================= */
-const SESSION = JSON.parse(sessionStorage.getItem('traq_session') || 'null');
-// セッションがなければログインへ
-if (!SESSION || !SESSION.id) {
-  location.href = 'index.html';
-}
-
-/* =============================================
-   Master data (Supabaseから取得)
-============================================= */
-let LINES      = []; // { id, line_name }
-let MACHINES   = []; // { id, machine_no, line_id }
-let PRODUCTS   = []; // { id, product_code, product_name }
-let MP_MAP     = {}; // machine_id → [product_id, ...]
-let CATEGORIES = []; // { id, name, sort_order }
-
-async function loadMasterData() {
-  const [lines, machines, products, mps, cats] = await Promise.all([
-    sbFetch('lines?select=id,line_name&is_active=eq.true&order=line_name'),
-    sbFetch('machines?select=id,machine_no,line_id&is_active=eq.true&order=machine_no'),
-    sbFetch('products?select=id,product_code,product_name&is_active=eq.true&order=product_name'),
-    sbFetch('machine_products?select=machine_id,product_id'),
-    sbFetch('categories?select=id,name,sort_order&type=eq.equipment&is_active=eq.true&order=sort_order'),
-  ]);
-  LINES      = lines      || [];
-  MACHINES   = machines   || [];
-  PRODUCTS   = products   || [];
-  CATEGORIES = cats       || [];
-
-  // machine_id → product_id[] のマップ構築
-  MP_MAP = {};
-  (mps || []).forEach(mp => {
-    if (!MP_MAP[mp.machine_id]) MP_MAP[mp.machine_id] = [];
-    MP_MAP[mp.machine_id].push(mp.product_id);
-  });
-}
-
-/* =============================================
-   Form state
-============================================= */
-const form = {
-  date:        '',
-  shift:       null,
-  lineId:      null,
-  lineName:    '',
-  machineId:   null,
-  machineNo:   '',
-  productId:   null,
-  productName: '',
-  stop:        '',
-  categoryId:  null,
-  categoryName:'',
-  detail:      '',
-  occurrence:  null,
-};
-let currentScreen = 1;
-let autosaveTimer = null;
-// images: [{ file: File, url: string(dataURL) }]
-let images = [];
-
-/* =============================================
-   Init
-============================================= */
-(async function init() {
-  initTheme();
-  const savedLang = localStorage.getItem('traq_lang') || 'ja';
-  currentLang = savedLang;
-  ['ja','vi','en'].forEach(l =>
-    document.getElementById('lang-' + l).classList.toggle('active', l === savedLang)
-  );
-
-  // 日付初期値
-  const now = new Date();
-  const sh  = SESSION.shift || 1;
-  const displayDate = (sh === 3 && now.getHours() < 8)
-    ? new Date(now.getTime() - 86400000) : now;
-  document.getElementById('dateInput').value = displayDate.toISOString().slice(0, 10);
-  form.date  = document.getElementById('dateInput').value;
-  form.shift = sh;
-  selectShift(sh);
-
-  try {
-    await loadMasterData();
-    renderLineButtons();
-    renderCategoryButtons();
-    await loadDraft(); // 下書き復元
-  } catch (err) {
-    console.error('マスタ読み込み失敗:', err);
-    alert('データの読み込みに失敗しました。再読み込みしてください。');
-  } finally {
-    document.getElementById('loadingOverlay').style.display = 'none';
-  }
-
-  startAutosave();
+// ── セッション確認 ────────────────────────────────────────
+var session = null;
+(function() {
+  var s = localStorage.getItem('traq_session');
+  if (!s) { location.href = 'index.html'; return; }
+  session = JSON.parse(s);
+  if (Date.now() > session.expiresAt) { location.href = 'index.html'; return; }
+  document.getElementById('header-user').textContent = session.name + ' (' + session.shift + '直)';
+  document.getElementById('shift-display').value = session.shift + '直';
+  setDefaultDate();
 })();
 
-/* =============================================
-   Theme / Lang
-============================================= */
-let currentLang = 'ja';
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('traq_theme', isDark ? 'light' : 'dark');
-}
-function initTheme() {
-  const saved = localStorage.getItem('traq_theme');
-  const pref  = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  const theme = saved || pref;
-  document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('themeBtn').textContent = theme === 'dark' ? '🌙' : '☀️';
-}
-function setLang(lang) {
-  currentLang = lang;
-  localStorage.setItem('traq_lang', lang);
-  ['ja','vi','en'].forEach(l =>
-    document.getElementById('lang-' + l).classList.toggle('active', l === lang)
-  );
-}
+function goBack() { history.back(); }
 
-/* =============================================
-   ライン描画
-============================================= */
-function renderLineButtons() {
-  const row = document.getElementById('lineRow');
-  row.innerHTML = '';
-  if (!LINES.length) {
-    row.innerHTML = '<div class="machine-empty">ラインデータがありません</div>';
-    return;
+// ── 発生日のデフォルト設定（3直は前日）────────────────────
+function setDefaultDate() {
+  var now = new Date();
+  if (session.shift === 3) {
+    now.setDate(now.getDate() - 1);
   }
-  LINES.forEach(line => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = line.line_name;
-    btn.dataset.id  = line.id;
-    btn.onclick = () => selectLine(line.id, line.line_name, btn);
-    row.appendChild(btn);
-  });
+  var y = now.getFullYear();
+  var m = String(now.getMonth() + 1).padStart(2, '0');
+  var d = String(now.getDate()).padStart(2, '0');
+  document.getElementById('occurred-date').value = y + '-' + m + '-' + d;
 }
 
-function selectLine(lineId, lineName, btnEl) {
-  if (form.lineId === lineId) return;
-  form.lineId   = lineId;
-  form.lineName = lineName;
-  form.machineId   = null;
-  form.machineNo   = '';
-  form.productId   = null;
-  form.productName = '';
+// ── マスタデータ ──────────────────────────────────────────
+var allLines = [], allMachines = [], allProducts = [], allCategories = [];
+var machineProducts = []; // machine_productsテーブル
 
-  document.querySelectorAll('#lineRow .choice-btn').forEach(b =>
-    b.classList.toggle('selected', b === btnEl)
-  );
-  hideError('err_line');
-  renderMachineGrid(lineId);
-  resetProductSelect();
-}
+async function loadMasters() {
+  try {
+    var results = await Promise.all([
+      sbFetch('lines?is_active=eq.true&order=name.asc&select=*'),
+      sbFetch('machines?is_active=eq.true&order=machine_no.asc&select=*'),
+      sbFetch('products?is_active=eq.true&order=product_code.asc&select=*'),
+      sbFetch('categories?is_active=eq.true&type=eq.equipment&order=sort_order.asc&select=*'),
+      sbFetch('machine_products?select=*')
+    ]);
+    allLines      = results[0] || [];
+    allMachines   = results[1] || [];
+    allProducts   = results[2] || [];
+    allCategories = results[3] || [];
+    machineProducts = results[4] || [];
 
-/* =============================================
-   機番描画
-============================================= */
-function renderMachineGrid(lineId) {
-  const grid = document.getElementById('machineGrid');
-  grid.innerHTML = '';
-  const machines = MACHINES.filter(m => m.line_id === lineId);
-  if (!machines.length) {
-    grid.innerHTML = '<div class="machine-empty">この���インに機番がありません</div>';
-    return;
-  }
-  // machine_no を数値として自然順ソート
-  machines.sort((a, b) => {
-    const na = parseInt(a.machine_no) || 0;
-    const nb = parseInt(b.machine_no) || 0;
-    return na - nb;
-  });
-  machines.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'machine-btn';
-    btn.textContent = m.machine_no;
-    btn.dataset.id  = m.id;
-    btn.onclick = () => selectMachine(m.id, m.machine_no, btn);
-    grid.appendChild(btn);
-  });
-}
+    // ライン選択肢
+    var lineSelect = document.getElementById('line-select');
+    lineSelect.innerHTML = '<option value="">選択してください</option>' +
+      allLines.map(function(l) { return '<option value="' + l.id + '">' + l.name + '</option>'; }).join('');
 
-function selectMachine(machineId, machineNo, btnEl) {
-  form.machineId   = machineId;
-  form.machineNo   = machineNo;
-  form.productId   = null;
-  form.productName = '';
+    // 分類選択肢
+    var catSelect = document.getElementById('category-select');
+    catSelect.innerHTML = '<option value="">選択してください</option>' +
+      allCategories.map(function(c) { return '<option value="' + c.id + '">' + c.name + '</option>'; }).join('');
 
-  document.querySelectorAll('.machine-btn').forEach(b =>
-    b.classList.toggle('selected', b === btnEl)
-  );
-  hideError('err_machine');
-  renderProductSelect(machineId);
-}
-
-/* =============================================
-   品名描画
-============================================= */
-function renderProductSelect(machineId) {
-  const sel      = document.getElementById('productSelect');
-  const prodIds  = MP_MAP[machineId] || [];
-  const products = PRODUCTS.filter(p => prodIds.includes(p.id));
-
-  sel.innerHTML = '<option value="">品名を選択してください</option>';
-  products.forEach(p => {
-    const o = document.createElement('option');
-    o.value       = p.id;
-    o.textContent = p.product_name || p.product_code;
-    sel.appendChild(o);
-  });
-  sel.disabled = products.length === 0;
-  sel.value = '';
-}
-
-function resetProductSelect() {
-  const sel = document.getElementById('productSelect');
-  sel.innerHTML = '<option value="">機番を選択してください</option>';
-  sel.disabled  = true;
-}
-
-function selectProduct() {
-  const sel = document.getElementById('productSelect');
-  form.productId = sel.value ? Number(sel.value) : null;
-  const opt = sel.options[sel.selectedIndex];
-  form.productName = form.productId ? opt.textContent : '';
-  if (form.productId) hideError('err_product');
-}
-
-/* =============================================
-   分類描画
-============================================= */
-function renderCategoryButtons() {
-  const row = document.getElementById('categoryRow');
-  row.innerHTML = '';
-  if (!CATEGORIES.length) {
-    row.innerHTML = '<div class="machine-empty">分類データがありません</div>';
-    return;
-  }
-  CATEGORIES.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className   = 'choice-btn';
-    btn.textContent = cat.name;
-    btn.dataset.id  = cat.id;
-    btn.onclick = () => selectCategory(cat.id, cat.name, btn);
-    row.appendChild(btn);
-  });
-}
-
-function selectCategory(catId, catName, btnEl) {
-  form.categoryId   = catId;
-  form.categoryName = catName;
-  document.querySelectorAll('#categoryRow .choice-btn').forEach(b =>
-    b.classList.toggle('selected', b === btnEl)
-  );
-  hideError('err_category');
-}
-
-/* =============================================
-   その他フィールド
-============================================= */
-function selectShift(s) {
-  form.shift = s;
-  [1,2,3].forEach(i =>
-    document.getElementById('sh' + i).classList.toggle('selected', i === s)
-  );
-}
-
-function validateStop() {
-  const val = document.getElementById('stopInput').value;
-  form.stop = val;
-  const errEl = document.getElementById('err_stop');
-  if (val !== '' && (isNaN(val) || Number(val) < 0 || Number(val) > 9999)) {
-    errEl.classList.add('show');
-  } else {
-    errEl.classList.remove('show');
+  } catch(e) {
+    showToast('マスタ読込失敗: ' + e.message, 'error');
   }
 }
 
-function updateCharCount() {
-  const val = document.getElementById('detailInput').value;
-  form.detail = val;
-  const el = document.getElementById('charCount');
-  el.textContent = `${val.length} / 1000`;
-  el.classList.toggle('over', val.length > 1000);
+// ── ライン変更→機番絞り込み ───────────────────────────────
+function onLineChange() {
+  var lineId = parseInt(document.getElementById('line-select').value);
+  var machSel = document.getElementById('machine-select');
+  var prodSel = document.getElementById('product-select');
+
+  machSel.innerHTML = '<option value="">選択してください</option>';
+  prodSel.innerHTML = '<option value="">機番を先に選択</option>';
+  prodSel.disabled = true;
+
+  if (!lineId) { machSel.disabled = true; return; }
+
+  var filtered = allMachines.filter(function(m) { return m.line_id === lineId; });
+  machSel.innerHTML = '<option value="">選択してください</option>' +
+    filtered.map(function(m) { return '<option value="' + m.id + '">' + m.machine_no + '</option>'; }).join('');
+  machSel.disabled = false;
+  saveDraft();
 }
 
-function selectOccurrence(o) {
-  form.occurrence = o;
-  document.getElementById('occ_first').classList.toggle('selected', o === 'first');
-  document.getElementById('occ_rec').classList.toggle('selected',   o === 'recurrence');
-  hideError('err_occurrence');
+// ── 機番変更→品番絞り込み ────────────────────────────────
+function onMachineChange() {
+  var machineId = parseInt(document.getElementById('machine-select').value);
+  var prodSel = document.getElementById('product-select');
+
+  prodSel.innerHTML = '<option value="">選択してください</option>';
+
+  if (!machineId) { prodSel.disabled = true; return; }
+
+  // machine_productsから紐づく品番を取得
+  var linkedProductIds = machineProducts
+    .filter(function(mp) { return mp.machine_id === machineId; })
+    .map(function(mp) { return mp.product_id; });
+
+  var filtered = linkedProductIds.length > 0
+    ? allProducts.filter(function(p) { return linkedProductIds.includes(p.id); })
+    : allProducts; // 紐づけなしの場合は全品番
+
+  prodSel.innerHTML = '<option value="">選択してください</option>' +
+    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + ' ' + p.product_name + '</option>'; }).join('');
+  prodSel.disabled = false;
+  saveDraft();
 }
 
-/* =============================================
-   画像
-============================================= */
-function handleImageUpload(e) {
-  const files  = Array.from(e.target.files);
-  const errEl  = document.getElementById('err_image');
-  errEl.style.display = 'none';
-  errEl.textContent   = '';
+// ── 初発/再発 ─────────────────────────────────────────────
+var selectedOccurrence = null;
+function selectOccurrence(val) {
+  selectedOccurrence = val;
+  document.getElementById('btn-first').classList.toggle('selected', val === 'first');
+  document.getElementById('btn-repeat').classList.toggle('selected', val === 'repeat');
+  saveDraft();
+}
 
-  files.forEach(f => {
-    if (f.size > 10 * 1024 * 1024) {
-      errEl.textContent   = `${f.name}：10MB以下の画像を選択してください`;
-      errEl.style.display = 'block';
-      return;
+// ── 画像 ──────────────────────────────────────────────────
+var selectedImages = []; // { file, dataUrl }
+
+function onImageSelect(event) {
+  var files = Array.from(event.target.files);
+  files.forEach(function(file) {
+    if (file.size > 200 * 1024) {
+      // 200KB超は圧縮
+      compressImage(file, function(compressed) {
+        addImage(compressed);
+      });
+    } else {
+      addImage(file);
     }
-    const reader = new FileReader();
-    reader.onload = ev => {
-      images.push({ file: f, url: ev.target.result });
-      renderImagePreviews();
-    };
-    reader.readAsDataURL(f);
   });
-  // input をリセット（同じファイルを再選択できるように）
-  e.target.value = '';
+  event.target.value = '';
 }
 
-function renderImagePreviews() {
-  const wrap = document.getElementById('imagePreview');
-  wrap.innerHTML = '';
-  images.forEach((img, i) => {
-    wrap.innerHTML += `
-      <div class="preview-item">
-        <img class="preview-img" src="${img.url}" alt="画像${i+1}">
-        <button class="preview-del" onclick="removeImage(${i})">×</button>
-      </div>
-    `;
-  });
+function compressImage(file, callback) {
+  var img = new Image();
+  var url = URL.createObjectURL(file);
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var scale = Math.min(1, Math.sqrt((200 * 1024) / file.size));
+    canvas.width  = img.width  * scale;
+    canvas.height = img.height * scale;
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(function(blob) {
+      URL.revokeObjectURL(url);
+      callback(new File([blob], file.name, { type: 'image/jpeg' }));
+    }, 'image/jpeg', 0.8);
+  };
+  img.src = url;
+}
+
+function addImage(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    selectedImages.push({ file: file, dataUrl: e.target.result });
+    renderPreviews();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPreviews() {
+  var wrap = document.getElementById('image-previews');
+  wrap.innerHTML = selectedImages.map(function(img, i) {
+    return '<div class="image-preview">' +
+      '<img src="' + img.dataUrl + '">' +
+      '<button class="del-btn" onclick="removeImage(' + i + ')">×</button>' +
+      '</div>';
+  }).join('');
 }
 
 function removeImage(i) {
-  images.splice(i, 1);
-  renderImagePreviews();
+  selectedImages.splice(i, 1);
+  renderPreviews();
 }
 
-/* =============================================
-   バリデーション
-============================================= */
-function validate() {
-  let ok = true;
-  if (!form.lineId)      { showError('err_line');       ok = false; }
-  if (!form.machineId)   { showError('err_machine');    ok = false; }
-  if (!form.productId)   { showError('err_product');    ok = false; }
-  if (!form.categoryId)  { showError('err_category');   ok = false; }
-  if (!form.detail.trim() || form.detail.length > 1000) { showError('err_detail'); ok = false; }
-  if (!form.occurrence)  { showError('err_occurrence'); ok = false; }
-
-  // stopの数値チェック
-  const stopVal = document.getElementById('stopInput').value;
-  if (stopVal !== '' && (isNaN(stopVal) || Number(stopVal) < 0 || Number(stopVal) > 9999)) {
-    showError('err_stop'); ok = false;
-  }
-
-  if (!ok) {
-    const first = document.querySelector('.field-error.show');
-    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  return ok;
+// ── 下書き保存（30秒ごと + 変更時）─────────────────────────
+var draftTimer = null;
+function saveDraft() {
+  if (draftTimer) clearTimeout(draftTimer);
+  draftTimer = setTimeout(function() { _saveDraft(); }, 1000);
 }
 
-function showError(id) { document.getElementById(id).classList.add('show'); }
-function hideError(id) { document.getElementById(id).classList.remove('show'); }
-
-/* =============================================
-   画面遷移
-============================================= */
-function handleNext() {
-  if (currentScreen === 1) {
-    form.date   = document.getElementById('dateInput').value;
-    form.detail = document.getElementById('detailInput').value;
-    form.stop   = document.getElementById('stopInput').value;
-    if (!validate()) return;
-    showConfirm();
-    goScreen(2);
-  } else if (currentScreen === 2) {
-    doSubmit();
+async function _saveDraft() {
+  if (!session) return;
+  var data = getDraftData();
+  try {
+    await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.equipment', 'DELETE');
+    await sbFetch('drafts', 'POST', {
+      user_id: session.userId, trouble_type: 'equipment', data: data
+    });
+    document.getElementById('draft-dot').className = 'draft-dot saved';
+    document.getElementById('draft-status-text').textContent = '下書き保存済み（' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'}) + '）';
+  } catch(e) {
+    console.warn('下書き保存失敗:', e);
   }
 }
 
-function handleBack() {
-  if (currentScreen === 2) { goScreen(1); return; }
-  if (currentScreen === 1) {
-    if (confirm('入力を中断してホームに戻りますか？\n（入力内容は下書き保存されます）')) {
-      triggerAutosave(true);
-      goHome();
+function getDraftData() {
+  return {
+    occurred_date:  document.getElementById('occurred-date').value,
+    line_id:        document.getElementById('line-select').value,
+    machine_id:     document.getElementById('machine-select').value,
+    product_id:     document.getElementById('product-select').value,
+    category_id:    document.getElementById('category-select').value,
+    occurrence:     selectedOccurrence,
+    stop_minutes:   document.getElementById('stop-minutes').value,
+    detail:         document.getElementById('detail').value
+  };
+}
+
+async function loadDraft() {
+  try {
+    var rows = await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.equipment&select=data');
+    if (!rows || !rows.length) { showToast('下書きがありません', ''); return; }
+    var d = rows[0].data;
+    if (d.occurred_date) document.getElementById('occurred-date').value = d.occurred_date;
+    if (d.line_id) {
+      document.getElementById('line-select').value = d.line_id;
+      onLineChange();
     }
+    if (d.machine_id) {
+      document.getElementById('machine-select').value = d.machine_id;
+      onMachineChange();
+    }
+    if (d.product_id)  document.getElementById('product-select').value  = d.product_id;
+    if (d.category_id) document.getElementById('category-select').value = d.category_id;
+    if (d.occurrence)  selectOccurrence(d.occurrence);
+    if (d.stop_minutes) document.getElementById('stop-minutes').value = d.stop_minutes;
+    if (d.detail)      document.getElementById('detail').value = d.detail;
+    showToast('下書きを読み込みました', 'success');
+  } catch(e) {
+    showToast('下書き読込失敗: ' + e.message, 'error');
   }
 }
 
-function goScreen(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById('screen' + i).classList.toggle('active', i === n);
-  });
-  currentScreen = n;
-  document.getElementById('scrollArea').scrollTo(0, 0);
+// 30秒ごとに自動保存
+setInterval(function() { _saveDraft(); }, 30000);
 
-  const pct = [0, 16, 58, 100][n];
-  document.getElementById('progressFill').style.width = pct + '%';
-  ['prog1','prog2','prog3'].forEach((id, i) => {
-    const el  = document.getElementById(id);
-    el.className = 'prog-label' + (i+1 < n ? ' done' : i+1 === n ? ' active' : '');
-    el.querySelector('.prog-dot').textContent = i+1 < n ? '✓' : String(i+1);
-  });
+// フォーム変更時に保存
+['occurred-date','line-select','machine-select','product-select','category-select','stop-minutes','detail'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('change', saveDraft);
+});
 
-  const topbarTitles = ['', '⚙️ 設備トラブル入力', '⚙️ 内容確認', '⚙️ 送信完了'];
-  document.getElementById('topbarTitle').textContent = topbarTitles[n];
-
-  const btnBack  = document.getElementById('btnBack');
-  const btnDraft = document.getElementById('btnDraft');
-  const btnNext  = document.getElementById('btnNext');
-  const btnNextLabel = document.getElementById('btnNextLabel');
-  const bottomBar = document.getElementById('bottomBar');
-
-  if (n === 1) {
-    btnBack.style.display  = 'none';
-    btnDraft.style.display = '';
-    btnNext.style.display  = '';
-    btnNextLabel.textContent = '確認画面へ →';
-    document.getElementById('progressWrap').style.display = '';
-    bottomBar.style.display = 'flex';
-  } else if (n === 2) {
-    btnBack.style.display  = '';
-    btnDraft.style.display = 'none';
-    btnNext.style.display  = '';
-    btnNextLabel.textContent = '送信する';
-    document.getElementById('progressWrap').style.display = '';
-    bottomBar.style.display = 'flex';
-  } else {
-    bottomBar.style.display = 'none';
-    document.getElementById('progressWrap').style.display = 'none';
-  }
+// ── バリデーション ────────────────────────────────────────
+function validate() {
+  if (!document.getElementById('occurred-date').value) { showToast('発生日を入力してください', 'error'); return false; }
+  if (!document.getElementById('line-select').value)    { showToast('ラインを選択してください', 'error'); return false; }
+  if (!document.getElementById('machine-select').value) { showToast('機番を選択してください', 'error'); return false; }
+  if (!document.getElementById('category-select').value){ showToast('分類を選択してください', 'error'); return false; }
+  if (!selectedOccurrence)                              { showToast('初発/再発を選択してください', 'error'); return false; }
+  return true;
 }
 
-/* =============================================
-   確認画面
-============================================= */
-function showConfirm() {
-  const stop = form.stop ? form.stop + '分' : '不明';
-  const occ  = form.occurrence === 'first' ? '初発' : '再発';
-  const imgVal = images.length ? `${images.length}枚` : 'なし';
-
-  const rows = [
-    ['日付',    form.date.replace(/-/g, '/')],
-    ['直',      `${form.shift}直`],
-    ['ライン',  form.lineName],
-    ['機番',    form.machineNo + '号機'],
-    ['品名',    form.productName],
-    ['停止時間', stop],
-    ['分類',    form.categoryName],
-    ['詳細内容', form.detail],
-    ['初発/再発', occ],
-    ['画像',    imgVal],
-  ];
-  document.getElementById('confirmRows').innerHTML = rows.map(([k, v]) => `
-    <div class="confirm-row">
-      <span class="confirm-key">${k}</span>
-      <span class="confirm-val">${escapeHtml(String(v))}</span>
-    </div>
-  `).join('');
-}
-
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-/* =============================================
-   Submit（Supabase INSERT）
-============================================= */
-let submitting = false;
-
+// ── 送信 ──────────────────────────────────────────────────
 async function doSubmit() {
-  if (submitting) return;
-  submitting = true;
-  document.getElementById('btnNext').disabled = true;
+  if (!validate()) return;
 
-  // ローディング表示
-  const overlay = document.getElementById('loadingOverlay');
-  overlay.querySelector('.loading-text').textContent = '送信中...';
-  overlay.style.display = 'flex';
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  showOverlay('送信中...');
 
   try {
-    // 1. troublesテーブルINSERT
-    const troublePayload = {
-      type:            'equipment',
-      status:          'pending',
-      occurred_date:   form.date,
-      shift:           form.shift,
-      occurrence_type: form.occurrence,
-      line_id:         form.lineId,
-      machine_id:      form.machineId,
-      product_id:      form.productId,
-      category_id:     form.categoryId,
-      reported_by:     SESSION.id,
-      detail:          form.detail,
-      stop_minutes:    form.stop !== '' ? parseInt(form.stop) : null,
+    // 1. troublesテーブルにINSERT
+    var troubleData = {
+      trouble_type:  'equipment',
+      status:        'pending',
+      occurred_date: document.getElementById('occurred-date').value,
+      shift:         session.shift,
+      line_id:       parseInt(document.getElementById('line-select').value) || null,
+      machine_id:    parseInt(document.getElementById('machine-select').value) || null,
+      product_id:    parseInt(document.getElementById('product-select').value) || null,
+      category_id:   parseInt(document.getElementById('category-select').value) || null,
+      occurrence:    selectedOccurrence,
+      stop_minutes:  parseInt(document.getElementById('stop-minutes').value) || null,
+      detail:        document.getElementById('detail').value.trim() || null,
+      reporter_id:   session.userId
     };
 
-    const [trouble] = await sbFetch('troubles', {
-      method: 'POST',
-      prefer: 'return=representation',
-      body:   JSON.stringify(troublePayload),
-    });
+    var result = await sbFetch('troubles', 'POST', troubleData);
+    var troubleId = result[0].id;
 
-    const troubleId = trouble.id;
+    // 2. 画像アップロード
+    if (selectedImages.length > 0) {
+      showOverlay('画像をアップロード中...');
+      for (var i = 0; i < selectedImages.length; i++) {
+        var img = selectedImages[i];
+        var dateStr = troubleData.occurred_date.replace(/-/g, '');
+        var fileName = dateStr + '_' + session.shift + 'shift_' + troubleId + '_' + (i + 1) + '.jpg';
+        var storagePath = 'troubles/' + troubleId + '/' + fileName;
 
-    // 2. 画像アップロード → trouble_images INSERT
-    if (images.length > 0) {
-      overlay.querySelector('.loading-text').textContent = '画像をアップロード中...';
-      for (let i = 0; i < images.length; i++) {
-        const img   = images[i];
-        const ext   = img.file.name.split('.').pop().toLowerCase().replace('heic', 'jpg');
-        const dateStr = form.date.replace(/-/g, '');
-        const seq   = String(i + 1).padStart(3, '0');
-        const fileName = `${dateStr}_${form.shift}直_機番${form.machineNo}_${form.productName}_${seq}.${ext}`;
-        const storagePath = `equipment/${troubleId}/${fileName}`;
-
-        try {
-          await sbStorageUpload(storagePath, img.file);
-          await sbFetch('trouble_images', {
-            method: 'POST',
-            prefer: 'return=minimal',
-            body: JSON.stringify({
-              trouble_id:   troubleId,
-              storage_path: storagePath,
-              file_name:    fileName,
-            }),
-          });
-        } catch (imgErr) {
-          console.error(`画像${i+1}のアップロード失敗:`, imgErr);
-          // 画像失敗は致命的エラーにしない（トラブル本体は保存済み）
+        // Supabase StorageへアップロードTroubles バケット必要
+        var uploadRes = await fetch(SB_URL + '/storage/v1/object/trouble-images/' + storagePath, {
+          method: 'POST',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': img.file.type },
+          body: img.file
+        });
+        if (uploadRes.ok) {
+          await sbFetch('trouble_images', 'POST', { trouble_id: troubleId, storage_path: storagePath });
         }
       }
     }
 
     // 3. 下書き削除
-    await deleteDraft();
+    await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.equipment', 'DELETE');
 
-    stopAutosave();
-    overlay.style.display = 'none';
-    goScreen(3);
+    hideOverlay();
+    showToast('送信しました', 'success');
+    setTimeout(function() { location.href = 'home.html'; }, 1200);
 
-  } catch (err) {
-    console.error('送信失敗:', err);
-    overlay.style.display = 'none';
-    alert('送信に失敗しました。\n' + err.message + '\n\nもう一度お試しください。');
-    document.getElementById('btnNext').disabled = false;
-    submitting = false;
+  } catch(e) {
+    hideOverlay();
+    btn.disabled = false;
+    showToast('送信失敗: ' + e.message, 'error');
   }
 }
 
-/* =============================================
-   下書き（draftsテーブル UPSERT）
-============================================= */
-function buildDraftData() {
-  return {
-    date:        document.getElementById('dateInput').value,
-    shift:       form.shift,
-    lineId:      form.lineId,
-    lineName:    form.lineName,
-    machineId:   form.machineId,
-    machineNo:   form.machineNo,
-    productId:   form.productId,
-    productName: form.productName,
-    stop:        document.getElementById('stopInput').value,
-    categoryId:  form.categoryId,
-    categoryName:form.categoryName,
-    detail:      document.getElementById('detailInput').value,
-    occurrence:  form.occurrence,
-  };
+// ── UI共通 ────────────────────────────────────────────────
+function showOverlay(text) {
+  document.getElementById('overlay-text').textContent = text;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function hideOverlay() {
+  document.getElementById('overlay').classList.add('hidden');
 }
 
-async function saveDraftToDb(silent = false) {
-  if (!SESSION || !SESSION.id) return;
-  try {
-    await sbFetch('drafts', {
-      method: 'POST',
-      prefer: 'resolution=merge-duplicates,return=minimal',
-      body: JSON.stringify({
-        user_id: SESSION.id,
-        type:    'equipment',
-        data:    buildDraftData(),
-      }),
-    });
-    if (!silent) {
-      setAutosaveStatus('saved');
-    }
-  } catch (err) {
-    console.error('下書き保存失敗:', err);
-    if (!silent) setAutosaveStatus('error');
-  }
+var toastTimer = null;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + (type || '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.add('hidden'); }, 3000);
 }
 
-async function deleteDraft() {
-  if (!SESSION || !SESSION.id) return;
-  try {
-    await sbFetch(`drafts?user_id=eq.${SESSION.id}&type=eq.equipment`, {
-      method: 'DELETE',
-    });
-  } catch (err) {
-    console.error('下書き削除失敗:', err);
-  }
-}
-
-async function loadDraft() {
-  if (!SESSION || !SESSION.id) return;
-  try {
-    const rows = await sbFetch(
-      `drafts?user_id=eq.${SESSION.id}&type=eq.equipment&select=data&limit=1`
-    );
-    if (!rows || !rows.length) return;
-    const d = rows[0].data;
-    if (!d) return;
-
-    // フォームに復元
-    if (d.date) {
-      document.getElementById('dateInput').value = d.date;
-      form.date = d.date;
-    }
-    if (d.shift) selectShift(d.shift);
-
-    // ライン復元
-    if (d.lineId) {
-      form.lineId   = d.lineId;
-      form.lineName = d.lineName || '';
-      const btn = document.querySelector(`#lineRow .choice-btn[data-id="${d.lineId}"]`);
-      if (btn) btn.classList.add('selected');
-      renderMachineGrid(d.lineId);
-    }
-
-    // 機番復元
-    if (d.machineId) {
-      form.machineId = d.machineId;
-      form.machineNo = d.machineNo || '';
-      // DOM生成後にボタンを選択
-      setTimeout(() => {
-        const mBtn = document.querySelector(`.machine-btn[data-id="${d.machineId}"]`);
-        if (mBtn) mBtn.classList.add('selected');
-      }, 0);
-      renderProductSelect(d.machineId);
-    }
-
-    // 品名復元
-    if (d.productId) {
-      form.productId   = d.productId;
-      form.productName = d.productName || '';
-      const sel = document.getElementById('productSelect');
-      sel.value = String(d.productId);
-    }
-
-    // 停止時間
-    if (d.stop !== undefined && d.stop !== '') {
-      document.getElementById('stopInput').value = d.stop;
-      form.stop = String(d.stop);
-    }
-
-    // 分類復元
-    if (d.categoryId) {
-      form.categoryId   = d.categoryId;
-      form.categoryName = d.categoryName || '';
-      const cBtn = document.querySelector(`#categoryRow .choice-btn[data-id="${d.categoryId}"]`);
-      if (cBtn) cBtn.classList.add('selected');
-    }
-
-    // 詳細
-    if (d.detail) {
-      document.getElementById('detailInput').value = d.detail;
-      form.detail = d.detail;
-      updateCharCount();
-    }
-
-    // 初発/再発
-    if (d.occurrence) selectOccurrence(d.occurrence);
-
-    setAutosaveStatus('saved');
-  } catch (err) {
-    console.error('下書き読み込み失敗:', err);
-  }
-}
-
-/* =============================================
-   Autosave
-============================================= */
-function startAutosave() {
-  autosaveTimer = setInterval(() => triggerAutosave(true), 30000);
-}
-
-function stopAutosave() {
-  clearInterval(autosaveTimer);
-  autosaveTimer = null;
-}
-
-function triggerAutosave(silent = false) {
-  if (currentScreen !== 1) return;
-  setAutosaveStatus('saving');
-  saveDraftToDb(silent);
-}
-
-async function saveDraft() {
-  setAutosaveStatus('saving');
-  await saveDraftToDb(false);
-  setAutosaveStatus('saved');
-  // 簡易フィードバック
-  const txt = document.getElementById('autosaveText');
-  txt.style.color = 'var(--success)';
-  setTimeout(() => { txt.style.color = ''; }, 1500);
-}
-
-function setAutosaveStatus(status) {
-  const dot = document.getElementById('autosaveDot');
-  const txt = document.getElementById('autosaveText');
-  if (status === 'saving') {
-    dot.classList.add('saving');
-    txt.textContent = '保存中...';
-  } else if (status === 'saved') {
-    dot.classList.remove('saving');
-    txt.textContent = '下書き自動保存済み';
-  } else if (status === 'error') {
-    dot.classList.remove('saving');
-    dot.style.background = 'var(--danger)';
-    txt.textContent = '保存失敗';
-  }
-}
-
-/* =============================================
-   ナビゲーション
-============================================= */
-function goAnother() {
-  // フォームリセット
-  Object.keys(form).forEach(k => { form[k] = null; });
-  form.date = ''; form.stop = ''; form.detail = '';
-  form.lineName = ''; form.machineNo = ''; form.productName = ''; form.categoryName = '';
-  images = [];
-
-  document.getElementById('detailInput').value = '';
-  document.getElementById('stopInput').value   = '';
-  document.querySelectorAll('.choice-btn, .machine-btn, .shift-sel-btn').forEach(b =>
-    b.classList.remove('selected')
-  );
-  resetProductSelect();
-  document.getElementById('machineGrid').innerHTML =
-    '<div class="machine-empty">ラインを選択すると表示されます</div>';
-  document.getElementById('imagePreview').innerHTML = '';
-  updateCharCount();
-
-  const now = new Date();
-  document.getElementById('dateInput').value = now.toISOString().slice(0, 10);
-  form.date = document.getElementById('dateInput').value;
-  selectShift(SESSION.shift || 1);
-  submitting = false;
-  document.getElementById('btnNext').disabled = false;
-  goScreen(1);
-  startAutosave();
-}
-
-function goHome() {
-  location.href = 'home.html';
-}
+// ── 初期化 ────────────────────────────────────────────────
+loadMasters();
 </script>
-<script src="traq-version.js"></script>
 </body>
 </html>
