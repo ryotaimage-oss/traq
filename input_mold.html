@@ -122,6 +122,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin .6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .overlay-text { font-size: 14px; color: var(--muted); }
+/* ドラムロール */
+  .drum-wrap { position:relative; overflow:hidden; height:180px; border-radius:var(--radius); background:var(--bg); }
+  .drum-selector { position:absolute; top:50%; left:0; right:0; height:40px; margin-top:-20px; border-top:2px solid var(--orange); border-bottom:2px solid var(--orange); pointer-events:none; z-index:2; }
+  .drum-fade-top { position:absolute; top:0; left:0; right:0; height:70px; background:linear-gradient(to bottom,var(--bg),transparent); z-index:1; pointer-events:none; }
+  .drum-fade-bot { position:absolute; bottom:0; left:0; right:0; height:70px; background:linear-gradient(to top,var(--bg),transparent); z-index:1; pointer-events:none; }
+  .drum-list { position:absolute; left:0; right:0; top:70px; cursor:grab; user-select:none; }
+  .drum-item { height:40px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:var(--text); }
+  .drum-label { font-size:11px; color:var(--muted); text-align:center; margin-top:4px; }
+  .stop-result { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 16px; text-align:center; margin-top:8px; font-size:15px; font-weight:500; min-height:42px; }
 </style>
 </head>
 <body>
@@ -394,19 +403,39 @@ function selectOccurrence(val) {
   saveDraft();
 }
 
-// ── 停止時間自動計算 ──────────────────────────────────────
-function calcStopMinutes() {
-  var start = document.getElementById('stop-start').value;
-  var end   = document.getElementById('stop-end').value;
-  if (!start || !end) return;
-  var sm = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
-  var em = parseInt(end.split(':')[0])   * 60 + parseInt(end.split(':')[1]);
-  if (em < sm) em += 24 * 60;
-  var diff = em - sm;
-  if (diff >= 0) {
-    document.getElementById('stop-minutes').value = diff;
-    saveDraft();
-  }
+// ── ドラムロール ─────────────────────────────────────────
+var ITEM_H = 40;
+var drumState = { sh:0, sm:0, eh:-1, em:-1 }; // -1 = 未設定
+var endTimeSet = false;
+
+var drumDefs = [
+  { id:'dSH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'sh' },
+  { id:'dSM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'sm' },
+  { id:'dEH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'eh' },
+  { id:'dEM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'em' }
+];
+
+function initDrums() {
+  var now = new Date();
+  var sh = now.getHours();
+  var sm = Math.floor(now.getMinutes() / 5);
+  drumState.sh = sh;
+  drumState.sm = sm;
+
+  drumDefs.forEach(function(d) {
+    var el = document.getElementById(d.id);
+    el.innerHTML = '';
+    d.items.forEach(function(label) {
+      var div = document.createElement('div');
+      div.className = 'drum-item';
+      div.textContent = label;
+      el.appendChild(div);
+    });
+    var idx = (d.key === 'sh') ? sh : (d.key === 'sm') ? sm : 0;
+    setDrumPos(d.id, idx, false);
+    initDrumDrag(d);
+  });
+  updateStopResult();
 }
 
 // ── 画像 ──────────────────────────────────────────────────
@@ -498,6 +527,8 @@ function getDraftData() {
     product_id:     document.getElementById('product-select').value,
     category_id:    document.getElementById('category-select').value,
     occurrence:     selectedOccurrence,
+    stop_start_h:   drumState ? drumState.sh : 0,
+    stop_start_m:   drumState ? drumState.sm : 0,
     stop_minutes:   document.getElementById('stop-minutes').value,
     detail:         document.getElementById('detail').value
   };
@@ -567,7 +598,9 @@ async function doSubmit() {
       product_id:    parseInt(document.getElementById('product-select').value) || null,
       category_id:   parseInt(document.getElementById('category-select').value) || null,
       occurrence:    selectedOccurrence,
-      stop_minutes:  parseInt(document.getElementById('stop-minutes').value) || null,
+      stop_start:    (function(){ var sh=drumState.sh,sm=drumState.sm*5; return String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0')+':00'; })(),
+      stop_end:      endTimeSet && drumState.eh >= 0 ? (function(){ var eh=drumState.eh,em=drumState.em*5; return String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0')+':00'; })() : null,
+      stop_minutes:  (function(){ var v=document.getElementById('stop-minutes').value; return v ? parseInt(v) : null; })(),
       detail:        document.getElementById('detail').value.trim() || null,
       reporter_id:   session.userId
     };
@@ -630,6 +663,7 @@ function showToast(msg, type) {
 
 // ── 初期化 ────────────────────────────────────────────────
 loadMasters();
+initDrums();
 </script>
 </body>
 </html>
