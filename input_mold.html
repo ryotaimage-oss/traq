@@ -12,37 +12,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --orange:  #EF9F27;
-  --error:   #ef4444;
-  --success: #22c55e;
-  --radius:  12px;
+:root{
+  --orange:#EF9F27;--error:#ef4444;--success:#22c55e;--radius:10px;
+  --bg:#080d18;--surface:#111827;--surface2:#16213a;
+  --border:#1e293b;--text:#f1f5f9;--muted:#64748b;
+  --nav-h:56px;--factory:#2e3a52;--roof:#3d4e6e;
 }
-
-/* ライト/ダーク自動切替 */
-:root {
-  --bg:      #080d18;
-  --surface: #111827;
-  --surface2:#16213a;
-  --border:  #1e293b;
-  --text:    #f1f5f9;
-  --muted:   #64748b;
-  --nav-h:56px;
-  --factory:#2e3a52; --roof:#3d4e6e;
+[data-theme="light"]{
+  --bg:#e8e6e2;--surface:#ffffff;--surface2:#f0ede8;
+  --border:rgba(0,0,0,0.18);--text:#1a1f2e;--muted:#666666;
 }
-[data-theme="light"] {
-  --bg:      #e8e6e2;
-  --surface: #ffffff;
-  --surface2:#f0ede8;
-  --border:  rgba(0,0,0,0.18);
-  --text:    #1a1f2e;
-  --muted:   #666666;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column}
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
-
-/* ===== Common Header (F-style) ===== */
+/* ===== Header ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
@@ -59,7 +42,13 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 [data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
-/* ===== Bottom Nav (2-tab) ===== */
+/* ===== Page Title ===== */
+.page-title-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.page-back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--muted);transition:all .15s}
+.page-back-btn:hover{border-color:var(--orange);color:var(--orange)}
+.page-title-text{font-size:15px;font-weight:700}
+
+/* ===== Bottom Nav ===== */
 .bottom-nav{display:flex;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
 .nav-item.active{color:var(--orange)}
@@ -68,230 +57,218 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}}
 
-/* ===== Page Title Bar ===== */
-.page-title-bar {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px; background: var(--surface);
-  border-bottom: 1px solid var(--border); flex-shrink: 0;
-}
-.page-back-btn {
-  background: none; border: 1px solid var(--border); border-radius: 6px;
-  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
-  font-size: 16px; cursor: pointer; color: var(--muted); transition: all .15s;
-}
-.page-back-btn:hover { border-color: var(--orange); color: var(--orange); }
-.page-title-text { font-size: 15px; font-weight: 700; }
+/* ===== Main ===== */
+.main{flex:1;padding:16px;max-width:600px;margin:0 auto;width:100%}
 
-/* メイン */
-.main { flex: 1; padding: 20px 16px; max-width: 600px; margin: 0 auto; width: 100%; }
+/* ===== Section ===== */
+.section{background:var(--surface);border-radius:var(--radius);padding:18px 16px;margin-bottom:12px}
+.section-title{font-size:12px;font-weight:700;color:var(--orange);margin-bottom:16px;display:flex;align-items:center;gap:6px;letter-spacing:.04em;text-transform:uppercase}
 
-/* セクション */
-.section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-.section-title { font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 18px; display: flex; align-items: center; gap: 6px; letter-spacing: .04em; }
-
-/* フォーム */
-.form-group { margin-bottom: 18px; }
-.form-group:last-child { margin-bottom: 0; }
-.form-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
-.form-label .required { color: var(--error); margin-left: 2px; }
-.form-input, .form-select, .form-textarea {
-  width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 14px 16px; color: var(--text);
-  font-family: inherit; font-size: 16px;
+/* ===== Form ===== */
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-label .req{color:var(--error);font-size:10px}
+.form-input,.form-select,.form-textarea{
+  width:100%;background:var(--bg);border:1px solid transparent;
+  border-radius:8px;padding:12px 14px;color:var(--text);
+  font-family:inherit;font-size:15px;transition:border-color .15s;
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--orange); background: var(--surface); }
-.form-select option { background: var(--surface); }
-.form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-.form-input:disabled, .form-select:disabled { opacity: .4; cursor: not-allowed; }
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--orange)}
+.form-select option{background:var(--surface)}
+.form-textarea{resize:vertical;min-height:100px;line-height:1.6}
+.form-input:disabled,.form-select:disabled{opacity:.4;cursor:not-allowed}
 
-/* 2カラム */
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row{display:grid;gap:10px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
 
-/* 初発/再発ボタン */
-.occurrence-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.occurrence-btn {
-  background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 16px; text-align: center; cursor: pointer; font-family: inherit;
-  font-size: 16px; font-weight: 600; color: var(--muted); transition: all .15s;
+/* 初発/再発 */
+.occurrence-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.occurrence-btn{
+  background:var(--bg);border:1px solid transparent;border-radius:8px;
+  padding:14px;text-align:center;cursor:pointer;font-family:inherit;
+  font-size:15px;font-weight:600;color:var(--muted);transition:all .15s;
 }
-.occurrence-btn.selected { border-color: var(--orange); color: var(--orange); background: rgba(239,159,39,.1); }
+.occurrence-btn.selected{border-color:var(--orange);color:var(--orange);background:rgba(239,159,39,.08)}
 
-/* 画像アップロード */
-.image-area {
-  border: 2px dashed var(--border); border-radius: var(--radius);
-  padding: 28px; text-align: center; cursor: pointer; transition: border-color .15s;
-  background: var(--surface2);
-}
-.image-area:hover { border-color: var(--orange); }
-.image-area-text { font-size: 15px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-.image-area-sub  { font-size: 12px; color: var(--muted); opacity: .7; }
-.image-previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.image-preview { position: relative; width: 88px; height: 88px; }
-.image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1.5px solid var(--border); }
-.image-preview .del-btn {
-  position: absolute; top: -6px; right: -6px;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--error); color: #fff; border: none;
-  font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-}
+/* 画像 */
+.image-area{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:border-color .15s;background:var(--bg)}
+.image-area:hover{border-color:var(--orange)}
+.image-area-text{font-size:14px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.image-area-sub{font-size:11px;color:var(--muted);opacity:.6}
+.image-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.image-preview{position:relative;width:80px;height:80px}
+.image-preview img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.image-preview .del-btn{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:var(--error);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-/* 送信ボタン */
-.submit-area { padding: 16px 0; }
-.submit-btn {
-  width: 100%; padding: 18px; background: var(--orange); color: #000;
-  border: none; border-radius: var(--radius); font-family: inherit;
-  font-size: 17px; font-weight: 700; cursor: pointer; letter-spacing: .04em;
-}
-.submit-btn:active { opacity: .85; transform: scale(.99); }
-.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+/* 送信 */
+.submit-area{padding:8px 0 16px}
+.submit-btn{width:100%;padding:16px;background:var(--orange);color:#000;border:none;border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:opacity .15s,transform .1s}
+.submit-btn:active{opacity:.85;transform:scale(.99)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
 
-/* 下書きバー */
-.draft-bar {
-  position: relative;
-  background: var(--surface); border-top: 1px solid var(--border);
-  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
-  font-size: 13px; color: var(--muted); z-index: 10;
-}
-.draft-status { display: flex; align-items: center; gap: 6px; }
-.draft-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
-.draft-dot.saved { background: var(--success); }
+/* 下書き */
+.draft-bar{background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);z-index:10;flex-shrink:0}
+.draft-status{display:flex;align-items:center;gap:6px}
+.draft-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.draft-dot.saved{background:var(--success)}
+.draft-load-btn{background:none;border:none;color:var(--orange);font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;padding:4px 8px;border-radius:6px;transition:background .15s}
+.draft-load-btn:hover{background:rgba(239,159,39,.1)}
 
 /* トースト */
-.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 24px; font-size: 14px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.15); white-space: nowrap; font-weight: 500; }
-.toast.success { border-color: var(--success); }
-.toast.error   { border-color: var(--error); }
-.hidden { display: none !important; }
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 20px;font-size:13px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.15);white-space:nowrap;font-weight:500}
+.toast.success{border-color:var(--success)}
+.toast.error{border-color:var(--error)}
+.hidden{display:none !important}
 
-/* ローディング overlay */
-.overlay { position: fixed; inset: 0; background: rgba(8,13,24,.8); z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-.spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,.1); border-top-color: var(--orange); border-radius: 50%; animation: spin .6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.overlay-text { font-size: 14px; color: #94a3b8; }
+/* ローディング */
+.overlay{position:fixed;inset:0;background:rgba(8,13,24,.8);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-text{font-size:14px;color:#94a3b8}
 
-  /* ドラムロール */
-  .drum-wrap { position:relative; overflow:hidden; height:180px; border-radius:var(--radius); background:var(--bg); }
-  .drum-selector { position:absolute; top:50%; left:0; right:0; height:40px; margin-top:-20px; border-top:2px solid var(--orange); border-bottom:2px solid var(--orange); pointer-events:none; z-index:2; }
-  .drum-fade-top { position:absolute; top:0; left:0; right:0; height:70px; background:linear-gradient(to bottom,var(--bg),transparent); z-index:1; pointer-events:none; }
-  .drum-fade-bot { position:absolute; bottom:0; left:0; right:0; height:70px; background:linear-gradient(to top,var(--bg),transparent); z-index:1; pointer-events:none; }
-  .drum-list { position:absolute; left:0; right:0; top:70px; cursor:grab; user-select:none; }
-  .drum-item { height:40px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:var(--text); }
-  .drum-label { font-size:11px; color:var(--muted); text-align:center; margin-top:4px; }
-  .stop-result { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 16px; text-align:center; margin-top:8px; font-size:15px; font-weight:500; min-height:42px; }
+/* ドラムロール */
+.drum-col{display:flex;flex-direction:column;gap:4px}
+.drum-col-label{font-size:11px;color:var(--muted);font-weight:500;text-align:center}
+.drum-pair{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.drum-pair-labels{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.drum-pair-labels span{font-size:10px;color:var(--muted);text-align:center;opacity:.7}
+.drum-wrap{position:relative;overflow:hidden;height:150px;border-radius:8px;background:var(--bg)}
+.drum-selector{position:absolute;top:50%;left:0;right:0;height:36px;margin-top:-18px;border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);pointer-events:none;z-index:2}
+.drum-fade-top{position:absolute;top:0;left:0;right:0;height:57px;background:linear-gradient(to bottom,var(--bg),transparent);z-index:1;pointer-events:none}
+.drum-fade-bot{position:absolute;bottom:0;left:0;right:0;height:57px;background:linear-gradient(to top,var(--bg),transparent);z-index:1;pointer-events:none}
+.drum-list{position:absolute;left:0;right:0;top:57px;cursor:grab;user-select:none}
+.drum-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text)}
+.stop-result{background:var(--bg);border-radius:8px;padding:10px 14px;text-align:center;margin-top:10px;font-size:14px;font-weight:500;color:var(--text)}
+.clear-end-btn{width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px;font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
+.clear-end-btn:hover{border-color:var(--orange);color:var(--orange)}
 </style>
 </head>
 <body>
 
-  <header class="topbar">
-    <div class="topbar-left">
-      <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-      </svg>
-      <span class="topbar-logo-text">Traq</span>
-      <span class="topbar-sep"></span>
-      <span class="topbar-sub">Trouble Tracking System</span>
-    </div>
-    <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
-      <div class="hdr-avatar" id="mob-avatar"></div>
-    </div>
-  </header>
+<header class="topbar">
+  <div class="topbar-left">
+    <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
+      <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+      <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
+      <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+      <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+      <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+      <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+      <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+      <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+      <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+      <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+      <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
+      <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+    </svg>
+    <span class="topbar-logo-text">Traq</span>
+    <span class="topbar-sep"></span>
+    <span class="topbar-sub">Trouble Tracking System</span>
+  </div>
+  <div class="topbar-right">
+    <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
+    <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
+    <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
+    <div class="hdr-avatar" id="mob-avatar"></div>
+  </div>
+</header>
 <div class="page-title-bar">
   <button class="page-back-btn" onclick="goBack()">←</button>
   <span class="page-title-text">🔧 金型トラブル入力</span>
 </div>
 
 <main class="main">
-
   <!-- 基本情報 -->
   <div class="section">
     <div class="section-title">🔧 基本情報</div>
-    <div class="form-row">
+    <div class="form-row form-row-3">
       <div class="form-group">
-        <label class="form-label">発生日<span class="required">*</span></label>
+        <label class="form-label">発生日<span class="req">*</span></label>
         <input class="form-input" type="date" id="occurred-date">
       </div>
       <div class="form-group">
-        <label class="form-label">シフト</label>
-        <input class="form-input" id="shift-display" disabled>
+        <label class="form-label">シフト<span class="req">*</span></label>
+        <select class="form-select" id="shift-select">
+          <option value="1">1直</option>
+          <option value="2">2直</option>
+          <option value="3">3直</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">報告者</label>
+        <input class="form-input" id="reporter-display" disabled>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">ライン<span class="required">*</span></label>
+      <label class="form-label">ライン<span class="req">*</span></label>
       <select class="form-select" id="line-select" onchange="onLineChange()">
         <option value="">選択してください</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label">機番<span class="required">*</span></label>
-      <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled>
-        <option value="">ラインを先に選択</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">品番<span class="required">*</span></label>
-      <select class="form-select" id="product-select" disabled>
-        <option value="">機番を先に選択</option>
-      </select>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label class="form-label">機番<span class="req">*</span></label>
+        <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled>
+          <option value="">ライン選択後</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">品番<span class="req">*</span></label>
+        <select class="form-select" id="product-select" disabled>
+          <option value="">機番選択後</option>
+        </select>
+      </div>
     </div>
   </div>
 
   <!-- トラブル詳細 -->
   <div class="section">
     <div class="section-title">📋 トラブル詳細</div>
-    <div class="form-group">
-      <label class="form-label">分類<span class="required">*</span></label>
-      <select class="form-select" id="category-select">
-        <option value="">選択してください</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">初発 / 再発<span class="required">*</span></label>
-      <div class="occurrence-group">
-        <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
-        <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label class="form-label">分類<span class="req">*</span></label>
+        <select class="form-select" id="category-select">
+          <option value="">選択してください</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">初発 / 再発<span class="req">*</span></label>
+        <div class="occurrence-group">
+          <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
+          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
+        </div>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">停止時間<span class="required">*</span>（開始）/ 終了は不明な場合は空白でOK</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <div class="drum-label" style="margin-bottom:6px;">開始時刻（必須）</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+      <label class="form-label">停止時間<span class="req">*</span> — 開始は必須 / 終了は未定なら空白OK</label>
+      <div class="form-row form-row-2" style="margin-bottom:0">
+        <div class="drum-col">
+          <div class="drum-col-label">開始時刻</div>
+          <div class="drum-pair">
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSH"></div></div>
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSM"></div></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div class="drum-label">時</div><div class="drum-label">分</div></div>
+          <div class="drum-pair-labels"><span>時</span><span>分</span></div>
         </div>
-        <div>
-          <div class="drum-label" style="margin-bottom:6px;">終了時刻（任意）</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+        <div class="drum-col">
+          <div class="drum-col-label">終了時刻（任意）</div>
+          <div class="drum-pair">
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEH"></div></div>
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEM"></div></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div class="drum-label">時</div><div class="drum-label">分</div></div>
-          <button onclick="clearEndTime()" style="width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);padding:6px;font-family:inherit;font-size:12px;cursor:pointer;">終了時刻をクリア</button>
+          <div class="drum-pair-labels"><span>時</span><span>分</span></div>
+          <button class="clear-end-btn" onclick="clearEndTime()">終了時刻をクリア</button>
         </div>
       </div>
       <div class="stop-result" id="stop-result">開始時刻を設定してください</div>
       <input type="hidden" id="stop-minutes">
     </div>
     <div class="form-group">
-      <label class="form-label">詳細内容<span class="required">*</span></label>
+      <label class="form-label">詳細内容<span class="req">*</span></label>
       <textarea class="form-textarea" id="detail" placeholder="トラブルの内容を入力してください"></textarea>
     </div>
   </div>
@@ -301,18 +278,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <div class="section-title">📷 写真</div>
     <div class="image-area" onclick="document.getElementById('image-input').click()">
       <div class="image-area-text">タップして写真を追加</div>
-      <div class="image-area-sub">カメラ撮影またはギャラリーから選択 / 最大200KB</div>
+      <div class="image-area-sub">カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮</div>
       <input type="file" id="image-input" accept="image/*" multiple class="hidden" onchange="onImageSelect(event)">
     </div>
     <div class="image-previews" id="image-previews"></div>
   </div>
 
-  <!-- 送信 -->
   <div class="submit-area">
     <button class="submit-btn" id="submit-btn" onclick="doSubmit()">送信する</button>
   </div>
-
-
 </main>
 
 <!-- 下書きバー -->
@@ -321,88 +295,60 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <div class="draft-dot" id="draft-dot"></div>
     <span id="draft-status-text">下書き未保存</span>
   </div>
-  <button onclick="loadDraft()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;">下書きを読込</button>
+  <button class="draft-load-btn" onclick="loadDraft()">下書きを読込</button>
 </div>
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-    <button class="nav-item" onclick="goHome()">
-      <span class="nav-icon">📋</span>
-      <span class="nav-label">一覧</span>
-    </button>
-    <button class="nav-item" onclick="location.href='dashboard.html'">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">ダッシュボード</span>
-    </button>
-    <button class="nav-item" onclick="goMaster()">
-      <span class="nav-icon">🔧</span>
-      <span class="nav-label">マスタ</span>
-    </button>
-  </nav>
+  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label">一覧</span></button>
+  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span></button>
+  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label">マスタ</span></button>
+</nav>
 
-<!-- ローディング -->
-<div class="overlay hidden" id="overlay">
-  <div class="spinner"></div>
-  <div class="overlay-text" id="overlay-text">送信中...</div>
-</div>
-
-<!-- トースト -->
+<div class="overlay hidden" id="overlay"><div class="spinner"></div><div class="overlay-text" id="overlay-text">送信中...</div></div>
 <div class="toast hidden" id="toast"></div>
 
 <script>
-(function(){
-  var saved=localStorage.getItem('traq_theme');
-  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
-  document.documentElement.setAttribute('data-theme',saved||pref);
-})();
-var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+(function(){var s=localStorage.getItem('traq_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p)})();
 
-async function sbFetch(path, method, body) {
-  var opts = {
-    method: method || 'GET',
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  var res = await fetch(SB_URL + '/rest/v1/' + path, opts);
-  if (!res.ok) throw new Error(await res.text());
-  var text = await res.text();
-  return text ? JSON.parse(text) : null;
+var SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+
+async function sbFetch(path,method,body){
+  var opts={method:method||'GET',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  if(body) opts.body=JSON.stringify(body);
+  var res=await fetch(SB_URL+'/rest/v1/'+path,opts);
+  if(!res.ok) throw new Error(await res.text());
+  var text=await res.text();
+  return text?JSON.parse(text):null;
 }
 
-// ── セッション確認 ────────────────────────────────────────
-var session = null;
-(function() {
-  var s = localStorage.getItem('traq_session');
-  if (!s) { location.href = 'index.html'; return; }
-  session = JSON.parse(s);
-  if (Date.now() > session.expiresAt) { location.href = 'index.html'; return; }
-  document.getElementById('shift-display').value = session.shift + '直';
+/* ── Session ── */
+var session=null;
+(function(){
+  var s=localStorage.getItem('traq_session');
+  if(!s){location.href='index.html';return;}
+  session=JSON.parse(s);
+  if(Date.now()>session.expiresAt){location.href='index.html';return;}
+  document.getElementById('shift-select').value=String(session.shift);
+  document.getElementById('reporter-display').value=session.name||'';
   setDefaultDate();
   initChip();
 })();
 
-function goBack() { history.back(); }
+function goBack(){history.back();}
 function forceReload(){if('caches' in window){caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}).then(function(){location.reload(true)})}else{location.reload(true)}}
-// ── ヘッダーチップ初期化 ──
 function initChip(){
-  var s;
-  try{s=JSON.parse(localStorage.getItem('traq_session')||'{}');}catch(e){s={};}
-  var name=s.name||'';
-  var role=s.role||'worker';
-  var initial=name?name.charAt(0):'?';
+  var s;try{s=JSON.parse(localStorage.getItem('traq_session')||'{}');}catch(e){s={};}
+  var name=s.name||'',role=s.role||'worker';
   var classMap={worker:'role-op',leader:'role-sl',admin:'role-admin'};
-  var topbar=document.querySelector('.topbar');
-  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(classMap[role]||'role-op');}
-  var av=document.getElementById('mob-avatar');
-  if(av) av.textContent=initial;
+  var tb=document.querySelector('.topbar');
+  if(tb){tb.classList.remove('role-op','role-sl','role-admin');tb.classList.add(classMap[role]||'role-op');}
+  var av=document.getElementById('mob-avatar');if(av) av.textContent=name?name.charAt(0):'?';
 }
 function goHome(){
-  try{
-    var r=session?session.role:'';
-    if(r==='leader'||r==='admin') location.href='home_sl.html';
-    else location.href='home.html';
-  }catch(e){location.href='home.html';}
+  try{var r=session?session.role:'';if(r==='leader'||r==='admin') location.href='home_sl.html';else location.href='home.html';}
+  catch(e){location.href='home.html';}
 }
 function goMaster(){
   var r=session&&session.role;
@@ -415,494 +361,250 @@ function showMasterDenied(){
   ov.style.cssText='position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
-  box.style.cssText='background:var(--bg2,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  box.style.cssText='background:var(--surface,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
   box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">アクセス制限</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">マスタはSL・管理者のみ利用できます</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
-
-// ── 発生日のデフォルト設定（3直は前日）────────────────────
-function setDefaultDate() {
-  var now = new Date();
-  if (session.shift === 3) {
-    now.setDate(now.getDate() - 1);
-  }
-  var y = now.getFullYear();
-  var m = String(now.getMonth() + 1).padStart(2, '0');
-  var d = String(now.getDate()).padStart(2, '0');
-  document.getElementById('occurred-date').value = y + '-' + m + '-' + d;
+/* ── Default date (shift=3 → previous day) ── */
+function setDefaultDate(){
+  var now=new Date();
+  var shift=parseInt(document.getElementById('shift-select').value)||session.shift;
+  if(shift===3) now.setDate(now.getDate()-1);
+  document.getElementById('occurred-date').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
 }
+document.getElementById('shift-select').addEventListener('change',function(){setDefaultDate();saveDraft();});
 
-// ── マスタデータ ──────────────────────────────────────────
-var allLines = [], allMachines = [], allProducts = [], allCategories = [];
-var machineProducts = []; // machine_productsテーブル
-
-async function loadMasters() {
-  try {
-    var results = await Promise.all([
+/* ── Masters ── */
+var allLines=[],allMachines=[],allProducts=[],allCategories=[],machineProducts=[];
+async function loadMasters(){
+  try{
+    var r=await Promise.all([
       sbFetch('lines?is_active=eq.true&order=name.asc&select=*'),
       sbFetch('machines?is_active=eq.true&order=machine_no.asc&select=*'),
       sbFetch('products?is_active=eq.true&order=product_code.asc&select=*'),
       sbFetch('categories?is_active=eq.true&type=eq.mold&order=sort_order.asc&select=*'),
-      sbFetch('machine_products?select=*').catch(function() { return []; })
+      sbFetch('machine_products?select=*').catch(function(){return[];})
     ]);
-    allLines      = results[0] || [];
-    allMachines   = results[1] || [];
-    allProducts   = results[2] || [];
-    allCategories = results[3] || [];
-    machineProducts = results[4] || [];
-
-    // ライン選択肢
-    var lineSelect = document.getElementById('line-select');
-    lineSelect.innerHTML = '<option value="">選択してください</option>' +
-      allLines.map(function(l) { return '<option value="' + l.id + '">' + l.name + '</option>'; }).join('');
-
-    // 分類選択肢
-    var catSelect = document.getElementById('category-select');
-    catSelect.innerHTML = '<option value="">選択してください</option>' +
-      allCategories.map(function(c) { return '<option value="' + c.id + '">' + c.name + '</option>'; }).join('');
-
-  } catch(e) {
-    showToast('マスタ読込失敗: ' + e.message, 'error');
-  }
+    allLines=r[0]||[];allMachines=r[1]||[];allProducts=r[2]||[];allCategories=r[3]||[];machineProducts=r[4]||[];
+    document.getElementById('line-select').innerHTML='<option value="">選択してください</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
+    document.getElementById('category-select').innerHTML='<option value="">選択してください</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+  }catch(e){showToast('マスタ読込失敗: '+e.message,'error');}
 }
 
-// ── ライン変更→機番絞り込み ───────────────────────────────
-function onLineChange() {
-  var lineId = parseInt(document.getElementById('line-select').value);
-  var machSel = document.getElementById('machine-select');
-  var prodSel = document.getElementById('product-select');
+function onLineChange(){
+  var lineId=parseInt(document.getElementById('line-select').value);
+  var ms=document.getElementById('machine-select'),ps=document.getElementById('product-select');
+  ms.innerHTML='<option value="">選択してください</option>';ps.innerHTML='<option value="">機番選択後</option>';ps.disabled=true;
+  if(!lineId){ms.disabled=true;return;}
+  var f=allMachines.filter(function(m){return m.line_id===lineId;});
+  f.sort(function(a,b){var na=parseInt(a.machine_no),nb=parseInt(b.machine_no);if(!isNaN(na)&&!isNaN(nb))return na-nb;return a.machine_no.localeCompare(b.machine_no);});
+  ms.innerHTML='<option value="">選択してください</option>'+f.map(function(m){return '<option value="'+m.id+'">'+m.machine_no+'</option>';}).join('');
+  ms.disabled=false;saveDraft();
+}
+function onMachineChange(){
+  var mid=parseInt(document.getElementById('machine-select').value);
+  var ps=document.getElementById('product-select');
+  ps.innerHTML='<option value="">選択してください</option>';
+  if(!mid){ps.disabled=true;return;}
+  var linked=machineProducts.filter(function(mp){return mp.machine_id===mid;}).map(function(mp){return mp.product_id;});
+  var f=linked.length>0?allProducts.filter(function(p){return linked.includes(p.id);}):allProducts;
+  ps.innerHTML='<option value="">選択してください</option>'+f.map(function(p){return '<option value="'+p.id+'">'+p.product_code+'('+p.product_name+')</option>';}).join('');
+  ps.disabled=false;saveDraft();
+}
 
-  machSel.innerHTML = '<option value="">選択してください</option>';
-  prodSel.innerHTML = '<option value="">機番を先に選択</option>';
-  prodSel.disabled = true;
-
-  if (!lineId) { machSel.disabled = true; return; }
-
-  var filtered = allMachines.filter(function(m) { return m.line_id === lineId; });
-  filtered.sort(function(a, b) {
-    var na = parseInt(a.machine_no); var nb = parseInt(b.machine_no);
-    if (!isNaN(na) && !isNaN(nb)) return na - nb;
-    return a.machine_no.localeCompare(b.machine_no);
-  });
-  machSel.innerHTML = '<option value="">選択してください</option>' +
-    filtered.map(function(m) { return '<option value="' + m.id + '">' + m.machine_no + '</option>'; }).join('');
-  machSel.disabled = false;
+/* ── Occurrence ── */
+var selectedOccurrence=null;
+function selectOccurrence(val){
+  selectedOccurrence=val;
+  document.getElementById('btn-first').classList.toggle('selected',val==='first');
+  document.getElementById('btn-repeat').classList.toggle('selected',val==='recurrence');
   saveDraft();
 }
 
-// ── 機番変更→品番絞り込み ────────────────────────────────
-function onMachineChange() {
-  var machineId = parseInt(document.getElementById('machine-select').value);
-  var prodSel = document.getElementById('product-select');
-
-  prodSel.innerHTML = '<option value="">選択してください</option>';
-
-  if (!machineId) { prodSel.disabled = true; return; }
-
-  // machine_productsから紐づく品番を取得
-  var linkedProductIds = machineProducts
-    .filter(function(mp) { return mp.machine_id === machineId; })
-    .map(function(mp) { return mp.product_id; });
-
-  var filtered = linkedProductIds.length > 0
-    ? allProducts.filter(function(p) { return linkedProductIds.includes(p.id); })
-    : allProducts; // 紐づけなしの場合は全品番
-
-  prodSel.innerHTML = '<option value="">選択してください</option>' +
-    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + '(' + p.product_name + ')</option>'; }).join('');
-  prodSel.disabled = false;
-  saveDraft();
-}
-
-// ── 初発/再発 ─────────────────────────────────────────────
-var selectedOccurrence = null;
-function selectOccurrence(val) {
-  selectedOccurrence = val;
-  document.getElementById('btn-first').classList.toggle('selected', val === 'first');
-  document.getElementById('btn-repeat').classList.toggle('selected', val === 'recurrence');
-  saveDraft();
-}
-
-// ── ドラムロール ─────────────────────────────────────────
-var ITEM_H = 40;
-var drumState = { sh:0, sm:0, eh:-1, em:-1 }; // -1 = 未設定
-var endTimeSet = false;
-
-var drumDefs = [
-  { id:'dSH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'sh' },
-  { id:'dSM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'sm' },
-  { id:'dEH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'eh' },
-  { id:'dEM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'em' }
+/* ── Drum roller ── */
+var ITEM_H=36,DRUM_TOP=57;
+var drumState={sh:0,sm:0,eh:-1,em:-1};
+var endTimeSet=false;
+var drumDefs=[
+  {id:'dSH',items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}),key:'sh'},
+  {id:'dSM',items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}),key:'sm'},
+  {id:'dEH',items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}),key:'eh'},
+  {id:'dEM',items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}),key:'em'}
 ];
-
-function initDrums() {
-  var now = new Date();
-  var sh = now.getHours();
-  var sm = Math.floor(now.getMinutes() / 5);
-  drumState.sh = sh;
-  drumState.sm = sm;
-
-  drumDefs.forEach(function(d) {
-    var el = document.getElementById(d.id);
-    el.innerHTML = '';
-    d.items.forEach(function(label) {
-      var div = document.createElement('div');
-      div.className = 'drum-item';
-      div.textContent = label;
-      el.appendChild(div);
-    });
-    var idx = (d.key === 'sh') ? sh : (d.key === 'sm') ? sm : 0;
-    setDrumPos(d.id, idx, false);
-    initDrumDrag(d);
+function initDrums(){
+  var now=new Date(),sh=now.getHours(),sm=Math.floor(now.getMinutes()/5);
+  drumState.sh=sh;drumState.sm=sm;
+  drumDefs.forEach(function(d){
+    var el=document.getElementById(d.id);el.innerHTML='';
+    d.items.forEach(function(label){var div=document.createElement('div');div.className='drum-item';div.textContent=label;el.appendChild(div);});
+    var idx=(d.key==='sh')?sh:(d.key==='sm')?sm:0;
+    setDrumPos(d.id,idx,false);initDrumDrag(d);
   });
   updateStopResult();
 }
-
-function setDrumPos(id, idx, animate) {
-  var el = document.getElementById(id);
-  var top = 70 - idx * ITEM_H;
-  el.style.transition = animate ? 'top 0.2s ease' : 'none';
-  el.style.top = top + 'px';
+function setDrumPos(id,idx,animate){var el=document.getElementById(id);el.style.transition=animate?'top 0.2s ease':'none';el.style.top=(DRUM_TOP-idx*ITEM_H)+'px';}
+function snapDrum(d){
+  var el=document.getElementById(d.id),top=parseInt(el.style.top)||DRUM_TOP,maxIdx=d.items.length-1;
+  var idx=Math.round((DRUM_TOP-top)/ITEM_H);idx=Math.max(0,Math.min(maxIdx,idx));
+  if(d.key==='eh'||d.key==='em') endTimeSet=true;
+  drumState[d.key]=idx;setDrumPos(d.id,idx,true);updateStopResult();saveDraft();
+}
+function clearEndTime(){endTimeSet=false;drumState.eh=-1;drumState.em=-1;setDrumPos('dEH',0,true);setDrumPos('dEM',0,true);updateStopResult();}
+function updateStopResult(){
+  var sh=drumState.sh,sm=drumState.sm*5,startStr=String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0');
+  var el=document.getElementById('stop-result');
+  if(!endTimeSet||drumState.eh<0){el.textContent='開始: '+startStr+' ／ 終了: 未定（承認者が入力）';document.getElementById('stop-minutes').value='';return;}
+  var eh=drumState.eh,em=drumState.em*5,endStr=String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0');
+  var sMins=sh*60+sm,eMins=eh*60+em;if(eMins<sMins)eMins+=1440;var diff=eMins-sMins;
+  el.textContent=startStr+' → '+endStr+'　'+diff+'分';document.getElementById('stop-minutes').value=diff;
+}
+function initDrumDrag(d){
+  var el=document.getElementById(d.id),startY=0,startTop=0,dragging=false;
+  function onS(e){dragging=true;startY=e.touches?e.touches[0].clientY:e.clientY;startTop=parseInt(el.style.top)||DRUM_TOP;el.style.transition='none';e.preventDefault();}
+  function onM(e){if(!dragging)return;var y=e.touches?e.touches[0].clientY:e.clientY;var nt=startTop+(y-startY);var mn=DRUM_TOP-(d.items.length-1)*ITEM_H;nt=Math.max(mn-20,Math.min(DRUM_TOP+20,nt));el.style.top=nt+'px';e.preventDefault();}
+  function onE(){if(!dragging)return;dragging=false;snapDrum(d);}
+  el.addEventListener('mousedown',onS);el.addEventListener('touchstart',onS,{passive:false});
+  document.addEventListener('mousemove',onM);document.addEventListener('touchmove',onM,{passive:false});
+  document.addEventListener('mouseup',onE);document.addEventListener('touchend',onE);
 }
 
-function snapDrum(d) {
-  var el = document.getElementById(d.id);
-  var top = parseInt(el.style.top) || 70;
-  var maxIdx = d.items.length - 1;
-  var idx = Math.round((70 - top) / ITEM_H);
-  idx = Math.max(0, Math.min(maxIdx, idx));
-  if (d.key === 'eh' || d.key === 'em') endTimeSet = true;
-  drumState[d.key] = idx;
-  setDrumPos(d.id, idx, true);
-  updateStopResult();
-  saveDraft();
+/* ── Images ── */
+var selectedImages=[];
+function onImageSelect(event){
+  Array.from(event.target.files).forEach(function(file){
+    if(file.size>200*1024) compressImage(file,function(c){addImage(c);});
+    else addImage(file);
+  });event.target.value='';
 }
-
-function clearEndTime() {
-  endTimeSet = false;
-  drumState.eh = -1;
-  drumState.em = -1;
-  setDrumPos('dEH', 0, true);
-  setDrumPos('dEM', 0, true);
-  updateStopResult();
+function compressImage(file,cb){
+  var img=new Image(),url=URL.createObjectURL(file);
+  img.onload=function(){var cv=document.createElement('canvas'),sc=Math.min(1,Math.sqrt(204800/file.size));cv.width=img.width*sc;cv.height=img.height*sc;cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);cv.toBlob(function(b){URL.revokeObjectURL(url);cb(new File([b],file.name,{type:'image/jpeg'}));},'image/jpeg',0.8);};
+  img.src=url;
 }
-
-function updateStopResult() {
-  var sh = drumState.sh, sm = drumState.sm * 5;
-  var startStr = String(sh).padStart(2,'0') + ':' + String(sm).padStart(2,'0');
-  var result = document.getElementById('stop-result');
-
-  if (!endTimeSet || drumState.eh < 0) {
-    result.textContent = '開始: ' + startStr + ' ／ 終了: 未定（承認者が入力）';
-    document.getElementById('stop-minutes').value = '';
-  } else {
-    var eh = drumState.eh, em = drumState.em * 5;
-    var endStr = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0');
-    var startMins = sh * 60 + sm;
-    var endMins   = eh * 60 + em;
-    if (endMins < startMins) endMins += 1440;
-    var diff = endMins - startMins;
-    result.textContent = startStr + ' → ' + endStr + '　' + diff + '分';
-    document.getElementById('stop-minutes').value = diff;
-  }
-}
-
-function initDrumDrag(d) {
-  var el = document.getElementById(d.id);
-  var startY = 0, startTop = 0, dragging = false;
-  function onStart(e) {
-    dragging = true;
-    startY = e.touches ? e.touches[0].clientY : e.clientY;
-    startTop = parseInt(el.style.top) || 70;
-    el.style.transition = 'none';
-    e.preventDefault();
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    var y = e.touches ? e.touches[0].clientY : e.clientY;
-    var newTop = startTop + (y - startY);
-    var minTop = 70 - (d.items.length - 1) * ITEM_H;
-    newTop = Math.max(minTop - 20, Math.min(90, newTop));
-    el.style.top = newTop + 'px';
-    e.preventDefault();
-  }
-  function onEnd() {
-    if (!dragging) return;
-    dragging = false;
-    snapDrum(d);
-  }
-  el.addEventListener('mousedown', onStart);
-  el.addEventListener('touchstart', onStart, {passive:false});
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, {passive:false});
-  document.addEventListener('mouseup', onEnd);
-  document.addEventListener('touchend', onEnd);
-}
-
-// ── 画像 ──────────────────────────────────────────────────
-var selectedImages = []; // { file, dataUrl }
-
-function onImageSelect(event) {
-  var files = Array.from(event.target.files);
-  files.forEach(function(file) {
-    if (file.size > 200 * 1024) {
-      // 200KB超は圧縮
-      compressImage(file, function(compressed) {
-        addImage(compressed);
-      });
-    } else {
-      addImage(file);
-    }
-  });
-  event.target.value = '';
-}
-
-function compressImage(file, callback) {
-  var img = new Image();
-  var url = URL.createObjectURL(file);
-  img.onload = function() {
-    var canvas = document.createElement('canvas');
-    var scale = Math.min(1, Math.sqrt((200 * 1024) / file.size));
-    canvas.width  = img.width  * scale;
-    canvas.height = img.height * scale;
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(function(blob) {
-      URL.revokeObjectURL(url);
-      callback(new File([blob], file.name, { type: 'image/jpeg' }));
-    }, 'image/jpeg', 0.8);
-  };
-  img.src = url;
-}
-
-function addImage(file) {
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    selectedImages.push({ file: file, dataUrl: e.target.result });
-    renderPreviews();
-  };
-  reader.readAsDataURL(file);
-}
-
-function renderPreviews() {
-  var wrap = document.getElementById('image-previews');
-  wrap.innerHTML = selectedImages.map(function(img, i) {
-    return '<div class="image-preview">' +
-      '<img src="' + img.dataUrl + '">' +
-      '<button class="del-btn" onclick="removeImage(' + i + ')">×</button>' +
-      '</div>';
+function addImage(file){var r=new FileReader();r.onload=function(e){selectedImages.push({file:file,dataUrl:e.target.result});renderPreviews();};r.readAsDataURL(file);}
+function renderPreviews(){
+  document.getElementById('image-previews').innerHTML=selectedImages.map(function(img,i){
+    return '<div class="image-preview"><img src="'+img.dataUrl+'"><button class="del-btn" onclick="removeImage('+i+')">×</button></div>';
   }).join('');
 }
+function removeImage(i){selectedImages.splice(i,1);renderPreviews();}
 
-function removeImage(i) {
-  selectedImages.splice(i, 1);
-  renderPreviews();
+/* ── Draft ── */
+var draftTimer=null;
+function saveDraft(){if(draftTimer)clearTimeout(draftTimer);draftTimer=setTimeout(function(){_saveDraft();},1000);}
+async function _saveDraft(){
+  if(!session)return;
+  try{
+    await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold','DELETE');
+    await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'mold',data:getDraftData()});
+    document.getElementById('draft-dot').className='draft-dot saved';
+    document.getElementById('draft-status-text').textContent='下書き保存済み（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）';
+  }catch(e){console.warn('下書き保存失敗:',e);}
 }
-
-// ── 下書き保存（30秒ごと + 変更時）─────────────────────────
-var draftTimer = null;
-function saveDraft() {
-  if (draftTimer) clearTimeout(draftTimer);
-  draftTimer = setTimeout(function() { _saveDraft(); }, 1000);
-}
-
-async function _saveDraft() {
-  if (!session) return;
-  var data = getDraftData();
-  try {
-    await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.mold', 'DELETE');
-    await sbFetch('drafts', 'POST', {
-      user_id: session.userId, trouble_type: 'mold', data: data
-    });
-    document.getElementById('draft-dot').className = 'draft-dot saved';
-    document.getElementById('draft-status-text').textContent = '下書き保存済み（' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'}) + '）';
-  } catch(e) {
-    console.warn('下書き保存失敗:', e);
-  }
-}
-
-function getDraftData() {
+function getDraftData(){
   return {
-    occurred_date:  document.getElementById('occurred-date').value,
-    line_id:        document.getElementById('line-select').value,
-    machine_id:     document.getElementById('machine-select').value,
-    product_id:     document.getElementById('product-select').value,
-    category_id:    document.getElementById('category-select').value,
-    occurrence:     selectedOccurrence,
-    stop_start_h:   drumState ? drumState.sh : 0,
-    stop_start_m:   drumState ? drumState.sm : 0,
-    stop_end_h:     drumState ? drumState.eh : -1,
-    stop_end_m:     drumState ? drumState.em : -1,
-    end_time_set:   endTimeSet,
-    stop_minutes:   document.getElementById('stop-minutes').value,
-    detail:         document.getElementById('detail').value
+    occurred_date:document.getElementById('occurred-date').value,
+    shift:document.getElementById('shift-select').value,
+    line_id:document.getElementById('line-select').value,
+    machine_id:document.getElementById('machine-select').value,
+    product_id:document.getElementById('product-select').value,
+    category_id:document.getElementById('category-select').value,
+    occurrence:selectedOccurrence,
+    stop_start_h:drumState.sh,stop_start_m:drumState.sm,
+    stop_end_h:drumState.eh,stop_end_m:drumState.em,
+    end_time_set:endTimeSet,
+    detail:document.getElementById('detail').value
   };
 }
-
-async function loadDraft() {
-  try {
-    var rows = await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.mold&select=data');
-    if (!rows || !rows.length) { showToast('下書きがありません', ''); return; }
-    var d = rows[0].data;
-    if (d.occurred_date) document.getElementById('occurred-date').value = d.occurred_date;
-    if (d.line_id) {
-      document.getElementById('line-select').value = d.line_id;
-      onLineChange();
-    }
-    if (d.machine_id) {
-      document.getElementById('machine-select').value = d.machine_id;
-      onMachineChange();
-    }
-    if (d.product_id)  document.getElementById('product-select').value  = d.product_id;
-    if (d.category_id) document.getElementById('category-select').value = d.category_id;
-    if (d.occurrence)  selectOccurrence(d.occurrence);
-    // ドラムロール復元
-    if (typeof d.stop_start_h === 'number') {
-      drumState.sh = d.stop_start_h;
-      setDrumPos('dSH', d.stop_start_h, false);
-    }
-    if (typeof d.stop_start_m === 'number') {
-      drumState.sm = d.stop_start_m;
-      setDrumPos('dSM', d.stop_start_m, false);
-    }
-    if (d.end_time_set && typeof d.stop_end_h === 'number' && d.stop_end_h >= 0) {
-      endTimeSet = true;
-      drumState.eh = d.stop_end_h;
-      drumState.em = typeof d.stop_end_m === 'number' ? d.stop_end_m : 0;
-      setDrumPos('dEH', drumState.eh, false);
-      setDrumPos('dEM', drumState.em, false);
+async function loadDraft(){
+  try{
+    var rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold&select=data');
+    if(!rows||!rows.length){showToast('下書きがありません','');return;}
+    var d=rows[0].data;
+    if(d.occurred_date) document.getElementById('occurred-date').value=d.occurred_date;
+    if(d.shift) document.getElementById('shift-select').value=d.shift;
+    if(d.line_id){document.getElementById('line-select').value=d.line_id;onLineChange();}
+    if(d.machine_id){document.getElementById('machine-select').value=d.machine_id;onMachineChange();}
+    if(d.product_id) document.getElementById('product-select').value=d.product_id;
+    if(d.category_id) document.getElementById('category-select').value=d.category_id;
+    if(d.occurrence) selectOccurrence(d.occurrence);
+    if(typeof d.stop_start_h==='number'){drumState.sh=d.stop_start_h;setDrumPos('dSH',d.stop_start_h,false);}
+    if(typeof d.stop_start_m==='number'){drumState.sm=d.stop_start_m;setDrumPos('dSM',d.stop_start_m,false);}
+    if(d.end_time_set&&typeof d.stop_end_h==='number'&&d.stop_end_h>=0){
+      endTimeSet=true;drumState.eh=d.stop_end_h;drumState.em=typeof d.stop_end_m==='number'?d.stop_end_m:0;
+      setDrumPos('dEH',drumState.eh,false);setDrumPos('dEM',drumState.em,false);
     }
     updateStopResult();
-    if (d.detail)      document.getElementById('detail').value = d.detail;
-    showToast('下書きを読み込みました', 'success');
-  } catch(e) {
-    showToast('下書き読込失敗: ' + e.message, 'error');
-  }
+    if(d.detail) document.getElementById('detail').value=d.detail;
+    showToast('下書きを読み込みました','success');
+  }catch(e){showToast('下書き読込失敗: '+e.message,'error');}
 }
-
-// 30秒ごとに自動保存
-setInterval(function() { _saveDraft(); }, 30000);
-
-// フォーム変更時に保存
-['occurred-date','line-select','machine-select','product-select','category-select','stop-minutes','detail'].forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) el.addEventListener('change', saveDraft);
+setInterval(function(){_saveDraft();},30000);
+['occurred-date','shift-select','line-select','machine-select','product-select','category-select','detail'].forEach(function(id){
+  var el=document.getElementById(id);if(el)el.addEventListener('change',saveDraft);
 });
 
-// ── バリデーション ────────────────────────────────────────
-function validate() {
-  if (!document.getElementById('occurred-date').value) { showToast('発生日を入力してください', 'error'); return false; }
-  if (!document.getElementById('line-select').value)    { showToast('ラインを選択してください', 'error'); return false; }
-  if (!document.getElementById('machine-select').value) { showToast('機番を選択してください', 'error'); return false; }
-  if (!document.getElementById('product-select').value) { showToast('品番を選択してください', 'error'); return false; }
-  if (!document.getElementById('category-select').value){ showToast('分類を選択してください', 'error'); return false; }
-  if (!selectedOccurrence)                              { showToast('初発/再発を選択してください', 'error'); return false; }
-  if (!document.getElementById('detail').value.trim())  { showToast('詳細内容を入力してください', 'error'); return false; }
+/* ── Validation ── */
+function validate(){
+  if(!document.getElementById('occurred-date').value){showToast('発生日を入力してください','error');return false;}
+  if(!document.getElementById('line-select').value){showToast('ラインを選択してください','error');return false;}
+  if(!document.getElementById('machine-select').value){showToast('機番を選択してください','error');return false;}
+  if(!document.getElementById('product-select').value){showToast('品番を選択してください','error');return false;}
+  if(!document.getElementById('category-select').value){showToast('分類を選択してください','error');return false;}
+  if(!selectedOccurrence){showToast('初発/再発を選択してください','error');return false;}
+  if(!document.getElementById('detail').value.trim()){showToast('詳細内容を入力してください','error');return false;}
   return true;
 }
 
-// ── 送信 ──────────────────────────────────────────────────
-async function doSubmit() {
-  if (!validate()) return;
-
-  var btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  showOverlay('送信中...');
-
-  try {
-    // 1. troublesテーブルにINSERT
-    var troubleData = {
-      trouble_type:  'mold',
-      status:        'pending',
-      occurred_date: document.getElementById('occurred-date').value,
-      shift:         session.shift,
-      line_id:       parseInt(document.getElementById('line-select').value) || null,
-      machine_id:    parseInt(document.getElementById('machine-select').value) || null,
-      product_id:    parseInt(document.getElementById('product-select').value) || null,
-      category_id:   parseInt(document.getElementById('category-select').value) || null,
-      occurrence:    selectedOccurrence,
-      stop_start:    (function(){ var sh=drumState.sh,sm=drumState.sm*5; return String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0')+':00'; })(),
-      stop_end:      endTimeSet && drumState.eh >= 0 ? (function(){ var eh=drumState.eh,em=drumState.em*5; return String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0')+':00'; })() : null,
-      stop_minutes:  (function(){ var v=document.getElementById('stop-minutes').value; return v ? parseInt(v) : null; })(),
-      detail:        document.getElementById('detail').value.trim() || null,
-      reporter_id:   session.userId
+/* ── Submit ── */
+async function doSubmit(){
+  if(!validate())return;
+  var btn=document.getElementById('submit-btn');btn.disabled=true;showOverlay('送信中...');
+  try{
+    var selectedShift=parseInt(document.getElementById('shift-select').value);
+    var td={
+      trouble_type:'mold',status:'pending',
+      occurred_date:document.getElementById('occurred-date').value,
+      shift:selectedShift,
+      line_id:parseInt(document.getElementById('line-select').value)||null,
+      machine_id:parseInt(document.getElementById('machine-select').value)||null,
+      product_id:parseInt(document.getElementById('product-select').value)||null,
+      category_id:parseInt(document.getElementById('category-select').value)||null,
+      occurrence:selectedOccurrence,
+      stop_start:(function(){var h=drumState.sh,m=drumState.sm*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})(),
+      stop_end:endTimeSet&&drumState.eh>=0?(function(){var h=drumState.eh,m=drumState.em*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})():null,
+      stop_minutes:(function(){var v=document.getElementById('stop-minutes').value;return v?parseInt(v):null;})(),
+      detail:document.getElementById('detail').value.trim()||null,
+      reporter_id:session.userId
     };
-
-    var result = await sbFetch('troubles', 'POST', troubleData);
-    var troubleId = result[0].id;
-
-    // 2. 画像アップロード
-    if (selectedImages.length > 0) {
+    var result=await sbFetch('troubles','POST',td);var tId=result[0].id;
+    if(selectedImages.length>0){
       showOverlay('画像をアップロード中...');
-      for (var i = 0; i < selectedImages.length; i++) {
-        var img = selectedImages[i];
-        var dateStr = troubleData.occurred_date.replace(/-/g, '');
-        // 機番テキストを取得
-        var machSel = document.getElementById('machine-select');
-        var machText = machSel.options[machSel.selectedIndex] ? machSel.options[machSel.selectedIndex].text : 'XX';
-        // 品番テキストを取得
-        var prodSel = document.getElementById('product-select');
-        var prodText = prodSel.options[prodSel.selectedIndex] ? prodSel.options[prodSel.selectedIndex].text.split('(')[0].trim() : 'unknown';
-        var fileName = dateStr + '_' + session.shift + '直_機番' + machText + '_' + prodText + '_' + (i + 1) + '.jpg';
-        var storagePath = 'troubles/' + troubleId + '/' + fileName;
-
-        // Supabase StorageへアップロードTroubles バケット必要
-        var uploadRes = await fetch(SB_URL + '/storage/v1/object/trouble-images/' + storagePath, {
-          method: 'POST',
-          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': img.file.type },
-          body: img.file
-        });
-        if (uploadRes.ok) {
-          await sbFetch('trouble_images', 'POST', { trouble_id: troubleId, storage_path: storagePath });
-        }
+      for(var i=0;i<selectedImages.length;i++){
+        var img=selectedImages[i],ds=td.occurred_date.replace(/-/g,'');
+        var ms=document.getElementById('machine-select'),mt=ms.options[ms.selectedIndex]?ms.options[ms.selectedIndex].text:'XX';
+        var ps=document.getElementById('product-select'),pt=ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text.split('(')[0].trim():'unknown';
+        var fn=ds+'_'+selectedShift+'直_機番'+mt+'_'+pt+'_'+(i+1)+'.jpg';
+        var sp='troubles/'+tId+'/'+fn;
+        var ur=await fetch(SB_URL+'/storage/v1/object/trouble-images/'+sp,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type},body:img.file});
+        if(ur.ok) await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
       }
     }
-
-    // 3. 下書き削除
-    await sbFetch('drafts?user_id=eq.' + session.userId + '&trouble_type=eq.mold', 'DELETE');
-
-    hideOverlay();
-    showToast('送信しました', 'success');
-    setTimeout(function() { goHome(); }, 1200);
-
-  } catch(e) {
-    hideOverlay();
-    btn.disabled = false;
-    showToast('送信失敗: ' + e.message, 'error');
-  }
+    await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold','DELETE');
+    hideOverlay();showToast('送信しました','success');setTimeout(function(){goHome();},1200);
+  }catch(e){hideOverlay();btn.disabled=false;showToast('送信失敗: '+e.message,'error');}
 }
 
-// ── UI共通 ────────────────────────────────────────────────
-function showOverlay(text) {
-  document.getElementById('overlay-text').textContent = text;
-  document.getElementById('overlay').classList.remove('hidden');
-}
-function hideOverlay() {
-  document.getElementById('overlay').classList.add('hidden');
-}
+/* ── Util ── */
+function showOverlay(t){document.getElementById('overlay-text').textContent=t;document.getElementById('overlay').classList.remove('hidden');}
+function hideOverlay(){document.getElementById('overlay').classList.add('hidden');}
+var toastTimer=null;
+function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3000);}
+function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';}
 
-var toastTimer = null;
-function showToast(msg, type) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast ' + (type || '');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() { el.classList.add('hidden'); }, 3000);
-}
-
-// ── 初期化 ────────────────────────────────────────────────
-loadMasters();
-initDrums();
-
-function toggleTheme() {
-  var h = document.documentElement;
-  var isDark = h.getAttribute('data-theme') === 'dark';
-  var next = isDark ? 'light' : 'dark';
-  h.setAttribute('data-theme', next);
-  localStorage.setItem('traq_theme', next);
-  var btn = document.getElementById('themeBtn');
-  if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
-}
+/* ── Init ── */
+loadMasters();initDrums();
 </script>
 <script src="./update_banner.js"></script>
 </body>
