@@ -590,10 +590,19 @@ async function doSubmit(){
         var img=selectedImages[i],ds=td.occurred_date.replace(/-/g,'');
         var ms=document.getElementById('machine-select'),mt=ms.options[ms.selectedIndex]?ms.options[ms.selectedIndex].text:'XX';
         var ps=document.getElementById('product-select'),pt=ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text.split('(')[0].trim():'unknown';
-        var fn=ds+'_'+selectedShift+'S_機番'+mt+'_'+pt+'_'+(i+1)+'.jpg';
+        var fn=ds+'_'+selectedShift+'S_M'+mt+'_'+pt+'_'+(i+1)+'.jpg';
         var sp='troubles/'+tId+'/'+fn;
-        var ur=await fetch(SB_URL+'/storage/v1/object/trouble-images/'+sp,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type},body:img.file});
-        if(ur.ok) await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
+        try{
+          var ur=await fetch(SB_URL+'/storage/v1/object/trouble-images/troubles/'+tId+'/'+encodeURIComponent(fn),{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type,'x-upsert':'true'},body:img.file});
+          if(ur.ok){
+            await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
+          }else{
+            var errText=await ur.text();
+            console.error('Storage upload failed:',ur.status,errText);
+          }
+        }catch(upErr){
+          console.error('Image upload error:',upErr);
+        }
       }
     }
     await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
