@@ -43,9 +43,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:10px}
 .topbar-right{display:flex;align-items:center;gap:6px}
-.mini-logo{display:flex;align-items:center;gap:6px}
-.mini-logo-emoji{font-size:18px;line-height:1}
-.mini-logo-text{font-size:15px;font-weight:700;color:var(--orange)}
 .user-chip{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 5px}
 .user-chip-avatar{width:26px;height:26px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .user-chip-name{font-size:12px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -55,38 +52,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
 .icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-/* Layout */
-.main-wrap{flex:1;overflow:hidden;display:flex}
-
-/* Sidebar */
-.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
-.sb-user{padding:16px;border-bottom:1px solid var(--border)}
-.sb-avatar{width:40px;height:40px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.sb-name{font-size:14px;font-weight:700}
-.sb-role{font-size:11px;color:var(--warning);margin-top:2px}
-.sb-nav{flex:1;padding:8px}
-.sb-nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-decoration:none;width:100%;background:none;border:none;font-family:inherit;text-align:left;position:relative}
-.sb-nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text1)}
-.sb-nav-item.active{background:rgba(239,159,39,0.12);color:var(--orange);font-weight:700}
-.sb-nav-icon{font-size:15px;width:18px;text-align:center}
-.sb-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
-.sb-bottom{padding:8px;border-top:1px solid var(--border);margin-top:auto}
-.sb-theme-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;background:none;border:none;font-family:inherit;width:100%;text-align:left;transition:all .15s}
-.sb-theme-btn:hover{color:var(--text1)}
-.sb-lang{display:flex;gap:4px;padding:4px;margin-bottom:4px}
-.sb-lang-btn{flex:1;padding:5px 4px;border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
-.sb-lang-btn.active,.sb-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-
-/* Right panel */
-.right-panel{flex:1;overflow:hidden;display:flex;flex-direction:column}
-
 /* Pending banner */
 .pending-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.25);flex-shrink:0}
 .pending-banner-left{display:flex;align-items:center;gap:10px}
 .pending-icon{font-size:20px}
+.pending-count-wrap{}
 .pending-count{font-size:22px;font-weight:700;color:var(--warning);line-height:1}
 .pending-label{font-size:11px;color:var(--text2)}
-.btn-review-all{background:var(--warning);color:var(--navy);border:none;border-radius:var(--radius);padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pending-banner-right{}
+.btn-review-all{background:var(--warning);color:var(--navy);border:none;border-radius:var(--radius);padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-review-all:hover{background:#d97706}
 
 /* Tab bar */
@@ -98,412 +72,815 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
 /* Scroll area */
 .scroll-area{flex:1;overflow-y:auto;padding:12px 16px calc(var(--nav-h) + 12px)}
-@media(min-width:768px){.scroll-area{padding-bottom:12px}}
 
 /* Filter row */
 .filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
 .filter-row::-webkit-scrollbar{display:none}
 .ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
-.ftab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
 
-/* Cards */
+/* Trouble cards */
 .trouble-list{display:flex;flex-direction:column;gap:10px}
 .tcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .15s;animation:slideUp .25s ease both}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .tcard:hover{border-color:rgba(239,159,39,.3)}
-.tcard.actioned{opacity:0.45;pointer-events:none;transition:opacity .4s}
-.tcard-top{padding:14px 14px 10px;cursor:pointer}
+.tcard-top{padding:14px 14px 10px}
 .tcard-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .tcard-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tcard-time{font-size:12px;color:var(--text2);white-space:nowrap}
 .tcard-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
 .tcard-type.eq{background:rgba(59,130,246,.15);color:#60a5fa}
 .tcard-type.md{background:rgba(168,85,247,.15);color:#c084fc}
-.status-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
-.status-badge.pending{background:rgba(245,158,11,.15);color:#fbbf24}
-.status-badge.approved{background:rgba(16,185,129,.15);color:#34d399}
-.status-badge.rejected{background:rgba(239,68,68,.15);color:#f87171}
-.status-badge.draft{background:rgba(100,116,139,.15);color:#94a3b8}
-.shift-badge{font-size:11px;color:var(--text2)}
-.tcard-title{font-size:15px;font-weight:700;margin-bottom:3px}
-.tcard-product{font-size:12px;color:var(--text2);margin-bottom:8px}
-.tcard-cat{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);margin-bottom:8px}
-.tcard-detail{font-size:13px;line-height:1.6;color:var(--text1);margin-bottom:10px}
-.tcard-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
-.tcard-reporter::before{content:'👤';font-size:11px;margin-right:4px}
-.tcard-stop::before{content:'⏱';font-size:11px;margin-right:4px}
-.reject-box{margin-top:8px;padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px}
-.reject-label{font-size:10px;font-weight:700;color:var(--danger);margin-bottom:2px}
-.reject-text{font-size:12px;color:var(--danger)}
+.status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.status-pending{background:rgba(245,158,11,.15);color:var(--warning)}
+.status-approved{background:rgba(16,185,129,.12);color:var(--success)}
+.status-rejected{background:rgba(239,68,68,.12);color:var(--danger)}
+.tcard-date{font-size:11px;color:var(--text2)}
+.tcard-time{font-size:11px;color:var(--text2);margin-left:auto}
+.tcard-body{margin-bottom:8px}
+.tcard-machine{font-size:15px;font-weight:700;margin-bottom:2px}
+.tcard-product{font-size:12px;color:var(--text2);margin-bottom:4px}
+.tcard-category{display:inline-block;font-size:11px;font-weight:500;background:var(--bg3);border-radius:4px;padding:2px 7px;color:var(--text2);margin-bottom:4px}
+.tcard-detail{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tcard-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)}
+.tcard-submitter{font-size:11px;color:var(--text2)}
+.tcard-stop{font-size:11px;color:var(--text2)}
 
-/* Action buttons */
+/* Approve/Reject action bar (bottom of card) */
 .card-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
-.ca-btn{padding:12px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:5px}
-.ca-approve{background:rgba(16,185,129,.1);color:#10b981;border-right:1px solid var(--border)}
-.ca-approve:hover{background:rgba(16,185,129,.2)}
-.ca-reject{background:rgba(239,68,68,.1);color:var(--danger)}
-.ca-reject:hover{background:rgba(239,68,68,.2)}
+.ca-btn{height:48px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.ca-approve{background:rgba(16,185,129,.12);color:var(--success)}
+.ca-approve:hover{background:rgba(16,185,129,.25)}
+.ca-reject{background:rgba(239,68,68,.08);color:var(--danger)}
+.ca-reject:hover{background:rgba(239,68,68,.18)}
+.ca-btn:active{transform:scale(.97)}
 
-/* Empty */
-.empty-state{text-align:center;padding:48px 16px;color:var(--text2)}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-text{font-size:14px}
+/* Already-actioned card dimming */
+.tcard.actioned{opacity:.55}
+
+/* Empty state */
+.empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.empty-sub{font-size:12px}
 
 /* Bottom nav */
-.bottom-nav{height:var(--nav-h);flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);display:flex}
-.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:10px;color:var(--text2);border:none;background:none;font-family:inherit;transition:color .15s;position:relative}
-.bn-item.active,.bn-item:hover{color:var(--orange)}
-.bn-icon{font-size:20px;line-height:1}
-.bn-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--danger);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:flex;align-items:center;justify-content:center}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 4px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;cursor:pointer;position:relative;transition:all .15s;border:none;background:none;font-family:inherit}
+.nav-icon{font-size:22px;line-height:1}
+.nav-label{font-size:10px;font-weight:500;color:var(--text2)}
+.nav-item.active .nav-label{color:var(--orange)}
+.nav-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--danger);color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;font-weight:700;min-width:16px;text-align:center}
+
+/* PC sidebar */
+@media(min-width:768px){
+  .bottom-nav{display:none}
+  .app{flex-direction:row}
+  .sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+  .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
+  .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .sidebar-avatar{width:36px;height:36px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-name{font-size:13px;font-weight:700}
+  .sidebar-role{font-size:11px;color:var(--warning)}
+  .sidebar-nav{flex:1;padding:12px 8px}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left;position:relative}
+  .snav-item:hover{background:var(--bg3);color:var(--text1)}
+  .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
+  .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
+  .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+  .topbar{display:none}
+  .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .scroll-area{padding-bottom:24px}
+}
 
 /* Modal */
-.modal-wrap{position:fixed;inset:0;z-index:100;display:none}
-.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-end}
-.modal-overlay.center{align-items:center;justify-content:center}
-.modal-sheet{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 20px 40px}
-.modal-overlay.center .modal-sheet{border-radius:12px;max-width:360px;width:calc(100% - 32px);padding:24px}
-.modal-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:4px}
-.modal-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
-.modal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;gap:12px}
-.modal-label{color:var(--text2);flex-shrink:0}
-.modal-value{font-weight:500;text-align:right}
-.modal-textarea{width:100%;min-height:96px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);resize:vertical;outline:none}
-.modal-textarea:focus{border-color:var(--orange)}
-.modal-btns{display:flex;gap:10px;margin-top:14px}
-.btn-cancel{flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
-.btn-danger{flex:1;padding:12px;background:var(--danger);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit}
-.btn-primary{flex:1;padding:12px;background:var(--orange);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit}
-.modal-close-btn{width:100%;margin-top:14px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeIn .15s ease}
+.modal-overlay.center{align-items:center}
+.modal-sheet{background:var(--bg2);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;animation:slideUp .2s ease}
+.modal-overlay.center .modal-sheet{border-radius:12px;margin:20px;max-height:80vh}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+
+/* Detail rows */
+.detail-row{display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none;margin-bottom:0}
+.detail-key{font-size:11px;font-weight:500;color:var(--text2);width:80px;flex-shrink:0;padding-top:2px}
+.detail-val{font-size:13px;flex:1;word-break:break-all}
+
+/* Approve/Reject modal buttons */
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.btn-approve{flex:1;height:52px;background:var(--success);border:none;border-radius:var(--radius);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-approve:hover{opacity:.85}
+.btn-reject-modal{flex:1;height:52px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);color:var(--danger);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-reject-modal:hover{background:rgba(239,68,68,.2)}
+.btn-close{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;margin-top:8px;transition:all .15s}
+.btn-close:hover{color:var(--text1)}
+
+/* Reject reason input */
+.reject-wrap{margin-top:12px;display:none}
+.reject-wrap.show{display:block;animation:fadeIn .2s ease}
+.reject-textarea{width:100%;min-height:80px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);padding:10px 12px;outline:none;resize:vertical;transition:border-color .15s}
+.reject-textarea:focus{border-color:var(--danger)}
+.reject-textarea::placeholder{color:var(--text2)}
+.reject-hint{font-size:11px;color:var(--text2);margin-bottom:6px}
+.btn-reject-confirm{width:100%;height:50px;background:var(--danger);border:none;border-radius:var(--radius);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
+.btn-reject-confirm:hover{opacity:.85}
+.btn-cancel-reject{width:100%;height:44px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;margin-top:6px}
 
 /* Toast */
-.toast-wrap{position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;transform:translateX(-50%);z-index:200;pointer-events:none}
-.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
-.toast.success{background:#065f46;border-color:#10b981}
-.toast.error{background:#7f1d1d;border-color:#ef4444}
-@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:300;animation:fadeIn .2s ease;white-space:nowrap}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
 
-@media(min-width:768px){
-  .sidebar{display:flex!important}
-  .bottom-nav{display:none}
-  .toast-wrap{bottom:16px}
-}
-@media(max-width:767px){
-  .sidebar{display:none}
-  .tab-item{font-size:12px;padding:10px 6px}
-}
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="mini-logo">
-        <span class="mini-logo-emoji">🏭</span>
-        <span class="mini-logo-text">Traq</span>
+  <!-- Sidebar (PC) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
+        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
+        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
+        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+        <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
+      </svg>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">山</div>
+      <div>
+        <div class="sidebar-name" id="sb-name">山田 太郎</div>
+        <div class="sidebar-role">SL / 1直</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <button class="lang-btn" id="lang-ja" onclick="setLang('ja')">JP</button>
-      <button class="lang-btn" id="lang-vi" onclick="setLang('vi')">VN</button>
-      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
-      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-      <div class="user-chip">
-        <div class="user-chip-avatar" id="chipAvatar">山</div>
-        <div>
-          <div class="user-chip-name" id="chipName">山田 太郎</div>
-          <div class="user-chip-role" id="chipRole">SL / 1直</div>
-        </div>
-      </div>
+    <nav class="sidebar-nav">
+      <button class="snav-item active" onclick="setTab('pending')">
+        <span class="snav-icon">⏳</span>
+        <span data-i18n="nav_pending">承認待ち</span>
+        <span class="snav-badge" id="sb-badge">0</span>
+      </button>
+      <button class="snav-item" onclick="setTab('all')">
+        <span class="snav-icon">📋</span>
+        <span data-i18n="nav_all">全データ一覧</span>
+      </button>
+      <button class="snav-item" onclick="setTab('input')">
+        <span class="snav-icon">✏️</span>
+        <span data-i18n="nav_input">トラブル入力</span>
+      </button>
+      <button class="snav-item" onclick="setTab('dashboard')">
+        <span class="snav-icon">📊</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
+      </button>
+      <button class="snav-item" onclick="setTab('excel')">
+        <span class="snav-icon">📥</span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="snav-item" onclick="toggleTheme()">
+        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span data-i18n="nav_theme">テーマ切替</span>
+      </button>
+      <button class="snav-item" style="gap:6px">
+        <span class="snav-icon">🌐</span>
+        <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
+      </button>
+      <button class="snav-item" onclick="location.href='settings.html'">
+        <span class="snav-icon">⚙️</span>
+        <span>設定</span>
+      </button>
+      <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
+        <span class="snav-icon">🚪</span>
+        <span data-i18n="nav_logout">ログアウト</span>
+      </button>
     </div>
-  </header>
+  </aside>
 
-  <div class="main-wrap">
-    <aside class="sidebar" id="sidebarEl" style="display:none">
-      <div class="sb-user">
-        <div class="sb-avatar" id="sbAvatar">山</div>
-        <div class="sb-name" id="sbName">山田 太郎</div>
-        <div class="sb-role" id="sbRole">SL / 1直</div>
-      </div>
-      <nav class="sb-nav">
-        <button class="sb-nav-item active" id="sb-pending" onclick="setTab('pending')">
-          <span class="sb-nav-icon">⏳</span>承認待ち
-          <span class="sb-badge" id="sbBadge" style="display:none">0</span>
-        </button>
-        <button class="sb-nav-item" id="sb-all" onclick="setTab('all')">
-          <span class="sb-nav-icon">📋</span>全データ一覧
-        </button>
-        <button class="sb-nav-item" onclick="location.href='input_equipment.html'">
-          <span class="sb-nav-icon">✏️</span>トラブル入力
-        </button>
-        <button class="sb-nav-item" onclick="location.href='dashboard.html'">
-          <span class="sb-nav-icon">📊</span>ダッシュボード
-        </button>
-        <button class="sb-nav-item" onclick="location.href='excel_download.html'">
-          <span class="sb-nav-icon">📥</span>Excelダウンロード
-        </button>
-      </nav>
-      <div class="sb-bottom">
-        <button class="sb-theme-btn" onclick="toggleTheme()">
-          <span id="sbThemeIcon">🌙</span><span>テーマ切替</span>
-        </button>
-        <span style="font-size:16px;padding:6px 12px;display:block;color:var(--text2)">🌐</span>
-        <div class="sb-lang">
-          <button class="sb-lang-btn active" id="sb-lang-ja" onclick="setLang('ja')">JP</button>
-          <button class="sb-lang-btn" id="sb-lang-vi" onclick="setLang('vi')">VN</button>
-          <button class="sb-lang-btn" id="sb-lang-en" onclick="setLang('en')">EN</button>
-        </div>
-        <button class="sb-nav-item" onclick="location.href='settings.html'">
-          <span class="sb-nav-icon">⚙️</span>設定
-        </button>
-        <button class="sb-nav-item" style="color:var(--danger)" onclick="doLogout()">
-          <span class="sb-nav-icon">🚪</span>ログアウト
-        </button>
-      </div>
-    </aside>
+  <!-- Main column -->
+  <div class="main-column">
 
-    <div class="right-panel">
-      <div class="pending-banner" id="pendingBanner" style="display:none">
-        <div class="pending-banner-left">
-          <span class="pending-icon">⏳</span>
+    <!-- Topbar (mobile) -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <svg width="72" height="26" viewBox="0 0 200 56" fill="none">
+          <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+          <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
+          <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+          <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+          <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+          <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+          <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+          <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+          <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+          <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+          <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+          <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+          <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
+          <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+          <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
+        </svg>
+        <div class="user-chip">
+          <div class="user-chip-avatar">山</div>
           <div>
-            <div class="pending-count" id="pendingCount">0</div>
-            <div class="pending-label">件の承認待ち</div>
+            <div class="user-chip-name">山田 太郎</div>
+            <div class="user-chip-role">SL</div>
           </div>
         </div>
-        <button class="btn-review-all" onclick="setTab('pending')">承認待ちを確認</button>
       </div>
-
-      <div class="tab-bar">
-        <button class="tab-item active" id="tab-pending" onclick="setTab('pending')">承認待ち<span class="tab-badge" id="tabBadge">0</span></button>
-        <button class="tab-item" id="tab-all" onclick="setTab('all')">全件</button>
-        <button class="tab-item" id="tab-approved" onclick="setTab('approved')">承認済み</button>
-        <button class="tab-item" id="tab-rejected" onclick="setTab('rejected')">差し戻し</button>
+      <div class="topbar-right">
+        <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
       </div>
+    </div>
 
-      <div class="scroll-area" id="scrollArea">
-        <div class="filter-row">
-          <button class="ftab active" data-f="all" onclick="setTypeFilter('all')">すべて</button>
-          <button class="ftab" data-f="eq" onclick="setTypeFilter('eq')">設備</button>
-          <button class="ftab" data-f="md" onclick="setTypeFilter('md')">金型</button>
-        </div>
-        <div class="trouble-list" id="troubleList">
-          <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">読み込み中...</div></div>
+    <!-- Pending banner -->
+    <div class="pending-banner" id="pendingBanner">
+      <div class="pending-banner-left">
+        <div class="pending-icon">⏳</div>
+        <div class="pending-count-wrap">
+          <div class="pending-count" id="pendingCount">0</div>
+          <div class="pending-label" data-i18n="pending_label">件の承認待ち</div>
         </div>
       </div>
+      <div class="pending-banner-right">
+        <button class="btn-review-all" onclick="setMainTab('pending')" data-i18n="btn_review">承認待ちを確認</button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-item active" id="tab-pending" onclick="setMainTab('pending')">
+        <span data-i18n="tab_pending">承認待ち</span>
+        <span class="tab-badge" id="tab-badge-pending">0</span>
+      </button>
+      <button class="tab-item" id="tab-all" onclick="setMainTab('all')">
+        <span data-i18n="tab_all">全件</span>
+      </button>
+      <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
+        <span data-i18n="tab_approved">承認済み</span>
+      </button>
+      <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
+        <span data-i18n="tab_rejected">差し戻し</span>
+      </button>
+    </div>
+
+    <!-- Scroll area -->
+    <div class="scroll-area" id="scrollArea">
+
+      <!-- Type filter -->
+      <div class="filter-row">
+        <button class="ftab active" id="ftab-all2"  onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
+        <button class="ftab"        id="ftab-eq"    onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
+        <button class="ftab"        id="ftab-md"    onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
+      </div>
+
+      <!-- List -->
+      <div class="trouble-list" id="troubleList"></div>
+
     </div>
   </div>
 
+  <!-- Bottom nav (mobile) -->
   <nav class="bottom-nav">
-    <button class="bn-item active" id="bn-pending" onclick="setTab('pending')">
-      <span class="bn-icon">⏳</span>承認待ち
-      <span class="bn-badge" id="mobBadge" style="display:none">0</span>
+    <button class="nav-item active" id="bnav-pending" onclick="setTab('pending')">
+      <span class="nav-icon">⏳</span>
+      <span class="nav-label" data-i18n="nav_pending">承認待ち</span>
+      <span class="nav-badge" id="mob-badge">0</span>
     </button>
-    <button class="bn-item" id="bn-all" onclick="setTab('all')"><span class="bn-icon">📋</span>全件</button>
-    <button class="bn-item" onclick="location.href='dashboard.html'"><span class="bn-icon">📊</span>集計</button>
-    <button class="bn-item" style="color:var(--danger)" onclick="doLogout()"><span class="bn-icon">🚪</span>ログアウト</button>
+    <button class="nav-item" id="bnav-all" onclick="setTab('all')">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label" data-i18n="nav_all">全件</span>
+    </button>
+    <button class="nav-item" id="bnav-input" onclick="setTab('input')">
+      <span class="nav-icon">✏️</span>
+      <span class="nav-label" data-i18n="nav_input">入力</span>
+    </button>
+    <button class="nav-item" id="bnav-excel" onclick="setTab('excel')">
+      <span class="nav-icon">📥</span>
+      <span class="nav-label" data-i18n="nav_excel">Excel</span>
+    </button>
+    <button class="nav-item" onclick="location.href='settings.html'">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">設定</span>
+    </button>
+    <button class="nav-item" onclick="doLogout()" style="color:var(--danger)">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label" style="color:var(--danger)" data-i18n="nav_logout">ログアウト</span>
+    </button>
   </nav>
+
 </div>
 
-<div class="modal-wrap" id="modalEl"></div>
-<div class="toast-wrap" id="toastWrap" style="display:none"></div>
+<!-- Modal / Toast placeholders -->
+<div id="modalEl" style="display:none"></div>
+<div id="toastEl" style="display:none"></div>
 
 <script>
-var SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-async function sbFetch(path,method,body){
-  var opts={method:method||'GET',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
-  if(body)opts.body=JSON.stringify(body);
-  var res=await fetch(SB_URL+'/rest/v1/'+path,opts);
-  if(!res.ok)throw new Error(await res.text());
-  var text=await res.text();return text?JSON.parse(text):null;
-}
-
-var currentLang='ja';
-var I18N={
-  ja:{shift:'直',eq:'設備',md:'金型',pending:'承認待ち',approved:'承認済み',rejected:'差し戻し',draft:'下書き',first:'初発',repeat:'再発',min:function(m){return m+'分'},unknown:'不明',empty_pending:'承認待ちはありません ✅',empty_all:'投稿はありません',approve:'✓ 承認する',reject:'✗ 差し戻す',reject_title:'差し戻し理由',reject_ph:'差し戻しの理由を入力してください…',reject_btn:'差し戻す',cancel:'キャンセル',approved_msg:'承認しました',rejected_msg:'差し戻しました',logout_msg:'ログアウトしました'},
-  vi:{shift:'ca',eq:'Thiết bị',md:'Khuôn',pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Trả lại',draft:'Nháp',first:'Lần đầu',repeat:'Tái phát',min:function(m){return m+' phút'},unknown:'Không rõ',empty_pending:'Không có báo cáo chờ duyệt ✅',empty_all:'Không có báo cáo',approve:'✓ Duyệt',reject:'✗ Trả lại',reject_title:'Lý do trả lại',reject_ph:'Nhập lý do…',reject_btn:'Trả lại',cancel:'Hủy',approved_msg:'Đã duyệt',rejected_msg:'Đã trả lại',logout_msg:'Đã đăng xuất'},
-  en:{shift:'shift',eq:'Equipment',md:'Mold',pending:'Pending',approved:'Approved',rejected:'Rejected',draft:'Draft',first:'First',repeat:'Repeat',min:function(m){return m+'min'},unknown:'Unknown',empty_pending:'No pending approvals ✅',empty_all:'No posts',approve:'✓ Approve',reject:'✗ Reject',reject_title:'Reject Reason',reject_ph:'Enter reason…',reject_btn:'Reject',cancel:'Cancel',approved_msg:'Approved',rejected_msg:'Rejected',logout_msg:'Logged out'}
+/* ===== i18n ===== */
+const I18N = {
+  ja:{
+    nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'トラブル入力',
+    nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード',
+    nav_theme:'テーマ切替', nav_logout:'ログアウト',
+    pending_label:'件の承認待ち', btn_review:'承認待ちを確認',
+    tab_pending:'承認待ち', tab_all:'全件', tab_approved:'承認済み', tab_rejected:'差し戻し',
+    filter_all:'すべて', filter_eq:'設備', filter_md:'金型',
+    type_eq:'設備', type_md:'金型',
+    status_pending:'承認待ち', status_approved:'承認済み', status_rejected:'差し戻し', status_draft:'下書き',
+    occ_first:'初発', occ_rec:'再発',
+    stop_min:(n)=>`${n}分`, stop_none:'不明',
+    shift_label:(s)=>`${s}直`,
+    btn_approve:'✓ 承認する', btn_reject:'✕ 差し戻す',
+    btn_close:'閉じる',
+    approve_confirm:'この内容を承認しますか？',
+    approve_done:'承認しました',
+    reject_title:'差し戻し理由', reject_hint:'差し戻し理由を入力してください（任意）',
+    reject_placeholder:'例：詳細内容が不足しています',
+    reject_confirm:'差し戻す', reject_cancel:'キャンセル',
+    reject_done:'差し戻しました',
+    detail_title:'トラブル詳細',
+    key_status:'ステータス', key_date:'日付', key_shift:'直', key_line:'ライン',
+    key_machine:'機番', key_product:'品名', key_stop:'停止時間',
+    key_category:'分類', key_detail:'詳細', key_occurrence:'初発/再発',
+    key_submitter:'入力者', key_approved:'承認者', key_reject_reason:'差し戻し理由',
+    coming_soon:(f)=>`${f}は開発中です`,
+    logout_done:'ログアウトしました',
+    empty_pending:'承認待ちの投稿はありません 👍',
+    empty_all:'投稿データがありません',
+  },
+  vi:{
+    nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
+    nav_dashboard:'Thống kê', nav_excel:'Tải Excel',
+    nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
+    pending_label:'đang chờ duyệt', btn_review:'Xem chờ duyệt',
+    tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
+    filter_all:'Tất cả', filter_eq:'Thiết bị', filter_md:'Khuôn',
+    type_eq:'Thiết bị', type_md:'Khuôn',
+    status_pending:'Chờ duyệt', status_approved:'Đã duyệt', status_rejected:'Trả lại', status_draft:'Nháp',
+    occ_first:'Lần đầu', occ_rec:'Tái phát',
+    stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
+    shift_label:(s)=>`Ca ${s}`,
+    btn_approve:'✓ Duyệt', btn_reject:'✕ Trả lại',
+    btn_close:'Đóng',
+    approve_confirm:'Bạn có muốn duyệt nội dung này không?',
+    approve_done:'Đã duyệt',
+    reject_title:'Lý do trả lại', reject_hint:'Nhập lý do trả lại (tùy chọn)',
+    reject_placeholder:'Ví dụ: Nội dung chưa đầy đủ',
+    reject_confirm:'Trả lại', reject_cancel:'Huỷ',
+    reject_done:'Đã trả lại',
+    detail_title:'Chi tiết sự cố',
+    key_status:'Trạng thái', key_date:'Ngày', key_shift:'Ca', key_line:'Dây chuyền',
+    key_machine:'Máy', key_product:'Sản phẩm', key_stop:'Thời gian dừng',
+    key_category:'Phân loại', key_detail:'Chi tiết', key_occurrence:'Lần đầu/Tái phát',
+    key_submitter:'Người nhập', key_approved:'Người duyệt', key_reject_reason:'Lý do trả lại',
+    coming_soon:(f)=>`${f} đang phát triển`,
+    logout_done:'Đã đăng xuất',
+    empty_pending:'Không có sự cố nào chờ duyệt 👍',
+    empty_all:'Chưa có dữ liệu',
+  },
+  en:{
+    nav_pending:'Pending', nav_all:'All Data', nav_input:'Input',
+    nav_dashboard:'Dashboard', nav_excel:'Excel Download',
+    nav_theme:'Toggle Theme', nav_logout:'Logout',
+    pending_label:'pending approval', btn_review:'Review pending',
+    tab_pending:'Pending', tab_all:'All', tab_approved:'Approved', tab_rejected:'Rejected',
+    filter_all:'All', filter_eq:'Equipment', filter_md:'Mold',
+    type_eq:'Equipment', type_md:'Mold',
+    status_pending:'Pending', status_approved:'Approved', status_rejected:'Rejected', status_draft:'Draft',
+    occ_first:'First', occ_rec:'Recurrence',
+    stop_min:(n)=>`${n} min`, stop_none:'Unknown',
+    shift_label:(s)=>`Shift ${s}`,
+    btn_approve:'✓ Approve', btn_reject:'✕ Reject',
+    btn_close:'Close',
+    approve_confirm:'Approve this submission?',
+    approve_done:'Approved',
+    reject_title:'Rejection Reason', reject_hint:'Enter rejection reason (optional)',
+    reject_placeholder:'e.g. Please add more detail',
+    reject_confirm:'Reject', reject_cancel:'Cancel',
+    reject_done:'Rejected',
+    detail_title:'Trouble Detail',
+    key_status:'Status', key_date:'Date', key_shift:'Shift', key_line:'Line',
+    key_machine:'Machine', key_product:'Product', key_stop:'Downtime',
+    key_category:'Category', key_detail:'Detail', key_occurrence:'First/Recurrence',
+    key_submitter:'Submitted by', key_approved:'Approved by', key_reject_reason:'Rejection reason',
+    coming_soon:(f)=>`${f} is coming soon`,
+    logout_done:'Logged out',
+    empty_pending:'No pending submissions 👍',
+    empty_all:'No data yet',
+  }
 };
-function t(k,arg){var d=I18N[currentLang]||I18N.ja;var v=d[k]||I18N.ja[k]||k;return typeof v==='function'?v(arg):v;}
-function setLang(l){
-  currentLang=l;localStorage.setItem('traq_lang',l);
-  ['ja','vi','en'].forEach(function(x){
-    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
+let currentLang = localStorage.getItem('traq_lang')||'ja';
+function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(...a):(v??k)}
+function setLang(lang){
+  currentLang=lang; localStorage.setItem('traq_lang',lang);
+  ['ja','vi','en'].forEach(l=>{
+    const b1=document.getElementById('lang-'+l);
+    const b2=document.getElementById('sb-lang-'+l);
+    if(b1) b1.classList.toggle('active',l===lang);
+    if(b2) b2.classList.toggle('active',l===lang);
   });
-  renderList();
+  applyI18n(); renderList();
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  updateBadges();
 }
 
-var SESSION=null,TROUBLES=[],currentTab='pending',typeFilter='all';
-function getSession(){try{var s=localStorage.getItem('traq_session');if(!s)return null;var o=JSON.parse(s);if(o.expiresAt&&Date.now()>o.expiresAt){localStorage.removeItem('traq_session');return null;}return o;}catch(e){return null;}}
+/* ===== Supabase ===== */
+const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path, method='GET', body=null) {
+  const opts = { method, headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
 
+/* ===== Session ===== */
+const SESSION = (() => {
+  try {
+    const s = localStorage.getItem('traq_session');
+    if (!s) return null;
+    const o = JSON.parse(s);
+    if (o.expiresAt && Date.now() > o.expiresAt) { localStorage.removeItem('traq_session'); return null; }
+    return o;
+  } catch(e) { return null; }
+})();
+
+/* ===== State ===== */
+let TROUBLES = [];
+let mainTab = 'pending';
+let typeFilter = 'all';
+
+/* ===== Init ===== */
 (async function init(){
-  SESSION=getSession();
-  if(!SESSION){location.href='index.html';return;}
-  if(SESSION.role==='worker'||SESSION.role==='op'){location.href='home.html';return;}
+  if (!SESSION) { location.href = 'index.html'; return; }
+  if (SESSION.role === 'worker' || SESSION.role === 'op') { location.href = 'home.html'; return; }
 
-  var th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-  document.documentElement.setAttribute('data-theme',th);
-  var icon=th==='dark'?'🌙':'☀️';
-  document.getElementById('themeBtn').textContent=icon;
-  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
-
-  var l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
-  ['ja','vi','en'].forEach(function(x){
-    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
+  initTheme();
+  const savedLang = localStorage.getItem('traq_lang') || 'ja';
+  currentLang = savedLang;
+  ['ja','vi','en'].forEach(l => {
+    const b1 = document.getElementById('lang-'+l);
+    const b2 = document.getElementById('sb-lang-'+l);
+    if(b1) b1.classList.toggle('active', l===savedLang);
+    if(b2) b2.classList.toggle('active', l===savedLang);
   });
 
-  var name=SESSION.name||'';var ini=name.charAt(0)||'?';
-  var rl=SESSION.role==='leader'||SESSION.role==='sl'?'SL':SESSION.role==='admin'?'Admin':'SL';
-  var shStr=(SESSION.shift||'')+t('shift');
-  document.getElementById('chipAvatar').textContent=ini;
-  document.getElementById('chipName').textContent=name;
-  document.getElementById('chipRole').textContent=rl+' / '+shStr;
-  document.getElementById('sbAvatar').textContent=ini;
-  document.getElementById('sbName').textContent=name;
-  document.getElementById('sbRole').textContent=rl+' / '+shStr;
+  // ユーザー情報をセット
+  const name = SESSION.name || '';
+  const initial = name.charAt(0) || '?';
+  const rl = SESSION.role === 'leader' || SESSION.role === 'sl' ? 'SL' : SESSION.role === 'admin' ? 'Admin' : 'SL';
+  const shiftStr = (SESSION.shift || '') + '直';
+  const sbAvatar = document.getElementById('sb-avatar');
+  if (sbAvatar) sbAvatar.textContent = initial;
+  const sbName = document.getElementById('sb-name');
+  if (sbName) sbName.textContent = name;
+  // topbar user chip
+  document.querySelectorAll('.user-chip-avatar').forEach(el => el.textContent = initial);
+  document.querySelectorAll('.user-chip-name').forEach(el => el.textContent = name);
+  document.querySelectorAll('.user-chip-role').forEach(el => el.textContent = rl);
 
-  var sb=document.getElementById('sidebarEl');
-  function checkSb(){if(sb)sb.style.display=window.innerWidth>=768?'flex':'none';}
-  checkSb();window.addEventListener('resize',checkSb);
-
+  applyI18n();
   await loadTroubles();
 })();
 
-async function loadTroubles(){
-  try{
-    var q='troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100';
-    if(SESSION.shift)q+='&shift=eq.'+encodeURIComponent(SESSION.shift);
-    var rows=await sbFetch(q,'GET');if(!rows)rows=[];
-    TROUBLES=rows.map(function(r){return{id:r.id,type:r.trouble_type,status:r.status,date:r.occurred_date||'',shift:r.shift,line:r.lines?r.lines.name:'',machine:r.machines?r.machines.machine_no:'',product_code:r.products?r.products.product_code:'',product_name:r.products?r.products.product_name:'',category:r.categories?r.categories.name:'',occurrence:r.occurrence,stop_minutes:r.stop_minutes,detail:r.detail||'',reporter:r.traq_users?r.traq_users.name:'',reject_reason:r.reject_reason||'',created_at:r.created_at,stop_start:r.stop_start||null};});
-  }catch(e){TROUBLES=[];showToast('データ読込エラー','error');}
+/* ===== Load from Supabase ===== */
+async function loadTroubles() {
+  try {
+    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100';
+    if (SESSION.shift) q += '&shift=eq.' + encodeURIComponent(SESSION.shift);
+    const rows = await sbFetch(q);
+    TROUBLES = (rows || []).map(r => ({
+      id: r.id,
+      type: r.trouble_type,
+      status: r.status,
+      date: (r.occurred_date || '').slice(0,10),
+      shift: r.shift ? String(r.shift) : '',
+      line: r.lines ? r.lines.name : '',
+      machine: r.machines ? r.machines.machine_no : '',
+      product_code: r.products ? r.products.product_code : '',
+      product_name: r.products ? r.products.product_name : '',
+      category: r.categories ? r.categories.name : '',
+      occurrence: r.occurrence || 'first',
+      stop_minutes: r.stop_minutes,
+      detail: r.detail || '',
+      submitted_by: r.traq_users ? r.traq_users.name : '',
+      submitted_at: r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '',
+      approved_by: r.approver_id ? '承認済み' : null,
+      approved_at: r.approved_at ? r.approved_at.slice(0,16).replace('T',' ') : null,
+      reject_reason: r.reject_reason || null,
+    }));
+  } catch(e) {
+    console.error(e);
+    showToast('データ読込エラー', 'error');
+    TROUBLES = [];
+  }
   renderList();
 }
 
+/* ===== Theme ===== */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  const icon=isDark?'☀️':'🌙';
+  document.getElementById('themeBtn').textContent=icon;
+  const sb=document.getElementById('sb-theme-icon');
+  if(sb) sb.textContent=icon;
+  localStorage.setItem('traq_theme',isDark?'light':'dark');
+}
+function initTheme(){
+  const saved=localStorage.getItem('traq_theme');
+  const pref=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  const theme=saved||pref;
+  document.documentElement.setAttribute('data-theme',theme);
+  const icon=theme==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').textContent=icon;
+  const sb=document.getElementById('sb-theme-icon');
+  if(sb) sb.textContent=icon;
+}
+
+/* ===== Tabs ===== */
+function setMainTab(tab){
+  mainTab=tab;
+  ['pending','all','approved','rejected'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  renderList();
+  document.getElementById('scrollArea').scrollTo(0,0);
+}
 function setTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab-item').forEach(function(b){b.classList.toggle('active',b.id==='tab-'+tab);});
-  ['sb-pending','sb-all'].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.toggle('active',id==='sb-'+tab);});
-  ['bn-pending','bn-all'].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.toggle('active',id==='bn-'+tab);});
-  document.getElementById('scrollArea').scrollTo(0,0);renderList();
+  if(tab==='dashboard'){ location.href='dashboard.html'; return; }
+  if(tab==='excel')    { location.href='excel_download.html'; return; }
+  if(tab==='input')    { location.href='home.html'; return; }
+  setMainTab(tab==='pending'?'pending':'all');
 }
 function setTypeFilter(f){
   typeFilter=f;
-  document.querySelectorAll('.ftab').forEach(function(b){b.classList.toggle('active',b.dataset.f===f);});
+  ['all2','eq','md'].forEach(k=>document.getElementById('ftab-'+k).classList.toggle('active',k===(f==='all'?'all2':f)));
   renderList();
 }
-function getFiltered(){
-  return TROUBLES.filter(function(tr){
-    var sok=currentTab==='pending'?tr.status==='pending':currentTab==='approved'?tr.status==='approved':currentTab==='rejected'?tr.status==='rejected':true;
-    var tok=typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
-    return sok&&tok;
+
+/* ===== Badges ===== */
+function updateBadges(){
+  const cnt=TROUBLES.filter(tr=>tr.status==='pending').length;
+  document.getElementById('pendingCount').textContent=cnt;
+  document.getElementById('tab-badge-pending').textContent=cnt;
+  document.getElementById('mob-badge').textContent=cnt;
+  document.getElementById('sb-badge').textContent=cnt;
+  document.getElementById('pendingBanner').style.display=cnt>0?'flex':'none';
+}
+
+/* ===== Render list ===== */
+function renderList(){
+  updateBadges();
+  const list=getFiltered();
+  const container=document.getElementById('troubleList');
+
+  if(list.length===0){
+    const msg=mainTab==='pending'?t('empty_pending'):t('empty_all');
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">${mainTab==='pending'?'✅':'📭'}</div><div class="empty-title">${msg}</div></div>`;
+    return;
+  }
+
+  container.innerHTML='';
+  list.forEach((tr,idx)=>{
+    const card=buildCard(tr,idx);
+    container.appendChild(card);
   });
 }
 
-function renderList(){
-  var cnt=TROUBLES.filter(function(tr){return tr.status==='pending';}).length;
-  document.getElementById('pendingCount').textContent=cnt;
-  document.getElementById('tabBadge').textContent=cnt;
-  var sb=document.getElementById('sbBadge');var mb=document.getElementById('mobBadge');
-  if(cnt>0){sb.textContent=cnt;sb.style.display='flex';mb.textContent=cnt;mb.style.display='flex';}
-  else{sb.style.display='none';mb.style.display='none';}
-  document.getElementById('pendingBanner').style.display=cnt>0?'flex':'none';
-
-  var list=getFiltered();var container=document.getElementById('troubleList');
-  if(list.length===0){
-    var msg=currentTab==='pending'?t('empty_pending'):t('empty_all');
-    container.innerHTML='<div class="empty-state"><div class="empty-icon">'+(currentTab==='pending'?'✅':'📭')+'</div><div class="empty-text">'+msg+'</div></div>';
-    return;
-  }
-  container.innerHTML='';
-  list.forEach(function(tr,i){container.appendChild(buildCard(tr,i));});
+function getFiltered(){
+  return TROUBLES.filter(tr=>{
+    const statusOk = mainTab==='pending'?tr.status==='pending':
+                     mainTab==='approved'?tr.status==='approved':
+                     mainTab==='rejected'?tr.status==='rejected':true;
+    const typeOk = typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
+    return statusOk && typeOk;
+  });
 }
 
 function buildCard(tr,idx){
-  var div=document.createElement('div');div.className='tcard';div.id='card-'+tr.id;div.style.animationDelay=(idx*0.04)+'s';
-  var tc=tr.type==='equipment'?'eq':'md';
-  var stop=tr.stop_minutes?t('min',tr.stop_minutes):t('unknown');
-  var occ=tr.occurrence==='first'?t('first'):t('repeat');
-  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine?tr.machine+'号機':'');
-  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:(tr.product_code||tr.product_name||'');
-  var timeStr=tr.stop_start?tr.stop_start.slice(0,5):(tr.created_at?tr.created_at.slice(11,16):'');
-  var dateStr=tr.date?tr.date.replace(/-/g,'/').slice(0,10):(tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'/'):'');
-  var shiftStr=tr.shift?tr.shift+t('shift'):'';
-  var repDate=tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'-')+' '+tr.created_at.slice(11,16):'';
-  var rejHTML=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
-  var actHTML=tr.status==='pending'?'<div class="card-actions"><button class="ca-btn ca-approve" onclick="event.stopPropagation();quickApprove(\''+tr.id+'\')">'+t('approve')+'</button><button class="ca-btn ca-reject" onclick="event.stopPropagation();openRejectModal(\''+tr.id+'\')">'+t('reject')+'</button></div>':'';
-  div.innerHTML=
-    '<div class="tcard-top" onclick="openDetail(\''+tr.id+'\')">' +
-    '<div class="tcard-header"><div class="tcard-meta"><span class="tcard-type '+tc+'">'+t(tc)+'</span><span class="status-badge '+tr.status+'">'+t(tr.status)+'</span><span class="shift-badge">'+dateStr+' '+shiftStr+'</span></div><span class="tcard-time">'+timeStr+'</span></div>'+
-    '<div class="tcard-title">'+esc(machine)+'</div>'+
-    (product?'<div class="tcard-product">'+esc(product)+'</div>':'')+
-    (tr.category?'<span class="tcard-cat">'+esc(tr.category)+'</span>':'')+
-    '<div class="tcard-detail">'+esc(tr.detail).substring(0,100)+(tr.detail.length>100?'…':'')+'</div>'+
-    '<div class="tcard-footer"><span class="tcard-reporter">'+esc(tr.reporter)+'　'+repDate+'</span><div style="display:flex;gap:8px"><span class="tcard-stop">'+stop+'</span><span style="font-size:11px;color:var(--text2)">'+occ+'</span></div></div>'+
-    rejHTML+'</div>'+actHTML;
+  const div=document.createElement('div');
+  div.className='tcard';
+  div.setAttribute('data-id', tr.id);
+  div.style.animationDelay=`${idx*0.04}s`;
+  if(tr._actioned) div.classList.add('actioned');
+
+  const typeClass=tr.type==='equipment'?'eq':'md';
+  const typeLabel=t('type_'+typeClass);
+  const statusLabel=t('status_'+tr.status);
+  const stopLabel=tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none');
+  const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
+
+  let actionsHTML='';
+  if(tr.status==='pending'){
+    actionsHTML=`
+      <div class="card-actions">
+        <button class="ca-btn ca-approve" onclick="event.stopPropagation();quickApprove(${tr.id})">${t('btn_approve')}</button>
+        <button class="ca-btn ca-reject"  onclick="event.stopPropagation();openRejectModal(${tr.id})">${t('btn_reject')}</button>
+      </div>`;
+  }
+
+  let rejectHTML='';
+  if(tr.status==='rejected'&&tr.reject_reason){
+    rejectHTML=`<div style="margin-top:6px;padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:var(--danger)"><strong style="display:block;font-size:10px;margin-bottom:2px">差し戻し理由：</strong>${tr.reject_reason}</div>`;
+  }
+
+  div.innerHTML=`
+    <div class="tcard-top" onclick="openDetail(${tr.id})">
+      <div class="tcard-header">
+        <div class="tcard-meta">
+          <span class="tcard-type ${typeClass}">${typeLabel}</span>
+          <span class="status-badge status-${tr.status}">${statusLabel}</span>
+          <span class="tcard-date">${tr.date.replace(/-/g,'/')} ${t('shift_label',tr.shift)}</span>
+        </div>
+        <span class="tcard-time">${tr.submitted_at?tr.submitted_at.slice(11,16):''}</span>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-machine">${tr.line} – ${tr.machine}号機</div>
+        <div class="tcard-product">${tr.product_code} / ${tr.product_name}</div>
+        <span class="tcard-category">${tr.category}</span>
+        <div class="tcard-detail">${tr.detail}</div>
+        ${rejectHTML}
+      </div>
+      <div class="tcard-footer">
+        <span class="tcard-submitter">👤 ${tr.submitted_by}　${tr.submitted_at||''}</span>
+        <span class="tcard-stop">⏱ ${stopLabel} ${occLabel}</span>
+      </div>
+    </div>
+    ${actionsHTML}
+  `;
   return div;
 }
 
-function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function openDetail(id){
-  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(!tr)return;
-  var tc=tr.type==='equipment'?'eq':'md';
-  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'');
-  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:'';
-  var rBox=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box" style="margin-bottom:12px"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
-  var btns=tr.status==='pending'?'<div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">'+t('cancel')+'</button><button class="btn-primary" onclick="closeModal();quickApprove(\''+tr.id+'\')">'+t('approve')+'</button><button class="btn-danger" onclick="closeModal();openRejectModal(\''+tr.id+'\')">差し戻す</button></div>':'<button class="modal-close-btn" onclick="closeModal()">閉じる</button>';
-  showModal('<div class="modal-handle"></div><div class="modal-title">'+esc(machine)+'</div>'+rBox+mrow('種別','<span class="tcard-type '+tc+'">'+t(tc)+'</span>')+mrow('ステータス','<span class="status-badge '+tr.status+'">'+t(tr.status)+'</span>')+mrow('発生日',tr.date||'')+mrow('直',tr.shift?tr.shift+t('shift'):'')+mrow('品番',product)+mrow('分類',tr.category||'')+mrow('初発/再発',tr.occurrence==='first'?t('first'):t('repeat'))+mrow('停止時間',tr.stop_minutes?t('min',tr.stop_minutes):t('unknown'))+mrow('詳細',esc(tr.detail))+mrow('報告者',tr.reporter)+btns);
-}
-function mrow(l,v){return'<div class="modal-row"><span class="modal-label">'+l+'</span><span class="modal-value">'+v+'</span></div>';}
-
+/* ===== Quick approve (from card button) ===== */
 async function quickApprove(id){
-  var card=document.getElementById('card-'+id);if(card)card.classList.add('actioned');
-  try{
-    await sbFetch('troubles?id=eq.'+id,'PATCH',{status:'approved',approver_id:SESSION.userId,approved_at:new Date().toISOString()});
-    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(tr)tr.status='approved';
-    showToast(t('approved_msg'),'success');setTimeout(renderList,400);
-  }catch(e){if(card)card.classList.remove('actioned');showToast('エラー: '+e.message,'error');}
+  const tr = TROUBLES.find(x => x.id === id);
+  if (!tr) return;
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) card.classList.add('actioned');
+  try {
+    await sbFetch('troubles?id=eq.' + id, 'PATCH', {
+      status: 'approved',
+      approver_id: SESSION.userId,
+      approved_at: new Date().toISOString()
+    });
+    tr.status = 'approved';
+    tr._actioned = true;
+    renderList();
+    showToast(t('approve_done'), 'success');
+  } catch(e) {
+    if (card) card.classList.remove('actioned');
+    showToast('エラー: ' + e.message, 'error');
+  }
 }
 
-var _rid=null;
+/* ===== Reject modal ===== */
 function openRejectModal(id){
-  _rid=id;
-  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
-  var m=tr?(tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'')):'';
-  showModal('<div class="modal-handle"></div><div class="modal-title">'+t('reject_title')+'</div><div class="modal-sub">'+esc(m)+'</div><textarea id="rejectReason" class="modal-textarea" placeholder="'+t('reject_ph')+'"></textarea><div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">'+t('cancel')+'</button><button class="btn-danger" onclick="submitReject()">'+t('reject_btn')+'</button></div>',true);
-  setTimeout(function(){var ta=document.getElementById('rejectReason');if(ta)ta.focus();},100);
-}
-async function submitReject(){
-  var reason=(document.getElementById('rejectReason')||{}).value||'';
-  if(!reason.trim()){showToast('理由を入力してください','error');return;}
-  var id=_rid;closeModal();
-  var card=document.getElementById('card-'+id);if(card)card.classList.add('actioned');
-  try{
-    await sbFetch('troubles?id=eq.'+id,'PATCH',{status:'rejected',reject_reason:reason.trim(),approver_id:SESSION.userId,approved_at:new Date().toISOString()});
-    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(tr){tr.status='rejected';tr.reject_reason=reason.trim();}
-    showToast(t('rejected_msg'),'success');setTimeout(renderList,400);
-  }catch(e){if(card)card.classList.remove('actioned');showToast('エラー: '+e.message,'error');}
+  const tr=TROUBLES.find(x=>x.id===id);
+  if(!tr) return;
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${t('reject_title')}</div>
+    <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
+    <p class="reject-hint">${t('reject_hint')}</p>
+    <textarea class="reject-textarea" id="rejectReasonInput"
+      placeholder="${t('reject_placeholder')}" rows="3"></textarea>
+    <button class="btn-reject-confirm" onclick="doReject(${id})">${t('reject_confirm')}</button>
+    <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
+  `,true);
+  setTimeout(()=>document.getElementById('rejectReasonInput')?.focus(),100);
 }
 
-function showModal(html,center){var el=document.getElementById('modalEl');el.innerHTML='<div class="modal-overlay'+(center?' center':'')+'" onclick="handleOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';el.style.display='block';}
-function closeModal(){document.getElementById('modalEl').style.display='none';}
-function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal();}
-
-var _tt=null;
-function showToast(msg,type){var el=document.getElementById('toastWrap');el.innerHTML='<div class="toast'+(type?' '+type:'')+'">'+msg+'</div>';el.style.display='block';if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.style.display='none';},2500);}
-
-function toggleTheme(){
-  var h=document.documentElement;var isDark=h.getAttribute('data-theme')==='dark';var next=isDark?'light':'dark';
-  h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);
-  var icon=next==='dark'?'🌙':'☀️';
-  document.getElementById('themeBtn').textContent=icon;
-  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
+async function doReject(id){
+  const tr = TROUBLES.find(x => x.id === id);
+  if (!tr) return;
+  const reason = document.getElementById('rejectReasonInput')?.value.trim() || '';
+  closeModal();
+  try {
+    await sbFetch('troubles?id=eq.' + id, 'PATCH', {
+      status: 'rejected',
+      reject_reason: reason || null,
+      approver_id: SESSION.userId,
+      approved_at: new Date().toISOString()
+    });
+    tr.status = 'rejected';
+    tr.reject_reason = reason || null;
+    tr._actioned = true;
+    renderList();
+    showToast(t('reject_done'), 'error');
+  } catch(e) {
+    showToast('エラー: ' + e.message, 'error');
+  }
 }
 
-function doLogout(){localStorage.removeItem('traq_session');showToast(t('logout_msg'));setTimeout(function(){location.href='index.html';},800);}
+/* ===== Detail modal ===== */
+function openDetail(id){
+  const tr=TROUBLES.find(x=>x.id===id);
+  if(!tr) return;
+  const typeClass=tr.type==='equipment'?'eq':'md';
+  const typeLabel=t('type_'+typeClass);
+  const stopLabel=tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none');
+  const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
+  const statusLabel=t('status_'+tr.status);
+
+  let approveActionsHTML='';
+  if(tr.status==='pending'){
+    approveActionsHTML=`
+      <div class="modal-actions">
+        <button class="btn-approve"      onclick="closeModal();quickApprove(${id})">${t('btn_approve')}</button>
+        <button class="btn-reject-modal" onclick="closeModal();openRejectModal(${id})">${t('btn_reject')}</button>
+      </div>`;
+  }
+
+  let rejectRowHTML='';
+  if(tr.reject_reason){
+    rejectRowHTML=`<div class="detail-row"><span class="detail-key">${t('key_reject_reason')}</span><span class="detail-val" style="color:var(--danger)">${tr.reject_reason}</span></div>`;
+  }
+  let approvedRowHTML='';
+  if(tr.approved_by){
+    approvedRowHTML=`<div class="detail-row"><span class="detail-key">${t('key_approved')}</span><span class="detail-val">${tr.approved_by} ${tr.approved_at||''}</span></div>`;
+  }
+
+  showModal(`
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span class="tcard-type ${typeClass}" style="font-size:11px;padding:3px 8px">${typeLabel}</span>
+      <span class="modal-title" style="margin:0">${t('detail_title')}</span>
+    </div>
+    <div class="modal-sub">No.${tr.id}</div>
+    <div class="detail-row"><span class="detail-key">${t('key_status')}</span><span class="detail-val"><span class="status-badge status-${tr.status}">${statusLabel}</span></span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_date')}</span><span class="detail-val">${tr.date.replace(/-/g,'/')} ${t('shift_label',tr.shift)}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_line')}</span><span class="detail-val">${tr.line}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_machine')}</span><span class="detail-val">${tr.machine}号機</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_product')}</span><span class="detail-val">${tr.product_code} / ${tr.product_name}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_stop')}</span><span class="detail-val">${stopLabel}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_category')}</span><span class="detail-val">${tr.category}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_detail')}</span><span class="detail-val">${tr.detail}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_occurrence')}</span><span class="detail-val">${occLabel}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_submitter')}</span><span class="detail-val">${tr.submitted_by} ${tr.submitted_at||''}</span></div>
+    ${approvedRowHTML}
+    ${rejectRowHTML}
+    ${approveActionsHTML}
+    <button class="btn-close" onclick="closeModal()">${t('btn_close')}</button>
+  `);
+}
+
+/* ===== Modal ===== */
+function showModal(html, center=false){
+  const el=document.getElementById('modalEl');
+  el.innerHTML=`<div class="modal-overlay ${center?'center':''}" onclick="handleOverlay(event)"><div class="modal-sheet">${html}</div></div>`;
+  el.style.display='block';
+}
+function closeModal(){ document.getElementById('modalEl').style.display='none'; }
+function handleOverlay(e){ if(e.target.classList.contains('modal-overlay')) closeModal(); }
+
+/* ===== Toast ===== */
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toastEl');
+  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
+  el.style.display='block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ el.style.display='none'; },2500);
+}
+
+/* ===== Logout ===== */
+function doLogout(){
+  localStorage.removeItem('traq_session');
+  showToast(t('logout_done'), 'info');
+  setTimeout(() => { location.href = 'index.html'; }, 1000);
+}
 </script>
+<script src="traq-version.js"></script>
 </body>
 </html>
