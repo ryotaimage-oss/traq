@@ -1,1153 +1,677 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="dark">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="manifest" href="./manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Traq">
 <title>Traq – TroubleTrack System</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/bCrypt.min.js"></script>
 <style>
-/* ===== CSS Variables ===== */
-:root {
-  --orange:        #EF9F27;
-  --orange-dark:   #c97d10;
-  --navy:          #080d18;
-  --bg1:           #080d18;
-  --bg2:           #111827;
-  --bg3:           #1e2d45;
-  --factory:       #2e3a52;
-  --roof:          #3d4e6e;
-  --text1:         #e8eaf0;
-  --text2:         #8b90a0;
-  --border:        rgba(255,255,255,0.08);
-  --success:       #10b981;
-  --danger:        #ef4444;
-  --warning:       #f59e0b;
-  --radius:        8px;
-  --shadow:        0 4px 24px rgba(0,0,0,0.4);
-}
-[data-theme="light"] {
-  --bg1:    #f5f5f2;
-  --bg2:    #ffffff;
-  --bg3:    #eeecea;
-  --text1:  #1a1f2e;
-  --text2:  #888888;
-  --border: rgba(0,0,0,0.1);
-  --shadow: 0 4px 24px rgba(0,0,0,0.1);
-}
+  :root {
+    --bg:        #080d18;
+    --surface:   #111827;
+    --border:    #1e293b;
+    --orange:    #EF9F27;
+    --orange-dim:#b87820;
+    --text:      #f1f5f9;
+    --muted:     #64748b;
+    --error:     #ef4444;
+    --success:   #22c55e;
+    --radius:    8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* ===== Reset ===== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 16px;
-  background: var(--bg1);
-  color: var(--text1);
-  -webkit-tap-highlight-color: transparent;
-  overflow: hidden;
-}
+  /* ── ヘッダー ── */
+  .header {
+    background: #080d18;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 20px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
+  .logo-sub  { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
 
-/* ===== Layout ===== */
-.app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+  /* ── メインコンテンツ ── */
+  .main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px;
+  }
 
-/* ===== Top bar ===== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  height: 56px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.lang-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text2);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 8px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.lang-btn.active, .lang-btn:hover {
-  border-color: var(--orange);
-  color: var(--orange);
-}
-.theme-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text2);
-  font-size: 16px;
-  width: 34px;
-  height: 30px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-}
-.theme-btn:hover { border-color: var(--orange); color: var(--orange); }
+  /* ── ステップインジケーター ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    color: var(--muted);
+    background: var(--bg);
+    transition: all .2s;
+    position: relative;
+    z-index: 1;
+  }
+  .step-dot.active  { border-color: var(--orange); color: var(--orange); }
+  .step-dot.done    { border-color: var(--orange); background: var(--orange); color: #000; }
+  .step-label { font-size: 10px; color: var(--muted); }
+  .step-label.active { color: var(--orange); }
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 16px;
+    transition: background .2s;
+  }
+  .step-line.done { background: var(--orange); }
 
-/* ===== Main scroll area ===== */
-.main {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 32px 20px 40px;
-}
+  /* ── セクションタイトル ── */
+  .section-title {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 500;
+    letter-spacing: .04em;
+  }
 
-/* ===== Logo ===== */
-.logo-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 32px;
-  animation: fadeDown .5s ease both;
-}
-.logo-sub {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text2);
-}
+  /* ── シフト選択 ── */
+  .shift-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .shift-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    color: var(--text);
+  }
+  .shift-btn:hover { border-color: var(--orange); }
+  .shift-btn .shift-no   { font-size: 22px; font-weight: 700; color: var(--orange); }
+  .shift-btn .shift-time { font-size: 10px; color: var(--muted); margin-top: 4px; white-space: nowrap; }
 
-/* ===== Step indicator ===== */
-.steps {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 28px;
-  animation: fadeIn .4s .1s both;
-}
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.step-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text2);
-  background: var(--bg2);
-  transition: all .3s;
-}
-.step-dot.active {
-  border-color: var(--orange);
-  color: var(--orange);
-  box-shadow: 0 0 0 3px rgba(239,159,39,.15);
-}
-.step-dot.done {
-  background: var(--orange);
-  border-color: var(--orange);
-  color: var(--navy);
-}
-.step-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text2);
-  white-space: nowrap;
-}
-.step-label.active { color: var(--orange); }
-.step-line {
-  width: 40px;
-  height: 2px;
-  background: var(--border);
-  margin: 0 4px;
-  margin-bottom: 14px;
-  transition: background .3s;
-}
-.step-line.done { background: var(--orange); }
+  /* ── ユーザーリスト ── */
+  .user-list { display: flex; flex-direction: column; gap: 6px; }
+  .user-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all .15s;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+  }
+  .user-btn:hover { border-color: var(--orange); }
+  .user-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    flex-shrink: 0;
+    color: var(--orange);
+  }
+  .user-name  { font-size: 14px; font-weight: 500; }
+  .user-role  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .role-badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .badge-admin  { background: #1e3a5f; color: #60a5fa; }
+  .badge-leader { background: #1a3a1a; color: #4ade80; }
+  .badge-worker { background: #2a1a00; color: var(--orange); }
 
-/* ===== Card ===== */
-.card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: var(--shadow);
-  animation: slideUp .35s ease both;
-}
-.card-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text1);
-  margin-bottom: 4px;
-}
-.card-hint {
-  font-size: 12px;
-  color: var(--text2);
-  margin-bottom: 20px;
-}
+  /* ── PINキーパッド ── */
+  .pin-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .pin-user-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    color: var(--orange);
+    flex-shrink: 0;
+  }
+  .pin-user-name { font-size: 15px; font-weight: 600; }
+  .pin-user-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-/* ===== Shift buttons ===== */
-.shift-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.shift-btn {
-  background: var(--bg3);
-  border: 2px solid transparent;
-  border-radius: var(--radius);
-  padding: 16px 8px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: all .15s;
-  color: var(--text1);
-  font-family: inherit;
-}
-.shift-btn:hover { border-color: var(--orange); }
-.shift-btn.selected {
-  border-color: var(--orange);
-  background: rgba(239,159,39,.1);
-}
-.shift-num {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--orange);
-  line-height: 1;
-}
-.shift-name {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text2);
-}
-.shift-time {
-  font-size: 11px;
-  color: var(--text2);
-}
+  .pin-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .pin-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: all .15s;
+  }
+  .pin-dot.filled { background: var(--orange); border-color: var(--orange); }
+  .pin-dot.error  { background: var(--error);  border-color: var(--error); }
 
-/* ===== User list ===== */
-.user-search {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text1);
-  margin-bottom: 12px;
-  outline: none;
-  transition: border-color .15s;
-}
-.user-search:focus { border-color: var(--orange); }
-.user-search::placeholder { color: var(--text2); }
-.user-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-.user-btn {
-  background: var(--bg3);
-  border: 2px solid transparent;
-  border-radius: var(--radius);
-  padding: 12px 14px;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  color: var(--text1);
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.user-btn:hover { border-color: var(--orange); }
-.user-btn.selected {
-  border-color: var(--orange);
-  background: rgba(239,159,39,.1);
-}
-.user-avatar {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--orange);
-  color: var(--navy);
-  font-size: 13px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.user-info { overflow: hidden; }
-.user-name {
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.user-role {
-  font-size: 11px;
-  color: var(--text2);
-  font-weight: 400;
-}
-.user-role.sl  { color: var(--warning); }
-.user-role.adm { color: var(--danger); }
-.user-locked {
-  opacity: 0.4;
-  pointer-events: none;
-  position: relative;
-}
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .pin-key {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .1s;
+    text-align: center;
+    user-select: none;
+  }
+  .pin-key:active { background: var(--border); transform: scale(.95); }
+  .pin-key.cancel { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .pin-key.del    { font-size: 18px; }
 
-/* ===== PIN Screen ===== */
-.pin-user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
-.pin-avatar {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: var(--orange);
-  color: var(--navy);
-  font-size: 18px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
-.pin-user-name {
-  font-size: 16px;
-  font-weight: 700;
-}
-.pin-user-role {
-  font-size: 12px;
-  color: var(--text2);
-}
-.pin-dots {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin: 4px 0 20px;
-}
-.pin-dot {
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: transparent;
-  transition: all .2s;
-}
-.pin-dot.filled {
-  background: var(--orange);
-  border-color: var(--orange);
-  transform: scale(1.1);
-}
-.pin-dot.error {
-  background: var(--danger);
-  border-color: var(--danger);
-  animation: shake .3s ease;
-}
-.pin-keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.key-btn {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  height: 56px;
-  font-family: inherit;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text1);
-  cursor: pointer;
-  transition: all .1s;
-  display: flex; align-items: center; justify-content: center;
-  user-select: none;
-}
-.key-btn:active { transform: scale(0.95); background: var(--bg1); }
-.key-btn.key-clear {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
-}
-.key-btn.key-del {
-  font-size: 20px;
-  color: var(--text2);
-}
-.key-btn:disabled { opacity: 0.3; pointer-events: none; }
+  .pin-error {
+    text-align: center;
+    font-size: 12px;
+    color: var(--error);
+    margin-bottom: 12px;
+    min-height: 18px;
+  }
 
-/* ===== Buttons ===== */
-.btn-primary {
-  width: 100%;
-  height: 52px;
-  background: var(--orange);
-  border: none;
-  border-radius: var(--radius);
-  color: var(--navy);
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all .15s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  margin-top: 4px;
-}
-.btn-primary:hover { background: var(--orange-dark); }
-.btn-primary:active { transform: scale(0.97); }
-.btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-.btn-secondary {
-  width: 100%;
-  height: 48px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text2);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .15s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  margin-top: 8px;
-}
-.btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+  /* ── 戻るボタン ── */
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 16px;
+    font-family: inherit;
+  }
+  .back-btn:hover { color: var(--text); }
 
-/* ===== Error / Info messages ===== */
-.msg-error {
-  background: rgba(239,68,68,.12);
-  border: 1px solid rgba(239,68,68,.3);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--danger);
-  margin-bottom: 12px;
-  text-align: center;
-  animation: fadeIn .2s ease;
-}
-.msg-lock {
-  text-align: center;
-  padding: 24px 0 8px;
-}
-.msg-lock .lock-icon { font-size: 36px; margin-bottom: 8px; }
-.msg-lock .lock-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--danger);
-  margin-bottom: 4px;
-}
-.msg-lock .lock-timer {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text1);
-  font-variant-numeric: tabular-nums;
-}
+  /* ── ローディング ── */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== Animations ===== */
-@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
-@keyframes slideUp  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20%      { transform: translateX(-6px); }
-  40%      { transform: translateX(6px); }
-  60%      { transform: translateX(-4px); }
-  80%      { transform: translateX(4px); }
-}
+  /* ── エラー表示 ── */
+  .fetch-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--error);
+    font-size: 13px;
+  }
+  .retry-btn {
+    margin-top: 12px;
+    background: none;
+    border: 1px solid var(--error);
+    color: var(--error);
+    border-radius: var(--radius);
+    padding: 8px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
 
-/* ===== Responsive ===== */
-@media (min-width: 480px) {
-  .user-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  /* ── 非表示 ── */
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<div class="app" id="app">
-
-  <!-- Top bar -->
-  <div class="topbar">
-    <!-- Traq logo horizontal (mini) -->
-    <svg width="80" height="28" viewBox="0 0 200 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Factory icon -->
-      <g class="factory-icon">
-        <!-- Base -->
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <!-- Roof highlight -->
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <!-- Windows -->
-        <rect x="9"  y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
-        <!-- Chimneys -->
-        <rect x="8"  y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <!-- Chimney tops -->
-        <rect x="6"  y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <!-- Smoke dots (orange) -->
-        <circle cx="12"  cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="14"  cy="5"  r="2.5" fill="var(--orange)" opacity=".6"/>
-        <circle cx="26"  cy="14" r="3"   fill="var(--orange)" opacity=".8"/>
-        <circle cx="28"  cy="9"  r="2"   fill="var(--orange)" opacity=".5"/>
-        <circle cx="40"  cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-        <circle cx="42"  cy="13" r="1.8" fill="var(--orange)" opacity=".45"/>
-      </g>
-      <!-- Text: Traq -->
-      <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
-    </svg>
-
-    <div class="topbar-right">
-      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
-      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
-      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
-      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-    </div>
+<!-- ヘッダー -->
+<header class="header">
+  <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="6" fill="#080d18"/>
+    <!-- 工場シルエット -->
+    <rect x="4" y="20" width="28" height="12" rx="1" fill="#2e3a52"/>
+    <rect x="6" y="14" width="6" height="8" fill="#2e3a52"/>
+    <rect x="16" y="12" width="6" height="10" fill="#2e3a52"/>
+    <rect x="26" y="16" width="4" height="6" fill="#2e3a52"/>
+    <!-- 煙突 -->
+    <rect x="8"  y="8" width="2" height="8" rx="1" fill="#2e3a52"/>
+    <rect x="18" y="6" width="2" height="8" rx="1" fill="#2e3a52"/>
+    <!-- 煙 -->
+    <circle cx="9"  cy="6"  r="2" fill="#EF9F27" opacity=".8"/>
+    <circle cx="11" cy="4"  r="1.5" fill="#EF9F27" opacity=".5"/>
+    <circle cx="19" cy="4"  r="2" fill="#EF9F27" opacity=".8"/>
+    <circle cx="21" cy="2"  r="1.5" fill="#EF9F27" opacity=".5"/>
+  </svg>
+  <div>
+    <div class="logo-text">Traq</div>
+    <div class="logo-sub">TROUBLETRACK SYSTEM</div>
   </div>
+</header>
 
-  <!-- Main -->
-  <div class="main" id="main">
+<!-- メイン -->
+<main class="main">
+  <div class="card">
 
-    <!-- Big Logo -->
-    <div class="logo-wrap">
-      <svg width="180" height="72" viewBox="0 0 360 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g>
-          <rect x="6" y="66" width="88" height="36" rx="3" fill="var(--factory)"/>
-          <rect x="6" y="64" width="88" height="5" rx="2" fill="var(--roof)"/>
-          <rect x="14" y="76" width="11" height="14" rx="2" fill="var(--orange)" opacity=".7"/>
-          <rect x="34" y="76" width="11" height="14" rx="2" fill="var(--orange)" opacity=".5"/>
-          <rect x="55" y="76" width="11" height="14" rx="2" fill="var(--orange)" opacity=".7"/>
-          <rect x="74" y="76" width="11" height="14" rx="2" fill="var(--orange)" opacity=".4"/>
-          <rect x="12"  y="35" width="16" height="33" rx="2" fill="var(--factory)"/>
-          <rect x="40"  y="43" width="16" height="25" rx="2" fill="var(--factory)"/>
-          <rect x="68"  y="50" width="16" height="18" rx="2" fill="var(--factory)"/>
-          <rect x="8"   y="31" width="24" height="7" rx="2" fill="var(--roof)"/>
-          <rect x="36"  y="39" width="24" height="7" rx="2" fill="var(--roof)"/>
-          <rect x="64"  y="46" width="24" height="7" rx="2" fill="var(--roof)"/>
-          <circle cx="20" cy="20" r="7"   fill="var(--orange)" opacity=".9"/>
-          <circle cx="24" cy="9"  r="5"   fill="var(--orange)" opacity=".55"/>
-          <circle cx="48" cy="29" r="6"   fill="var(--orange)" opacity=".8"/>
-          <circle cx="52" cy="18" r="4"   fill="var(--orange)" opacity=".5"/>
-          <circle cx="76" cy="37" r="5"   fill="var(--orange)" opacity=".75"/>
-          <circle cx="80" cy="27" r="3.5" fill="var(--orange)" opacity=".45"/>
-        </g>
-        <text x="110" y="85" font-family="'Noto Sans JP',sans-serif" font-size="62" font-weight="700" fill="var(--orange)">Traq</text>
-      </svg>
-      <span class="logo-sub">TroubleTrack System</span>
-    </div>
-
-    <!-- Step indicator -->
-    <div class="steps" id="stepsEl">
+    <!-- ステップインジケーター -->
+    <div class="steps">
       <div class="step-item">
         <div class="step-dot active" id="dot1">1</div>
-        <div class="step-label active" id="lbl1" data-i18n="step_shift">シフト</div>
+        <div class="step-label active" id="lbl1">シフト</div>
       </div>
       <div class="step-line" id="line1"></div>
       <div class="step-item">
         <div class="step-dot" id="dot2">2</div>
-        <div class="step-label" id="lbl2" data-i18n="step_user">ユーザー</div>
+        <div class="step-label" id="lbl2">ユーザー</div>
       </div>
       <div class="step-line" id="line2"></div>
       <div class="step-item">
         <div class="step-dot" id="dot3">3</div>
-        <div class="step-label" id="lbl3" data-i18n="step_pin">PIN</div>
+        <div class="step-label" id="lbl3">PIN</div>
       </div>
     </div>
 
-    <!-- === STEP 1: Shift === -->
-    <div class="card" id="step1">
-      <div class="card-title" data-i18n="shift_title">シフトを選択してください</div>
-      <div class="card-hint" data-i18n="shift_hint">現在のシフトを選択してください</div>
+    <!-- Step 1: シフト選択 -->
+    <div id="step1">
+      <div class="section-title">シフトを選択</div>
       <div class="shift-grid">
-        <button class="shift-btn" onclick="selectShift(1)" id="shift1">
-          <span class="shift-num">1</span>
-          <span class="shift-name" data-i18n="shift1_name">1直</span>
-          <span class="shift-time">08:00–16:00</span>
+        <button class="shift-btn" onclick="selectShift(1)">
+          <div class="shift-no">1直</div>
+          <div class="shift-time">08:00 – 16:00</div>
         </button>
-        <button class="shift-btn" onclick="selectShift(2)" id="shift2">
-          <span class="shift-num">2</span>
-          <span class="shift-name" data-i18n="shift2_name">2直</span>
-          <span class="shift-time">16:00–24:00</span>
+        <button class="shift-btn" onclick="selectShift(2)">
+          <div class="shift-no">2直</div>
+          <div class="shift-time">16:00 – 00:00</div>
         </button>
-        <button class="shift-btn" onclick="selectShift(3)" id="shift3">
-          <span class="shift-num">3</span>
-          <span class="shift-name" data-i18n="shift3_name">3直</span>
-          <span class="shift-time">00:00–08:00</span>
+        <button class="shift-btn" onclick="selectShift(3)">
+          <div class="shift-no">3直</div>
+          <div class="shift-time">00:00 – 08:00</div>
         </button>
       </div>
     </div>
 
-    <!-- === STEP 2: User === -->
-    <div class="card" id="step2" style="display:none">
-      <div class="card-title" data-i18n="user_title">ユーザーを選択してください</div>
-      <div class="card-hint" id="shiftBadge"></div>
-      <input class="user-search" type="text" id="userSearch"
-             data-i18n-ph="search_ph" placeholder="名前で検索..."
-             oninput="filterUsers()">
-      <div class="user-grid" id="userGrid"></div>
-      <button class="btn-secondary" onclick="goStep(1)" style="margin-top:16px">
-        <span>←</span> <span data-i18n="back">もどる</span>
+    <!-- Step 2: ユーザー選択 -->
+    <div id="step2" class="hidden">
+      <button class="back-btn" onclick="goStep(1)">
+        ← 戻る
       </button>
+      <div class="section-title" id="step2-title">ユーザーを選択</div>
+      <div id="user-list-wrap"></div>
     </div>
 
-    <!-- === STEP 3: PIN === -->
-    <div class="card" id="step3" style="display:none">
-      <div class="pin-user-info">
-        <div class="pin-avatar" id="pinAvatar"></div>
+    <!-- Step 3: PIN入力 -->
+    <div id="step3" class="hidden">
+      <button class="back-btn" onclick="goStep(2)">
+        ← 戻る
+      </button>
+      <div class="pin-user">
+        <div class="pin-user-avatar" id="pin-avatar"></div>
         <div>
-          <div class="pin-user-name" id="pinName"></div>
-          <div class="pin-user-role" id="pinRole"></div>
+          <div class="pin-user-name" id="pin-name"></div>
+          <div class="pin-user-role" id="pin-role"></div>
         </div>
       </div>
-      <div id="pinErrorEl"></div>
-      <div id="pinLockEl" style="display:none"></div>
-      <div id="pinInputArea">
-        <div class="pin-dots" id="pinDots">
-          <div class="pin-dot" id="pd0"></div>
-          <div class="pin-dot" id="pd1"></div>
-          <div class="pin-dot" id="pd2"></div>
-          <div class="pin-dot" id="pd3"></div>
-        </div>
-        <div class="pin-keypad" id="pinKeypad">
-          <button class="key-btn" onclick="pinKey('1')">1</button>
-          <button class="key-btn" onclick="pinKey('2')">2</button>
-          <button class="key-btn" onclick="pinKey('3')">3</button>
-          <button class="key-btn" onclick="pinKey('4')">4</button>
-          <button class="key-btn" onclick="pinKey('5')">5</button>
-          <button class="key-btn" onclick="pinKey('6')">6</button>
-          <button class="key-btn" onclick="pinKey('7')">7</button>
-          <button class="key-btn" onclick="pinKey('8')">8</button>
-          <button class="key-btn" onclick="pinKey('9')">9</button>
-          <button class="key-btn key-clear" onclick="pinClear()" data-i18n="pin_clear">クリア</button>
-          <button class="key-btn" onclick="pinKey('0')">0</button>
-          <button class="key-btn key-del" onclick="pinDel()">⌫</button>
-        </div>
-        <button class="btn-primary" id="loginBtn" onclick="doLogin()" disabled>
-          <span data-i18n="login_btn">ログイン</span>
-        </button>
-        <button class="btn-secondary" onclick="goStep(2)">
-          <span>←</span> <span data-i18n="back">もどる</span>
-        </button>
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key cancel" onclick="pinCancel()">取消</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
       </div>
     </div>
 
-  </div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</main>
 
 <script>
-/* =============================================
-   i18n
-============================================= */
-const I18N = {
-  ja: {
-    step_shift: 'シフト', step_user: 'ユーザー', step_pin: 'PIN',
-    shift_title: 'シフトを選択してください',
-    shift_hint: '現在のシフトを選択してください',
-    shift1_name: '1直', shift2_name: '2直', shift3_name: '3直',
-    user_title: 'ユーザーを選択してください',
-    search_ph: '名前で検索...',
-    back: 'もどる',
-    login_btn: 'ログイン',
-    pin_clear: 'クリア',
-    role_op: 'OP', role_sl: 'SL', role_adm: 'admin',
-    shift_badge: (s) => `${s}直のユーザー`,
-    pin_error_wrong: (n) => `PINが違います（残り ${3-n} 回）`,
-    pin_locked: 'アカウントがロックされています',
-    pin_unlock_in: (m,s) => `${m}分${s}秒後にロック解除`,
-    login_ok: (name) => `${name} さん、ログインしました`,
-  },
-  vi: {
-    step_shift: 'Ca làm', step_user: 'Người dùng', step_pin: 'PIN',
-    shift_title: 'Chọn ca làm việc',
-    shift_hint: 'Vui lòng chọn ca làm việc hiện tại',
-    shift1_name: 'Ca 1', shift2_name: 'Ca 2', shift3_name: 'Ca 3',
-    user_title: 'Chọn người dùng',
-    search_ph: 'Tìm theo tên...',
-    back: 'Quay lại',
-    login_btn: 'Đăng nhập',
-    pin_clear: 'Xoá',
-    role_op: 'OP', role_sl: 'SL', role_adm: 'admin',
-    shift_badge: (s) => `Người dùng ca ${s}`,
-    pin_error_wrong: (n) => `PIN sai (còn ${3-n} lần)`,
-    pin_locked: 'Tài khoản đang bị khoá',
-    pin_unlock_in: (m,s) => `Mở khoá sau ${m} phút ${s} giây`,
-    login_ok: (name) => `${name} đã đăng nhập`,
-  },
-  en: {
-    step_shift: 'Shift', step_user: 'User', step_pin: 'PIN',
-    shift_title: 'Select your shift',
-    shift_hint: 'Please select the current shift',
-    shift1_name: 'Shift 1', shift2_name: 'Shift 2', shift3_name: 'Shift 3',
-    user_title: 'Select user',
-    search_ph: 'Search by name...',
-    back: 'Back',
-    login_btn: 'Login',
-    pin_clear: 'Clear',
-    role_op: 'OP', role_sl: 'SL', role_adm: 'admin',
-    shift_badge: (s) => `Shift ${s} users`,
-    pin_error_wrong: (n) => `Wrong PIN (${3-n} attempt${3-n===1?'':'s'} left)`,
-    pin_locked: 'Account is locked',
-    pin_unlock_in: (m,s) => `Unlocks in ${m}m ${s}s`,
-    login_ok: (name) => `${name} logged in`,
-  }
-};
-let currentLang = 'ja';
+// ── Supabase設定 ──────────────────────────────────────────
+const SB_URL = 'https://avureyklkpslrjasrxuv.supabase.co';
+const SB_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
 
-function t(key, ...args) {
-  const v = I18N[currentLang][key];
-  return typeof v === 'function' ? v(...args) : (v || key);
-}
-
-function setLang(lang) {
-  currentLang = lang;
-  localStorage.setItem('traq_lang', lang);
-  ['ja','vi','en'].forEach(l => {
-    document.getElementById('lang-'+l).classList.toggle('active', l===lang);
-  });
-  applyI18n();
-}
-
-function applyI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.dataset.i18n);
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-    el.placeholder = t(el.dataset.i18nPh);
-  });
-  if (state.selectedShift) {
-    document.getElementById('shiftBadge').textContent = t('shift_badge', state.selectedShift);
-  }
-}
-
-/* =============================================
-   Supabase Config
-============================================= */
-const SUPABASE_URL = 'https://avureyklkpslrjasrxuv.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_qElTC45JQveXq8oUf8L1Dg_PpBsH8PA';
-
-async function sbFetch(path, opts={}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
     headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
     },
-    ...opts,
+    ...opts
   });
-  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`${res.status}: ${err}`);
+  }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
 
-/* =============================================
-   Users (loaded from Supabase)
-============================================= */
-let USERS = [];
+// ── 状態管理 ──────────────────────────────────────────────
+let selectedShift = null;
+let selectedUser  = null;
+let allUsers      = [];
+let pinInput      = '';
 
-async function loadUsers() {
+// ロールごとのPINロック状態（ブラウザメモリ管理）
+// key: userId, value: { failCount, lockedUntil }
+const lockState = {};
+
+// ロールの日本語変換
+const ROLE_LABELS = { worker: 'OP', leader: 'SL', admin: 'Admin' };
+
+// ── ページ初期化 ──────────────────────────────────────────
+(async () => {
   try {
-    const users = await sbFetch('users?select=*&is_active=eq.true&order=name');
-    USERS = users.map(u => ({
-      id: u.id,
-      name: u.name,
-      role: u.role,
-      pin_hash: u.pin_hash || '0000',
-      shift: u.default_shift ? parseInt(u.default_shift) : null,
-      is_active: u.is_active,
-      pin_fail_count: 0,
-      pin_lock_until: null,
-    }));
-  } catch (err) {
-    console.error('ユーザー読み込み失敗:', err);
-    // フォールバック: エラー時はログイン画面でメッセージ表示
-    USERS = [];
+    allUsers = await sbFetch('traq_users?is_active=eq.true&order=role.asc,name.asc&select=id,name,role,shift,pin_hash');
+  } catch (e) {
+    console.error('ユーザー取得失敗:', e);
+    allUsers = [];
   }
-}
+})();
 
-const ROLE_ORDER = { sl:0, op:1, admin:2 };
-
-function sortUsers(list) {
-  return [...list].sort((a,b) => {
-    const rd = ROLE_ORDER[a.role] - ROLE_ORDER[b.role];
-    if (rd !== 0) return rd;
-    return a.name.localeCompare(b.name, 'ja');
-  });
-}
-
-/* =============================================
-   State
-============================================= */
-const state = {
-  selectedShift: null,
-  selectedUser: null,
-  pinInput: '',
-  lockTimers: {},
-};
-
-/* =============================================
-   Theme
-============================================= */
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('traq_theme', isDark ? 'light' : 'dark');
-}
-function initTheme() {
-  const saved = localStorage.getItem('traq_theme');
-  const pref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  const theme = saved || pref;
-  document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('themeBtn').textContent = theme === 'dark' ? '🌙' : '☀️';
-}
-
-/* =============================================
-   Step navigation
-============================================= */
+// ── ステップ制御 ──────────────────────────────────────────
 function goStep(n) {
   [1,2,3].forEach(i => {
-    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
-    const dot = document.getElementById('dot'+i);
-    const lbl = document.getElementById('lbl'+i);
-    if (i < n) {
-      dot.className = 'step-dot done'; dot.textContent = '✓';
-      lbl.className = 'step-label';
-    } else if (i === n) {
-      dot.className = 'step-dot active'; dot.textContent = String(i);
-      lbl.className = 'step-label active';
-    } else {
-      dot.className = 'step-dot'; dot.textContent = String(i);
-      lbl.className = 'step-label';
-    }
-    if (i < 3) {
-      document.getElementById('line'+i).className = 'step-line' + (i < n ? ' done' : '');
-    }
+    document.getElementById(`step${i}`).classList.toggle('hidden', i !== n);
   });
-  document.getElementById('main').scrollTo(0, 0);
+  updateStepIndicator(n);
 }
 
-/* =============================================
-   Step 1 – Shift
-============================================= */
-function selectShift(s) {
-  state.selectedShift = s;
+function updateStepIndicator(n) {
   [1,2,3].forEach(i => {
-    document.getElementById('shift'+i).classList.toggle('selected', i===s);
+    const dot = document.getElementById(`dot${i}`);
+    const lbl = document.getElementById(`lbl${i}`);
+    dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+    lbl.className = 'step-label' + (i === n ? ' active' : '');
+    if (i < 3) {
+      document.getElementById(`line${i}`).className = 'step-line' + (i < n ? ' done' : '');
+    }
   });
-  setTimeout(() => {
-    renderUsers();
-    goStep(2);
-  }, 150);
 }
 
-function autoSuggestShift() {
-  const h = new Date().getHours();
-  if (h >= 8  && h < 16) return 1;
-  if (h >= 16 && h < 24) return 2;
-  return 3;
+// ── Step1: シフト選択 ─────────────────────────────────────
+function selectShift(shift) {
+  selectedShift = shift;
+  renderUserList();
+  goStep(2);
 }
 
-/* =============================================
-   Step 2 – User
-============================================= */
-function renderUsers(filter='') {
-  // admin/SL(shift=null) は常に表示、OPは選択シフトで絞り込み
-  const list = USERS.filter(u => {
-    if (u.role === 'admin' || u.role === 'sl') return true;
-    if (u.shift === state.selectedShift) return true;
-    return false;
-  });
-  const sorted = sortUsers(list);
-  const filtered = filter
-    ? sorted.filter(u => u.name.toLowerCase().includes(filter.toLowerCase()))
-    : sorted;
+// ── Step2: ユーザーリスト表示 ─────────────────────────────
+function renderUserList() {
+  const wrap = document.getElementById('user-list-wrap');
 
-  document.getElementById('shiftBadge').textContent = t('shift_badge', state.selectedShift);
-  const grid = document.getElementById('userGrid');
-  grid.innerHTML = '';
-
-  if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);font-size:13px">ユーザーが見つかりません</div>';
+  if (allUsers.length === 0) {
+    wrap.innerHTML = '<div class="fetch-error">ユーザーを取得できませんでした<br><button class="retry-btn" onclick="retryLoad()">再読込</button></div>';
     return;
   }
 
-  filtered.forEach(u => {
-    const locked = isLocked(u);
-    const btn = document.createElement('button');
-    btn.className = 'user-btn' + (locked ? ' user-locked' : '');
-    btn.onclick = () => selectUser(u);
-    btn.disabled = locked;
-    const roleLabel = u.role === 'admin' ? t('role_adm') : u.role === 'sl' ? t('role_sl') : t('role_op');
-    const roleClass = u.role === 'admin' ? 'adm' : u.role === 'sl' ? 'sl' : '';
-    btn.innerHTML = `
-      <div class="user-avatar">${u.name[0]}</div>
-      <div class="user-info">
-        <div class="user-name">${u.name}</div>
-        <div class="user-role ${roleClass}">${roleLabel}</div>
-      </div>
-    `;
-    grid.appendChild(btn);
+  // シフト優先（自分のシフト→他シフト）、ロール順（admin→leader→worker）
+  const roleOrder = { admin: 0, leader: 1, worker: 2 };
+  const sorted = [...allUsers].sort((a, b) => {
+    const aMyShift = a.shift === selectedShift ? 0 : 1;
+    const bMyShift = b.shift === selectedShift ? 0 : 1;
+    if (aMyShift !== bMyShift) return aMyShift - bMyShift;
+    return (roleOrder[a.role] ?? 9) - (roleOrder[b.role] ?? 9);
   });
+
+  const title = document.getElementById('step2-title');
+  title.textContent = `${selectedShift}直 — ユーザーを選択`;
+
+  const badgeClass = { admin: 'badge-admin', leader: 'badge-leader', worker: 'badge-worker' };
+
+  wrap.innerHTML = '<div class="user-list">' +
+    sorted.map(u => {
+      const initials = u.name.charAt(0);
+      const roleLabel = ROLE_LABELS[u.role] || u.role;
+      const badge = badgeClass[u.role] || 'badge-worker';
+      const locked = isLocked(u.id);
+      return `
+        <button class="user-btn" onclick="selectUser(${u.id})" ${locked ? 'disabled style="opacity:.5"' : ''}>
+          <div class="user-avatar">${initials}</div>
+          <div>
+            <div class="user-name">${u.name}</div>
+            <div class="user-role">${u.shift}直${locked ? ' — ロック中' : ''}</div>
+          </div>
+          <span class="role-badge ${badge}">${roleLabel}</span>
+        </button>`;
+    }).join('') +
+  '</div>';
 }
 
-function filterUsers() {
-  renderUsers(document.getElementById('userSearch').value);
+async function retryLoad() {
+  const wrap = document.getElementById('user-list-wrap');
+  wrap.innerHTML = '<div class="loading"><div class="spinner"></div>読込中...</div>';
+  try {
+    allUsers = await sbFetch('traq_users?is_active=eq.true&order=role.asc,name.asc&select=id,name,role,shift,pin_hash');
+    renderUserList();
+  } catch (e) {
+    wrap.innerHTML = '<div class="fetch-error">取得失敗<br><button class="retry-btn" onclick="retryLoad()">再読込</button></div>';
+  }
 }
 
-function selectUser(u) {
-  state.selectedUser = u;
-  state.pinInput = '';
-  updatePinDots();
-  document.getElementById('pinAvatar').textContent = u.name[0];
-  document.getElementById('pinName').textContent = u.name;
-  const rl = u.role === 'admin' ? t('role_adm') : u.role === 'sl' ? t('role_sl') : t('role_op');
-  const rc = u.role === 'admin' ? 'adm' : u.role === 'sl' ? 'sl' : '';
-  const roleEl = document.getElementById('pinRole');
-  roleEl.textContent = rl;
-  roleEl.className = 'pin-user-role ' + rc;
-  clearError();
-  document.getElementById('loginBtn').disabled = true;
-  checkLockState(u);
+// ── Step3: PIN入力 ────────────────────────────────────────
+function selectUser(userId) {
+  selectedUser = allUsers.find(u => u.id === userId);
+  if (!selectedUser) return;
+
+  pinInput = '';
+  document.getElementById('pin-avatar').textContent = selectedUser.name.charAt(0);
+  document.getElementById('pin-name').textContent   = selectedUser.name;
+  document.getElementById('pin-role').textContent   = ROLE_LABELS[selectedUser.role] || selectedUser.role;
+  document.getElementById('pin-error').textContent  = '';
+  renderPinDots();
   goStep(3);
 }
 
-/* =============================================
-   Step 3 – PIN
-============================================= */
+function renderPinDots(shake = false) {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById(`pd${i}`);
+    dot.className = 'pin-dot' + (i < pinInput.length ? (shake ? ' error' : ' filled') : '');
+  }
+}
+
 function pinKey(k) {
-  if (state.pinInput.length >= 4) return;
-  state.pinInput += k;
-  updatePinDots();
-  if (state.pinInput.length === 4) {
-    document.getElementById('loginBtn').disabled = false;
-  }
+  if (pinInput.length >= 4) return;
+  pinInput += k;
+  renderPinDots();
+  document.getElementById('pin-error').textContent = '';
+  if (pinInput.length === 4) setTimeout(verifyPin, 80);
 }
+
 function pinDel() {
-  state.pinInput = state.pinInput.slice(0,-1);
-  updatePinDots();
-  document.getElementById('loginBtn').disabled = true;
-}
-function pinClear() {
-  state.pinInput = '';
-  updatePinDots();
-  document.getElementById('loginBtn').disabled = true;
-}
-function updatePinDots() {
-  for (let i=0;i<4;i++) {
-    const d = document.getElementById('pd'+i);
-    d.className = 'pin-dot' + (i < state.pinInput.length ? ' filled' : '');
+  if (pinInput.length > 0) {
+    pinInput = pinInput.slice(0, -1);
+    renderPinDots();
+    document.getElementById('pin-error').textContent = '';
   }
 }
 
-let loginBusy = false;
-async function doLogin() {
-  const u = state.selectedUser;
-  if (!u || state.pinInput.length !== 4) return;
-  if (isLocked(u)) return;
-  if (loginBusy) return;
-  loginBusy = true;
-  document.getElementById('loginBtn').disabled = true;
+function pinCancel() {
+  pinInput = '';
+  renderPinDots();
+  document.getElementById('pin-error').textContent = '';
+  goStep(2);
+}
 
-  if (state.pinInput === u.pin_hash) {
-    // ✅ 成功
-    u.pin_fail_count = 0;
-    u.pin_lock_until = null;
+// ── ロック管理 ────────────────────────────────────────────
+function isLocked(userId) {
+  const s = lockState[userId];
+  if (!s) return false;
+  if (s.lockedUntil && new Date() < new Date(s.lockedUntil)) return true;
+  return false;
+}
 
-    sessionStorage.setItem('traq_session', JSON.stringify({
-      id: u.id, name: u.name, role: u.role, shift: state.selectedShift
-    }));
-    flashSuccess();
-  } else {
-    // ❌ 失敗
-    const newCount = (u.pin_fail_count || 0) + 1;
-    u.pin_fail_count = newCount;
-
-    shakeDots();
-
-    if (newCount >= 3) {
-      lockAccount(u);
-    } else {
-      showError(t('pin_error_wrong', newCount));
-    }
-    state.pinInput = '';
-    updatePinDots();
-    document.getElementById('loginBtn').disabled = true;
-    loginBusy = false;
+function recordFail(userId) {
+  if (!lockState[userId]) lockState[userId] = { failCount: 0, lockedUntil: null };
+  lockState[userId].failCount++;
+  if (lockState[userId].failCount >= 3) {
+    const until = new Date(Date.now() + 5 * 60 * 1000);
+    lockState[userId].lockedUntil = until.toISOString();
+    lockState[userId].failCount = 0;
+    return true; // ロックした
   }
+  return false;
 }
 
-function flashSuccess() {
-  const u = state.selectedUser;
-  const btn = document.getElementById('loginBtn');
-  btn.textContent = '✓ ' + t('login_ok', u.name.split(' ')[0]);
-  btn.style.background = 'var(--success)';
-  setTimeout(() => {
-    if (u.role === 'sl') {
-      location.href = 'home_sl.html';
-    } else {
-      location.href = 'home.html';
-    }
-  }, 1000);
+function clearFail(userId) {
+  delete lockState[userId];
 }
 
-function shakeDots() {
-  for (let i=0;i<4;i++) {
-    const d = document.getElementById('pd'+i);
-    d.className = 'pin-dot error';
-  }
-  setTimeout(() => updatePinDots(), 400);
-}
+// ── PIN検証 ───────────────────────────────────────────────
+let verifying = false;
+async function verifyPin() {
+  if (verifying) return;
+  verifying = true;
 
-function showError(msg) {
-  document.getElementById('pinErrorEl').innerHTML =
-    `<div class="msg-error">${msg}</div>`;
-}
-function clearError() {
-  document.getElementById('pinErrorEl').innerHTML = '';
-}
-
-/* =============================================
-   Lock logic (メモリ管理)
-============================================= */
-function isLocked(u) {
-  if (!u.pin_lock_until) return false;
-  return Date.now() < new Date(u.pin_lock_until).getTime();
-}
-
-function lockAccount(u) {
-  const until = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-  u.pin_lock_until = until;
-  u.pin_fail_count = 3;
-  showLockScreen(u);
-}
-
-function showLockScreen(u) {
-  document.getElementById('pinInputArea').style.display = 'none';
-  clearError();
-  const lockEl = document.getElementById('pinLockEl');
-  lockEl.style.display = 'block';
-  const untilTs = new Date(u.pin_lock_until).getTime();
-  updateLockTimer(u, untilTs, lockEl);
-  state.lockTimers[u.id] = setInterval(() => {
-    if (Date.now() >= untilTs) {
-      clearInterval(state.lockTimers[u.id]);
-      delete state.lockTimers[u.id];
-      u.pin_fail_count = 0;
-      u.pin_lock_until = null;
-      lockEl.style.display = 'none';
-      document.getElementById('pinInputArea').style.display = 'block';
-      state.pinInput = '';
-      updatePinDots();
-      document.getElementById('loginBtn').disabled = true;
-      renderUsers(document.getElementById('userSearch').value);
-    } else {
-      updateLockTimer(u, untilTs, lockEl);
-    }
-  }, 1000);
-}
-
-function updateLockTimer(u, untilTs, el) {
-  const rem = Math.max(0, untilTs - Date.now());
-  const m = Math.floor(rem / 60000);
-  const s = Math.floor((rem % 60000) / 1000);
-  el.innerHTML = `
-    <div class="msg-lock">
-      <div class="lock-icon">🔒</div>
-      <div class="lock-text">${t('pin_locked')}</div>
-      <div class="lock-timer">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:6px">${t('pin_unlock_in',m,s)}</div>
-    </div>
-  `;
-}
-
-function checkLockState(u) {
-  if (isLocked(u)) {
-    document.getElementById('pinInputArea').style.display = 'none';
-    const lockEl = document.getElementById('pinLockEl');
-    lockEl.style.display = 'block';
-    const untilTs = new Date(u.pin_lock_until).getTime();
-    updateLockTimer(u, untilTs, lockEl);
-    if (!state.lockTimers[u.id]) {
-      state.lockTimers[u.id] = setInterval(() => {
-        if (Date.now() >= untilTs) {
-          clearInterval(state.lockTimers[u.id]);
-          delete state.lockTimers[u.id];
-          u.pin_fail_count = 0;
-          u.pin_lock_until = null;
-          lockEl.style.display = 'none';
-          document.getElementById('pinInputArea').style.display = 'block';
-          state.pinInput = '';
-          updatePinDots();
-          document.getElementById('loginBtn').disabled = true;
-        } else {
-          updateLockTimer(u, untilTs, lockEl);
-        }
-      }, 1000);
-    }
-  } else {
-    document.getElementById('pinInputArea').style.display = 'block';
-    document.getElementById('pinLockEl').style.display = 'none';
-  }
-}
-
-/* =============================================
-   Init
-============================================= */
-(async function init() {
-  initTheme();
-  const savedLang = localStorage.getItem('traq_lang') || 'ja';
-  setLang(savedLang);
-  await loadUsers();
-  if (!USERS.length) {
-    document.getElementById('main').innerHTML =
-      '<div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px">⚠️</div><div style="font-size:14px">ユーザーデータの読み込みに失敗しました。<br>インターネット接続を確認してください。</div></div>';
+  if (isLocked(selectedUser.id)) {
+    showPinError('アカウントがロックされています');
+    verifying = false;
     return;
   }
-  const suggested = autoSuggestShift();
-  document.getElementById('shift'+suggested).classList.add('selected');
-  applyI18n();
-})();
+
+  try {
+    const ok = await dcodeIO.bcrypt.compare(pinInput, selectedUser.pin_hash);
+    if (ok) {
+      clearFail(selectedUser.id);
+      doLogin();
+    } else {
+      const locked = recordFail(selectedUser.id);
+      pinInput = '';
+      renderPinDots(true);
+      if (locked) {
+        showPinError('3回失敗しました。5分間ロックします');
+        renderUserList(); // ロック状態をリスト反映
+      } else {
+        const s = lockState[selectedUser.id];
+        showPinError(`PINが違います（${s.failCount}/3回）`);
+      }
+    }
+  } catch (e) {
+    console.error('PIN検証エラー:', e);
+    showPinError('エラーが発生しました');
+  }
+
+  verifying = false;
+}
+
+function showPinError(msg) {
+  document.getElementById('pin-error').textContent = msg;
+}
+
+// ── ログイン処理 ──────────────────────────────────────────
+function doLogin() {
+  // ロール変換
+  const roleMap = { worker: 'op', leader: 'sl', admin: 'admin' };
+  const role = roleMap[selectedUser.role] || 'op';
+
+  // セッション保存（8時間有効）
+  const session = {
+    userId:    selectedUser.id,
+    name:      selectedUser.name,
+    role:      role,
+    shift:     selectedShift,
+    expiresAt: Date.now() + 8 * 60 * 60 * 1000
+  };
+  localStorage.setItem('traq_session', JSON.stringify(session));
+
+  // リダイレクト
+  const dest = { op: 'home.html', sl: 'home_sl.html', admin: 'home.html' };
+  location.href = dest[role] || 'home.html';
+}
 </script>
-<script src="traq-version.js"></script>
 </body>
 </html>
