@@ -56,6 +56,7 @@ html, body {
 
 /* ===== Layout ===== */
 .app { height: 100%; display: flex; flex-direction: column; }
+.main-column { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 .sidebar { display: none; }
 
 /* ===== Common Header (topbar) ===== */
@@ -88,7 +89,7 @@ html, body {
 .scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 16px calc(var(--nav-h) + 16px);
+  padding: 16px 16px 16px;
 }
 
 /* ===== Date/shift bar ===== */
@@ -659,7 +660,7 @@ html, body {
 const I18N = {
   ja: {
     nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
-    nav_theme:'テーマ切替', nav_logout:'ログアウト', master_denied:'マスタはSL・管理者のみ利用できます',
+    nav_theme:'テーマ切替', nav_logout:'ログアウト', master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
     section_list:'投稿一覧', show_all:'すべて表示',
@@ -689,7 +690,7 @@ const I18N = {
   },
   vi: {
     nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Cài đặt',
-    nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất', master_denied:'Chỉ SL và Admin mới dùng được Master',
+    nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất', master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
     draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
     section_list:'Danh sách', show_all:'Xem tất cả',
@@ -718,7 +719,7 @@ const I18N = {
   },
   en: {
     nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
-    nav_theme:'Toggle theme', nav_logout:'Logout', master_denied:'Master is for SL and Admin only',
+    nav_theme:'Toggle theme', nav_logout:'Logout', master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
     btn_eq:'Equipment\nTrouble', btn_md:'Mold\nTrouble',
     draft_label:'draft(s) unsent', draft_confirm:'Review →',
     section_list:'Post List', show_all:'Show all',
@@ -1068,10 +1069,27 @@ function handleOverlayClick(e) { if (e.target.classList.contains('modal-overlay'
 function goMaster() {
   var role = SESSION && SESSION.role;
   if (role === 'worker' || role === 'op' || !role) {
-    showToast(t('master_denied'), 'error');
+    showMasterDenied();
     return;
   }
   location.href = 'admin.html';
+}
+function showMasterDenied() {
+  var existing = document.getElementById('masterDeniedOverlay');
+  if (existing) existing.remove();
+  var ov = document.createElement('div');
+  ov.id = 'masterDeniedOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);animation:fadeIn .15s ease';
+  ov.onclick = function(){ ov.remove(); };
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  box.innerHTML =
+    '<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div>' +
+    '<div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">' + t('master_denied_title') + '</div>' +
+    '<div style="font-size:13px;color:var(--text2);line-height:1.6">' + t('master_denied') + '</div>' +
+    '<button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  ov.appendChild(box);
+  document.body.appendChild(ov);
 }
 
 /* ===== Toast ===== */

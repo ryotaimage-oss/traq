@@ -405,8 +405,18 @@ function goHome(){
 }
 function goMaster(){
   var r=session&&session.role;
-  if(r==='worker'||r==='op'||!r){showToast('マスタはSL・管理者のみ利用できます','error');return;}
+  if(r==='worker'||r==='op'||!r){showMasterDenied();return;}
   location.href='admin.html';
+}
+function showMasterDenied(){
+  var ex=document.getElementById('masterDeniedOverlay');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.id='masterDeniedOverlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
+  ov.onclick=function(){ov.remove();};
+  var box=document.createElement('div');
+  box.style.cssText='background:var(--bg2,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">アクセス制限</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">マスタはSL・管理者のみ利用できます</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  ov.appendChild(box);document.body.appendChild(ov);
 }
 
 
