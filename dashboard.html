@@ -698,12 +698,6 @@ function goHome(){
     if(r==='leader'||r==='admin') location.href='home_sl.html';
     else location.href='home.html';
   }catch(e){location.href='home.html';}
-}');
-    const r=s.role||'';
-    if(r==='leader'||r==='sl') location.href='home_sl.html';
-    else if(r==='admin') location.href='admin.html';
-    else location.href='home.html';
-  }catch(e){location.href='home.html';}
 }
 
 /* ===== Toast ===== */
@@ -717,6 +711,7 @@ function showToast(msg,type='info'){
 }
 </script>
 
+<script>
 /* ===== Swipe Navigation ===== */
 (function(){
   var sess=(function(){try{return JSON.parse(localStorage.getItem('traq_session')||'{}')}catch(e){return{}}})();
@@ -742,6 +737,7 @@ function showToast(msg,type='info'){
     else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
   });
 })();
+</script>
 <script src="./update_banner.js"></script>
 </body>
 </html>
