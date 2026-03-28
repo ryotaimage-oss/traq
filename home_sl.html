@@ -246,7 +246,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </button>
       <button class="snav-item" onclick="setTab('input')">
         <span class="snav-icon">✏️</span>
-        <span data-i18n="nav_input">トラブル入力</span>
+        <span data-i18n="nav_input">異常入力</span>
       </button>
       <button class="snav-item" onclick="setTab('dashboard')">
         <span class="snav-icon">📊</span>
@@ -378,7 +378,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     </button>
     <button class="nav-item" id="bnav-input" onclick="setTab('input')">
       <span class="nav-icon">✏️</span>
-      <span class="nav-label" data-i18n="nav_input">入力</span>
+      <span class="nav-label" data-i18n="nav_input">異常入力</span>
     </button>
     <button class="nav-item" id="bnav-excel" onclick="setTab('excel')">
       <span class="nav-icon">📥</span>
@@ -401,10 +401,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 <div id="toastEl" style="display:none"></div>
 
 <script>
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
 /* ===== i18n ===== */
 const I18N = {
   ja:{
-    nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'トラブル入力',
+    nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'異常入力',
     nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
     pending_label:'件の承認待ち', btn_review:'承認待ちを確認',
@@ -464,7 +469,7 @@ const I18N = {
     empty_all:'Chưa có dữ liệu',
   },
   en:{
-    nav_pending:'Pending', nav_all:'All Data', nav_input:'Input',
+    nav_pending:'Pending', nav_all:'All Data', nav_input:'入力',
     nav_dashboard:'Dashboard', nav_excel:'Excel Download',
     nav_theme:'Toggle Theme', nav_logout:'Logout',
     pending_label:'pending approval', btn_review:'Review pending',
@@ -640,7 +645,7 @@ function setMainTab(tab){
 function setTab(tab){
   if(tab==='dashboard'){ location.href='dashboard.html'; return; }
   if(tab==='excel')    { location.href='excel_download.html'; return; }
-  if(tab==='input')    { location.href='home.html'; return; }
+  if(tab==='input')    { openInputModal(); return; }
   setMainTab(tab==='pending'?'pending':'all');
 }
 function setTypeFilter(f){
@@ -853,6 +858,37 @@ function openDetail(id){
     ${approveActionsHTML}
     <button class="btn-close" onclick="closeModal()">${t('btn_close')}</button>
   `);
+}
+
+/* ===== 異常入力選択モーダル ===== */
+function openInputModal(){
+  showModal(
+    '<div class="modal-handle"></div>'+
+    '<div class="modal-title" style="margin-bottom:16px">異常を入力する</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<button onclick="location.href=\'input_equipment.html\'" style="'+
+        'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);'+
+        'padding:20px 12px;cursor:pointer;font-family:inherit;text-align:center;width:100%">'+
+        '<div style="font-size:28px;margin-bottom:8px">⚙️</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--text1)">設備異常</div>'+
+        '<div style="font-size:11px;color:var(--text2);margin-top:3px">入力する</div>'+
+      '</button>'+
+      '<button onclick="location.href=\'input_mold.html\'" style="'+
+        'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);'+
+        'padding:20px 12px;cursor:pointer;font-family:inherit;text-align:center;width:100%">'+
+        '<div style="font-size:28px;margin-bottom:8px">🔧</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--text1)">金型異常</div>'+
+        '<div style="font-size:11px;color:var(--text2);margin-top:3px">入力する</div>'+
+      '</button>'+
+    '</div>'+
+    '<button onclick="closeModal()" style="'+
+      'width:100%;margin-top:12px;padding:12px;'+
+      'background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);'+
+      'font-family:inherit;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer">'+
+      'キャンセル'+
+    '</button>',
+    true
+  );
 }
 
 /* ===== Modal ===== */
