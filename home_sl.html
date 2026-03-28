@@ -64,15 +64,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* Pending banner */
-.pending-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.25);flex-shrink:0}
-.pending-banner-left{display:flex;align-items:center;gap:10px}
-.pending-icon{font-size:20px}
-.pending-count-wrap{}
-.pending-count{font-size:22px;font-weight:700;color:var(--warning);line-height:1}
-.pending-label{font-size:11px;color:var(--text2)}
-.pending-banner-right{}
-.btn-review-all{background:var(--warning);color:var(--navy);border:none;border-radius:var(--radius);padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
-.btn-review-all:hover{background:#d97706}
 
 /* Tab bar */
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
@@ -82,7 +73,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:5px;vertical-align:middle}
 
 /* Scroll area */
-.scroll-area{flex:1;overflow-y:auto;padding:12px 16px calc(var(--nav-h) + 12px)}
+.scroll-area{flex:1;overflow-y:auto;padding:12px 16px 12px}
 
 /* Filter row */
 .filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
@@ -132,6 +123,17 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .empty-icon{font-size:40px;margin-bottom:10px}
 .empty-title{font-size:15px;font-weight:700;margin-bottom:4px}
 .empty-sub{font-size:12px}
+
+/* Action cards (input shortcut) */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px;flex-shrink:0}
+.action-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s;position:relative;overflow:hidden}
+.action-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;border-radius:10px 10px 0 0;background:var(--orange);transform:scaleX(0);transition:transform .2s ease;transform-origin:left}
+.action-card:hover,.action-card:active{border-color:var(--orange);transform:translateY(-1px);box-shadow:0 4px 12px rgba(239,159,39,.12)}
+.action-card:hover::before,.action-card:active::before{transform:scaleX(1)}
+.action-icon{width:36px;height:36px;border-radius:8px;background:rgba(239,159,39,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.action-label{font-size:13px;font-weight:700;color:var(--text1);line-height:1.3}
+.action-arrow{margin-left:auto;font-size:16px;color:var(--text2);font-weight:300}
+@media(min-width:768px){.action-grid{display:none}}
 
 /* Bottom nav */
 .bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
@@ -328,17 +330,17 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
-    <!-- Pending banner -->
-    <div class="pending-banner" id="pendingBanner">
-      <div class="pending-banner-left">
-        <div class="pending-icon">⏳</div>
-        <div class="pending-count-wrap">
-          <div class="pending-count" id="pendingCount">0</div>
-          <div class="pending-label" data-i18n="pending_label">件の承認待ち</div>
-        </div>
+    <!-- Action cards (mobile input shortcut) -->
+    <div class="action-grid">
+      <div class="action-card" onclick="location.href='input_equipment.html'">
+        <div class="action-icon">⚙️</div>
+        <div class="action-label" data-i18n="btn_eq">設備異常 入力</div>
+        <div class="action-arrow">›</div>
       </div>
-      <div class="pending-banner-right">
-        <button class="btn-review-all" onclick="setMainTab('pending')" data-i18n="btn_review">承認待ちを確認</button>
+      <div class="action-card" onclick="location.href='input_mold.html'">
+        <div class="action-icon">🔧</div>
+        <div class="action-label" data-i18n="btn_md">金型異常 入力</div>
+        <div class="action-arrow">›</div>
       </div>
     </div>
 
@@ -410,7 +412,8 @@ const I18N = {
     nav_list:'一覧', nav_settings:'設定',
     nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード', nav_master:'マスタ',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
-    pending_label:'件の承認待ち', btn_review:'承認待ちを確認',
+    btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
+    btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     tab_pending:'承認待ち', tab_all:'全件', tab_approved:'承認済み', tab_rejected:'差し戻し',
     filter_all:'すべて', filter_eq:'設備', filter_md:'金型',
     type_eq:'設備', type_md:'金型',
@@ -441,7 +444,8 @@ const I18N = {
     nav_list:'Danh sách', nav_settings:'Cài đặt',
     nav_dashboard:'Dashboard', nav_excel:'Tải Excel', nav_master:'Master',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
-    pending_label:'đang chờ duyệt', btn_review:'Xem chờ duyệt',
+    btn_eq:'Nhập sự cố thiết bị', btn_md:'Nhập sự cố khuôn',
+    btn_eq:'Nhập sự cố thiết bị', btn_md:'Nhập sự cố khuôn',
     tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
     filter_all:'Tất cả', filter_eq:'Thiết bị', filter_md:'Khuôn',
     type_eq:'Thiết bị', type_md:'Khuôn',
@@ -472,7 +476,8 @@ const I18N = {
     nav_list:'List', nav_settings:'Settings',
     nav_dashboard:'Dashboard', nav_excel:'Excel Download', nav_master:'Master',
     nav_theme:'Toggle Theme', nav_logout:'Logout',
-    pending_label:'pending approval', btn_review:'Review pending',
+    btn_eq:'Equipment trouble', btn_md:'Mold trouble',
+    btn_eq:'Equipment trouble', btn_md:'Mold trouble',
     tab_pending:'Pending', tab_all:'All', tab_approved:'Approved', tab_rejected:'Rejected',
     filter_all:'All', filter_eq:'Equipment', filter_md:'Mold',
     type_eq:'Equipment', type_md:'Mold',
@@ -669,11 +674,9 @@ function setTypeFilter(f){
 /* ===== Badges ===== */
 function updateBadges(){
   const cnt=TROUBLES.filter(tr=>tr.status==='pending').length;
-  document.getElementById('pendingCount').textContent=cnt;
   document.getElementById('tab-badge-pending').textContent=cnt;
   const sbBadge=document.getElementById('sb-badge');
   if(sbBadge) sbBadge.textContent=cnt;
-  document.getElementById('pendingBanner').style.display=cnt>0?'flex':'none';
 }
 
 /* ===== Render list ===== */
