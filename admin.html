@@ -216,26 +216,15 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <option value="leader">SL</option>
           <option value="admin">Admin</option>
         </select>
-        <select class="filter-select" id="userShiftFilter" onchange="renderUsers()">
-          <option value="">全直</option>
-          <option value="1">1直</option>
-          <option value="2">2直</option>
-          <option value="3">3直</option>
-        </select>
-        <select class="filter-select" id="userActiveFilter" onchange="renderUsers()">
-          <option value="">全状態</option>
-          <option value="true">有効</option>
-          <option value="false">無効</option>
-        </select>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>名前</th><th>ロール</th><th>直</th><th>状態</th><th style="text-align:right">操作</th>
+              <th>名前</th><th>ロール</th><th style="text-align:right">操作</th>
             </tr>
           </thead>
-          <tbody id="userTable"><tr class="loading-row"><td colspan="5">読み込み中...</td></tr></tbody>
+          <tbody id="userTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
         </table>
       </div>
       <div class="pagination" id="userPagination"></div>
@@ -496,13 +485,9 @@ function setTab(tab){
 function getFilteredUsers(){
   const q=(document.getElementById('userSearch').value||'').toLowerCase();
   const rf=document.getElementById('userRoleFilter').value;
-  const sf=document.getElementById('userShiftFilter').value;
-  const af=document.getElementById('userActiveFilter').value;
   return USERS.filter(u=>{
     if(q&&!u.name.toLowerCase().includes(q))return false;
     if(rf&&u.role!==rf)return false;
-    if(sf&&String(u.shift||'')!==sf)return false;
-    if(af!==''&&String(u.is_active)!==af)return false;
     return true;
   });
 }
@@ -512,22 +497,17 @@ function renderUsers(){
   const start=(userPage-1)*PAGE_SIZE;
   const page=list.slice(start,start+PAGE_SIZE);
   const tbody=document.getElementById('userTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">該当なし</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
   tbody.innerHTML=page.map(u=>{
     const role=u.role==='admin'?'admin':u.role==='leader'||u.role==='sl'?'sl':'op';
     const rl=role==='admin'?'Admin':role==='sl'?'SL':'OP';
     const bc='badge-'+role;
-    const shift=u.shift||'–';
-    const active=u.is_active!==false;
     return`<tr>
       <td style="font-weight:600">${esc(u.name)}</td>
       <td><span class="badge ${bc}">${rl}</span></td>
-      <td>${shift!=='–'?shift+'直':shift}</td>
-      <td><span class="badge ${active?'badge-active':'badge-inactive'}">${active?'有効':'無効'}</span></td>
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">編集</button>
         <button class="btn btn-secondary btn-sm" onclick="resetPin('${u.id}','${esc(u.name)}')">PIN初期化</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleActive('traq_users','${u.id}',${active},'USERS','renderUsers')">${active?'無効化':'有効化'}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -544,12 +524,6 @@ function openUserModal(id){
         <option value="leader" ${u&&(u.role==='leader'||u.role==='sl')?'selected':''}>SL</option>
         <option value="admin"  ${u&&u.role==='admin'?'selected':''}>Admin</option>
       </select></div>
-    <div class="form-group"><label class="form-label">デフォルト直</label>
-      <select class="form-select" id="m-shift">
-        <option value="1" ${u&&(u.shift)==1?'selected':''}>1直</option>
-        <option value="2" ${u&&(u.shift)==2?'selected':''}>2直</option>
-        <option value="3" ${u&&(u.shift)==3?'selected':''}>3直</option>
-      </select></div>
     ${!u?'<div class="form-group"><label class="form-label">初期PIN</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
@@ -559,16 +533,15 @@ function openUserModal(id){
 async function saveUser(id){
   const name=document.getElementById('m-name').value.trim();
   const role=document.getElementById('m-role').value;
-  const shift=parseInt(document.getElementById('m-shift').value);
   if(!name){showToast('名前を入力してください','error');return;}
   try{
     if(id){
-      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role,shift:shift});
+      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role});
       const idx=USERS.findIndex(u=>u.id===id);
       if(idx>=0&&updated&&updated[0])USERS[idx]={...USERS[idx],...updated[0]};
     }else{
       const pin=document.getElementById('m-pin')?.value||'0000';
-      const created=await sbFetch('traq_users','POST',{name,role,shift:shift,pin,is_active:true});
+      const created=await sbFetch('traq_users','POST',{name,role,pin,is_active:true});
       if(created&&created[0])USERS.push(created[0]);
     }
     closeModal();renderUsers();showToast('保存しました','success');
