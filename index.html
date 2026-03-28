@@ -11,7 +11,6 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"></script>
 <style>
   :root {
     --bg:        #080d18;
@@ -611,6 +610,12 @@ function clearFail(userId) {
   delete lockState[userId];
 }
 
+// ── SHA-256（Web Crypto API・CDN不要・ブラウザ標準）────────
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // ── PIN検証 ───────────────────────────────────────────────
 let verifying = false;
 async function verifyPin() {
@@ -624,8 +629,8 @@ async function verifyPin() {
   }
 
   try {
-    const _bcrypt = (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) ? dcodeIO.bcrypt : window.bcrypt;
-    const ok = await _bcrypt.compare(pinInput, selectedUser.pin_hash);
+    const hashed = await sha256(pinInput);
+    const ok = (hashed === selectedUser.pin_hash);
     if (ok) {
       clearFail(selectedUser.id);
       doLogin();
@@ -635,7 +640,7 @@ async function verifyPin() {
       renderPinDots(true);
       if (locked) {
         showPinError('3回失敗しました。5分間ロックします');
-        renderUserList(); // ロック状態をリスト反映
+        renderUserList();
       } else {
         const s = lockState[selectedUser.id];
         showPinError(`PINが違います（${s.failCount}/3回）`);
