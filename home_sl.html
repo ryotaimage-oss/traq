@@ -26,13 +26,13 @@
   --sb-w:        220px;
 }
 [data-theme="light"] {
-  --bg1:    #f0f2f5;
+  --bg1:    #e8e6e2;
   --bg2:    #ffffff;
-  --bg3:    #f8f9fb;
-  --text1:  #0f172a;
-  --text2:  #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --bg3:    #f0ede8;
+  --text1:  #1a1f2e;
+  --text2:  #666666;
+  --border: rgba(0,0,0,0.18);
+  --shadow: 0 4px 24px rgba(0,0,0,0.12);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
@@ -382,6 +382,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <span class="logo-emoji">🏭</span>
       <span class="logo-text">Traq</span>
     </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 5px">
+        <div id="topAvatar" style="width:28px;height:28px;border-radius:50%;background:var(--warning);color:#080d18;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">山</div>
+        <div>
+          <div id="topName" style="font-size:12px;font-weight:700;line-height:1.2">山田 太郎</div>
+          <div id="topRole" style="font-size:10px;color:var(--warning);line-height:1.2">SL / 1直</div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <div class="main-wrap">
@@ -654,6 +663,13 @@ function getSession(){
   document.getElementById('sbAvatar').textContent=initial;
   document.getElementById('sbName').textContent=name;
   document.getElementById('sbRole').textContent=roleLabel+' / '+SESSION.shift+t('shift');
+  // Topbar chip
+  var ta=document.getElementById('topAvatar');
+  var tn=document.getElementById('topName');
+  var tr2=document.getElementById('topRole');
+  if(ta) ta.textContent=initial;
+  if(tn) tn.textContent=name;
+  if(tr2) tr2.textContent=roleLabel+' / '+SESSION.shift+t('shift');
 
   await loadTroubles();
 })();
