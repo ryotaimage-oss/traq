@@ -101,6 +101,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text2);background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
+th.sortable{cursor:pointer;user-select:none;transition:color .15s}
+th.sortable:hover{color:var(--orange)}
+th.sortable::after{content:'';display:inline-block;margin-left:4px;font-size:9px;opacity:.5}
+th.sortable.asc::after{content:'▲';opacity:1;color:var(--orange)}
+th.sortable.desc::after{content:'▼';opacity:1;color:var(--orange)}
 td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(239,159,39,.04)}
@@ -226,7 +231,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <table>
           <thead>
             <tr>
-              <th>名前</th><th>ロール</th><th style="text-align:right">操作</th>
+              <th class="sortable" onclick="sortTable('user','name')">名前</th><th class="sortable" onclick="sortTable('user','role')">ロール</th><th style="text-align:right">操作</th>
             </tr>
           </thead>
           <tbody id="userTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
@@ -258,7 +263,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>機番</th><th>ライン</th><th>状態</th><th style="text-align:right">操作</th></tr>
+            <tr><th class="sortable" onclick="sortTable('machine','machine_no')">機番</th><th class="sortable" onclick="sortTable('machine','line')">ライン</th><th class="sortable" onclick="sortTable('machine','is_active')">状態</th><th style="text-align:right">操作</th></tr>
           </thead>
           <tbody id="machineTable"><tr class="loading-row"><td colspan="4">読み込み中...</td></tr></tbody>
         </table>
@@ -286,7 +291,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>品番</th><th>品名</th><th>状態</th><th style="text-align:right">操作</th></tr>
+            <tr><th class="sortable" onclick="sortTable('product','product_code')">品番</th><th class="sortable" onclick="sortTable('product','product_name')">品名</th><th class="sortable" onclick="sortTable('product','is_active')">状態</th><th style="text-align:right">操作</th></tr>
           </thead>
           <tbody id="productTable"><tr class="loading-row"><td colspan="4">読み込み中...</td></tr></tbody>
         </table>
@@ -310,7 +315,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">⚙️ 設備分類</div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>分類名</th><th>順序</th><th style="text-align:right">操作</th></tr></thead>
+              <thead><tr><th class="sortable" onclick="sortTable('catEq','name')">分類名</th><th class="sortable" onclick="sortTable('catEq','sort_order')">順序</th><th style="text-align:right">操作</th></tr></thead>
               <tbody id="catEqTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
             </table>
           </div>
@@ -319,7 +324,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">🔧 金型分類</div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>分類名</th><th>順序</th><th style="text-align:right">操作</th></tr></thead>
+              <thead><tr><th class="sortable" onclick="sortTable('catMd','name')">分類名</th><th class="sortable" onclick="sortTable('catMd','sort_order')">順序</th><th style="text-align:right">操作</th></tr></thead>
               <tbody id="catMdTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
             </table>
           </div>
@@ -501,7 +506,12 @@ function getFilteredUsers(){
   });
 }
 function renderUsers(){
-  const list=getFilteredUsers();
+  var list=getFilteredUsers();
+  list=applySortToList(list,'user',function(u,k){
+    if(k==='name')return u.name;
+    if(k==='role')return u.role;
+    return '';
+  });
   const total=list.length;
   const start=(userPage-1)*PAGE_SIZE;
   const page=list.slice(start,start+PAGE_SIZE);
@@ -578,7 +588,13 @@ function getFilteredMachines(){
   });
 }
 function renderMachines(){
-  const list=getFilteredMachines();
+  var list=getFilteredMachines();
+  list=applySortToList(list,'machine',function(m,k){
+    if(k==='machine_no')return parseInt(m.machine_no)||0;
+    if(k==='line')return m.lines?m.lines.name:'';
+    if(k==='is_active')return m.is_active===false?0:1;
+    return '';
+  });
   const total=list.length;
   const page=list.slice((machinePage-1)*PAGE_SIZE,machinePage*PAGE_SIZE);
   const tbody=document.getElementById('machineTable');
@@ -662,7 +678,13 @@ function getFilteredProducts(){
   });
 }
 function renderProducts(){
-  const list=getFilteredProducts();
+  var list=getFilteredProducts();
+  list=applySortToList(list,'product',function(p,k){
+    if(k==='product_code')return p.product_code||'';
+    if(k==='product_name')return p.product_name||'';
+    if(k==='is_active')return p.is_active===false?0:1;
+    return '';
+  });
   const total=list.length;
   const page=list.slice((productPage-1)*PAGE_SIZE,productPage*PAGE_SIZE);
   const tbody=document.getElementById('productTable');
@@ -716,8 +738,18 @@ function renderCategories(){
     if(q&&!c.name.toLowerCase().includes(q))return false;
     return true;
   });
-  const eq=filtered.filter(c=>c.type==='equipment').sort((a,b)=>a.sort_order-b.sort_order);
-  const md=filtered.filter(c=>c.type==='mold').sort((a,b)=>a.sort_order-b.sort_order);
+  var eq=filtered.filter(c=>c.type==='equipment');
+  var md=filtered.filter(c=>c.type==='mold');
+  var catVal=function(c,k){
+    if(k==='name')return c.name||'';
+    if(k==='sort_order')return c.sort_order||0;
+    return '';
+  };
+  eq=applySortToList(eq,'catEq',catVal);
+  md=applySortToList(md,'catMd',catVal);
+  // デフォルト（ソート未指定時）はsort_order昇順
+  if(!sortState['catEq'])eq.sort(function(a,b){return a.sort_order-b.sort_order;});
+  if(!sortState['catMd'])md.sort(function(a,b){return a.sort_order-b.sort_order;});
   renderCatTable('catEqTable',eq);
   renderCatTable('catMdTable',md);
 }
@@ -781,6 +813,51 @@ async function toggleActive(table, id, currentActive, dataKey, renderFn) {
     RENDER_MAP[renderFn]();
     showToast(newVal ? '有効にしました' : '無効にしました', 'success');
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+/* ===== Sort ===== */
+var sortState = {};
+function sortTable(entity, key) {
+  var prev = sortState[entity];
+  if (prev && prev.key === key) {
+    sortState[entity] = { key: key, dir: prev.dir === 'asc' ? 'desc' : 'asc' };
+  } else {
+    sortState[entity] = { key: key, dir: 'asc' };
+  }
+  // ヘッダーの矢印表示を更新
+  var panelId = entity === 'catEq' ? 'catEqTable' : entity === 'catMd' ? 'catMdTable' : 'panel-' + entity + 's';
+  var panel = entity === 'catEq' || entity === 'catMd'
+    ? document.getElementById(panelId)?.closest('.table-wrap')
+    : document.getElementById(panelId);
+  if (panel) {
+    panel.querySelectorAll('th.sortable').forEach(function(th) { th.classList.remove('asc', 'desc'); });
+    var ths = panel.querySelectorAll('th.sortable');
+    ths.forEach(function(th) {
+      if (th.getAttribute('onclick').indexOf("'" + key + "'") >= 0) {
+        th.classList.add(sortState[entity].dir);
+      }
+    });
+  }
+  // 再描画
+  if (entity === 'user') renderUsers();
+  else if (entity === 'machine') renderMachines();
+  else if (entity === 'product') renderProducts();
+  else if (entity === 'catEq' || entity === 'catMd') renderCategories();
+}
+function applySortToList(list, entity, getValue) {
+  var s = sortState[entity];
+  if (!s) return list;
+  var sorted = list.slice().sort(function(a, b) {
+    var va = getValue(a, s.key), vb = getValue(b, s.key);
+    if (va == null) va = '';
+    if (vb == null) vb = '';
+    if (typeof va === 'number' && typeof vb === 'number') return s.dir === 'asc' ? va - vb : vb - va;
+    va = String(va).toLowerCase(); vb = String(vb).toLowerCase();
+    if (va < vb) return s.dir === 'asc' ? -1 : 1;
+    if (va > vb) return s.dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return sorted;
 }
 
 /* ===== Pagination ===== */
