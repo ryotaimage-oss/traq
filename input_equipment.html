@@ -383,6 +383,7 @@ var session = null;
 })();
 
 function goBack() { history.back(); }
+function forceReload(){if('caches' in window){caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}).then(function(){location.reload(true)})}else{location.reload(true)}}
 // ── ヘッダーチップ初期化 ──
 function initChip(){
   var s;
@@ -730,6 +731,9 @@ function getDraftData() {
     occurrence:     selectedOccurrence,
     stop_start_h:   drumState ? drumState.sh : 0,
     stop_start_m:   drumState ? drumState.sm : 0,
+    stop_end_h:     drumState ? drumState.eh : -1,
+    stop_end_m:     drumState ? drumState.em : -1,
+    end_time_set:   endTimeSet,
     stop_minutes:   document.getElementById('stop-minutes').value,
     detail:         document.getElementById('detail').value
   };
@@ -752,7 +756,23 @@ async function loadDraft() {
     if (d.product_id)  document.getElementById('product-select').value  = d.product_id;
     if (d.category_id) document.getElementById('category-select').value = d.category_id;
     if (d.occurrence)  selectOccurrence(d.occurrence);
-    if (d.stop_minutes) document.getElementById('stop-minutes').value = d.stop_minutes;
+    // ドラムロール復元
+    if (typeof d.stop_start_h === 'number') {
+      drumState.sh = d.stop_start_h;
+      setDrumPos('dSH', d.stop_start_h, false);
+    }
+    if (typeof d.stop_start_m === 'number') {
+      drumState.sm = d.stop_start_m;
+      setDrumPos('dSM', d.stop_start_m, false);
+    }
+    if (d.end_time_set && typeof d.stop_end_h === 'number' && d.stop_end_h >= 0) {
+      endTimeSet = true;
+      drumState.eh = d.stop_end_h;
+      drumState.em = typeof d.stop_end_m === 'number' ? d.stop_end_m : 0;
+      setDrumPos('dEH', drumState.eh, false);
+      setDrumPos('dEM', drumState.em, false);
+    }
+    updateStopResult();
     if (d.detail)      document.getElementById('detail').value = d.detail;
     showToast('下書きを読み込みました', 'success');
   } catch(e) {
@@ -843,7 +863,7 @@ async function doSubmit() {
 
     hideOverlay();
     showToast('送信しました', 'success');
-    setTimeout(function() { location.href = 'home.html'; }, 1200);
+    setTimeout(function() { goHome(); }, 1200);
 
   } catch(e) {
     hideOverlay();

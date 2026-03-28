@@ -58,6 +58,17 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 [data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 [data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+
+/* ===== Bottom Nav (2-tab) ===== */
+.bottom-nav{display:flex;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.nav-item.active{color:var(--orange)}
+.nav-item:hover:not(.active){color:var(--text)}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
+@media(min-width:768px){.bottom-nav{display:none}}
+
+/* ===== Page Title Bar ===== */
 .page-title-bar {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 16px; background: var(--surface);
@@ -70,14 +81,6 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 }
 .page-back-btn:hover { border-color: var(--orange); color: var(--orange); }
 .page-title-text { font-size: 15px; font-weight: 700; }
-/* ===== Bottom Nav (2-tab) ===== */
-.bottom-nav{display:flex;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
-.nav-item.active{color:var(--orange)}
-.nav-item:hover:not(.active){color:var(--text)}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
-@media(min-width:768px){.bottom-nav{display:none}}
 
 /* メイン */
 .main { flex: 1; padding: 20px 16px; max-width: 600px; margin: 0 auto; width: 100%; }
@@ -264,21 +267,28 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">停止時間</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <label class="form-label">停止時間<span class="required">*</span>（開始）/ 終了は不明な場合は空白でOK</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">開始時刻</div>
-          <input class="form-input" type="time" id="stop-start" onchange="calcStopMinutes()">
+          <div class="drum-label" style="margin-bottom:6px;">開始時刻（必須）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSH"></div></div>
+            <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSM"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div class="drum-label">時</div><div class="drum-label">分</div></div>
         </div>
         <div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">終了時刻</div>
-          <input class="form-input" type="time" id="stop-end" onchange="calcStopMinutes()">
+          <div class="drum-label" style="margin-bottom:6px;">終了時刻（任意）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEH"></div></div>
+            <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEM"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div class="drum-label">時</div><div class="drum-label">分</div></div>
+          <button onclick="clearEndTime()" style="width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);padding:6px;font-family:inherit;font-size:12px;cursor:pointer;">終了時刻をクリア</button>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input class="form-input" type="number" id="stop-minutes" placeholder="0" min="0" style="width:120px;">
-        <span style="font-size:13px;color:var(--muted);">分（自動計算・手動変更可）</span>
-      </div>
+      <div class="stop-result" id="stop-result">開始時刻を設定してください</div>
+      <input type="hidden" id="stop-minutes">
     </div>
     <div class="form-group">
       <label class="form-label">詳細内容<span class="required">*</span></label>
@@ -373,6 +383,7 @@ var session = null;
 })();
 
 function goBack() { history.back(); }
+function forceReload(){if('caches' in window){caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}).then(function(){location.reload(true)})}else{location.reload(true)}}
 // ── ヘッダーチップ初期化 ──
 function initChip(){
   var s;
@@ -499,7 +510,7 @@ function onMachineChange() {
     : allProducts; // 紐づけなしの場合は全品番
 
   prodSel.innerHTML = '<option value="">選択してください</option>' +
-    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + '(' + p.product_name + ')' + '</option>'; }).join('');
+    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + '(' + p.product_name + ')</option>'; }).join('');
   prodSel.disabled = false;
   saveDraft();
 }
@@ -513,19 +524,120 @@ function selectOccurrence(val) {
   saveDraft();
 }
 
-// ── 停止時間自動計算 ──────────────────────────────────────
-function calcStopMinutes() {
-  var startVal = document.getElementById('stop-start').value;
-  var endVal   = document.getElementById('stop-end').value;
-  if (!startVal || !endVal) return;
-  var startParts = startVal.split(':');
-  var endParts   = endVal.split(':');
-  var startMins  = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
-  var endMins    = parseInt(endParts[0])   * 60 + parseInt(endParts[1]);
-  if (endMins < startMins) endMins += 1440; // 日またぎ対応
-  var diff = endMins - startMins;
-  document.getElementById('stop-minutes').value = diff > 0 ? diff : '';
+// ── ドラムロール ─────────────────────────────────────────
+var ITEM_H = 40;
+var drumState = { sh:0, sm:0, eh:-1, em:-1 }; // -1 = 未設定
+var endTimeSet = false;
+
+var drumDefs = [
+  { id:'dSH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'sh' },
+  { id:'dSM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'sm' },
+  { id:'dEH', items:Array.from({length:24},function(_,i){return String(i).padStart(2,'0');}), key:'eh' },
+  { id:'dEM', items:Array.from({length:12},function(_,i){return String(i*5).padStart(2,'0');}), key:'em' }
+];
+
+function initDrums() {
+  var now = new Date();
+  var sh = now.getHours();
+  var sm = Math.floor(now.getMinutes() / 5);
+  drumState.sh = sh;
+  drumState.sm = sm;
+
+  drumDefs.forEach(function(d) {
+    var el = document.getElementById(d.id);
+    el.innerHTML = '';
+    d.items.forEach(function(label) {
+      var div = document.createElement('div');
+      div.className = 'drum-item';
+      div.textContent = label;
+      el.appendChild(div);
+    });
+    var idx = (d.key === 'sh') ? sh : (d.key === 'sm') ? sm : 0;
+    setDrumPos(d.id, idx, false);
+    initDrumDrag(d);
+  });
+  updateStopResult();
+}
+
+function setDrumPos(id, idx, animate) {
+  var el = document.getElementById(id);
+  var top = 70 - idx * ITEM_H;
+  el.style.transition = animate ? 'top 0.2s ease' : 'none';
+  el.style.top = top + 'px';
+}
+
+function snapDrum(d) {
+  var el = document.getElementById(d.id);
+  var top = parseInt(el.style.top) || 70;
+  var maxIdx = d.items.length - 1;
+  var idx = Math.round((70 - top) / ITEM_H);
+  idx = Math.max(0, Math.min(maxIdx, idx));
+  if (d.key === 'eh' || d.key === 'em') endTimeSet = true;
+  drumState[d.key] = idx;
+  setDrumPos(d.id, idx, true);
+  updateStopResult();
   saveDraft();
+}
+
+function clearEndTime() {
+  endTimeSet = false;
+  drumState.eh = -1;
+  drumState.em = -1;
+  setDrumPos('dEH', 0, true);
+  setDrumPos('dEM', 0, true);
+  updateStopResult();
+}
+
+function updateStopResult() {
+  var sh = drumState.sh, sm = drumState.sm * 5;
+  var startStr = String(sh).padStart(2,'0') + ':' + String(sm).padStart(2,'0');
+  var result = document.getElementById('stop-result');
+
+  if (!endTimeSet || drumState.eh < 0) {
+    result.textContent = '開始: ' + startStr + ' ／ 終了: 未定（承認者が入力）';
+    document.getElementById('stop-minutes').value = '';
+  } else {
+    var eh = drumState.eh, em = drumState.em * 5;
+    var endStr = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0');
+    var startMins = sh * 60 + sm;
+    var endMins   = eh * 60 + em;
+    if (endMins < startMins) endMins += 1440;
+    var diff = endMins - startMins;
+    result.textContent = startStr + ' → ' + endStr + '　' + diff + '分';
+    document.getElementById('stop-minutes').value = diff;
+  }
+}
+
+function initDrumDrag(d) {
+  var el = document.getElementById(d.id);
+  var startY = 0, startTop = 0, dragging = false;
+  function onStart(e) {
+    dragging = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startTop = parseInt(el.style.top) || 70;
+    el.style.transition = 'none';
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var y = e.touches ? e.touches[0].clientY : e.clientY;
+    var newTop = startTop + (y - startY);
+    var minTop = 70 - (d.items.length - 1) * ITEM_H;
+    newTop = Math.max(minTop - 20, Math.min(90, newTop));
+    el.style.top = newTop + 'px';
+    e.preventDefault();
+  }
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false;
+    snapDrum(d);
+  }
+  el.addEventListener('mousedown', onStart);
+  el.addEventListener('touchstart', onStart, {passive:false});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchend', onEnd);
 }
 
 // ── 画像 ──────────────────────────────────────────────────
@@ -617,8 +729,11 @@ function getDraftData() {
     product_id:     document.getElementById('product-select').value,
     category_id:    document.getElementById('category-select').value,
     occurrence:     selectedOccurrence,
-    stop_start:     document.getElementById('stop-start').value,
-    stop_end:       document.getElementById('stop-end').value,
+    stop_start_h:   drumState ? drumState.sh : 0,
+    stop_start_m:   drumState ? drumState.sm : 0,
+    stop_end_h:     drumState ? drumState.eh : -1,
+    stop_end_m:     drumState ? drumState.em : -1,
+    end_time_set:   endTimeSet,
     stop_minutes:   document.getElementById('stop-minutes').value,
     detail:         document.getElementById('detail').value
   };
@@ -641,9 +756,23 @@ async function loadDraft() {
     if (d.product_id)  document.getElementById('product-select').value  = d.product_id;
     if (d.category_id) document.getElementById('category-select').value = d.category_id;
     if (d.occurrence)  selectOccurrence(d.occurrence);
-    if (d.stop_start) document.getElementById('stop-start').value = d.stop_start;
-    if (d.stop_end)   document.getElementById('stop-end').value   = d.stop_end;
-    if (d.stop_minutes) document.getElementById('stop-minutes').value = d.stop_minutes;
+    // ドラムロール復元
+    if (typeof d.stop_start_h === 'number') {
+      drumState.sh = d.stop_start_h;
+      setDrumPos('dSH', d.stop_start_h, false);
+    }
+    if (typeof d.stop_start_m === 'number') {
+      drumState.sm = d.stop_start_m;
+      setDrumPos('dSM', d.stop_start_m, false);
+    }
+    if (d.end_time_set && typeof d.stop_end_h === 'number' && d.stop_end_h >= 0) {
+      endTimeSet = true;
+      drumState.eh = d.stop_end_h;
+      drumState.em = typeof d.stop_end_m === 'number' ? d.stop_end_m : 0;
+      setDrumPos('dEH', drumState.eh, false);
+      setDrumPos('dEM', drumState.em, false);
+    }
+    updateStopResult();
     if (d.detail)      document.getElementById('detail').value = d.detail;
     showToast('下書きを読み込みました', 'success');
   } catch(e) {
@@ -692,8 +821,8 @@ async function doSubmit() {
       product_id:    parseInt(document.getElementById('product-select').value) || null,
       category_id:   parseInt(document.getElementById('category-select').value) || null,
       occurrence:    selectedOccurrence,
-      stop_start:    (function(){ var v=document.getElementById('stop-start').value; return v ? v+':00' : null; })(),
-      stop_end:      (function(){ var v=document.getElementById('stop-end').value; return v ? v+':00' : null; })(),
+      stop_start:    (function(){ var sh=drumState.sh,sm=drumState.sm*5; return String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0')+':00'; })(),
+      stop_end:      endTimeSet && drumState.eh >= 0 ? (function(){ var eh=drumState.eh,em=drumState.em*5; return String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0')+':00'; })() : null,
       stop_minutes:  (function(){ var v=document.getElementById('stop-minutes').value; return v ? parseInt(v) : null; })(),
       detail:        document.getElementById('detail').value.trim() || null,
       reporter_id:   session.userId
@@ -708,8 +837,10 @@ async function doSubmit() {
       for (var i = 0; i < selectedImages.length; i++) {
         var img = selectedImages[i];
         var dateStr = troubleData.occurred_date.replace(/-/g, '');
+        // 機番テキストを取得
         var machSel = document.getElementById('machine-select');
         var machText = machSel.options[machSel.selectedIndex] ? machSel.options[machSel.selectedIndex].text : 'XX';
+        // 品番テキストを取得
         var prodSel = document.getElementById('product-select');
         var prodText = prodSel.options[prodSel.selectedIndex] ? prodSel.options[prodSel.selectedIndex].text.split('(')[0].trim() : 'unknown';
         var fileName = dateStr + '_' + session.shift + '直_機番' + machText + '_' + prodText + '_' + (i + 1) + '.jpg';
@@ -732,7 +863,7 @@ async function doSubmit() {
 
     hideOverlay();
     showToast('送信しました', 'success');
-    setTimeout(function() { location.href = 'home.html'; }, 1200);
+    setTimeout(function() { goHome(); }, 1200);
 
   } catch(e) {
     hideOverlay();
@@ -761,6 +892,7 @@ function showToast(msg, type) {
 
 // ── 初期化 ────────────────────────────────────────────────
 loadMasters();
+initDrums();
 
 function toggleTheme() {
   var h = document.documentElement;
