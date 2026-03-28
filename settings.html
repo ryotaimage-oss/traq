@@ -20,9 +20,12 @@
   --border:rgba(255,255,255,0.08);
   --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
   --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+  --nav-h:56px;
+  --factory:#1e293b; --roof:#334155;
 }
 [data-theme="light"]{
   --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
+  --factory:#c8c4bc; --roof:#b0aca4;
   --text1:#1a1f2e;--text2:#666666;
   --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
 }
@@ -41,6 +44,52 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
 .icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+/* ===== Common Header Components ===== */
+.mini-logo svg { display: block; }
+.user-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 8px 4px 4px; white-space: nowrap;
+}
+.user-chip-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-chip-name { font-size: 12px; font-weight: 700; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-chip-role {
+  font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+}
+.chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.35); color: #6b8ec5; }
+.chip-role-sl   .user-chip-avatar { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-sl   .user-chip-role   { background: rgba(239,159,39,0.25); color: #e8a520; }
+.chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.25); color: #f87171; }
+.chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.25); color: #f87171; }
+[data-theme="light"] .chip-role-op   .user-chip-avatar { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-op   .user-chip-role   { background: rgba(30,58,110,0.15); color: #2c4a80; }
+[data-theme="light"] .chip-role-sl   .user-chip-avatar { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-sl   .user-chip-role   { background: rgba(200,130,20,0.18); color: #b07a10; }
+[data-theme="light"] .chip-role-admin .user-chip-avatar { background: rgba(239,68,68,0.15); color: #c53030; }
+[data-theme="light"] .chip-role-admin .user-chip-role   { background: rgba(239,68,68,0.15); color: #c53030; }
+
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+  display: flex; height: var(--nav-h); background: var(--bg2);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; background: none; border: none; color: var(--text2);
+  font-family: inherit; font-size: 10px; cursor: pointer; transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item.active { color: var(--orange); }
+.nav-item:hover:not(.active) { color: var(--text1); }
+.nav-icon { font-size: 18px; line-height: 1; }
+.nav-label { font-weight: 500; }
+@media(min-width:768px){ .bottom-nav { display: none; } }
+
 
 /* Scroll */
 .scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px}
@@ -160,18 +209,35 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 <div class="app">
 
   <!-- Topbar -->
-  <div class="topbar">
+  <header class="topbar">
     <div class="topbar-left">
-      <button class="back-btn" onclick="(()=>{ const s=JSON.parse(localStorage.getItem('traq_session')||'null'); location.href=s&&s.role==='op'?'home.html':s&&s.role==='admin'?'admin.html':'home_sl.html'; })()">←</button>
-      <span class="topbar-title">⚙️ 設定</span>
+      <svg class="mini-logo" width="72" height="26" viewBox="0 0 200 56" fill="none">
+        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+        <rect x="4" y="33" width="48" height="3"  rx="1" fill="var(--roof)"/>
+        <rect x="9"  y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="8"  y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+        <rect x="6"  y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+        <circle cx="26" cy="14" r="3"   fill="var(--orange)" opacity=".8"/>
+        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+        <text x="58" y="40" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
+      </svg>
+      <div class="user-chip" id="mob-chip">
+        <div class="user-chip-avatar" id="mob-avatar"></div>
+        <span class="user-chip-name" id="mob-name"></span>
+        <span class="user-chip-role" id="mob-role"></span>
+      </div>
     </div>
     <div class="topbar-right">
-      <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
-      <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
-      <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
       <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
     </div>
-  </div>
+  </header>
 
   <!-- アップデートバナー（新バージョン検知時に表示） -->
   <div id="updateBanner" style="display:none;background:rgba(239,159,39,.12);border-bottom:2px solid var(--orange);padding:10px 16px;flex-shrink:0;animation:fadeIn .3s ease">
@@ -189,7 +255,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     </div>
   </div>
 
-  <div class="scroll-area">
+  <div class="scroll-area" id="scrollArea">
   <div class="inner">
 
     <!-- ユーザーカード -->
@@ -326,6 +392,21 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   </div>
   </div>
 
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goHome()">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">一覧</span>
+    </button>
+    <button class="nav-item" onclick="location.href='dashboard.html'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">分析</span>
+    </button>
+    <button class="nav-item active" onclick="void(0)">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">設定</span>
+    </button>
+  </nav>
 </div>
 <div id="toastEl" style="display:none"></div>
 
@@ -392,9 +473,27 @@ function setLang(lang){
   currentLang=lang;
   localStorage.setItem('traq_lang',lang);
   ['ja','vi','en'].forEach(l=>{
-    document.getElementById('lang-'+l)?.classList.toggle('active',l===lang);
-    document.getElementById('s-lang-'+l)?.classList.toggle('active',l===lang);
+    var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===lang);
   });
+}
+
+
+/* ===== Header Chip ===== */
+function initChip(){
+  if(!SESSION) return;
+  const name = SESSION.name || '';
+  const role = SESSION.role || 'worker';
+  const initial = name ? name.charAt(0) : '?';
+  const roleMap = {worker:'OP', leader:'SL', admin:'Admin'};
+  const classMap = {worker:'chip-role-op', leader:'chip-role-sl', admin:'chip-role-admin'};
+  const chip = document.getElementById('mob-chip');
+  if(chip) chip.className = 'user-chip ' + (classMap[role]||'chip-role-op');
+  const av = document.getElementById('mob-avatar');
+  if(av) av.textContent = initial;
+  const nm = document.getElementById('mob-name');
+  if(nm) nm.textContent = name;
+  const rl = document.getElementById('mob-role');
+  if(rl) rl.textContent = roleMap[role]||'OP';
 }
 
 /* ===== Init user info ===== */
@@ -656,6 +755,16 @@ function doLogout(){
   setTimeout(()=>{location.href='index.html'},1000);
 }
 
+
+/* ===== Navigation ===== */
+function goHome(){
+  try{
+    const r = SESSION ? SESSION.role : '';
+    if(r==='leader'||r==='admin') location.href='home_sl.html';
+    else location.href='home.html';
+  }catch(e){location.href='home.html';}
+}
+
 /* ===== Toast ===== */
 let toastTimer=null;
 function showToast(msg,type='info'){
@@ -670,17 +779,17 @@ function showToast(msg,type='info'){
 (function init(){
   if (!SESSION) { location.href = 'index.html'; return; }
   initTheme();
+  initChip();
   const sl=localStorage.getItem('traq_lang')||'ja';
   currentLang=sl;
   ['ja','vi','en'].forEach(l=>{
-    document.getElementById('lang-'+l)?.classList.toggle('active',l===sl);
-    document.getElementById('s-lang-'+l)?.classList.toggle('active',l===sl);
+    var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===sl);
   });
   initUserInfo();
   checkVersion();
 })();
 </script>
-<script src="traq-version.js"></script>
+
 
 <!-- ホーム画面追加モーダル -->
 <div class="modal-overlay hidden" id="addHomeModal" onclick="closeAddHomeModal(event)">
@@ -752,5 +861,34 @@ function showToast(msg,type='info'){
     <button class="add-home-close-btn" onclick="closeAddHomeModalDirect()">閉じる</button>
   </div>
 </div>
+
+<!-- Swipe Navigation -->
+<script>
+(function(){
+  var sess=(function(){try{return JSON.parse(localStorage.getItem('traq_session')||'{}')}catch(e){return{}}})();
+  var homePage=(sess.role==='leader'||sess.role==='admin')?'home_sl.html':'home.html';
+  var PAGES = [homePage,'dashboard.html','settings.html'];
+  var CURRENT = 2; // settings = index 2
+  var el = document.getElementById('scrollArea');
+  if(!el) return;
+  var sx=0, sy=0, dragging=false;
+  el.addEventListener('touchstart', function(e){
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true;
+  }, {passive:true});
+  el.addEventListener('touchmove', function(e){
+    if(!dragging) return;
+    var dx=e.touches[0].clientX-sx, dy=Math.abs(e.touches[0].clientY-sy);
+    if(dy>Math.abs(dx)) dragging=false;
+  }, {passive:true});
+  el.addEventListener('touchend', function(e){
+    if(!dragging) return;
+    dragging=false;
+    var dx=e.changedTouches[0].clientX-sx;
+    if(dx<-50){ location.href=PAGES[(CURRENT+1)%PAGES.length]; }
+    else if(dx>50){ location.href=PAGES[(CURRENT-1+PAGES.length)%PAGES.length]; }
+  });
+})();
+</script>
+<script src="./update_banner.js"></script>
 </body>
 </html>
