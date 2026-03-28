@@ -267,6 +267,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <span class="snav-icon">📥</span>
         <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
+      <button class="snav-item" onclick="location.href='admin.html'">
+        <span class="snav-icon">🔧</span>
+        <span data-i18n="nav_master">マスタ</span>
+      </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
@@ -381,6 +385,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <span class="nav-icon">📊</span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
+    <button class="nav-item" onclick="location.href='admin.html'">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+    </button>
   </nav>
 
 </div>
@@ -400,7 +408,7 @@ const I18N = {
   ja:{
     nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'異常入力',
     nav_list:'一覧', nav_settings:'設定',
-    nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード',
+    nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード', nav_master:'マスタ',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
     pending_label:'件の承認待ち', btn_review:'承認待ちを確認',
     tab_pending:'承認待ち', tab_all:'全件', tab_approved:'承認済み', tab_rejected:'差し戻し',
@@ -431,7 +439,7 @@ const I18N = {
   vi:{
     nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
     nav_list:'Danh sách', nav_settings:'Cài đặt',
-    nav_dashboard:'Dashboard', nav_excel:'Tải Excel',
+    nav_dashboard:'Dashboard', nav_excel:'Tải Excel', nav_master:'Master',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
     pending_label:'đang chờ duyệt', btn_review:'Xem chờ duyệt',
     tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
@@ -462,7 +470,7 @@ const I18N = {
   en:{
     nav_pending:'Pending', nav_all:'All Data', nav_input:'入力',
     nav_list:'List', nav_settings:'Settings',
-    nav_dashboard:'Dashboard', nav_excel:'Excel Download',
+    nav_dashboard:'Dashboard', nav_excel:'Excel Download', nav_master:'Master',
     nav_theme:'Toggle Theme', nav_logout:'Logout',
     pending_label:'pending approval', btn_review:'Review pending',
     tab_pending:'Pending', tab_all:'All', tab_approved:'Approved', tab_rejected:'Rejected',

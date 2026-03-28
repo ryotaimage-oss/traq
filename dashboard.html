@@ -280,6 +280,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <span class="nav-icon">📊</span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
+    <button class="nav-item" onclick="location.href='admin.html'">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+    </button>
   </nav>
 </div>
 <div id="toastEl" style="display:none"></div>
@@ -306,9 +310,9 @@ async function sbFetch(path){
 /* ===== i18n ===== */
 let currentLang=localStorage.getItem('traq_lang')||'ja';
 const I18N={
-  ja:{page_title:'ダッシュボード',nav_list:'一覧',nav_dashboard:'ダッシュボード',nav_settings:'設定',p7:'直近7日',p30:'直近30日',p90:'直近90日',p_all:'全期間',t_all:'すべて',t_eq:'設備',t_md:'金型',kpi_total:'総件数',kpi_eq:'設備',kpi_md:'金型',kpi_stop:'停止時間(分)',chart1_title:'日別件数推移',chart2_title:'停止時間合計推移（分）',chart3_title:'初発・再発比率',chart4_title:'設備 分類別件数',chart5_title:'金型 異常内容別件数',chart6_title:'再発率（設備 / 金型）',chart7_title:'機番別件数ランキング（上位10）',chart8_title:'品番別件数ランキング（上位10）',first:'初発',rec:'再発',no_data:'データなし'},
-  vi:{page_title:'Thống kê',nav_list:'Danh sách',nav_dashboard:'Dashboard',nav_settings:'Cài đặt',p7:'7 ngày',p30:'30 ngày',p90:'90 ngày',p_all:'Tất cả',t_all:'Tất cả',t_eq:'Thiết bị',t_md:'Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Tỷ lệ tái phát',chart7_title:'Top 10 máy',chart8_title:'Top 10 sản phẩm',first:'Lần đầu',rec:'Tái phát',no_data:'Không có dữ liệu'},
-  en:{page_title:'Dashboard',nav_list:'List',nav_dashboard:'Dashboard',nav_settings:'Settings',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',first:'First',rec:'Recurrence',no_data:'No data'}
+  ja:{page_title:'ダッシュボード',nav_list:'一覧',nav_dashboard:'ダッシュボード',nav_master:'マスタ',nav_settings:'設定',p7:'直近7日',p30:'直近30日',p90:'直近90日',p_all:'全期間',t_all:'すべて',t_eq:'設備',t_md:'金型',kpi_total:'総件数',kpi_eq:'設備',kpi_md:'金型',kpi_stop:'停止時間(分)',chart1_title:'日別件数推移',chart2_title:'停止時間合計推移（分）',chart3_title:'初発・再発比率',chart4_title:'設備 分類別件数',chart5_title:'金型 異常内容別件数',chart6_title:'再発率（設備 / 金型）',chart7_title:'機番別件数ランキング（上位10）',chart8_title:'品番別件数ランキング（上位10）',first:'初発',rec:'再発',no_data:'データなし'},
+  vi:{page_title:'Thống kê',nav_list:'Danh sách',nav_dashboard:'Dashboard',nav_master:'Master',nav_settings:'Cài đặt',p7:'7 ngày',p30:'30 ngày',p90:'90 ngày',p_all:'Tất cả',t_all:'Tất cả',t_eq:'Thiết bị',t_md:'Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Tỷ lệ tái phát',chart7_title:'Top 10 máy',chart8_title:'Top 10 sản phẩm',first:'Lần đầu',rec:'Tái phát',no_data:'Không có dữ liệu'},
+  en:{page_title:'Dashboard',nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master',nav_settings:'Settings',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',first:'First',rec:'Recurrence',no_data:'No data'}
 };
 function t(k){return(I18N[currentLang]||I18N.ja)[k]||(I18N.ja[k]||k)}
 function setLang(l){

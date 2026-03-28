@@ -381,6 +381,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <span class="nav-icon">📊</span>
       <span class="nav-label">ダッシュボード</span>
     </button>
+    <button class="nav-item active" onclick="void(0)">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label">マスタ</span>
+    </button>
   </nav>
 </div>
 
@@ -416,7 +420,7 @@ async function sbFetch(path,method='GET',body=null){
     if(!s){location.href='index.html';return;}
     const o=JSON.parse(s);
     if(o.expiresAt&&Date.now()>o.expiresAt){localStorage.removeItem('traq_session');location.href='index.html';return;}
-    if(o.role!=='admin'){location.href='home.html';return;}
+    if(o.role!=='admin'&&o.role!=='leader'&&o.role!=='sl'){location.href='home.html';return;}
   }catch(e){location.href='index.html';}
 })();
 
