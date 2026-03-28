@@ -592,16 +592,21 @@ async function doSubmit(){
         var ps=document.getElementById('product-select'),pt=ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text.split('(')[0].trim():'unknown';
         var fn=ds+'_'+selectedShift+'S_M'+mt+'_'+pt+'_'+(i+1)+'.jpg';
         var sp='troubles/'+tId+'/'+fn;
+        var uploadUrl=SB_URL+'/storage/v1/object/trouble-images/'+sp;
         try{
-          var ur=await fetch(SB_URL+'/storage/v1/object/trouble-images/troubles/'+tId+'/'+encodeURIComponent(fn),{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type,'x-upsert':'true'},body:img.file});
+          var ur=await fetch(uploadUrl,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':img.file.type,'x-upsert':'true'},body:img.file});
+          var respText=await ur.text();
           if(ur.ok){
             await sbFetch('trouble_images','POST',{trouble_id:tId,storage_path:sp});
           }else{
-            var errText=await ur.text();
-            console.error('Storage upload failed:',ur.status,errText);
+            hideOverlay();
+            alert('画像アップロード失敗\n\nステータス: '+ur.status+'\nURL: '+uploadUrl+'\nレスポンス: '+respText);
+            showOverlay('残りを処理中...');
           }
         }catch(upErr){
-          console.error('Image upload error:',upErr);
+          hideOverlay();
+          alert('画像アップロード例外\n\n'+upErr.message+'\nURL: '+uploadUrl);
+          showOverlay('残りを処理中...');
         }
       }
     }
