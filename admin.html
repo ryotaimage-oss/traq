@@ -439,7 +439,7 @@ function getFilteredUsers(){
   return USERS.filter(u=>{
     if(q&&!u.name.toLowerCase().includes(q))return false;
     if(rf&&u.role!==rf)return false;
-    if(sf&&String(u.default_shift||u.shift||'')!==sf)return false;
+    if(sf&&String(u.shift||u.shift||'')!==sf)return false;
     if(af!==''&&String(u.is_active)!==af)return false;
     return true;
   });
@@ -455,7 +455,7 @@ function renderUsers(){
     const role=u.role==='admin'?'admin':u.role==='leader'||u.role==='sl'?'sl':'op';
     const rl=role==='admin'?'Admin':role==='sl'?'SL':'OP';
     const bc='badge-'+role;
-    const shift=u.default_shift||u.shift||'–';
+    const shift=u.shift||u.shift||'–';
     const active=u.is_active!==false;
     return`<tr>
       <td style="font-weight:600">${esc(u.name)}</td>
@@ -484,9 +484,9 @@ function openUserModal(id){
       </select></div>
     <div class="form-group"><label class="form-label">デフォルト直</label>
       <select class="form-select" id="m-shift">
-        <option value="1" ${u&&(u.default_shift||u.shift)==1?'selected':''}>1直</option>
-        <option value="2" ${u&&(u.default_shift||u.shift)==2?'selected':''}>2直</option>
-        <option value="3" ${u&&(u.default_shift||u.shift)==3?'selected':''}>3直</option>
+        <option value="1" ${u&&(u.shift||u.shift)==1?'selected':''}>1直</option>
+        <option value="2" ${u&&(u.shift||u.shift)==2?'selected':''}>2直</option>
+        <option value="3" ${u&&(u.shift||u.shift)==3?'selected':''}>3直</option>
       </select></div>
     ${!u?'<div class="form-group"><label class="form-label">初期PIN</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
     <div class="modal-btns">
@@ -501,12 +501,12 @@ async function saveUser(id){
   if(!name){showToast('名前を入力してください','error');return;}
   try{
     if(id){
-      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role,default_shift:shift});
+      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role,shift:shift});
       const idx=USERS.findIndex(u=>u.id===id);
       if(idx>=0&&updated&&updated[0])USERS[idx]={...USERS[idx],...updated[0]};
     }else{
       const pin=document.getElementById('m-pin')?.value||'0000';
-      const created=await sbFetch('traq_users','POST',{name,role,default_shift:shift,pin,is_active:true});
+      const created=await sbFetch('traq_users','POST',{name,role,shift:shift,pin,is_active:true});
       if(created&&created[0])USERS.push(created[0]);
     }
     closeModal();renderUsers();showToast('保存しました','success');

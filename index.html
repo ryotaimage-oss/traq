@@ -596,7 +596,7 @@ async function doLogin() {
   clearError();
   try {
     // Supabase からPINを取得して照合
-    const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,default_shift,pin');
+    const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,shift,pin');
     if (!rows || rows.length === 0) throw new Error('user not found');
     const dbUser = rows[0];
 
