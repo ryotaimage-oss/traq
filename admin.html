@@ -223,7 +223,7 @@ tr:hover td { background: var(--surface2); }
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>品番コード</th><th>品番名</th><th>メモ</th><th>状態</th><th>操作</th></tr></thead>
+          <thead><tr><th>品番</th><th>品名</th><th>メモ</th><th>状態</th><th>操作</th></tr></thead>
           <tbody id="products-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span>読込中...</td></tr></tbody>
         </table>
       </div>
@@ -347,11 +347,11 @@ tr:hover td { background: var(--surface2); }
     <div class="modal-body">
       <input type="hidden" id="product-id">
       <div class="form-group">
-        <label class="form-label">品番コード</label>
+        <label class="form-label">品番</label>
         <input class="form-input" id="product-code" placeholder="例: P-001">
       </div>
       <div class="form-group">
-        <label class="form-label">品番名</label>
+        <label class="form-label">品名</label>
         <input class="form-input" id="product-name" placeholder="例: ○○部品">
       </div>
       <div class="form-group">
@@ -777,8 +777,8 @@ async function saveProduct() {
   var code = document.getElementById('product-code').value.trim();
   var name = document.getElementById('product-name').value.trim();
   var memo = document.getElementById('product-memo').value.trim();
-  if (!code) { showToast('品番コードを入力してください', 'error'); return; }
-  if (!name) { showToast('品番名を入力してください', 'error'); return; }
+  if (!code) { showToast('品番を入力してください', 'error'); return; }
+  if (!name) { showToast('品名を入力してください', 'error'); return; }
   var data = { product_code: code, product_name: name, memo: memo || null };
   try {
     if (id) {
@@ -805,7 +805,7 @@ async function toggleProduct(id, isActive) {
 }
 
 function exportProducts() {
-  var rows = [['品番コード','品番名','メモ','状態']];
+  var rows = [['品番','品名','メモ','状態']];
   products.forEach(function(p) {
     rows.push([p.product_code, p.product_name, p.memo || '', p.is_active ? '有効' : '無効']);
   });

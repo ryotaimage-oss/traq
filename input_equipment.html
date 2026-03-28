@@ -362,7 +362,7 @@ function onMachineChange() {
     : allProducts; // 紐づけなしの場合は全品番
 
   prodSel.innerHTML = '<option value="">選択してください</option>' +
-    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + ' ' + p.product_name + '</option>'; }).join('');
+    filtered.map(function(p) { return '<option value="' + p.id + '">' + p.product_code + '(' + p.product_name + ')</option>'; }).join('');
   prodSel.disabled = false;
   saveDraft();
 }

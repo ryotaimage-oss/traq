@@ -251,7 +251,7 @@ async function download(type) {
     var STATUS_LABEL = { pending: '承認待ち', approved: '承認済み', rejected: '差戻し', draft: '下書き' };
     var OCC_LABEL    = { first: '初発', repeat: '再発' };
 
-    var headers = ['発生日','シフト','ライン','機番','品番コード','品番名','分類','初発/再発','停止時間(分)','詳細','報告者','承認者','ステータス','差戻し理由'];
+    var headers = ['発生日','シフト','ライン','機番','品番','品名','分類','初発/再発','停止時間(分)','詳細','報告者','承認者','ステータス','差戻し理由'];
     var data = [headers].concat(rows.map(function(r) {
       var line    = getName(allLines, r.line_id, 'name');
       var machine = getName(allMachines, r.machine_id, 'machine_no');
