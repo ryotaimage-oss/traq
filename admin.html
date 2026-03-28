@@ -501,7 +501,7 @@ function getFilteredUsers(){
   return USERS.filter(u=>{
     if(q&&!u.name.toLowerCase().includes(q))return false;
     if(rf&&u.role!==rf)return false;
-    if(sf&&String(u.shift||u.shift||'')!==sf)return false;
+    if(sf&&String(u.shift||'')!==sf)return false;
     if(af!==''&&String(u.is_active)!==af)return false;
     return true;
   });
@@ -512,12 +512,12 @@ function renderUsers(){
   const start=(userPage-1)*PAGE_SIZE;
   const page=list.slice(start,start+PAGE_SIZE);
   const tbody=document.getElementById('userTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('userPagination',total,userPage,p=>{userPage=p;renderUsers();});return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
   tbody.innerHTML=page.map(u=>{
     const role=u.role==='admin'?'admin':u.role==='leader'||u.role==='sl'?'sl':'op';
     const rl=role==='admin'?'Admin':role==='sl'?'SL':'OP';
     const bc='badge-'+role;
-    const shift=u.shift||u.shift||'–';
+    const shift=u.shift||'–';
     const active=u.is_active!==false;
     return`<tr>
       <td style="font-weight:600">${esc(u.name)}</td>
@@ -531,7 +531,7 @@ function renderUsers(){
       </div></td>
     </tr>`;
   }).join('');
-  renderPagination('userPagination',total,userPage,p=>{userPage=p;renderUsers();});
+  renderPagination('userPagination',total,userPage,'user');
 }
 function openUserModal(id){
   const u=id?USERS.find(x=>x.id===id):null;
@@ -546,9 +546,9 @@ function openUserModal(id){
       </select></div>
     <div class="form-group"><label class="form-label">デフォルト直</label>
       <select class="form-select" id="m-shift">
-        <option value="1" ${u&&(u.shift||u.shift)==1?'selected':''}>1直</option>
-        <option value="2" ${u&&(u.shift||u.shift)==2?'selected':''}>2直</option>
-        <option value="3" ${u&&(u.shift||u.shift)==3?'selected':''}>3直</option>
+        <option value="1" ${u&&(u.shift)==1?'selected':''}>1直</option>
+        <option value="2" ${u&&(u.shift)==2?'selected':''}>2直</option>
+        <option value="3" ${u&&(u.shift)==3?'selected':''}>3直</option>
       </select></div>
     ${!u?'<div class="form-group"><label class="form-label">初期PIN</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
     <div class="modal-btns">
@@ -601,7 +601,7 @@ function renderMachines(){
   const total=list.length;
   const page=list.slice((machinePage-1)*PAGE_SIZE,machinePage*PAGE_SIZE);
   const tbody=document.getElementById('machineTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('machinePagination',total,machinePage,p=>{machinePage=p;renderMachines();});return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('machinePagination',total,machinePage,'machine');return;}
   tbody.innerHTML=page.map(m=>{
     const lineName=m.lines?m.lines.name:(LINES.find(l=>l.id===m.line_id)?.name||'–');
     const active=m.is_active!==false;
@@ -616,11 +616,11 @@ function renderMachines(){
       </div></td>
     </tr>`;
   }).join('');
-  renderPagination('machinePagination',total,machinePage,p=>{machinePage=p;renderMachines();});
+  renderPagination('machinePagination',total,machinePage,'machine');
 }
 function openMachineModal(id){
   const m=id?MACHINES.find(x=>x.id===id):null;
-  const lineOpts=LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+  const lineOpts=(m?'':'<option value="">選択してください</option>')+LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
   showModal(`
     <div class="modal-title">${m?'機番編集':'機番追加'}</div>
     <div class="form-group"><label class="form-label">機番</label><input class="form-input" id="m-no" type="number" value="${m?m.machine_no:''}" placeholder="例: 12"></div>
@@ -633,9 +633,10 @@ function openMachineModal(id){
 }
 async function saveMachine(id){
   const no=parseInt(document.getElementById('m-no').value);
-  const lineId=document.getElementById('m-line').value;
+  const lineId=parseInt(document.getElementById('m-line').value);
   const memo=document.getElementById('m-memo').value.trim();
   if(!no){showToast('機番を入力してください','error');return;}
+  if(!lineId){showToast('ラインを選択してください','error');return;}
   try{
     if(id){
       const updated=await sbFetch('machines?id=eq.'+id,'PATCH',{machine_no:no,line_id:lineId,memo});
@@ -666,7 +667,7 @@ function renderProducts(){
   const total=list.length;
   const page=list.slice((productPage-1)*PAGE_SIZE,productPage*PAGE_SIZE);
   const tbody=document.getElementById('productTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('productPagination',total,productPage,p=>{productPage=p;renderProducts();});return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="5">該当なし</td></tr>';renderPagination('productPagination',total,productPage,'product');return;}
   tbody.innerHTML=page.map(p=>{
     const active=p.is_active!==false;
     return`<tr>
@@ -680,7 +681,7 @@ function renderProducts(){
       </div></td>
     </tr>`;
   }).join('');
-  renderPagination('productPagination',total,productPage,p=>{productPage=p;renderProducts();});
+  renderPagination('productPagination',total,productPage,'product');
 }
 function openProductModal(id){
   const p=id?PRODUCTS.find(x=>x.id===id):null;
@@ -770,58 +771,92 @@ async function saveCategory(id){
 }
 
 /* ===== 共通: 有効/無効トグル ===== */
-async function toggleActive(table,id,currentActive,dataKey,renderFn){
-  const newVal=!currentActive;
-  try{
-    await sbFetch(table+'?id=eq.'+id,'PATCH',{is_active:newVal});
-    const arr=eval(dataKey);
-    const idx=arr.findIndex(x=>x.id===id);
-    if(idx>=0)arr[idx].is_active=newVal;
-    eval(renderFn+'()');
-    showToast(newVal?'有効にしました':'無効にしました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+const DATA_MAP = { USERS: () => USERS, MACHINES: () => MACHINES, PRODUCTS: () => PRODUCTS, CATEGORIES: () => CATEGORIES };
+const RENDER_MAP = { renderUsers, renderMachines, renderProducts, renderCategories };
+async function toggleActive(table, id, currentActive, dataKey, renderFn) {
+  const newVal = !currentActive;
+  try {
+    await sbFetch(table + '?id=eq.' + id, 'PATCH', { is_active: newVal });
+    const arr = DATA_MAP[dataKey]();
+    const idx = arr.findIndex(x => x.id === id);
+    if (idx >= 0) arr[idx].is_active = newVal;
+    RENDER_MAP[renderFn]();
+    showToast(newVal ? '有効にしました' : '無効にしました', 'success');
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
 
 /* ===== Pagination ===== */
-function renderPagination(elId,total,current,onPage){
-  const el=document.getElementById(elId);if(!el)return;
-  const pages=Math.ceil(total/PAGE_SIZE)||1;
-  if(pages<=1){el.innerHTML='';return;}
-  const start=(current-1)*PAGE_SIZE+1;
-  const end=Math.min(current*PAGE_SIZE,total);
-  el.innerHTML=`<span>${start}–${end} / ${total}件</span><div class="page-btns">
-    <button class="page-btn" onclick="(${onPage})(${current-1})" ${current<=1?'disabled':''}>← 前へ</button>
+function goPage(entity, p) {
+  if (entity === 'user') { userPage = p; renderUsers(); }
+  else if (entity === 'machine') { machinePage = p; renderMachines(); }
+  else if (entity === 'product') { productPage = p; renderProducts(); }
+}
+function renderPagination(elId, total, current, entity) {
+  const el = document.getElementById(elId); if (!el) return;
+  const pages = Math.ceil(total / PAGE_SIZE) || 1;
+  if (pages <= 1) { el.innerHTML = ''; return; }
+  const start = (current - 1) * PAGE_SIZE + 1;
+  const end = Math.min(current * PAGE_SIZE, total);
+  el.innerHTML = `<span>${start}–${end} / ${total}件</span><div class="page-btns">
+    <button class="page-btn" onclick="goPage('${entity}',${current - 1})" ${current <= 1 ? 'disabled' : ''}>← 前へ</button>
     <button class="page-btn active">${current} / ${pages}</button>
-    <button class="page-btn" onclick="(${onPage})(${current+1})" ${current>=pages?'disabled':''}>次へ →</button>
+    <button class="page-btn" onclick="goPage('${entity}',${current + 1})" ${current >= pages ? 'disabled' : ''}>次へ →</button>
+  </div>`;
   </div>`;
 }
 
 /* ===== Storage ===== */
-function initStorage(){
-  // Supabase Storage APIでファイル一覧取得して計算
-  fetch(SB_URL+'/storage/v1/bucket',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
-    .then(r=>r.json()).then(data=>{
-      // trouble-imagesバケットの使用量を表示
-      const bucket=Array.isArray(data)?data.find(b=>b.name==='trouble-images'):null;
-      const usedBytes=bucket?.size||0;
-      const usedMB=Math.round(usedBytes/1024/1024*10)/10;
-      const totalMB=1024;
-      const pct=Math.round(usedMB/totalMB*100);
-      updateStorageBar(usedMB,totalMB,pct);
-    }).catch(()=>{
-      // バケットAPIが使えない場合はメッセージ表示
-      document.getElementById('storageLabel').textContent='取得できません';
-      document.getElementById('storageDetail').textContent='Supabase Storageダッシュボードで確認してください';
+async function initStorage(){
+  try {
+    // trouble_imagesテーブルからレコード数を取得し、DB側のストレージパスからファイル一覧を推定
+    // Supabase Storage list APIでトップレベルフォルダを取得
+    var totalBytes = 0;
+    var fileCount = 0;
+    var res = await fetch(SB_URL + '/storage/v1/object/list/trouble-images', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefix: 'troubles/', limit: 1000, sortBy: { column: 'created_at', order: 'desc' } })
     });
+    if (res.ok) {
+      var items = await res.json();
+      // itemsにはフォルダ（id=null）とファイルが混在
+      // フォルダの場合は中のファイルを再取得
+      var folders = items.filter(function(i) { return i.id === null; });
+      var files = items.filter(function(i) { return i.id !== null; });
+      files.forEach(function(f) { if (f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
+      // 各フォルダ内のファイルを取得（最大50フォルダ）
+      for (var fi = 0; fi < Math.min(folders.length, 50); fi++) {
+        try {
+          var fr = await fetch(SB_URL + '/storage/v1/object/list/trouble-images', {
+            method: 'POST',
+            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prefix: 'troubles/' + folders[fi].name + '/', limit: 100 })
+          });
+          if (fr.ok) {
+            var subItems = await fr.json();
+            subItems.forEach(function(f) { if (f.id !== null && f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
+          }
+        } catch(e) { /* skip */ }
+      }
+    }
+    var usedMB = Math.round(totalBytes / 1024 / 1024 * 10) / 10;
+    var totalMB = 1024;
+    var pct = Math.round(usedMB / totalMB * 100);
+    updateStorageBar(usedMB, totalMB, pct, fileCount);
+  } catch(e) {
+    document.getElementById('storageLabel').textContent = '取得できません';
+    document.getElementById('storageDetail').textContent = 'Supabase Storageダッシュボードで確認してください';
+  }
 }
-function updateStorageBar(used,total,pct){
-  const color=pct>=70?'var(--danger)':pct>=50?'var(--warning)':'var(--success)';
-  document.getElementById('storageFill').style.width=pct+'%';
-  document.getElementById('storageFill').style.background=color;
-  document.getElementById('storageLabel').textContent=`${used}MB / ${total}MB (${pct}%)`;
-  document.getElementById('storageLabel').style.color=color;
-  document.getElementById('storageDetail').textContent=
-    pct>=70?'⚠️ 70%を超えています。不要な画像の削除を推奨します。':`残り ${Math.round((total-used)*10)/10}MB 利用可能`;
+function updateStorageBar(used, total, pct, fileCount) {
+  const color = pct >= 70 ? 'var(--danger)' : pct >= 50 ? 'var(--warning)' : 'var(--success)';
+  document.getElementById('storageFill').style.width = pct + '%';
+  document.getElementById('storageFill').style.background = color;
+  document.getElementById('storageLabel').textContent = `${used}MB / ${total}MB (${pct}%)`;
+  document.getElementById('storageLabel').style.color = color;
+  var detail = pct >= 70 ? '⚠️ 70%を超えています。不要な画像の削除を推奨します。' : `残り ${Math.round((total - used) * 10) / 10}MB 利用可能`;
+  if (typeof fileCount === 'number') detail += `　画像: ${fileCount}件`;
+  document.getElementById('storageDetail').textContent = detail;
 }
 function exportImages(){
   const year=document.getElementById('exportYear').value;
