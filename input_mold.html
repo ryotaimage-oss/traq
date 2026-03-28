@@ -75,7 +75,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   width:100%;background:var(--surface2);border:1px solid var(--field-border);
   border-radius:8px;padding:12px 14px;color:var(--text);
   font-family:inherit;font-size:15px;transition:border-color .15s;
+  -webkit-appearance:none;appearance:none;
 }
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--orange)}
 .form-select option{background:var(--surface)}
 .form-textarea{resize:vertical;min-height:100px;line-height:1.6}
@@ -92,6 +94,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   background:var(--surface2);border:1px solid var(--field-border);border-radius:8px;
   padding:12px;text-align:center;cursor:pointer;font-family:inherit;
   font-size:15px;font-weight:600;color:var(--muted);transition:all .15s;
+  -webkit-appearance:none;appearance:none;
 }
 .occurrence-btn.selected{border-color:var(--orange);color:var(--orange);background:rgba(239,159,39,.08)}
 
@@ -107,7 +110,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* 送信 */
 .submit-area{padding:8px 0 16px}
-.submit-btn{width:100%;padding:16px;background:var(--orange);color:#000;border:none;border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:opacity .15s,transform .1s}
+.submit-btn{width:100%;padding:16px;background:var(--orange);color:#000;border:none;border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:opacity .15s,transform .1s;-webkit-appearance:none;appearance:none}
 .submit-btn:active{opacity:.85;transform:scale(.99)}
 .submit-btn:disabled{opacity:.5;cursor:not-allowed}
 
@@ -195,7 +198,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
       </div>
       <div class="form-group">
         <label class="form-label">シフト<span class="req">*</span></label>
-        <select class="form-select" id="shift-select" style="padding:12px 6px;text-align:center">
+        <select class="form-select" id="shift-select" style="padding:12px 28px 12px 6px;text-align:center">
           <option value="1">１S</option>
           <option value="2">２S</option>
           <option value="3">３S</option>
@@ -208,11 +211,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
         </select>
       </div>
     </div>
-    <div class="form-row" style="grid-template-columns:1fr 100px 1fr">
-      <div class="form-group">
-        <label class="form-label">報告者</label>
-        <input class="form-input" id="reporter-display" disabled style="min-width:0">
-      </div>
+    <div class="form-row" style="grid-template-columns:100px 1fr">
       <div class="form-group">
         <label class="form-label">機番<span class="req">*</span></label>
         <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled style="min-width:0">
@@ -225,6 +224,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
           <option value="">—</option>
         </select>
       </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:2px">
+      <span>報告者:</span><span id="reporter-display" style="font-weight:500;color:var(--text)"></span>
     </div>
   </div>
 
@@ -334,7 +336,7 @@ var session=null;
   session=JSON.parse(s);
   if(Date.now()>session.expiresAt){location.href='index.html';return;}
   document.getElementById('shift-select').value=String(session.shift);
-  document.getElementById('reporter-display').value=session.name||'';
+  document.getElementById('reporter-display').textContent=session.name||'';
   setDefaultDate();
   initChip();
 })();
