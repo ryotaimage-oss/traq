@@ -127,6 +127,12 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </button>
   </div>
 
+  <!-- サブメニュー -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="admin-btn" onclick="location.href='dashboard.html'" style="flex:1;"><span>📊</span> ダッシュボード</button>
+    <button class="admin-btn" onclick="location.href='excel_download.html'" style="flex:1;"><span>📥</span> Excelダウンロード</button>
+  </div>
+
   <!-- 管理者メニュー（adminのみ表示） -->
   <div class="admin-link hidden" id="admin-link">
     <button class="admin-btn" onclick="location.href='admin.html'">
