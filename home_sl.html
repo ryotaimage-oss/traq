@@ -14,6 +14,8 @@
   --bg1:         #080d18;
   --bg2:         #111827;
   --bg3:         #1e2d45;
+  --factory:     #2e3a52;
+  --roof:        #3d4e6e;
   --text1:       #e8eaf0;
   --text2:       #8b90a0;
   --border:      rgba(255,255,255,0.08);
@@ -23,7 +25,6 @@
   --radius:      8px;
   --shadow:      0 4px 24px rgba(0,0,0,0.4);
   --nav-h:       64px;
-  --sb-w:        220px;
 }
 [data-theme="light"] {
   --bg1:    #e8e6e2;
@@ -38,1001 +39,471 @@
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
 .app{height:100%;display:flex;flex-direction:column}
 
-/* ===== Topbar ===== */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;
-  background:#080d18;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-shrink:0;z-index:20;
-}
-.logo-mark{display:flex;align-items:center;gap:7px}
-.logo-emoji{font-size:20px;line-height:1}
-.logo-text{font-size:15px;font-weight:700;color:#fff}
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.mini-logo{display:flex;align-items:center;gap:6px}
+.mini-logo-emoji{font-size:18px;line-height:1}
+.mini-logo-text{font-size:15px;font-weight:700;color:var(--orange)}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 5px}
+.user-chip-avatar{width:26px;height:26px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.user-chip-name{font-size:12px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip-role{font-size:10px;color:var(--warning)}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-/* ===== Main Layout ===== */
+/* Layout */
 .main-wrap{flex:1;overflow:hidden;display:flex}
 
-/* ===== Sidebar ===== */
-.sidebar{
-  width:var(--sb-w);flex-shrink:0;
-  background:#080d18;
-  border-right:1px solid rgba(255,255,255,0.08);
-  display:flex;flex-direction:column;
-  padding:20px 0 16px;
-  overflow-y:auto;
-}
-.sb-user{padding:0 16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:8px}
-.sb-avatar{
-  width:44px;height:44px;border-radius:50%;
-  background:var(--warning);color:#080d18;
-  font-size:18px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:10px;
-}
-.sb-name{font-size:15px;font-weight:700;color:#fff}
-.sb-role{font-size:12px;color:var(--text2);margin-top:2px}
-.sb-nav{flex:1;padding:0 8px}
-.sb-nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius);
-  font-size:14px;font-weight:500;color:var(--text2);
-  cursor:pointer;transition:all .15s;
-  text-decoration:none;position:relative;
-}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-user{padding:16px;border-bottom:1px solid var(--border)}
+.sb-avatar{width:40px;height:40px;border-radius:50%;background:var(--warning);color:var(--navy);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sb-name{font-size:14px;font-weight:700}
+.sb-role{font-size:11px;color:var(--warning);margin-top:2px}
+.sb-nav{flex:1;padding:8px}
+.sb-nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-decoration:none;width:100%;background:none;border:none;font-family:inherit;text-align:left;position:relative}
 .sb-nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text1)}
-.sb-nav-item.active{background:rgba(239,159,39,0.12);color:var(--orange)}
-.sb-nav-icon{font-size:16px;width:20px;text-align:center}
-.sb-badge{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  background:var(--danger);color:#fff;
-  font-size:10px;font-weight:700;
-  min-width:18px;height:18px;
-  border-radius:9px;padding:0 5px;
-  display:flex;align-items:center;justify-content:center;
-}
-.sb-bottom{padding:8px;border-top:1px solid rgba(255,255,255,0.08);margin-top:8px}
-.sb-lang{display:flex;gap:4px;padding:0 4px;margin-bottom:8px}
-.sb-lang-btn{
-  flex:1;padding:5px 4px;border:1px solid rgba(255,255,255,0.12);
-  border-radius:6px;background:none;font-family:inherit;
-  font-size:11px;font-weight:500;color:var(--text2);
-  cursor:pointer;transition:all .15s;text-align:center;
-}
-.sb-lang-btn.active,.sb-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-.sb-globe{font-size:16px;padding:8px 16px;display:block;color:var(--text2)}
-.sb-theme-btn{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;border-radius:var(--radius);
-  font-size:13px;font-weight:500;color:var(--text2);
-  cursor:pointer;background:none;border:none;
-  font-family:inherit;width:100%;text-align:left;
-  transition:all .15s;
-}
+.sb-nav-item.active{background:rgba(239,159,39,0.12);color:var(--orange);font-weight:700}
+.sb-nav-icon{font-size:15px;width:18px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
+.sb-bottom{padding:8px;border-top:1px solid var(--border);margin-top:auto}
+.sb-theme-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;background:none;border:none;font-family:inherit;width:100%;text-align:left;transition:all .15s}
 .sb-theme-btn:hover{color:var(--text1)}
-.sb-logout{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius);
-  font-size:14px;font-weight:600;color:var(--danger);
-  cursor:pointer;transition:all .15s;
-  width:100%;background:none;border:none;
-  font-family:inherit;text-align:left;
-}
-.sb-logout:hover{background:rgba(239,68,68,0.08)}
+.sb-lang{display:flex;gap:4px;padding:4px;margin-bottom:4px}
+.sb-lang-btn{flex:1;padding:5px 4px;border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.sb-lang-btn.active,.sb-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-/* ===== Right Panel ===== */
+/* Right panel */
 .right-panel{flex:1;overflow:hidden;display:flex;flex-direction:column}
 
-/* ===== Pending Banner ===== */
-.pending-banner{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;
-  background:rgba(239,159,39,0.08);
-  border-bottom:1px solid rgba(239,159,39,0.2);
-  flex-shrink:0;
-}
-[data-theme="light"] .pending-banner{
-  background:rgba(239,159,39,0.06);
-  border-bottom-color:rgba(239,159,39,0.25);
-}
-.pending-banner-left{display:flex;align-items:center;gap:12px}
+/* Pending banner */
+.pending-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.25);flex-shrink:0}
+.pending-banner-left{display:flex;align-items:center;gap:10px}
 .pending-icon{font-size:20px}
-.pending-info{}
-.pending-count{font-size:24px;font-weight:700;color:var(--orange);line-height:1}
-.pending-label{font-size:12px;color:var(--text2);margin-top:1px}
-.pending-btn{
-  background:var(--orange);color:#080d18;
-  font-size:13px;font-weight:700;
-  padding:9px 18px;border-radius:var(--radius);
-  border:none;cursor:pointer;font-family:inherit;
-  white-space:nowrap;
-  transition:background .15s;
-}
-.pending-btn:hover{background:var(--orange-dark)}
+.pending-count{font-size:22px;font-weight:700;color:var(--warning);line-height:1}
+.pending-label{font-size:11px;color:var(--text2)}
+.btn-review-all{background:var(--warning);color:var(--navy);border:none;border-radius:var(--radius);padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-review-all:hover{background:#d97706}
 
-/* ===== Main Tabs ===== */
-.main-tabs{
-  display:flex;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-  background:var(--bg2);
-}
-.main-tab{
-  flex:1;padding:12px 8px;
-  font-size:13px;font-weight:500;color:var(--text2);
-  cursor:pointer;border:none;background:none;
-  font-family:inherit;
-  border-bottom:2px solid transparent;
-  transition:all .15s;
-  position:relative;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.main-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
-.main-tab:hover:not(.active){color:var(--text1)}
-.tab-badge{
-  background:var(--danger);color:#fff;
-  font-size:10px;font-weight:700;
-  min-width:18px;height:18px;
-  border-radius:9px;padding:0 5px;
-  display:inline-flex;align-items:center;justify-content:center;
-}
+/* Tab bar */
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-item{flex:1;min-width:80px;padding:12px 8px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative}
+.tab-item.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:5px;vertical-align:middle}
 
-/* ===== Scroll Area ===== */
-.scroll-area{
-  flex:1;overflow-y:auto;
-  padding:16px;
-  padding-bottom:calc(var(--nav-h) + 16px);
-}
-@media(min-width:768px){.scroll-area{padding-bottom:16px}}
+/* Scroll area */
+.scroll-area{flex:1;overflow-y:auto;padding:12px 16px calc(var(--nav-h) + 12px)}
+@media(min-width:768px){.scroll-area{padding-bottom:12px}}
 
-/* ===== Type Filter ===== */
-.type-filter{display:flex;gap:6px;margin-bottom:14px}
-.tfbtn{
-  padding:5px 16px;border-radius:20px;
-  font-size:12px;font-weight:600;
-  border:1px solid var(--border);
-  background:none;color:var(--text2);
-  cursor:pointer;font-family:inherit;
-  transition:all .15s;
-}
-.tfbtn.active{background:var(--orange);color:#080d18;border-color:var(--orange)}
-.tfbtn:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+/* Filter row */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.filter-row::-webkit-scrollbar{display:none}
+.ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
+.ftab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
 
-/* ===== Trouble Card ===== */
-.tcard{
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  margin-bottom:12px;
-  overflow:hidden;
-  transition:box-shadow .15s;
-  animation:fadeUp .25s ease both;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.tcard:hover{box-shadow:0 4px 16px rgba(0,0,0,0.25)}
-.tcard.actioned{opacity:0.5;transition:opacity .3s}
-.tcard-body{padding:14px 16px;cursor:pointer}
+/* Cards */
+.trouble-list{display:flex;flex-direction:column;gap:10px}
+.tcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .15s;animation:slideUp .25s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tcard:hover{border-color:rgba(239,159,39,.3)}
+.tcard.actioned{opacity:0.45;pointer-events:none;transition:opacity .4s}
+.tcard-top{padding:14px 14px 10px;cursor:pointer}
 .tcard-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .tcard-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .tcard-time{font-size:12px;color:var(--text2);white-space:nowrap}
 .tcard-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
-.tcard-type.eq{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
-.tcard-type.md{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
-.tcard-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
-.tcard-status.pending{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
-.tcard-status.approved{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3)}
-.tcard-status.rejected{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
-.tcard-status.draft{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.3)}
-.tcard-shift{font-size:11px;color:var(--text2)}
-.tcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.tcard-type.eq{background:rgba(59,130,246,.15);color:#60a5fa}
+.tcard-type.md{background:rgba(168,85,247,.15);color:#c084fc}
+.status-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.status-badge.pending{background:rgba(245,158,11,.15);color:#fbbf24}
+.status-badge.approved{background:rgba(16,185,129,.15);color:#34d399}
+.status-badge.rejected{background:rgba(239,68,68,.15);color:#f87171}
+.status-badge.draft{background:rgba(100,116,139,.15);color:#94a3b8}
+.shift-badge{font-size:11px;color:var(--text2)}
+.tcard-title{font-size:15px;font-weight:700;margin-bottom:3px}
 .tcard-product{font-size:12px;color:var(--text2);margin-bottom:8px}
-.tcard-cat{
-  display:inline-block;font-size:11px;font-weight:500;
-  padding:2px 8px;border-radius:4px;
-  background:var(--bg3);color:var(--text2);
-  border:1px solid var(--border);margin-bottom:8px;
-}
-.tcard-detail{font-size:13px;color:var(--text1);line-height:1.6;margin-bottom:10px}
-.tcard-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:12px;color:var(--text2);
-}
-.tcard-reporter{display:flex;align-items:center;gap:4px}
-.tcard-reporter::before{content:'👤';font-size:11px}
-.tcard-stopinfo{display:flex;align-items:center;gap:4px}
-.tcard-stopinfo::before{content:'⏱';font-size:11px}
-
-/* Approve/Reject buttons */
-.card-actions{display:flex;height:48px}
-.ca-approve{
-  flex:1;border:none;cursor:pointer;font-family:inherit;
-  font-size:14px;font-weight:700;
-  color:#065f46;
-  transition:background .15s;
-  background:rgba(16,185,129,0.12);
-  border-top:1px solid rgba(16,185,129,0.2);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.ca-approve:hover{background:rgba(16,185,129,0.22)}
-[data-theme="light"] .ca-approve{
-  background:rgba(16,185,129,0.08);
-  color:#065f46;
-}
-[data-theme="light"] .ca-approve:hover{background:rgba(16,185,129,0.18)}
-.ca-reject{
-  flex:1;border:none;cursor:pointer;font-family:inherit;
-  font-size:14px;font-weight:700;
-  color:#991b1b;
-  transition:background .15s;
-  background:rgba(239,68,68,0.12);
-  border-top:1px solid rgba(239,68,68,0.2);
-  border-left:1px solid rgba(239,68,68,0.1);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.ca-reject:hover{background:rgba(239,68,68,0.22)}
-[data-theme="light"] .ca-reject{
-  background:rgba(239,68,68,0.06);
-  color:#991b1b;
-}
-[data-theme="light"] .ca-reject:hover{background:rgba(239,68,68,0.14)}
-
-/* Reject reason box */
-.reject-box{
-  margin-top:8px;padding:8px 10px;
-  background:rgba(239,68,68,0.08);
-  border:1px solid rgba(239,68,68,0.2);
-  border-radius:6px;
-}
+.tcard-cat{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);margin-bottom:8px}
+.tcard-detail{font-size:13px;line-height:1.6;color:var(--text1);margin-bottom:10px}
+.tcard-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
+.tcard-reporter::before{content:'👤';font-size:11px;margin-right:4px}
+.tcard-stop::before{content:'⏱';font-size:11px;margin-right:4px}
+.reject-box{margin-top:8px;padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px}
 .reject-label{font-size:10px;font-weight:700;color:var(--danger);margin-bottom:2px}
 .reject-text{font-size:12px;color:var(--danger)}
 
-/* ===== Empty ===== */
+/* Action buttons */
+.card-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.ca-btn{padding:12px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.ca-approve{background:rgba(16,185,129,.1);color:#10b981;border-right:1px solid var(--border)}
+.ca-approve:hover{background:rgba(16,185,129,.2)}
+.ca-reject{background:rgba(239,68,68,.1);color:var(--danger)}
+.ca-reject:hover{background:rgba(239,68,68,.2)}
+
+/* Empty */
 .empty-state{text-align:center;padding:48px 16px;color:var(--text2)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-text{font-size:14px}
 
-/* ===== Bottom Nav (Mobile) ===== */
-.bottom-nav{
-  height:var(--nav-h);flex-shrink:0;
-  background:#080d18;
-  border-top:1px solid rgba(255,255,255,0.08);
-  display:flex;
-}
-.bn-item{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:3px;
-  cursor:pointer;font-size:10px;color:var(--text2);
-  border:none;background:none;font-family:inherit;
-  transition:color .15s;position:relative;
-}
+/* Bottom nav */
+.bottom-nav{height:var(--nav-h);flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);display:flex}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:10px;color:var(--text2);border:none;background:none;font-family:inherit;transition:color .15s;position:relative}
 .bn-item.active,.bn-item:hover{color:var(--orange)}
 .bn-icon{font-size:20px;line-height:1}
-.bn-badge{
-  position:absolute;top:6px;right:calc(50% - 18px);
-  background:var(--danger);color:#fff;
-  font-size:9px;font-weight:700;
-  min-width:16px;height:16px;
-  border-radius:8px;padding:0 4px;
-  display:flex;align-items:center;justify-content:center;
-}
+.bn-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--danger);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:flex;align-items:center;justify-content:center}
 
-/* ===== Reject Modal ===== */
+/* Modal */
 .modal-wrap{position:fixed;inset:0;z-index:100;display:none}
-.modal-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,0.7);
-  display:flex;align-items:flex-end;
-}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-end}
 .modal-overlay.center{align-items:center;justify-content:center}
-.modal-sheet{
-  background:var(--bg2);
-  border-radius:20px 20px 0 0;
-  width:100%;max-height:85vh;overflow-y:auto;
-  padding:20px 20px 40px;
-}
-.modal-overlay.center .modal-sheet{
-  border-radius:var(--radius);
-  max-width:360px;width:calc(100% - 32px);padding:24px;
-}
+.modal-sheet{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 20px 40px}
+.modal-overlay.center .modal-sheet{border-radius:12px;max-width:360px;width:calc(100% - 32px);padding:24px}
 .modal-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
 .modal-title{font-size:16px;font-weight:700;margin-bottom:4px}
 .modal-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
-.modal-textarea{
-  width:100%;min-height:100px;padding:12px;
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--radius);
-  font-family:inherit;font-size:14px;color:var(--text1);
-  resize:vertical;outline:none;
-}
+.modal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;gap:12px}
+.modal-label{color:var(--text2);flex-shrink:0}
+.modal-value{font-weight:500;text-align:right}
+.modal-textarea{width:100%;min-height:96px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;color:var(--text1);resize:vertical;outline:none}
 .modal-textarea:focus{border-color:var(--orange)}
 .modal-btns{display:flex;gap:10px;margin-top:14px}
 .btn-cancel{flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
-.btn-danger{flex:1;padding:12px;background:var(--danger);border:none;border-radius:var(--radius);font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit}
-.btn-primary{flex:1;padding:12px;background:var(--orange);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:#080d18;cursor:pointer;font-family:inherit}
+.btn-danger{flex:1;padding:12px;background:var(--danger);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit}
+.btn-primary{flex:1;padding:12px;background:var(--orange);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit}
 .modal-close-btn{width:100%;margin-top:14px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
-.modal-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.modal-detail-label{color:var(--text2)}
-.modal-detail-value{font-weight:500;text-align:right;max-width:65%}
 
-/* ===== Toast ===== */
+/* Toast */
 .toast-wrap{position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;transform:translateX(-50%);z-index:200;pointer-events:none}
-.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,0.1);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
+.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
 .toast.success{background:#065f46;border-color:#10b981}
 .toast.error{background:#7f1d1d;border-color:#ef4444}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* PC */
 @media(min-width:768px){
-  .sidebar{display:flex}
+  .sidebar{display:flex!important}
   .bottom-nav{display:none}
   .toast-wrap{bottom:16px}
-  .scroll-area{padding-bottom:16px}
 }
 @media(max-width:767px){
   .sidebar{display:none}
-  .main-tab{font-size:11px;padding:10px 4px}
+  .tab-item{font-size:12px;padding:10px 6px}
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Topbar -->
   <header class="topbar">
-    <div class="logo-mark">
-      <span class="logo-emoji">🏭</span>
-      <span class="logo-text">Traq</span>
+    <div class="topbar-left">
+      <div class="mini-logo">
+        <span class="mini-logo-emoji">🏭</span>
+        <span class="mini-logo-text">Traq</span>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div style="display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 5px">
-        <div id="topAvatar" style="width:28px;height:28px;border-radius:50%;background:var(--warning);color:#080d18;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">山</div>
+    <div class="topbar-right">
+      <button class="lang-btn" id="lang-ja" onclick="setLang('ja')">JP</button>
+      <button class="lang-btn" id="lang-vi" onclick="setLang('vi')">VN</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+      <div class="user-chip">
+        <div class="user-chip-avatar" id="chipAvatar">山</div>
         <div>
-          <div id="topName" style="font-size:12px;font-weight:700;line-height:1.2">山田 太郎</div>
-          <div id="topRole" style="font-size:10px;color:var(--warning);line-height:1.2">SL / 1直</div>
+          <div class="user-chip-name" id="chipName">山田 太郎</div>
+          <div class="user-chip-role" id="chipRole">SL / 1直</div>
         </div>
       </div>
     </div>
   </header>
 
   <div class="main-wrap">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebarEl" style="display:none">
       <div class="sb-user">
         <div class="sb-avatar" id="sbAvatar">山</div>
         <div class="sb-name" id="sbName">山田 太郎</div>
         <div class="sb-role" id="sbRole">SL / 1直</div>
       </div>
       <nav class="sb-nav">
-        <a class="sb-nav-item active" onclick="return false;">
+        <button class="sb-nav-item active" id="sb-pending" onclick="setTab('pending')">
           <span class="sb-nav-icon">⏳</span>承認待ち
           <span class="sb-badge" id="sbBadge" style="display:none">0</span>
-        </a>
-        <a class="sb-nav-item" onclick="setMainTab('all');return false;">
+        </button>
+        <button class="sb-nav-item" id="sb-all" onclick="setTab('all')">
           <span class="sb-nav-icon">📋</span>全データ一覧
-        </a>
-        <a class="sb-nav-item" href="input_equipment.html">
+        </button>
+        <button class="sb-nav-item" onclick="location.href='input_equipment.html'">
           <span class="sb-nav-icon">✏️</span>トラブル入力
-        </a>
-        <a class="sb-nav-item" href="dashboard.html">
+        </button>
+        <button class="sb-nav-item" onclick="location.href='dashboard.html'">
           <span class="sb-nav-icon">📊</span>ダッシュボード
-        </a>
-        <a class="sb-nav-item" href="excel_download.html">
+        </button>
+        <button class="sb-nav-item" onclick="location.href='excel_download.html'">
           <span class="sb-nav-icon">📥</span>Excelダウンロード
-        </a>
+        </button>
       </nav>
       <div class="sb-bottom">
         <button class="sb-theme-btn" onclick="toggleTheme()">
-          <span id="sbThemeIcon">🌙</span>
-          <span>テーマ切替</span>
+          <span id="sbThemeIcon">🌙</span><span>テーマ切替</span>
         </button>
-        <span class="sb-globe">🌐</span>
+        <span style="font-size:16px;padding:6px 12px;display:block;color:var(--text2)">🌐</span>
         <div class="sb-lang">
           <button class="sb-lang-btn active" id="sb-lang-ja" onclick="setLang('ja')">JP</button>
           <button class="sb-lang-btn" id="sb-lang-vi" onclick="setLang('vi')">VN</button>
           <button class="sb-lang-btn" id="sb-lang-en" onclick="setLang('en')">EN</button>
         </div>
-        <a class="sb-nav-item" href="settings.html">
+        <button class="sb-nav-item" onclick="location.href='settings.html'">
           <span class="sb-nav-icon">⚙️</span>設定
-        </a>
-        <button class="sb-logout" onclick="doLogout()">
-          <span>🚪</span>ログアウト
+        </button>
+        <button class="sb-nav-item" style="color:var(--danger)" onclick="doLogout()">
+          <span class="sb-nav-icon">🚪</span>ログアウト
         </button>
       </div>
     </aside>
 
-    <!-- Right Panel -->
     <div class="right-panel">
-
-      <!-- Pending Banner -->
-      <div class="pending-banner" id="pendingBanner">
+      <div class="pending-banner" id="pendingBanner" style="display:none">
         <div class="pending-banner-left">
           <span class="pending-icon">⏳</span>
-          <div class="pending-info">
+          <div>
             <div class="pending-count" id="pendingCount">0</div>
             <div class="pending-label">件の承認待ち</div>
           </div>
         </div>
-        <button class="pending-btn" onclick="setMainTab('pending')">承認待ちを確認</button>
+        <button class="btn-review-all" onclick="setTab('pending')">承認待ちを確認</button>
       </div>
 
-      <!-- Main Tabs -->
-      <div class="main-tabs">
-        <button class="main-tab active" id="tab-pending" onclick="setMainTab('pending')">
-          承認待ち <span class="tab-badge" id="tabBadgePending">0</span>
-        </button>
-        <button class="main-tab" id="tab-all" onclick="setMainTab('all')">全件</button>
-        <button class="main-tab" id="tab-approved" onclick="setMainTab('approved')">承認済み</button>
-        <button class="main-tab" id="tab-rejected" onclick="setMainTab('rejected')">差し戻し</button>
+      <div class="tab-bar">
+        <button class="tab-item active" id="tab-pending" onclick="setTab('pending')">承認待ち<span class="tab-badge" id="tabBadge">0</span></button>
+        <button class="tab-item" id="tab-all" onclick="setTab('all')">全件</button>
+        <button class="tab-item" id="tab-approved" onclick="setTab('approved')">承認済み</button>
+        <button class="tab-item" id="tab-rejected" onclick="setTab('rejected')">差し戻し</button>
       </div>
 
-      <!-- Scroll Area -->
       <div class="scroll-area" id="scrollArea">
-
-        <!-- Type Filter -->
-        <div class="type-filter">
-          <button class="tfbtn active" data-tf="all" onclick="setTypeFilter('all')">すべて</button>
-          <button class="tfbtn" data-tf="eq" onclick="setTypeFilter('eq')">設備</button>
-          <button class="tfbtn" data-tf="md" onclick="setTypeFilter('md')">金型</button>
+        <div class="filter-row">
+          <button class="ftab active" data-f="all" onclick="setTypeFilter('all')">すべて</button>
+          <button class="ftab" data-f="eq" onclick="setTypeFilter('eq')">設備</button>
+          <button class="ftab" data-f="md" onclick="setTypeFilter('md')">金型</button>
         </div>
-
-        <!-- List -->
-        <div id="troubleList">
-          <div class="empty-state">
-            <div class="empty-icon">⏳</div>
-            <div class="empty-text">読み込み中...</div>
-          </div>
+        <div class="trouble-list" id="troubleList">
+          <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">読み込み中...</div></div>
         </div>
+      </div>
+    </div>
+  </div>
 
-      </div><!-- /scroll-area -->
-    </div><!-- /right-panel -->
-  </div><!-- /main-wrap -->
-
-  <!-- Bottom Nav (Mobile) -->
   <nav class="bottom-nav">
-    <button class="bn-item active" onclick="setMainTab('pending')">
+    <button class="bn-item active" id="bn-pending" onclick="setTab('pending')">
       <span class="bn-icon">⏳</span>承認待ち
       <span class="bn-badge" id="mobBadge" style="display:none">0</span>
     </button>
-    <button class="bn-item" onclick="setMainTab('all')">
-      <span class="bn-icon">📋</span>全件
-    </button>
-    <button class="bn-item" onclick="location.href='dashboard.html'">
-      <span class="bn-icon">📊</span>集計
-    </button>
-    <button class="bn-item" onclick="doLogout()">
-      <span class="bn-icon" style="color:var(--danger)">🚪</span>
-      <span style="color:var(--danger)">ログアウト</span>
-    </button>
+    <button class="bn-item" id="bn-all" onclick="setTab('all')"><span class="bn-icon">📋</span>全件</button>
+    <button class="bn-item" onclick="location.href='dashboard.html'"><span class="bn-icon">📊</span>集計</button>
+    <button class="bn-item" style="color:var(--danger)" onclick="doLogout()"><span class="bn-icon">🚪</span>ログアウト</button>
   </nav>
+</div>
 
-</div><!-- /app -->
-
-<!-- Modal -->
 <div class="modal-wrap" id="modalEl"></div>
-
-<!-- Toast -->
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
 <script>
-/* =============================================
-   Supabase
-============================================= */
-var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-
-async function sbFetch(path, method, body) {
-  var opts = {
-    method: method || 'GET',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  var res = await fetch(SB_URL + '/rest/v1/' + path, opts);
-  if (!res.ok) throw new Error(await res.text());
-  var text = await res.text();
-  return text ? JSON.parse(text) : null;
+var SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path,method,body){
+  var opts={method:method||'GET',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch(SB_URL+'/rest/v1/'+path,opts);
+  if(!res.ok)throw new Error(await res.text());
+  var text=await res.text();return text?JSON.parse(text):null;
 }
 
-/* =============================================
-   i18n
-============================================= */
-var currentLang = 'ja';
-var I18N = {
-  ja:{
-    shift:'直',type_eq:'設備',type_md:'金型',
-    status_pending:'承認待ち',status_approved:'承認済み',
-    status_rejected:'差し戻し',status_draft:'下書き',
-    occ_first:'初発',occ_rec:'再発',
-    stop_min:function(m){return m+'分'},
-    stop_none:'不明',
-    empty_pending:'承認待ちの投稿はありません ✅',
-    empty_all:'投稿はありません',
-    btn_approve:'✓ 承認する',btn_reject:'✗ 差し戻す',
-    reject_title:'差し戻し理由',
-    reject_placeholder:'差し戻しの理由を入力してください…',
-    reject_send:'差し戻す',cancel:'キャンセル',
-    approve_done:'承認しました',reject_done:'差し戻しました',
-    logout_msg:'ログアウトしました',
-  },
-  vi:{
-    shift:'ca',type_eq:'Thiết bị',type_md:'Khuôn',
-    status_pending:'Chờ duyệt',status_approved:'Đã duyệt',
-    status_rejected:'Trả lại',status_draft:'Nháp',
-    occ_first:'Lần đầu',occ_rec:'Tái phát',
-    stop_min:function(m){return m+' phút'},
-    stop_none:'Không rõ',
-    empty_pending:'Không có báo cáo chờ duyệt ✅',
-    empty_all:'Không có báo cáo',
-    btn_approve:'✓ Duyệt',btn_reject:'✗ Trả lại',
-    reject_title:'Lý do trả lại',
-    reject_placeholder:'Nhập lý do trả lại…',
-    reject_send:'Trả lại',cancel:'Hủy',
-    approve_done:'Đã duyệt',reject_done:'Đã trả lại',
-    logout_msg:'Đã đăng xuất',
-  },
-  en:{
-    shift:'shift',type_eq:'Equipment',type_md:'Mold',
-    status_pending:'Pending',status_approved:'Approved',
-    status_rejected:'Rejected',status_draft:'Draft',
-    occ_first:'First',occ_rec:'Repeat',
-    stop_min:function(m){return m+'min'},
-    stop_none:'Unknown',
-    empty_pending:'No pending approvals ✅',
-    empty_all:'No posts',
-    btn_approve:'✓ Approve',btn_reject:'✗ Reject',
-    reject_title:'Reject Reason',
-    reject_placeholder:'Enter reason for rejection…',
-    reject_send:'Reject',cancel:'Cancel',
-    approve_done:'Approved',reject_done:'Rejected',
-    logout_msg:'Logged out',
-  }
+var currentLang='ja';
+var I18N={
+  ja:{shift:'直',eq:'設備',md:'金型',pending:'承認待ち',approved:'承認済み',rejected:'差し戻し',draft:'下書き',first:'初発',repeat:'再発',min:function(m){return m+'分'},unknown:'不明',empty_pending:'承認待ちはありません ✅',empty_all:'投稿はありません',approve:'✓ 承認する',reject:'✗ 差し戻す',reject_title:'差し戻し理由',reject_ph:'差し戻しの理由を入力してください…',reject_btn:'差し戻す',cancel:'キャンセル',approved_msg:'承認しました',rejected_msg:'差し戻しました',logout_msg:'ログアウトしました'},
+  vi:{shift:'ca',eq:'Thiết bị',md:'Khuôn',pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Trả lại',draft:'Nháp',first:'Lần đầu',repeat:'Tái phát',min:function(m){return m+' phút'},unknown:'Không rõ',empty_pending:'Không có báo cáo chờ duyệt ✅',empty_all:'Không có báo cáo',approve:'✓ Duyệt',reject:'✗ Trả lại',reject_title:'Lý do trả lại',reject_ph:'Nhập lý do…',reject_btn:'Trả lại',cancel:'Hủy',approved_msg:'Đã duyệt',rejected_msg:'Đã trả lại',logout_msg:'Đã đăng xuất'},
+  en:{shift:'shift',eq:'Equipment',md:'Mold',pending:'Pending',approved:'Approved',rejected:'Rejected',draft:'Draft',first:'First',repeat:'Repeat',min:function(m){return m+'min'},unknown:'Unknown',empty_pending:'No pending approvals ✅',empty_all:'No posts',approve:'✓ Approve',reject:'✗ Reject',reject_title:'Reject Reason',reject_ph:'Enter reason…',reject_btn:'Reject',cancel:'Cancel',approved_msg:'Approved',rejected_msg:'Rejected',logout_msg:'Logged out'}
 };
-function t(k,arg){
-  var d=I18N[currentLang]||I18N.ja;
-  var v=d[k]||I18N.ja[k]||k;
-  if(typeof v==='function') return v(arg);
-  return v;
-}
+function t(k,arg){var d=I18N[currentLang]||I18N.ja;var v=d[k]||I18N.ja[k]||k;return typeof v==='function'?v(arg):v;}
 function setLang(l){
-  currentLang=l;
-  localStorage.setItem('traq_lang',l);
+  currentLang=l;localStorage.setItem('traq_lang',l);
   ['ja','vi','en'].forEach(function(x){
-    var b=document.getElementById('sb-lang-'+x);
-    if(b) b.classList.toggle('active',x===l);
+    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
   });
   renderList();
 }
 
-/* =============================================
-   State
-============================================= */
-var SESSION=null;
-var TROUBLES=[];
-var mainTab='pending';
-var typeFilter='all';
+var SESSION=null,TROUBLES=[],currentTab='pending',typeFilter='all';
+function getSession(){try{var s=localStorage.getItem('traq_session');if(!s)return null;var o=JSON.parse(s);if(o.expiresAt&&Date.now()>o.expiresAt){localStorage.removeItem('traq_session');return null;}return o;}catch(e){return null;}}
 
-function getSession(){
-  try{
-    var s=localStorage.getItem('traq_session');
-    if(!s) return null;
-    var obj=JSON.parse(s);
-    if(obj.expiresAt && Date.now()>obj.expiresAt){
-      localStorage.removeItem('traq_session');
-      return null;
-    }
-    return obj;
-  }catch(e){return null;}
-}
-
-/* =============================================
-   Init
-============================================= */
 (async function init(){
   SESSION=getSession();
   if(!SESSION){location.href='index.html';return;}
-  // OP → home
-  if(SESSION.role==='worker'||SESSION.role==='op'){
-    location.href='home.html';return;
-  }
+  if(SESSION.role==='worker'||SESSION.role==='op'){location.href='home.html';return;}
 
-  // Theme
-  var savedTheme=localStorage.getItem('traq_theme');
-  var prefTheme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-  var theme=savedTheme||prefTheme;
-  document.documentElement.setAttribute('data-theme',theme);
-  var sbTI=document.getElementById('sbThemeIcon');
-  if(sbTI) sbTI.textContent=theme==='dark'?'🌙':'☀️';
+  var th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',th);
+  var icon=th==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').textContent=icon;
+  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
 
-  // Lang
-  var savedLang=localStorage.getItem('traq_lang')||'ja';
-  currentLang=savedLang;
-  ['ja','vi','en'].forEach(function(l){
-    var b=document.getElementById('sb-lang-'+l);
-    if(b) b.classList.toggle('active',l===savedLang);
+  var l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
+  ['ja','vi','en'].forEach(function(x){
+    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
   });
 
-  // User info
-  var name=SESSION.name||'';
-  var initial=name.charAt(0)||'?';
-  var role=SESSION.role;
-  var roleLabel=role==='leader'||role==='sl'?'SL':role==='admin'?'Admin':'SL';
-  document.getElementById('sbAvatar').textContent=initial;
+  var name=SESSION.name||'';var ini=name.charAt(0)||'?';
+  var rl=SESSION.role==='leader'||SESSION.role==='sl'?'SL':SESSION.role==='admin'?'Admin':'SL';
+  var shStr=(SESSION.shift||'')+t('shift');
+  document.getElementById('chipAvatar').textContent=ini;
+  document.getElementById('chipName').textContent=name;
+  document.getElementById('chipRole').textContent=rl+' / '+shStr;
+  document.getElementById('sbAvatar').textContent=ini;
   document.getElementById('sbName').textContent=name;
-  document.getElementById('sbRole').textContent=roleLabel+' / '+SESSION.shift+t('shift');
-  // Topbar chip
-  var ta=document.getElementById('topAvatar');
-  var tn=document.getElementById('topName');
-  var tr2=document.getElementById('topRole');
-  if(ta) ta.textContent=initial;
-  if(tn) tn.textContent=name;
-  if(tr2) tr2.textContent=roleLabel+' / '+SESSION.shift+t('shift');
+  document.getElementById('sbRole').textContent=rl+' / '+shStr;
+
+  var sb=document.getElementById('sidebarEl');
+  function checkSb(){if(sb)sb.style.display=window.innerWidth>=768?'flex':'none';}
+  checkSb();window.addEventListener('resize',checkSb);
 
   await loadTroubles();
 })();
 
-/* =============================================
-   Load
-============================================= */
 async function loadTroubles(){
   try{
-    // SLは同シフトの全troubles取得
-    var query='troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)' +
-      '&order=created_at.desc&limit=100';
-    // shiftフィルター（同シフトのみ）
-    if(SESSION.shift){
-      query+='&shift=eq.'+encodeURIComponent(SESSION.shift);
-    }
-    var rows=await sbFetch(query,'GET');
-    if(!rows) rows=[];
-    TROUBLES=rows.map(function(r){
-      return{
-        id:r.id,
-        type:r.trouble_type,
-        status:r.status,
-        date:r.occurred_date||'',
-        shift:r.shift,
-        line:r.lines?r.lines.name:'',
-        machine:r.machines?r.machines.machine_no:'',
-        product_code:r.products?r.products.product_code:'',
-        product_name:r.products?r.products.product_name:'',
-        category:r.categories?r.categories.name:'',
-        occurrence:r.occurrence,
-        stop_minutes:r.stop_minutes,
-        detail:r.detail||'',
-        reporter:r.traq_users?r.traq_users.name:'',
-        reject_reason:r.reject_reason||'',
-        created_at:r.created_at,
-        stop_start:r.stop_start||null,
-        stop_end:r.stop_end||null,
-        _raw:r
-      };
-    });
-  }catch(e){
-    console.error('loadTroubles:',e);
-    TROUBLES=[];
-    showToast('データ読込エラー','error');
-  }
+    var q='troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100';
+    if(SESSION.shift)q+='&shift=eq.'+encodeURIComponent(SESSION.shift);
+    var rows=await sbFetch(q,'GET');if(!rows)rows=[];
+    TROUBLES=rows.map(function(r){return{id:r.id,type:r.trouble_type,status:r.status,date:r.occurred_date||'',shift:r.shift,line:r.lines?r.lines.name:'',machine:r.machines?r.machines.machine_no:'',product_code:r.products?r.products.product_code:'',product_name:r.products?r.products.product_name:'',category:r.categories?r.categories.name:'',occurrence:r.occurrence,stop_minutes:r.stop_minutes,detail:r.detail||'',reporter:r.traq_users?r.traq_users.name:'',reject_reason:r.reject_reason||'',created_at:r.created_at,stop_start:r.stop_start||null};});
+  }catch(e){TROUBLES=[];showToast('データ読込エラー','error');}
   renderList();
 }
 
-/* =============================================
-   Tab & Filter
-============================================= */
-function setMainTab(tab){
-  mainTab=tab;
-  document.querySelectorAll('.main-tab').forEach(function(b){
-    b.classList.toggle('active',b.id==='tab-'+tab);
-  });
-  // Mobile nav active
-  document.querySelectorAll('.bn-item').forEach(function(b,i){
-    b.classList.toggle('active',i===(['pending','all','dashboard','logout'].indexOf(tab)));
-  });
-  document.getElementById('scrollArea').scrollTo(0,0);
+function setTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-item').forEach(function(b){b.classList.toggle('active',b.id==='tab-'+tab);});
+  ['sb-pending','sb-all'].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.toggle('active',id==='sb-'+tab);});
+  ['bn-pending','bn-all'].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.toggle('active',id==='bn-'+tab);});
+  document.getElementById('scrollArea').scrollTo(0,0);renderList();
+}
+function setTypeFilter(f){
+  typeFilter=f;
+  document.querySelectorAll('.ftab').forEach(function(b){b.classList.toggle('active',b.dataset.f===f);});
   renderList();
 }
-
-function setTypeFilter(tf){
-  typeFilter=tf;
-  document.querySelectorAll('.tfbtn').forEach(function(b){
-    b.classList.toggle('active',b.dataset.tf===tf);
-  });
-  renderList();
-}
-
 function getFiltered(){
   return TROUBLES.filter(function(tr){
-    // main tab
-    var statusOk;
-    if(mainTab==='pending')  statusOk=tr.status==='pending';
-    else if(mainTab==='approved') statusOk=tr.status==='approved';
-    else if(mainTab==='rejected') statusOk=tr.status==='rejected';
-    else statusOk=true; // all
-    // type filter
-    var typeOk=typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
-    return statusOk&&typeOk;
+    var sok=currentTab==='pending'?tr.status==='pending':currentTab==='approved'?tr.status==='approved':currentTab==='rejected'?tr.status==='rejected':true;
+    var tok=typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
+    return sok&&tok;
   });
 }
 
-/* =============================================
-   Render
-============================================= */
 function renderList(){
-  var pending=TROUBLES.filter(function(tr){return tr.status==='pending';});
-  var cnt=pending.length;
-
-  // Badge updates
+  var cnt=TROUBLES.filter(function(tr){return tr.status==='pending';}).length;
   document.getElementById('pendingCount').textContent=cnt;
-  document.getElementById('tabBadgePending').textContent=cnt;
-  var sbBadge=document.getElementById('sbBadge');
-  var mobBadge=document.getElementById('mobBadge');
-  if(cnt>0){
-    sbBadge.textContent=cnt;sbBadge.style.display='flex';
-    mobBadge.textContent=cnt;mobBadge.style.display='flex';
-  }else{
-    sbBadge.style.display='none';
-    mobBadge.style.display='none';
-  }
-  // Banner
-  var banner=document.getElementById('pendingBanner');
-  banner.style.display=cnt>0?'flex':'none';
+  document.getElementById('tabBadge').textContent=cnt;
+  var sb=document.getElementById('sbBadge');var mb=document.getElementById('mobBadge');
+  if(cnt>0){sb.textContent=cnt;sb.style.display='flex';mb.textContent=cnt;mb.style.display='flex';}
+  else{sb.style.display='none';mb.style.display='none';}
+  document.getElementById('pendingBanner').style.display=cnt>0?'flex':'none';
 
-  var list=getFiltered();
-  var container=document.getElementById('troubleList');
+  var list=getFiltered();var container=document.getElementById('troubleList');
   if(list.length===0){
-    var msg=mainTab==='pending'?t('empty_pending'):t('empty_all');
-    container.innerHTML='<div class="empty-state"><div class="empty-icon">'+(mainTab==='pending'?'✅':'📭')+'</div><div class="empty-text">'+msg+'</div></div>';
+    var msg=currentTab==='pending'?t('empty_pending'):t('empty_all');
+    container.innerHTML='<div class="empty-state"><div class="empty-icon">'+(currentTab==='pending'?'✅':'📭')+'</div><div class="empty-text">'+msg+'</div></div>';
     return;
   }
   container.innerHTML='';
-  list.forEach(function(tr,idx){
-    container.appendChild(buildCard(tr,idx));
-  });
+  list.forEach(function(tr,i){container.appendChild(buildCard(tr,i));});
 }
 
 function buildCard(tr,idx){
-  var div=document.createElement('div');
-  div.className='tcard';
-  div.id='card-'+tr.id;
-  div.style.animationDelay=(idx*0.04)+'s';
-
-  var typeClass=tr.type==='equipment'?'eq':'md';
-  var typeLabel=t('type_'+typeClass);
-  var statusClass=tr.status;
-  var statusLabel=t('status_'+tr.status);
-  var occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
-  var stopLabel=tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none');
-
-  var machineLabel=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine?tr.machine+'号機':'');
-  var productLabel=tr.product_code&&tr.product_name
-    ?tr.product_code+' / '+tr.product_name:(tr.product_code||tr.product_name||'');
-
-  // Time display
-  var timeStr='';
-  if(tr.stop_start) timeStr=tr.stop_start.slice(0,5);
-  else if(tr.created_at) timeStr=tr.created_at.slice(11,16);
-
-  // Date
-  var dateStr=tr.date?tr.date.replace(/-/g,'/').slice(0,10):(tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'/'):'' );
+  var div=document.createElement('div');div.className='tcard';div.id='card-'+tr.id;div.style.animationDelay=(idx*0.04)+'s';
+  var tc=tr.type==='equipment'?'eq':'md';
+  var stop=tr.stop_minutes?t('min',tr.stop_minutes):t('unknown');
+  var occ=tr.occurrence==='first'?t('first'):t('repeat');
+  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine?tr.machine+'号機':'');
+  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:(tr.product_code||tr.product_name||'');
+  var timeStr=tr.stop_start?tr.stop_start.slice(0,5):(tr.created_at?tr.created_at.slice(11,16):'');
+  var dateStr=tr.date?tr.date.replace(/-/g,'/').slice(0,10):(tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'/'):'');
   var shiftStr=tr.shift?tr.shift+t('shift'):'';
-
-  // Reporter date
-  var reporterDateStr='';
-  if(tr.created_at) reporterDateStr=tr.created_at.slice(0,10).replace(/-/g,'-')+' '+tr.created_at.slice(11,16);
-
-  // Reject reason
-  var rejectHTML='';
-  if(tr.status==='rejected'&&tr.reject_reason){
-    rejectHTML='<div class="reject-box"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>';
-  }
-
-  // Action buttons (only for pending)
-  var actionsHTML='';
-  if(tr.status==='pending'){
-    actionsHTML='<div class="card-actions">'+
-      '<button class="ca-approve" onclick="quickApprove(\''+tr.id+'\')">'+t('btn_approve')+'</button>'+
-      '<button class="ca-reject"  onclick="openRejectModal(\''+tr.id+'\')">'+t('btn_reject')+'</button>'+
-      '</div>';
-  }
-
+  var repDate=tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'-')+' '+tr.created_at.slice(11,16):'';
+  var rejHTML=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
+  var actHTML=tr.status==='pending'?'<div class="card-actions"><button class="ca-btn ca-approve" onclick="event.stopPropagation();quickApprove(\''+tr.id+'\')">'+t('approve')+'</button><button class="ca-btn ca-reject" onclick="event.stopPropagation();openRejectModal(\''+tr.id+'\')">'+t('reject')+'</button></div>':'';
   div.innerHTML=
-    '<div class="tcard-body" onclick="openDetail(\''+tr.id+'\')">' +
-      '<div class="tcard-header">' +
-        '<div class="tcard-meta">' +
-          '<span class="tcard-type '+typeClass+'">'+typeLabel+'</span>'+
-          '<span class="tcard-status '+statusClass+'">'+statusLabel+'</span>'+
-          '<span class="tcard-shift">'+dateStr+' '+shiftStr+'</span>'+
-        '</div>'+
-        '<span class="tcard-time">'+timeStr+'</span>'+
-      '</div>'+
-      '<div class="tcard-title">'+esc(machineLabel)+'</div>'+
-      (productLabel?'<div class="tcard-product">'+esc(productLabel)+'</div>':'')+
-      (tr.category?'<span class="tcard-cat">'+esc(tr.category)+'</span>':'')+
-      '<div class="tcard-detail">'+esc(tr.detail).substring(0,100)+(tr.detail&&tr.detail.length>100?'…':'')+'</div>'+
-      '<div class="tcard-footer">'+
-        '<span class="tcard-reporter">'+esc(tr.reporter)+'　'+reporterDateStr+'</span>'+
-        '<div style="display:flex;align-items:center;gap:8px">'+
-          '<span class="tcard-stopinfo">'+stopLabel+'</span>'+
-          '<span style="font-size:11px;color:var(--text2)">'+occLabel+'</span>'+
-        '</div>'+
-      '</div>'+
-      rejectHTML+
-    '</div>'+
-    actionsHTML;
-
+    '<div class="tcard-top" onclick="openDetail(\''+tr.id+'\')">' +
+    '<div class="tcard-header"><div class="tcard-meta"><span class="tcard-type '+tc+'">'+t(tc)+'</span><span class="status-badge '+tr.status+'">'+t(tr.status)+'</span><span class="shift-badge">'+dateStr+' '+shiftStr+'</span></div><span class="tcard-time">'+timeStr+'</span></div>'+
+    '<div class="tcard-title">'+esc(machine)+'</div>'+
+    (product?'<div class="tcard-product">'+esc(product)+'</div>':'')+
+    (tr.category?'<span class="tcard-cat">'+esc(tr.category)+'</span>':'')+
+    '<div class="tcard-detail">'+esc(tr.detail).substring(0,100)+(tr.detail.length>100?'…':'')+'</div>'+
+    '<div class="tcard-footer"><span class="tcard-reporter">'+esc(tr.reporter)+'　'+repDate+'</span><div style="display:flex;gap:8px"><span class="tcard-stop">'+stop+'</span><span style="font-size:11px;color:var(--text2)">'+occ+'</span></div></div>'+
+    rejHTML+'</div>'+actHTML;
   return div;
 }
 
-function esc(str){
-  if(!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-/* =============================================
-   Detail Modal
-============================================= */
 function openDetail(id){
-  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
-  if(!tr) return;
-  var typeClass=tr.type==='equipment'?'eq':'md';
-  var machineLabel=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'');
-  var productLabel=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:'';
-  var rejectHTML='';
-  if(tr.status==='rejected'&&tr.reject_reason){
-    rejectHTML='<div class="reject-box" style="margin-bottom:12px"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>';
-  }
-  var approveBtn='';
-  if(tr.status==='pending'){
-    approveBtn='<div class="modal-btns" style="margin-top:16px">'+
-      '<button class="btn-cancel" onclick="closeModal()">閉じる</button>'+
-      '<button class="btn-primary" onclick="closeModal();quickApprove(\''+tr.id+'\')">✓ '+t('btn_approve').replace('✓ ','')+'</button>'+
-      '<button class="btn-danger"  onclick="closeModal();openRejectModal(\''+tr.id+'\')">差し戻す</button>'+
-      '</div>';
-  }else{
-    approveBtn='<button class="modal-close-btn" onclick="closeModal()">閉じる</button>';
-  }
-  showModal(
-    '<div class="modal-handle"></div>'+
-    '<div class="modal-title">'+esc(machineLabel)+'</div>'+
-    rejectHTML+
-    row('種別','<span class="tcard-type '+typeClass+'">'+t('type_'+typeClass)+'</span>')+
-    row('ステータス','<span class="tcard-status '+tr.status+'">'+t('status_'+tr.status)+'</span>')+
-    row('発生日',tr.date||'')+
-    row('直',tr.shift?tr.shift+t('shift'):'')+
-    row('品番',productLabel)+
-    row('分類',tr.category||'')+
-    row('初発/再発',tr.occurrence==='first'?t('occ_first'):t('occ_rec'))+
-    row('停止時間',tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none'))+
-    row('詳細',esc(tr.detail))+
-    row('報告者',tr.reporter)+
-    approveBtn
-  );
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(!tr)return;
+  var tc=tr.type==='equipment'?'eq':'md';
+  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'');
+  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:'';
+  var rBox=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box" style="margin-bottom:12px"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
+  var btns=tr.status==='pending'?'<div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">'+t('cancel')+'</button><button class="btn-primary" onclick="closeModal();quickApprove(\''+tr.id+'\')">'+t('approve')+'</button><button class="btn-danger" onclick="closeModal();openRejectModal(\''+tr.id+'\')">差し戻す</button></div>':'<button class="modal-close-btn" onclick="closeModal()">閉じる</button>';
+  showModal('<div class="modal-handle"></div><div class="modal-title">'+esc(machine)+'</div>'+rBox+mrow('種別','<span class="tcard-type '+tc+'">'+t(tc)+'</span>')+mrow('ステータス','<span class="status-badge '+tr.status+'">'+t(tr.status)+'</span>')+mrow('発生日',tr.date||'')+mrow('直',tr.shift?tr.shift+t('shift'):'')+mrow('品番',product)+mrow('分類',tr.category||'')+mrow('初発/再発',tr.occurrence==='first'?t('first'):t('repeat'))+mrow('停止時間',tr.stop_minutes?t('min',tr.stop_minutes):t('unknown'))+mrow('詳細',esc(tr.detail))+mrow('報告者',tr.reporter)+btns);
 }
-function row(label,value){
-  return '<div class="modal-detail-row"><span class="modal-detail-label">'+label+'</span><span class="modal-detail-value">'+value+'</span></div>';
-}
+function mrow(l,v){return'<div class="modal-row"><span class="modal-label">'+l+'</span><span class="modal-value">'+v+'</span></div>';}
 
-/* =============================================
-   Approve
-============================================= */
 async function quickApprove(id){
-  var card=document.getElementById('card-'+id);
-  if(card) card.classList.add('actioned');
+  var card=document.getElementById('card-'+id);if(card)card.classList.add('actioned');
   try{
-    await sbFetch('troubles?id=eq.'+id,'PATCH',{
-      status:'approved',
-      approver_id:SESSION.userId,
-      approved_at:new Date().toISOString()
-    });
-    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
-    if(tr) tr.status='approved';
-    showToast(t('approve_done'),'success');
-    setTimeout(function(){renderList();},400);
-  }catch(e){
-    if(card) card.classList.remove('actioned');
-    showToast('エラー: '+e.message,'error');
-  }
+    await sbFetch('troubles?id=eq.'+id,'PATCH',{status:'approved',approver_id:SESSION.userId,approved_at:new Date().toISOString()});
+    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(tr)tr.status='approved';
+    showToast(t('approved_msg'),'success');setTimeout(renderList,400);
+  }catch(e){if(card)card.classList.remove('actioned');showToast('エラー: '+e.message,'error');}
 }
 
-/* =============================================
-   Reject Modal
-============================================= */
-var _rejectTargetId=null;
+var _rid=null;
 function openRejectModal(id){
-  _rejectTargetId=id;
+  _rid=id;
   var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
-  var machineLabel=tr?(tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'')):'';
-  showModal(
-    '<div class="modal-handle"></div>'+
-    '<div class="modal-title">'+t('reject_title')+'</div>'+
-    '<div class="modal-sub">'+esc(machineLabel)+'</div>'+
-    '<textarea id="rejectReason" class="modal-textarea" placeholder="'+t('reject_placeholder')+'"></textarea>'+
-    '<div class="modal-btns">'+
-    '<button class="btn-cancel" onclick="closeModal()">'+t('cancel')+'</button>'+
-    '<button class="btn-danger" onclick="submitReject()">'+t('reject_send')+'</button>'+
-    '</div>',
-    true
-  );
-  setTimeout(function(){
-    var ta=document.getElementById('rejectReason');
-    if(ta) ta.focus();
-  },100);
+  var m=tr?(tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'')):'';
+  showModal('<div class="modal-handle"></div><div class="modal-title">'+t('reject_title')+'</div><div class="modal-sub">'+esc(m)+'</div><textarea id="rejectReason" class="modal-textarea" placeholder="'+t('reject_ph')+'"></textarea><div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">'+t('cancel')+'</button><button class="btn-danger" onclick="submitReject()">'+t('reject_btn')+'</button></div>',true);
+  setTimeout(function(){var ta=document.getElementById('rejectReason');if(ta)ta.focus();},100);
 }
-
 async function submitReject(){
   var reason=(document.getElementById('rejectReason')||{}).value||'';
-  if(!reason.trim()){
-    showToast('理由を入力してください','error');
-    return;
-  }
-  var id=_rejectTargetId;
-  closeModal();
-  var card=document.getElementById('card-'+id);
-  if(card) card.classList.add('actioned');
+  if(!reason.trim()){showToast('理由を入力してください','error');return;}
+  var id=_rid;closeModal();
+  var card=document.getElementById('card-'+id);if(card)card.classList.add('actioned');
   try{
-    await sbFetch('troubles?id=eq.'+id,'PATCH',{
-      status:'rejected',
-      reject_reason:reason.trim(),
-      approver_id:SESSION.userId,
-      approved_at:new Date().toISOString()
-    });
-    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
-    if(tr){tr.status='rejected';tr.reject_reason=reason.trim();}
-    showToast(t('reject_done'),'success');
-    setTimeout(function(){renderList();},400);
-  }catch(e){
-    if(card) card.classList.remove('actioned');
-    showToast('エラー: '+e.message,'error');
-  }
+    await sbFetch('troubles?id=eq.'+id,'PATCH',{status:'rejected',reject_reason:reason.trim(),approver_id:SESSION.userId,approved_at:new Date().toISOString()});
+    var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(tr){tr.status='rejected';tr.reject_reason=reason.trim();}
+    showToast(t('rejected_msg'),'success');setTimeout(renderList,400);
+  }catch(e){if(card)card.classList.remove('actioned');showToast('エラー: '+e.message,'error');}
 }
 
-/* =============================================
-   Modal
-============================================= */
-function showModal(html,center){
-  var el=document.getElementById('modalEl');
-  el.innerHTML='<div class="modal-overlay'+(center?' center':'')+'" onclick="handleOverlayClick(event)"><div class="modal-sheet">'+html+'</div></div>';
-  el.style.display='block';
-}
+function showModal(html,center){var el=document.getElementById('modalEl');el.innerHTML='<div class="modal-overlay'+(center?' center':'')+'" onclick="handleOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';el.style.display='block';}
 function closeModal(){document.getElementById('modalEl').style.display='none';}
-function handleOverlayClick(e){if(e.target.classList.contains('modal-overlay'))closeModal();}
+function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal();}
 
-/* =============================================
-   Toast
-============================================= */
-var toastTimer=null;
-function showToast(msg,type){
-  var el=document.getElementById('toastWrap');
-  el.innerHTML='<div class="toast'+(type?' '+type:'')+'">'+msg+'</div>';
-  el.style.display='block';
-  if(toastTimer) clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){el.style.display='none';},2500);
-}
+var _tt=null;
+function showToast(msg,type){var el=document.getElementById('toastWrap');el.innerHTML='<div class="toast'+(type?' '+type:'')+'">'+msg+'</div>';el.style.display='block';if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.style.display='none';},2500);}
 
-/* =============================================
-   Theme
-============================================= */
 function toggleTheme(){
-  var html=document.documentElement;
-  var isDark=html.getAttribute('data-theme')==='dark';
-  var next=isDark?'light':'dark';
-  html.setAttribute('data-theme',next);
-  localStorage.setItem('traq_theme',next);
-  var sbTI=document.getElementById('sbThemeIcon');
-  if(sbTI) sbTI.textContent=next==='dark'?'🌙':'☀️';
+  var h=document.documentElement;var isDark=h.getAttribute('data-theme')==='dark';var next=isDark?'light':'dark';
+  h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);
+  var icon=next==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').textContent=icon;
+  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
 }
 
-/* =============================================
-   Logout
-============================================= */
-function doLogout(){
-  localStorage.removeItem('traq_session');
-  showToast(t('logout_msg'));
-  setTimeout(function(){location.href='index.html';},800);
-}
+function doLogout(){localStorage.removeItem('traq_session');showToast(t('logout_msg'));setTimeout(function(){location.href='index.html';},800);}
 </script>
 </body>
 </html>

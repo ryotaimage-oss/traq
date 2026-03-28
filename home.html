@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ===== CSS Variables ===== */
 :root {
   --orange:      #EF9F27;
   --orange-dark: #c97d10;
@@ -15,6 +14,8 @@
   --bg1:         #080d18;
   --bg2:         #111827;
   --bg3:         #1e2d45;
+  --factory:     #2e3a52;
+  --roof:        #3d4e6e;
   --text1:       #e8eaf0;
   --text2:       #8b90a0;
   --border:      rgba(255,255,255,0.08);
@@ -24,7 +25,6 @@
   --radius:      8px;
   --shadow:      0 4px 24px rgba(0,0,0,0.4);
   --nav-h:       64px;
-  --sb-w:        220px;
 }
 [data-theme="light"] {
   --bg1:    #e8e6e2;
@@ -35,425 +35,227 @@
   --border: rgba(0,0,0,0.18);
   --shadow: 0 4px 24px rgba(0,0,0,0.12);
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
 .app{height:100%;display:flex;flex-direction:column}
 
-/* ===== Topbar ===== */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;
-  background:#080d18;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-shrink:0;z-index:20;
-}
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:10px}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.logo-mark{display:flex;align-items:center;gap:7px}
-.logo-emoji{font-size:20px;line-height:1}
-.logo-text{font-size:15px;font-weight:700;color:#fff}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.mini-logo{display:flex;align-items:center;gap:6px}
+.mini-logo-emoji{font-size:18px;line-height:1}
+.mini-logo-text{font-size:15px;font-weight:700;color:var(--orange)}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 5px}
+.user-chip-avatar{width:26px;height:26px;border-radius:50%;background:var(--orange);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.user-chip-name{font-size:12px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip-role{font-size:10px;color:var(--orange)}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--text2);transition:all .15s}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-/* ===== Main Layout ===== */
-.main-wrap{
-  flex:1;overflow:hidden;display:flex;
-}
+/* Layout */
+.main-wrap{flex:1;overflow:hidden;display:flex}
 
-/* ===== Sidebar (PC) ===== */
-.sidebar{
-  width:var(--sb-w);flex-shrink:0;
-  background:#080d18;
-  border-right:1px solid rgba(255,255,255,0.08);
-  display:flex;flex-direction:column;
-  padding:20px 0 16px;
-  overflow-y:auto;
-}
-.sb-user{padding:0 16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:8px}
-.sb-avatar{
-  width:44px;height:44px;border-radius:50%;
-  background:var(--orange);color:#080d18;
-  font-size:18px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:10px;
-}
-.sb-name{font-size:15px;font-weight:700;color:#fff}
-.sb-role{font-size:12px;color:var(--text2);margin-top:2px}
-.sb-nav{flex:1;padding:0 8px}
-.sb-nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius);
-  font-size:14px;font-weight:500;color:var(--text2);
-  cursor:pointer;transition:all .15s;
-  text-decoration:none;
-}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-user{padding:16px;border-bottom:1px solid var(--border)}
+.sb-avatar{width:40px;height:40px;border-radius:50%;background:var(--orange);color:var(--navy);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sb-name{font-size:14px;font-weight:700}
+.sb-role{font-size:11px;color:var(--orange);margin-top:2px}
+.sb-nav{flex:1;padding:8px}
+.sb-nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-decoration:none;width:100%;background:none;border:none;font-family:inherit;text-align:left}
 .sb-nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text1)}
-.sb-nav-item.active{background:rgba(239,159,39,0.12);color:var(--orange)}
-.sb-nav-icon{font-size:16px;width:20px;text-align:center}
-.sb-bottom{padding:8px;border-top:1px solid rgba(255,255,255,0.08);margin-top:8px}
-.sb-lang{display:flex;gap:4px;padding:0 4px;margin-bottom:8px}
-.sb-lang-btn{
-  flex:1;padding:5px 4px;border:1px solid rgba(255,255,255,0.12);
-  border-radius:6px;background:none;font-family:inherit;
-  font-size:11px;font-weight:500;color:var(--text2);
-  cursor:pointer;transition:all .15s;text-align:center;
-}
-.sb-lang-btn.active,.sb-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-.sb-globe{font-size:16px;padding:8px 16px;display:block;color:var(--text2)}
-.sb-theme-btn{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;border-radius:var(--radius);
-  font-size:13px;font-weight:500;color:var(--text2);
-  cursor:pointer;background:none;border:none;
-  font-family:inherit;width:100%;text-align:left;
-  transition:all .15s;
-}
+.sb-nav-item.active{background:rgba(239,159,39,0.12);color:var(--orange);font-weight:700}
+.sb-nav-item.danger{color:var(--danger)}
+.sb-nav-item.danger:hover{background:rgba(239,68,68,0.08)}
+.sb-nav-icon{font-size:15px;width:18px;text-align:center}
+.sb-bottom{padding:8px;border-top:1px solid var(--border);margin-top:auto}
+.sb-theme-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;background:none;border:none;font-family:inherit;width:100%;text-align:left;transition:all .15s}
 .sb-theme-btn:hover{color:var(--text1)}
-.sb-logout{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius);
-  font-size:14px;font-weight:600;color:var(--danger);
-  cursor:pointer;transition:all .15s;
-  width:100%;background:none;border:none;
-  font-family:inherit;text-align:left;
-}
-.sb-logout:hover{background:rgba(239,68,68,0.08)}
+.sb-lang{display:flex;gap:4px;padding:4px;margin-bottom:4px}
+.sb-lang-btn{flex:1;padding:5px 4px;border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.sb-lang-btn.active,.sb-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-/* ===== Scroll Area ===== */
-.scroll-area{
-  flex:1;overflow-y:auto;
-  padding:16px;
-  padding-bottom:calc(var(--nav-h) + 16px);
-}
-@media(min-width:768px){
-  .scroll-area{padding-bottom:16px}
-}
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:12px 16px calc(var(--nav-h) + 12px)}
+@media(min-width:768px){.scroll-area{padding-bottom:12px}}
 
-/* ===== Date Bar ===== */
-.date-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
-}
+/* Date bar */
+.date-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .date-text{font-size:14px;font-weight:500;color:var(--text2)}
-.shift-tag{
-  background:var(--orange);color:#080d18;
-  font-size:11px;font-weight:700;
-  padding:3px 10px;border-radius:20px;
-}
+.shift-tag{background:var(--orange);color:var(--navy);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 
-/* ===== Input Buttons ===== */
-.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.input-btn{
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:18px 16px;
-  cursor:pointer;
-  transition:all .18s;
-  text-align:left;
-  display:flex;align-items:center;justify-content:space-between;
-  text-decoration:none;
-  color:var(--text1);
-}
+/* Input buttons */
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.input-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 14px;cursor:pointer;transition:all .18s;text-align:left;display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:var(--text1)}
 .input-btn:hover{border-color:var(--orange);background:rgba(239,159,39,0.06);transform:translateY(-1px);box-shadow:var(--shadow)}
-.input-btn-left{display:flex;align-items:center;gap:12px}
-.input-btn-icon{
-  width:36px;height:36px;border-radius:8px;
-  background:var(--bg3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;
-}
+.input-btn-left{display:flex;align-items:center;gap:10px}
+.input-btn-icon{width:34px;height:34px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px}
 .input-btn-label{font-size:13px;font-weight:600}
-.input-btn-arrow{color:var(--text2);font-size:12px}
+.input-btn-arrow{color:var(--text2);font-size:14px}
 
-/* ===== Draft Banner ===== */
-.draft-banner{
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(239,159,39,0.1);
-  border:1px solid rgba(239,159,39,0.3);
-  border-radius:var(--radius);
-  padding:12px 16px;
-  margin-bottom:16px;
-  cursor:pointer;
-  transition:background .15s;
-}
+/* Draft banner */
+.draft-banner{display:flex;align-items:center;justify-content:space-between;background:rgba(239,159,39,0.1);border:1px solid rgba(239,159,39,0.3);border-radius:var(--radius);padding:11px 14px;margin-bottom:14px;cursor:pointer;transition:background .15s}
 .draft-banner:hover{background:rgba(239,159,39,0.15)}
 .draft-banner-left{display:flex;align-items:center;gap:10px}
-.draft-badge{
-  background:var(--orange);color:#080d18;
-  font-size:13px;font-weight:700;
-  width:24px;height:24px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
+.draft-badge{background:var(--orange);color:var(--navy);font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .draft-banner-text{font-size:13px;font-weight:600;color:var(--orange)}
 .draft-banner-link{font-size:12px;font-weight:600;color:var(--orange);white-space:nowrap}
 
-/* ===== Post List ===== */
-.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.list-title{font-size:14px;font-weight:600;color:var(--text2)}
+/* List header */
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.list-title{font-size:13px;font-weight:600;color:var(--text2)}
 .list-all-btn{font-size:12px;color:var(--text2);cursor:pointer;background:none;border:none;font-family:inherit;padding:0}
 .list-all-btn:hover{color:var(--orange)}
 
 /* Filter tabs */
-.filter-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.ftab{
-  padding:5px 12px;border-radius:20px;
-  font-size:12px;font-weight:500;
-  border:1px solid var(--border);
-  background:none;color:var(--text2);
-  cursor:pointer;font-family:inherit;
-  transition:all .15s;white-space:nowrap;
-}
-.ftab.active{background:var(--orange);color:#080d18;border-color:var(--orange);font-weight:700}
+.filter-row{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px}
+.filter-row::-webkit-scrollbar{display:none}
+.ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
 .ftab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
 
-/* ===== Trouble Card ===== */
-.tcard{
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  margin-bottom:10px;
-  overflow:hidden;
-  transition:box-shadow .15s;
-  animation:fadeUp .25s ease both;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.tcard:hover{box-shadow:0 4px 16px rgba(0,0,0,0.3)}
-.tcard-body{padding:14px;cursor:pointer}
-.tcard-meta{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.tcard-type{
-  font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;
-}
-.tcard-type.eq{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
-.tcard-type.md{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
-.tcard-status{
-  font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;
-}
-.tcard-status.draft{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.3)}
-.tcard-status.pending{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
-.tcard-status.approved{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3)}
-.tcard-status.rejected{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
-.tcard-date{font-size:11px;color:var(--text2)}
-.tcard-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text1)}
+/* Cards */
+.trouble-list{display:flex;flex-direction:column;gap:10px}
+.tcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .15s;animation:slideUp .25s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tcard:hover{border-color:rgba(239,159,39,.3)}
+.tcard-top{padding:14px 14px 10px;cursor:pointer}
+.tcard-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.tcard-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tcard-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.tcard-type.eq{background:rgba(59,130,246,.15);color:#60a5fa}
+.tcard-type.md{background:rgba(168,85,247,.15);color:#c084fc}
+.status-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.status-badge.draft{background:rgba(100,116,139,.15);color:#94a3b8}
+.status-badge.pending{background:rgba(245,158,11,.15);color:#fbbf24}
+.status-badge.approved{background:rgba(16,185,129,.15);color:#34d399}
+.status-badge.rejected{background:rgba(239,68,68,.15);color:#f87171}
+.shift-badge{font-size:11px;color:var(--text2)}
+.tcard-title{font-size:15px;font-weight:700;margin-bottom:3px}
 .tcard-product{font-size:12px;color:var(--text2);margin-bottom:8px}
-.tcard-cat{
-  display:inline-block;font-size:11px;font-weight:500;
-  padding:2px 8px;border-radius:4px;
-  background:var(--bg3);color:var(--text2);
-  border:1px solid var(--border);
-  margin-bottom:8px;
-}
-.tcard-detail{font-size:13px;color:var(--text1);line-height:1.6;margin-bottom:10px}
-.tcard-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:12px;color:var(--text2);
-}
-.tcard-reporter{display:flex;align-items:center;gap:4px}
-.tcard-reporter::before{content:'👤';font-size:11px}
-.tcard-stopinfo{display:flex;align-items:center;gap:4px}
-.tcard-stopinfo::before{content:'⏱';font-size:11px}
-.tcard-occ{font-size:11px;color:var(--text2)}
-.reject-box{
-  margin-top:8px;padding:8px 10px;
-  background:rgba(239,68,68,0.08);
-  border:1px solid rgba(239,68,68,0.2);
-  border-radius:6px;
-}
+.tcard-cat{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);margin-bottom:8px}
+.tcard-detail{font-size:13px;line-height:1.6;color:var(--text1);margin-bottom:10px}
+.tcard-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
+.tcard-reporter::before{content:'👤';font-size:11px;margin-right:4px}
+.tcard-stop::before{content:'⏱';font-size:11px;margin-right:4px}
+.reject-box{margin-top:8px;padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px}
 .reject-label{font-size:10px;font-weight:700;color:var(--danger);margin-bottom:2px}
 .reject-text{font-size:12px;color:var(--danger)}
 
-/* Draft card actions */
-.tcard-actions{
-  display:flex;gap:8px;padding:10px 14px;
-  background:var(--bg3);border-top:1px solid var(--border);
-}
-.ca-btn{
-  flex:1;padding:8px;border-radius:6px;
-  font-size:12px;font-weight:600;
-  cursor:pointer;font-family:inherit;
-  border:none;transition:all .15s;
-}
+/* Draft actions */
+.card-actions{display:flex;gap:6px;padding:10px 14px;background:var(--bg3);border-top:1px solid var(--border)}
+.ca-btn{flex:1;padding:8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .15s}
 .ca-edit{background:rgba(255,255,255,0.06);color:var(--text2)}
 .ca-edit:hover{background:rgba(255,255,255,0.1);color:var(--text1)}
-.ca-send{background:var(--orange);color:#080d18}
+.ca-send{background:var(--orange);color:var(--navy)}
 .ca-send:hover{background:var(--orange-dark)}
 .ca-delete{background:rgba(239,68,68,0.1);color:var(--danger)}
 .ca-delete:hover{background:rgba(239,68,68,0.2)}
 
-/* ===== Empty State ===== */
-.empty-state{
-  text-align:center;padding:48px 16px;
-  color:var(--text2);
-}
+/* Empty */
+.empty-state{text-align:center;padding:48px 16px;color:var(--text2)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-text{font-size:14px}
 
-/* ===== Bottom Nav (Mobile) ===== */
-.bottom-nav{
-  height:var(--nav-h);flex-shrink:0;
-  background:#080d18;
-  border-top:1px solid rgba(255,255,255,0.08);
-  display:flex;
-}
-.bn-item{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:3px;cursor:pointer;
-  font-size:10px;color:var(--text2);
-  border:none;background:none;font-family:inherit;
-  transition:color .15s;
-}
-.bn-item.active{color:var(--orange)}
-.bn-item:hover{color:var(--text1)}
+/* Bottom nav */
+.bottom-nav{height:var(--nav-h);flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);display:flex}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:10px;color:var(--text2);border:none;background:none;font-family:inherit;transition:color .15s}
+.bn-item.active,.bn-item:hover{color:var(--orange)}
 .bn-icon{font-size:20px;line-height:1}
-.bn-badge{
-  position:relative;
-}
-.bn-badge::after{
-  content:attr(data-count);
-  position:absolute;top:-2px;right:-8px;
-  background:var(--danger);color:#fff;
-  font-size:9px;font-weight:700;
-  min-width:16px;height:16px;
-  border-radius:8px;padding:0 4px;
-  display:flex;align-items:center;justify-content:center;
-}
 
-/* ===== Modal ===== */
-.modal-wrap{
-  position:fixed;inset:0;z-index:100;display:none;
-}
-.modal-overlay{
-  position:absolute;inset:0;
-  background:rgba(0,0,0,0.7);
-  display:flex;align-items:flex-end;
-}
+/* Modal */
+.modal-wrap{position:fixed;inset:0;z-index:100;display:none}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-end}
 .modal-overlay.center{align-items:center;justify-content:center}
-.modal-sheet{
-  background:var(--bg2);
-  border-radius:20px 20px 0 0;
-  width:100%;max-height:85vh;
-  overflow-y:auto;
-  padding:20px 20px 40px;
-}
-.modal-overlay.center .modal-sheet{
-  border-radius:var(--radius);
-  max-width:340px;width:calc(100% - 32px);
-  padding:24px;
-}
-.modal-handle{
-  width:40px;height:4px;border-radius:2px;
-  background:var(--border);margin:0 auto 16px;
-}
+.modal-sheet{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 20px 40px}
+.modal-overlay.center .modal-sheet{border-radius:12px;max-width:340px;width:calc(100% - 32px);padding:24px}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
 .modal-title{font-size:16px;font-weight:700;margin-bottom:12px}
-.modal-close-btn{
-  width:100%;margin-top:16px;padding:12px;
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--radius);
-  font-size:14px;font-weight:600;color:var(--text1);
-  cursor:pointer;font-family:inherit;
-}
-.modal-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.modal-detail-label{color:var(--text2)}
-.modal-detail-value{font-weight:500;text-align:right;max-width:60%}
-.confirm-msg{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.modal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;gap:12px}
+.modal-label{color:var(--text2);flex-shrink:0}
+.modal-value{font-weight:500;text-align:right}
+.modal-close-btn{width:100%;margin-top:14px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
+.confirm-msg{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:18px}
 .confirm-btns{display:flex;gap:10px}
 .btn-cancel{flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
-.btn-danger{flex:1;padding:12px;background:var(--danger);border:none;border-radius:var(--radius);font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit}
+.btn-danger{flex:1;padding:12px;background:var(--danger);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit}
 
-/* ===== Toast ===== */
-.toast-wrap{
-  position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;transform:translateX(-50%);
-  z-index:200;pointer-events:none;
-}
-.toast{
-  background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,0.1);
-  padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;
-  white-space:nowrap;
-  animation:toastIn .2s ease;
-}
+/* Toast */
+.toast-wrap{position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;transform:translateX(-50%);z-index:200;pointer-events:none}
+.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
 .toast.success{background:#065f46;border-color:#10b981}
 .toast.error{background:#7f1d1d;border-color:#ef4444}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ===== PC Layout ===== */
 @media(min-width:768px){
-  .sidebar{display:flex}
+  .sidebar{display:flex!important}
   .bottom-nav{display:none}
   .toast-wrap{bottom:16px}
-  .scroll-area{padding-bottom:16px}
 }
-@media(max-width:767px){
-  .sidebar{display:none}
-}
+@media(max-width:767px){.sidebar{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Topbar -->
   <header class="topbar">
     <div class="topbar-left">
-      <div class="logo-mark">
-        <span class="logo-emoji">🏭</span>
-        <span class="logo-text">Traq</span>
+      <div class="mini-logo">
+        <span class="mini-logo-emoji">🏭</span>
+        <span class="mini-logo-text">Traq</span>
       </div>
     </div>
     <div class="topbar-right">
-      <span id="shiftTagTop" class="shift-tag">1直</span>
+      <button class="lang-btn" id="lang-ja" onclick="setLang('ja')">JP</button>
+      <button class="lang-btn" id="lang-vi" onclick="setLang('vi')">VN</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+      <div class="user-chip">
+        <div class="user-chip-avatar" id="chipAvatar">高</div>
+        <div>
+          <div class="user-chip-name" id="chipName">高橋 A</div>
+          <div class="user-chip-role" id="chipRole">OP / 1直</div>
+        </div>
+      </div>
     </div>
   </header>
 
   <div class="main-wrap">
-
-    <!-- Sidebar (PC) -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebarEl" style="display:none">
       <div class="sb-user">
         <div class="sb-avatar" id="sbAvatar">高</div>
         <div class="sb-name" id="sbName">高橋 A</div>
         <div class="sb-role" id="sbRole">OP / 1直</div>
       </div>
       <nav class="sb-nav">
-        <a class="sb-nav-item active" onclick="return false;">
-          <span class="sb-nav-icon">🏠</span>ホーム
-        </a>
-        <a class="sb-nav-item" href="#" onclick="setFilter('all');document.querySelector('.scroll-area').scrollTo(0,300);return false;">
-          <span class="sb-nav-icon">📋</span>投稿一覧
-        </a>
-        <a class="sb-nav-item" href="dashboard.html">
-          <span class="sb-nav-icon">📊</span>ダッシュボード
-        </a>
+        <button class="sb-nav-item active"><span class="sb-nav-icon">🏠</span>ホーム</button>
+        <button class="sb-nav-item" onclick="document.getElementById('scrollArea').scrollTo(0,300)"><span class="sb-nav-icon">📋</span>投稿一覧</button>
+        <button class="sb-nav-item" onclick="location.href='dashboard.html'"><span class="sb-nav-icon">📊</span>ダッシュボード</button>
       </nav>
       <div class="sb-bottom">
         <button class="sb-theme-btn" onclick="toggleTheme()">
-          <span id="sbThemeIcon">🌙</span>
-          <span id="sbThemeLabel">テーマ切替</span>
+          <span id="sbThemeIcon">🌙</span><span>テーマ切替</span>
         </button>
-        <span class="sb-globe">🌐</span>
+        <span style="font-size:16px;padding:6px 12px;display:block;color:var(--text2)">🌐</span>
         <div class="sb-lang">
           <button class="sb-lang-btn active" id="sb-lang-ja" onclick="setLang('ja')">JP</button>
           <button class="sb-lang-btn" id="sb-lang-vi" onclick="setLang('vi')">VN</button>
           <button class="sb-lang-btn" id="sb-lang-en" onclick="setLang('en')">EN</button>
         </div>
-        <a class="sb-nav-item" href="settings.html">
-          <span class="sb-nav-icon">⚙️</span>設定
-        </a>
-        <button class="sb-logout" onclick="doLogout()">
-          <span>🚪</span>ログアウト
-        </button>
+        <button class="sb-nav-item" onclick="location.href='settings.html'"><span class="sb-nav-icon">⚙️</span>設定</button>
+        <button class="sb-nav-item danger" onclick="doLogout()"><span class="sb-nav-icon">🚪</span>ログアウト</button>
       </div>
     </aside>
 
-    <!-- Main Scroll -->
     <div class="scroll-area" id="scrollArea">
-
-      <!-- Date Bar -->
       <div class="date-bar">
         <span class="date-text" id="dateText">2026/03/28（土）</span>
         <span class="shift-tag" id="shiftTag">1直</span>
       </div>
 
-      <!-- Input Buttons -->
       <div class="input-grid">
         <a class="input-btn" href="input_equipment.html">
           <div class="input-btn-left">
@@ -471,7 +273,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </a>
       </div>
 
-      <!-- Draft Banner -->
       <div class="draft-banner" id="draftBanner" style="display:none" onclick="setFilter('draft')">
         <div class="draft-banner-left">
           <div class="draft-badge" id="draftCount">0</div>
@@ -480,12 +281,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <span class="draft-banner-link">確認する →</span>
       </div>
 
-      <!-- Post List -->
       <div class="list-header">
         <span class="list-title">投稿一覧</span>
         <button class="list-all-btn" onclick="setFilter('all')">すべて表示</button>
       </div>
-      <div class="filter-tabs">
+      <div class="filter-row">
         <button class="ftab active" data-f="all" onclick="setFilter('all')">すべて</button>
         <button class="ftab" data-f="draft" onclick="setFilter('draft')">下書き</button>
         <button class="ftab" data-f="pending" onclick="setFilter('pending')">承認待ち</button>
@@ -493,582 +293,212 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <button class="ftab" data-f="eq" onclick="setFilter('eq')">設備</button>
         <button class="ftab" data-f="md" onclick="setFilter('md')">金型</button>
       </div>
-      <div id="troubleList">
-        <div class="empty-state">
-          <div class="empty-icon">⏳</div>
-          <div class="empty-text">読み込み中...</div>
-        </div>
+      <div class="trouble-list" id="troubleList">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">読み込み中...</div></div>
       </div>
+    </div>
+  </div>
 
-    </div><!-- /scroll-area -->
-  </div><!-- /main-wrap -->
-
-  <!-- Bottom Nav (Mobile) -->
   <nav class="bottom-nav">
-    <button class="bn-item active" onclick="">
-      <span class="bn-icon">🏠</span>ホーム
-    </button>
-    <button class="bn-item" onclick="setFilter('all');document.querySelector('.scroll-area').scrollTo(0,300)">
-      <span class="bn-icon">📋</span>投稿一覧
-    </button>
-    <button class="bn-item" onclick="location.href='dashboard.html'">
-      <span class="bn-icon">📊</span>ダッシュボード
-    </button>
-    <button class="bn-item" onclick="doLogout()">
-      <span class="bn-icon" style="color:var(--danger)">🚪</span>
-      <span style="color:var(--danger)">ログアウト</span>
-    </button>
+    <button class="bn-item active"><span class="bn-icon">🏠</span>ホーム</button>
+    <button class="bn-item" onclick="document.getElementById('scrollArea').scrollTo(0,300)"><span class="bn-icon">📋</span>投稿一覧</button>
+    <button class="bn-item" onclick="location.href='dashboard.html'"><span class="bn-icon">📊</span>ダッシュボード</button>
+    <button class="bn-item" style="color:var(--danger)" onclick="doLogout()"><span class="bn-icon">🚪</span>ログアウト</button>
   </nav>
+</div>
 
-</div><!-- /app -->
-
-<!-- Modal -->
 <div class="modal-wrap" id="modalEl"></div>
-
-<!-- Toast -->
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
 <script>
-/* =============================================
-   Supabase
-============================================= */
-var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-
-async function sbFetch(path, method, body) {
-  var opts = {
-    method: method || 'GET',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  var res = await fetch(SB_URL + '/rest/v1/' + path, opts);
-  if (!res.ok) throw new Error(await res.text());
-  var text = await res.text();
-  return text ? JSON.parse(text) : null;
+var SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path,method,body){
+  var opts={method:method||'GET',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch(SB_URL+'/rest/v1/'+path,opts);
+  if(!res.ok)throw new Error(await res.text());
+  var text=await res.text();return text?JSON.parse(text):null;
 }
 
-/* =============================================
-   i18n
-============================================= */
-var currentLang = 'ja';
-var I18N = {
-  ja: {
-    shift:'直', type_eq:'設備', type_md:'金型',
-    status_draft:'下書き', status_pending:'承認待ち',
-    status_approved:'承認済み', status_rejected:'差し戻し',
-    occ_first:'初発', occ_rec:'再発',
-    stop_min:function(m){return m+'分'},
-    stop_none:'不明',
-    empty_all:'投稿はありません',
-    edit:'編集', send:'承認依頼', del:'削除',
-    del_title:'削除の確認',
-    del_msg:'この下書きを削除しますか？\nこの操作は元に戻せません。',
-    del_cancel:'キャンセル', del_confirm:'削除する',
-    del_done:'削除しました', send_done:'承認依頼を送信しました',
-    logout_msg:'ログアウトしました',
-    theme_label:'テーマ切替',
-  },
-  vi: {
-    shift:'ca', type_eq:'Thiết bị', type_md:'Khuôn',
-    status_draft:'Nháp', status_pending:'Chờ duyệt',
-    status_approved:'Đã duyệt', status_rejected:'Trả lại',
-    occ_first:'Lần đầu', occ_rec:'Tái phát',
-    stop_min:function(m){return m+' phút'},
-    stop_none:'Không rõ',
-    empty_all:'Không có báo cáo',
-    edit:'Sửa', send:'Gửi duyệt', del:'Xóa',
-    del_title:'Xác nhận xóa',
-    del_msg:'Xóa bản nháp này?\nKhông thể hoàn tác.',
-    del_cancel:'Hủy', del_confirm:'Xóa',
-    del_done:'Đã xóa', send_done:'Đã gửi duyệt',
-    logout_msg:'Đã đăng xuất',
-    theme_label:'Đổi giao diện',
-  },
-  en: {
-    shift:'shift', type_eq:'Equipment', type_md:'Mold',
-    status_draft:'Draft', status_pending:'Pending',
-    status_approved:'Approved', status_rejected:'Rejected',
-    occ_first:'First', occ_rec:'Repeat',
-    stop_min:function(m){return m+'min'},
-    stop_none:'Unknown',
-    empty_all:'No posts',
-    edit:'Edit', send:'Submit', del:'Delete',
-    del_title:'Confirm Delete',
-    del_msg:'Delete this draft?\nThis cannot be undone.',
-    del_cancel:'Cancel', del_confirm:'Delete',
-    del_done:'Deleted', send_done:'Submitted',
-    logout_msg:'Logged out',
-    theme_label:'Toggle Theme',
-  }
+var currentLang='ja';
+var I18N={
+  ja:{shift:'直',eq:'設備',md:'金型',draft:'下書き',pending:'承認待ち',approved:'承認済み',rejected:'差し戻し',first:'初発',repeat:'再発',min:function(m){return m+'分'},unknown:'不明',empty:'投稿はありません',edit:'編集',send:'承認依頼',del:'削除',del_title:'削除の確認',del_msg:'この下書きを削除しますか？\nこの操作は元に戻せません。',del_cancel:'キャンセル',del_ok:'削除する',del_done:'削除しました',send_done:'承認依頼を送信しました',logout_msg:'ログアウトしました'},
+  vi:{shift:'ca',eq:'Thiết bị',md:'Khuôn',draft:'Nháp',pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Trả lại',first:'Lần đầu',repeat:'Tái phát',min:function(m){return m+' phút'},unknown:'Không rõ',empty:'Không có báo cáo',edit:'Sửa',send:'Gửi duyệt',del:'Xóa',del_title:'Xác nhận xóa',del_msg:'Xóa bản nháp?\nKhông thể hoàn tác.',del_cancel:'Hủy',del_ok:'Xóa',del_done:'Đã xóa',send_done:'Đã gửi duyệt',logout_msg:'Đã đăng xuất'},
+  en:{shift:'shift',eq:'Equipment',md:'Mold',draft:'Draft',pending:'Pending',approved:'Approved',rejected:'Rejected',first:'First',repeat:'Repeat',min:function(m){return m+'min'},unknown:'Unknown',empty:'No posts',edit:'Edit',send:'Submit',del:'Delete',del_title:'Confirm Delete',del_msg:'Delete this draft?\nThis cannot be undone.',del_cancel:'Cancel',del_ok:'Delete',del_done:'Deleted',send_done:'Submitted',logout_msg:'Logged out'}
 };
-function t(k, arg) {
-  var d = I18N[currentLang] || I18N.ja;
-  var v = d[k] || I18N.ja[k] || k;
-  if (typeof v === 'function') return v(arg);
-  return v;
-}
-function setLang(l) {
-  currentLang = l;
-  localStorage.setItem('traq_lang', l);
+function t(k,arg){var d=I18N[currentLang]||I18N.ja;var v=d[k]||I18N.ja[k]||k;return typeof v==='function'?v(arg):v;}
+function setLang(l){
+  currentLang=l;localStorage.setItem('traq_lang',l);
   ['ja','vi','en'].forEach(function(x){
-    var b = document.getElementById('sb-lang-'+x);
-    if(b) b.classList.toggle('active', x===l);
+    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
   });
   renderList();
 }
 
-/* =============================================
-   Session
-============================================= */
-var SESSION = null;
-var TROUBLES = [];
-var currentFilter = 'all';
+var SESSION=null,TROUBLES=[],currentFilter='all';
+function getSession(){try{var s=localStorage.getItem('traq_session');if(!s)return null;var o=JSON.parse(s);if(o.expiresAt&&Date.now()>o.expiresAt){localStorage.removeItem('traq_session');return null;}return o;}catch(e){return null;}}
 
-function getSession() {
-  try {
-    var s = localStorage.getItem('traq_session');
-    if (!s) return null;
-    var obj = JSON.parse(s);
-    if (obj.expiresAt && Date.now() > obj.expiresAt) {
-      localStorage.removeItem('traq_session');
-      return null;
-    }
-    return obj;
-  } catch(e) { return null; }
-}
+(async function init(){
+  SESSION=getSession();
+  if(!SESSION){location.href='index.html';return;}
+  if(SESSION.role==='leader'||SESSION.role==='sl'){location.href='home_sl.html';return;}
+  if(SESSION.role==='admin'){location.href='admin.html';return;}
 
-/* =============================================
-   Init
-============================================= */
-(async function init() {
-  // Session check
-  SESSION = getSession();
-  if (!SESSION) {
-    location.href = 'index.html';
-    return;
-  }
-  // Redirect admin/SL
-  if (SESSION.role === 'admin') { location.href = 'admin.html'; return; }
-  if (SESSION.role === 'leader' || SESSION.role === 'sl') { location.href = 'home_sl.html'; return; }
+  var th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',th);
+  var icon=th==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').textContent=icon;
+  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
 
-  // Theme
-  var savedTheme = localStorage.getItem('traq_theme');
-  var prefTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  var theme = savedTheme || prefTheme;
-  document.documentElement.setAttribute('data-theme', theme);
-  var themeIcon = theme === 'dark' ? '🌙' : '☀️';
-  var sbTI = document.getElementById('sbThemeIcon');
-  if(sbTI) sbTI.textContent = themeIcon;
-
-  // Lang
-  var savedLang = localStorage.getItem('traq_lang') || 'ja';
-  currentLang = savedLang;
-  ['ja','vi','en'].forEach(function(l){
-    var b = document.getElementById('sb-lang-'+l);
-    if(b) b.classList.toggle('active', l===savedLang);
+  var l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
+  ['ja','vi','en'].forEach(function(x){
+    ['lang-','sb-lang-'].forEach(function(p){var b=document.getElementById(p+x);if(b)b.classList.toggle('active',x===l);});
   });
 
-  // User info
-  renderUserInfo();
+  var name=SESSION.name||'';var ini=name.charAt(0)||'?';
+  var shStr=(SESSION.shift||'')+t('shift');
+  document.getElementById('chipAvatar').textContent=ini;
+  document.getElementById('chipName').textContent=name;
+  document.getElementById('chipRole').textContent='OP / '+shStr;
+  document.getElementById('sbAvatar').textContent=ini;
+  document.getElementById('sbName').textContent=name;
+  document.getElementById('sbRole').textContent='OP / '+shStr;
 
-  // Load data
+  var now=new Date();
+  var ymd=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0');
+  var days=['日','月','火','水','木','金','土'];
+  document.getElementById('dateText').textContent=ymd+'（'+days[now.getDay()]+'）';
+  var st=(SESSION.shift||'')+t('shift');
+  document.getElementById('shiftTag').textContent=st;
+
+  var sb=document.getElementById('sidebarEl');
+  function checkSb(){if(sb)sb.style.display=window.innerWidth>=768?'flex':'none';}
+  checkSb();window.addEventListener('resize',checkSb);
+
   await loadTroubles();
 })();
 
-function renderUserInfo() {
-  var name = SESSION.name || '';
-  var initial = name.charAt(0) || '?';
-  var role = SESSION.role;
-  var roleLabel = role === 'worker' ? 'OP' : role === 'leader' ? 'SL' : role;
-  var shift = SESSION.shift;
-
-  document.getElementById('sbAvatar').textContent = initial;
-  document.getElementById('sbName').textContent = name;
-  document.getElementById('sbRole').textContent = roleLabel + ' / ' + shift + t('shift');
-
-  // Date
-  var now = new Date();
-  var d = now;
-  var ymd = d.getFullYear() + '/' +
-    String(d.getMonth()+1).padStart(2,'0') + '/' +
-    String(d.getDate()).padStart(2,'0');
-  var days = ['日','月','火','水','木','金','土'];
-  document.getElementById('dateText').textContent = ymd + '（' + days[d.getDay()] + '）';
-
-  var stTag = shift + t('shift');
-  document.getElementById('shiftTag').textContent = stTag;
-  document.getElementById('shiftTagTop').textContent = stTag;
-}
-
-/* =============================================
-   Load from Supabase
-============================================= */
-async function loadTroubles() {
-  try {
-    // troublesテーブルからreporter_id=自分のもの
-    // JOINでline/machine/productの名前も取得
-    var rows = await sbFetch(
-      'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)' +
-      '&reporter_id=eq.' + SESSION.userId +
-      '&order=created_at.desc&limit=50',
-      'GET'
-    );
-    if (!rows) rows = [];
-    TROUBLES = rows.map(function(r) {
-      return {
-        id: r.id,
-        type: r.trouble_type,
-        status: r.status,
-        date: r.occurred_date || '',
-        shift: r.shift,
-        line: r.lines ? r.lines.name : '',
-        machine: r.machines ? r.machines.machine_no : '',
-        product_code: r.products ? r.products.product_code : '',
-        product_name: r.products ? r.products.product_name : '',
-        category: r.categories ? r.categories.name : '',
-        occurrence: r.occurrence,
-        stop_minutes: r.stop_minutes,
-        detail: r.detail || '',
-        reporter: r.traq_users ? r.traq_users.name : SESSION.name,
-        reject_reason: r.reject_reason || '',
-        created_at: r.created_at,
-        _raw: r
-      };
-    });
-  } catch(e) {
-    console.error('loadTroubles error:', e);
-    TROUBLES = [];
-    showToast('データ読込エラー', 'error');
-  }
-
-  // Also load drafts
-  try {
-    var draftRows = await sbFetch(
-      'drafts?user_id=eq.' + SESSION.userId + '&order=updated_at.desc',
-      'GET'
-    );
-    if (draftRows && draftRows.length > 0) {
-      draftRows.forEach(function(dr) {
-        var d = dr.data || {};
-        TROUBLES.push({
-          id: 'draft_' + dr.id,
-          _draftId: dr.id,
-          type: dr.trouble_type || d.trouble_type || 'equipment',
-          status: 'draft',
-          date: d.occurred_date || '',
-          shift: d.shift || SESSION.shift,
-          line: d.line_name || '',
-          machine: d.machine_no || '',
-          product_code: d.product_code || '',
-          product_name: d.product_name || '',
-          category: d.category_name || '',
-          occurrence: d.occurrence || 'first',
-          stop_minutes: d.stop_minutes || null,
-          detail: d.detail || '',
-          reporter: SESSION.name,
-          reject_reason: '',
-          created_at: dr.updated_at,
-          _isDraft: true
-        });
-      });
-    }
-  } catch(e) {
-    console.warn('drafts load error:', e);
-  }
-
+async function loadTroubles(){
+  TROUBLES=[];
+  try{
+    var rows=await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&reporter_id=eq.'+SESSION.userId+'&order=created_at.desc&limit=50','GET');
+    if(!rows)rows=[];
+    TROUBLES=rows.map(function(r){return{id:r.id,type:r.trouble_type,status:r.status,date:r.occurred_date||'',shift:r.shift,line:r.lines?r.lines.name:'',machine:r.machines?r.machines.machine_no:'',product_code:r.products?r.products.product_code:'',product_name:r.products?r.products.product_name:'',category:r.categories?r.categories.name:'',occurrence:r.occurrence,stop_minutes:r.stop_minutes,detail:r.detail||'',reporter:r.traq_users?r.traq_users.name:SESSION.name,reject_reason:r.reject_reason||'',created_at:r.created_at};});
+  }catch(e){showToast('データ読込エラー','error');}
+  try{
+    var drows=await sbFetch('drafts?user_id=eq.'+SESSION.userId+'&order=updated_at.desc','GET');
+    if(drows&&drows.length){drows.forEach(function(dr){var d=dr.data||{};TROUBLES.push({id:'draft_'+dr.id,_draftId:dr.id,type:dr.trouble_type||'equipment',status:'draft',date:d.occurred_date||'',shift:d.shift||SESSION.shift,line:d.line_name||'',machine:d.machine_no||'',product_code:d.product_code||'',product_name:d.product_name||'',category:d.category_name||'',occurrence:d.occurrence||'first',stop_minutes:d.stop_minutes||null,detail:d.detail||'',reporter:SESSION.name,reject_reason:'',created_at:dr.updated_at,_isDraft:true});});}
+  }catch(e){}
   renderList();
 }
 
-/* =============================================
-   Filter & Render
-============================================= */
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.ftab').forEach(function(btn){
-    btn.classList.toggle('active', btn.dataset.f === f);
-  });
+function setFilter(f){
+  currentFilter=f;
+  document.querySelectorAll('.ftab').forEach(function(b){b.classList.toggle('active',b.dataset.f===f);});
   renderList();
 }
-
-function getFiltered() {
-  return TROUBLES.filter(function(tr) {
-    if (currentFilter === 'all') return true;
-    if (currentFilter === 'draft') return tr.status === 'draft';
-    if (currentFilter === 'pending') return tr.status === 'pending';
-    if (currentFilter === 'approved') return tr.status === 'approved';
-    if (currentFilter === 'eq') return tr.type === 'equipment';
-    if (currentFilter === 'md') return tr.type === 'mold';
+function getFiltered(){
+  return TROUBLES.filter(function(tr){
+    if(currentFilter==='all')return true;
+    if(currentFilter==='draft')return tr.status==='draft';
+    if(currentFilter==='pending')return tr.status==='pending';
+    if(currentFilter==='approved')return tr.status==='approved';
+    if(currentFilter==='eq')return tr.type==='equipment';
+    if(currentFilter==='md')return tr.type==='mold';
     return true;
   });
 }
 
-function renderList() {
-  // Draft banner
-  var drafts = TROUBLES.filter(function(tr){ return tr.status === 'draft'; });
-  var banner = document.getElementById('draftBanner');
-  if (drafts.length > 0) {
-    banner.style.display = 'flex';
-    document.getElementById('draftCount').textContent = drafts.length;
-  } else {
-    banner.style.display = 'none';
-  }
+function renderList(){
+  var drafts=TROUBLES.filter(function(tr){return tr.status==='draft';});
+  var banner=document.getElementById('draftBanner');
+  if(drafts.length>0){banner.style.display='flex';document.getElementById('draftCount').textContent=drafts.length;}
+  else banner.style.display='none';
 
-  var list = getFiltered();
-  var container = document.getElementById('troubleList');
-
-  if (list.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">' + t('empty_all') + '</div></div>';
-    return;
-  }
-
-  container.innerHTML = '';
-  list.forEach(function(tr, idx) {
-    var card = buildCard(tr, idx);
-    container.appendChild(card);
-  });
+  var list=getFiltered();var container=document.getElementById('troubleList');
+  if(list.length===0){container.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">'+t('empty')+'</div></div>';return;}
+  container.innerHTML='';
+  list.forEach(function(tr,i){container.appendChild(buildCard(tr,i));});
 }
 
-function buildCard(tr, idx) {
-  var div = document.createElement('div');
-  div.className = 'tcard';
-  div.style.animationDelay = (idx * 0.04) + 's';
-
-  var typeClass = tr.type === 'equipment' ? 'eq' : 'md';
-  var typeLabel = t('type_' + typeClass);
-  var statusLabel = t('status_' + tr.status);
-  var statusClass = tr.status;
-  var occLabel = tr.occurrence === 'first' ? t('occ_first') : t('occ_rec');
-  var stopLabel = tr.stop_minutes ? t('stop_min', tr.stop_minutes) : t('stop_none');
-
-  // Date format
-  var dateStr = tr.date ? tr.date.replace(/-/g, '/').slice(0,10) : (tr.created_at ? tr.created_at.slice(0,10).replace(/-/g,'/') : '');
-  var shiftStr = tr.shift ? tr.shift + t('shift') : '';
-
-  // Machine/Product display
-  var machineLabel = tr.line ? tr.line + ' – ' + tr.machine + '号機' : (tr.machine ? tr.machine + '号機' : '');
-  var productLabel = tr.product_code && tr.product_name
-    ? tr.product_code + ' / ' + tr.product_name
-    : (tr.product_code || tr.product_name || '');
-
-  // Reject box
-  var rejectHTML = '';
-  if (tr.status === 'rejected' && tr.reject_reason) {
-    rejectHTML = '<div class="reject-box"><div class="reject-label">差し戻し理由：</div><div class="reject-text">' + esc(tr.reject_reason) + '</div></div>';
+function buildCard(tr,idx){
+  var div=document.createElement('div');div.className='tcard';div.id='card-'+tr.id;div.style.animationDelay=(idx*0.04)+'s';
+  var tc=tr.type==='equipment'?'eq':'md';
+  var stop=tr.stop_minutes?t('min',tr.stop_minutes):t('unknown');
+  var occ=tr.occurrence==='first'?t('first'):t('repeat');
+  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine?tr.machine+'号機':'');
+  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:(tr.product_code||tr.product_name||'');
+  var dateStr=tr.date?tr.date.replace(/-/g,'/').slice(0,10):(tr.created_at?tr.created_at.slice(0,10).replace(/-/g,'/'):'');
+  var shiftStr=tr.shift?tr.shift+t('shift'):'';
+  var rejHTML=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
+  var actHTML='';
+  if(tr.status==='draft'){
+    var sid=String(tr.id);
+    actHTML='<div class="card-actions"><button class="ca-btn ca-edit" onclick="event.stopPropagation();editDraft(\''+sid+'\')">✏️ '+t('edit')+'</button><button class="ca-btn ca-send" onclick="event.stopPropagation();sendDraft(\''+sid+'\')">📤 '+t('send')+'</button><button class="ca-btn ca-delete" onclick="event.stopPropagation();confirmDelete(\''+sid+'\')">🗑 '+t('del')+'</button></div>';
   }
-
-  // Actions for draft
-  var actionsHTML = '';
-  var idStr = typeof tr.id === 'string' ? '"' + tr.id + '"' : tr.id;
-  if (tr.status === 'draft') {
-    actionsHTML = '<div class="tcard-actions">' +
-      '<button class="ca-btn ca-edit" onclick="editDraft(' + idStr + ')">✏️ ' + t('edit') + '</button>' +
-      '<button class="ca-btn ca-send" onclick="sendDraft(' + idStr + ')">📤 ' + t('send') + '</button>' +
-      '<button class="ca-btn ca-delete" onclick="confirmDelete(' + idStr + ')">🗑 ' + t('del') + '</button>' +
-      '</div>';
-  }
-
-  div.innerHTML =
-    '<div class="tcard-body" onclick="openDetail(\'' + tr.id + '\')">' +
-      '<div class="tcard-meta">' +
-        '<span class="tcard-type ' + typeClass + '">' + typeLabel + '</span>' +
-        '<span class="tcard-status ' + statusClass + '">' + statusLabel + '</span>' +
-        '<span class="tcard-date">' + dateStr + ' ' + shiftStr + '</span>' +
-      '</div>' +
-      '<div class="tcard-title">' + esc(machineLabel) + '</div>' +
-      (productLabel ? '<div class="tcard-product">' + esc(productLabel) + '</div>' : '') +
-      (tr.category ? '<span class="tcard-cat">' + esc(tr.category) + '</span>' : '') +
-      '<div class="tcard-detail">' + esc(tr.detail).substring(0, 80) + (tr.detail && tr.detail.length > 80 ? '…' : '') + '</div>' +
-      '<div class="tcard-footer">' +
-        '<span class="tcard-reporter">' + esc(tr.reporter) + '</span>' +
-        '<div style="display:flex;align-items:center;gap:8px">' +
-          '<span class="tcard-stopinfo">' + stopLabel + '</span>' +
-          '<span class="tcard-occ">' + occLabel + '</span>' +
-        '</div>' +
-      '</div>' +
-      rejectHTML +
-    '</div>' +
-    actionsHTML;
-
+  div.innerHTML=
+    '<div class="tcard-top" onclick="openDetail(\''+tr.id+'\')">' +
+    '<div class="tcard-header"><div class="tcard-meta"><span class="tcard-type '+tc+'">'+t(tc)+'</span><span class="status-badge '+tr.status+'">'+t(tr.status)+'</span><span class="shift-badge">'+dateStr+' '+shiftStr+'</span></div></div>'+
+    '<div class="tcard-title">'+esc(machine)+'</div>'+
+    (product?'<div class="tcard-product">'+esc(product)+'</div>':'')+
+    (tr.category?'<span class="tcard-cat">'+esc(tr.category)+'</span>':'')+
+    '<div class="tcard-detail">'+esc(tr.detail).substring(0,100)+(tr.detail.length>100?'…':'')+'</div>'+
+    '<div class="tcard-footer"><span class="tcard-reporter">'+esc(tr.reporter)+'</span><div style="display:flex;gap:8px"><span class="tcard-stop">'+stop+'</span><span style="font-size:11px;color:var(--text2)">'+occ+'</span></div></div>'+
+    rejHTML+'</div>'+actHTML;
   return div;
 }
 
-function esc(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function openDetail(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(!tr)return;
+  var tc=tr.type==='equipment'?'eq':'md';
+  var machine=tr.line?tr.line+' – '+tr.machine+'号機':(tr.machine||'');
+  var product=tr.product_code&&tr.product_name?tr.product_code+' / '+tr.product_name:'';
+  var rBox=tr.status==='rejected'&&tr.reject_reason?'<div class="reject-box" style="margin-bottom:12px"><div class="reject-label">差し戻し理由：</div><div class="reject-text">'+esc(tr.reject_reason)+'</div></div>':'';
+  showModal('<div class="modal-handle"></div><div class="modal-title">'+esc(machine)+'</div>'+rBox+mrow('種別','<span class="tcard-type '+tc+'">'+t(tc)+'</span>')+mrow('ステータス','<span class="status-badge '+tr.status+'">'+t(tr.status)+'</span>')+mrow('発生日',tr.date||'')+mrow('直',tr.shift?tr.shift+t('shift'):'')+mrow('品番',product)+mrow('分類',tr.category||'')+mrow('初発/再発',tr.occurrence==='first'?t('first'):t('repeat'))+mrow('停止時間',tr.stop_minutes?t('min',tr.stop_minutes):t('unknown'))+mrow('詳細',esc(tr.detail))+mrow('報告者',tr.reporter)+'<button class="modal-close-btn" onclick="closeModal()">閉じる</button>');
+}
+function mrow(l,v){return'<div class="modal-row"><span class="modal-label">'+l+'</span><span class="modal-value">'+v+'</span></div>';}
+
+function editDraft(id){var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(!tr)return;location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html'+(tr._draftId?'?draft='+tr._draftId:'');}
+
+async function sendDraft(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});if(!tr||!tr._draftId){showToast('送信できません','error');return;}
+  try{
+    await sbFetch('troubles','POST',{trouble_type:tr.type,status:'pending',occurred_date:tr.date||null,shift:tr.shift,detail:tr.detail,occurrence:tr.occurrence||'first',stop_minutes:tr.stop_minutes||null,reporter_id:SESSION.userId});
+    await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');
+    TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
+    renderList();showToast(t('send_done'),'success');
+  }catch(e){showToast('エラー: '+e.message,'error');}
 }
 
-/* =============================================
-   Detail Modal
-============================================= */
-function openDetail(id) {
-  var tr = TROUBLES.find(function(x){ return String(x.id) === String(id); });
-  if (!tr) return;
-
-  var typeClass = tr.type === 'equipment' ? 'eq' : 'md';
-  var typeLabel = t('type_' + typeClass);
-  var statusLabel = t('status_' + tr.status);
-  var machineLabel = tr.line ? tr.line + ' – ' + tr.machine + '号機' : (tr.machine || '');
-  var productLabel = tr.product_code && tr.product_name
-    ? tr.product_code + ' / ' + tr.product_name : '';
-
-  var rejectHTML = '';
-  if (tr.status === 'rejected' && tr.reject_reason) {
-    rejectHTML = '<div class="reject-box" style="margin-bottom:12px"><div class="reject-label">差し戻し理由：</div><div class="reject-text">' + esc(tr.reject_reason) + '</div></div>';
-  }
-
-  showModal(
-    '<div class="modal-handle"></div>' +
-    '<div class="modal-title">' + esc(machineLabel) + '</div>' +
-    rejectHTML +
-    row('種別', '<span class="tcard-type ' + typeClass + '">' + typeLabel + '</span>') +
-    row('ステータス', '<span class="tcard-status ' + tr.status + '">' + statusLabel + '</span>') +
-    row('発生日', tr.date || '') +
-    row('直', tr.shift ? tr.shift + t('shift') : '') +
-    row('品番', productLabel) +
-    row('分類', tr.category || '') +
-    row('初発/再発', tr.occurrence === 'first' ? t('occ_first') : t('occ_rec')) +
-    row('停止時間', tr.stop_minutes ? t('stop_min', tr.stop_minutes) : t('stop_none')) +
-    row('詳細', esc(tr.detail)) +
-    row('報告者', tr.reporter) +
-    '<button class="modal-close-btn" onclick="closeModal()">閉じる</button>'
-  );
+function confirmDelete(id){
+  showModal('<div class="modal-handle"></div><div class="modal-title">'+t('del_title')+'</div><p class="confirm-msg">'+t('del_msg').replace(/\n/g,'<br>')+'</p><div class="confirm-btns"><button class="btn-cancel" onclick="closeModal()">'+t('del_cancel')+'</button><button class="btn-danger" onclick="deleteDraft(\''+id+'\')">'+t('del_ok')+'</button></div>',true);
+}
+async function deleteDraft(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
+  if(tr&&tr._draftId){try{await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');}catch(e){}}
+  TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
+  closeModal();renderList();showToast(t('del_done'),'success');
 }
 
-function row(label, value) {
-  return '<div class="modal-detail-row"><span class="modal-detail-label">' + label + '</span><span class="modal-detail-value">' + value + '</span></div>';
+function showModal(html,center){var el=document.getElementById('modalEl');el.innerHTML='<div class="modal-overlay'+(center?' center':'')+'" onclick="handleOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';el.style.display='block';}
+function closeModal(){document.getElementById('modalEl').style.display='none';}
+function handleOverlay(e){if(e.target.classList.contains('modal-overlay'))closeModal();}
+
+var _tt=null;
+function showToast(msg,type){var el=document.getElementById('toastWrap');el.innerHTML='<div class="toast'+(type?' '+type:'')+'">'+msg+'</div>';el.style.display='block';if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.style.display='none';},2500);}
+
+function toggleTheme(){
+  var h=document.documentElement;var isDark=h.getAttribute('data-theme')==='dark';var next=isDark?'light':'dark';
+  h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);
+  var icon=next==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').textContent=icon;
+  var sti=document.getElementById('sbThemeIcon');if(sti)sti.textContent=icon;
 }
 
-/* =============================================
-   Draft Actions
-============================================= */
-function editDraft(id) {
-  // Find draft and navigate to input form with draft data
-  var tr = TROUBLES.find(function(x){ return String(x.id) === String(id); });
-  if (!tr) return;
-  var page = tr.type === 'equipment' ? 'input_equipment.html' : 'input_mold.html';
-  if (tr._draftId) {
-    location.href = page + '?draft=' + tr._draftId;
-  } else {
-    showToast('編集機能は入力フォームから行ってください');
-  }
-}
-
-async function sendDraft(id) {
-  var tr = TROUBLES.find(function(x){ return String(x.id) === String(id); });
-  if (!tr || !tr._draftId) {
-    showToast('この下書きは送信できません', 'error');
-    return;
-  }
-  try {
-    var draftData = tr._raw ? tr._raw.data : tr;
-    // Insert into troubles
-    await sbFetch('troubles', 'POST', {
-      trouble_type: tr.type,
-      status: 'pending',
-      occurred_date: tr.date || null,
-      shift: tr.shift,
-      detail: tr.detail,
-      occurrence: tr.occurrence || 'first',
-      stop_minutes: tr.stop_minutes || null,
-      reporter_id: SESSION.userId
-    });
-    // Delete draft
-    await sbFetch('drafts?id=eq.' + tr._draftId, 'DELETE');
-    TROUBLES = TROUBLES.filter(function(x){ return String(x.id) !== String(id); });
-    renderList();
-    showToast(t('send_done'), 'success');
-  } catch(e) {
-    showToast('送信エラー: ' + e.message, 'error');
-  }
-}
-
-function confirmDelete(id) {
-  showModal(
-    '<div class="modal-handle"></div>' +
-    '<div class="modal-title">' + t('del_title') + '</div>' +
-    '<p class="confirm-msg">' + t('del_msg').replace(/\n/g,'<br>') + '</p>' +
-    '<div class="confirm-btns">' +
-    '<button class="btn-cancel" onclick="closeModal()">' + t('del_cancel') + '</button>' +
-    '<button class="btn-danger" onclick="deleteDraft(\'' + id + '\')">' + t('del_confirm') + '</button>' +
-    '</div>',
-    true
-  );
-}
-
-async function deleteDraft(id) {
-  var tr = TROUBLES.find(function(x){ return String(x.id) === String(id); });
-  if (tr && tr._draftId) {
-    try {
-      await sbFetch('drafts?id=eq.' + tr._draftId, 'DELETE');
-    } catch(e) { console.warn(e); }
-  }
-  TROUBLES = TROUBLES.filter(function(x){ return String(x.id) !== String(id); });
-  closeModal();
-  renderList();
-  showToast(t('del_done'), 'success');
-}
-
-/* =============================================
-   Modal
-============================================= */
-function showModal(html, center) {
-  var el = document.getElementById('modalEl');
-  el.innerHTML =
-    '<div class="modal-overlay' + (center ? ' center' : '') + '" onclick="handleOverlayClick(event)">' +
-    '<div class="modal-sheet">' + html + '</div>' +
-    '</div>';
-  el.style.display = 'block';
-}
-function closeModal() {
-  document.getElementById('modalEl').style.display = 'none';
-}
-function handleOverlayClick(e) {
-  if (e.target.classList.contains('modal-overlay')) closeModal();
-}
-
-/* =============================================
-   Toast
-============================================= */
-var toastTimer = null;
-function showToast(msg, type) {
-  var el = document.getElementById('toastWrap');
-  el.innerHTML = '<div class="toast' + (type ? ' ' + type : '') + '">' + msg + '</div>';
-  el.style.display = 'block';
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ el.style.display = 'none'; }, 2500);
-}
-
-/* =============================================
-   Theme
-============================================= */
-function toggleTheme() {
-  var html = document.documentElement;
-  var isDark = html.getAttribute('data-theme') === 'dark';
-  var next = isDark ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('traq_theme', next);
-  var icon = next === 'dark' ? '🌙' : '☀️';
-  var sbTI = document.getElementById('sbThemeIcon');
-  if(sbTI) sbTI.textContent = icon;
-}
-
-/* =============================================
-   Logout
-============================================= */
-function doLogout() {
-  localStorage.removeItem('traq_session');
-  showToast(t('logout_msg'));
-  setTimeout(function(){ location.href = 'index.html'; }, 800);
-}
+function doLogout(){localStorage.removeItem('traq_session');showToast(t('logout_msg'));setTimeout(function(){location.href='index.html';},800);}
 </script>
 </body>
 </html>
