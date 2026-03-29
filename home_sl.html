@@ -264,6 +264,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
         <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
         <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
         <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
         <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
         <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
@@ -271,22 +272,26 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
         <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
         <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+        <circle cx="14" cy="5" r="2.5" fill="var(--orange)" opacity=".6"/>
         <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
+        <circle cx="28" cy="9" r="2" fill="var(--orange)" opacity=".5"/>
         <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
+        <circle cx="42" cy="13" r="1.8" fill="var(--orange)" opacity=".45"/>
         <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
       </svg>
     </div>
     <div class="sidebar-user" id="sb-user-wrap">
-      <div class="sidebar-avatar" id="sb-avatar">山</div>
+      <div class="sidebar-avatar" id="sb-avatar"></div>
       <div>
-        <div class="sidebar-name" id="sb-name">山田 太郎</div>
-        <div class="sidebar-role">SL / 1直</div>
+        <div class="sidebar-name" id="sb-name"></div>
+        <div class="sidebar-role" id="sb-role"></div>
       </div>
+    </div>
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item active" onclick="setTab('all')">
         <span class="snav-icon">📋</span>
-        <span data-i18n="nav_all">全データ一覧</span>
+        <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="setTab('dashboard')">
         <span class="snav-icon">📊</span>
@@ -318,14 +323,14 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
         <span class="snav-icon">⚙️</span>
-        <span>設定</span>
+        <span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
         <span class="snav-icon">🚪</span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
-  </aside>
+    </aside>
 
   <!-- Main column -->
   <div class="main-column">
@@ -441,7 +446,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* ===== i18n ===== */
 const I18N = {
   ja:{
-    nav_pending:'承認待ち', nav_all:'全データ一覧', nav_input:'異常入力',
+    nav_pending:'承認待ち', nav_all:'一覧', nav_input:'異常入力',
     nav_list:'一覧', nav_settings:'設定',
     nav_dashboard:'ダッシュボード', nav_excel:'Excelダウンロード', nav_master:'マスタ',
     nav_theme:'テーマ切替', nav_logout:'ログアウト',
@@ -480,7 +485,7 @@ const I18N = {
     delete_error:'削除に失敗しました',
   },
   vi:{
-    nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
+    nav_pending:'Chờ duyệt', nav_all:'Danh sách', nav_input:'Nhập sự cố',
     nav_list:'Danh sách', nav_settings:'Cài đặt',
     nav_dashboard:'Dashboard', nav_excel:'Tải Excel', nav_master:'Master',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất',
@@ -519,7 +524,7 @@ const I18N = {
     delete_error:'Xoá thất bại',
   },
   en:{
-    nav_pending:'Pending', nav_all:'All Data', nav_input:'入力',
+    nav_pending:'Pending', nav_all:'List', nav_input:'入力',
     nav_list:'List', nav_settings:'Settings',
     nav_dashboard:'Dashboard', nav_excel:'Excel Download', nav_master:'Master',
     nav_theme:'Toggle Theme', nav_logout:'Logout',
