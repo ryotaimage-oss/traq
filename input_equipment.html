@@ -717,7 +717,7 @@ async function loadDraft(){
     showToast(t('draft_loaded'),'success');
   }catch(e){showToast(t('draft_load_fail')(e.message),'error');}
 }
-setInterval(function(){_saveDraft();},30000);
+var draftInterval=setInterval(function(){_saveDraft();},30000);
 ['occurred-date','shift-select','line-select','machine-select','product-select','category-select','detail'].forEach(function(id){
   var el=document.getElementById(id);if(el)el.addEventListener('change',saveDraft);
 });
@@ -737,6 +737,9 @@ function validate(){
 /* ── Submit ── */
 async function doSubmit(){
   if(!validate())return;
+  // 下書き自動保存を停止（削除後に再保存されるのを防ぐ）
+  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+  if(draftInterval){clearInterval(draftInterval);draftInterval=null;}
   var btn=document.getElementById('submit-btn');btn.disabled=true;showOverlay(t('msg_sending'));
   try{
     var selectedShift=parseInt(document.getElementById('shift-select').value);
