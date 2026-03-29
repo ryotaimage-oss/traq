@@ -424,6 +424,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
     <!-- ===== STORAGE ===== -->
     <div class="panel" id="panel-storage">
+      <div id="storageWarningBanner" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.6">
+        <div style="font-weight:700;color:var(--danger);margin-bottom:4px">⚠️ ストレージ使用量が80%を超えています</div>
+        <div style="color:var(--text2)">Excelバックアップ → データ削除 を推奨します。<br><a href="excel_download.html" style="color:var(--orange);text-decoration:underline;font-weight:600">Excel出力画面へ →</a></div>
+      </div>
       <div class="section-header">
         <span class="section-title">💾 ストレージ管理</span>
       </div>
@@ -457,6 +461,29 @@ tr:hover td{background:rgba(239,159,39,.04)}
           </select>
           <button class="btn btn-primary" onclick="exportImages()">📥 画像をエクスポート</button>
         </div>
+      </div>
+      <!-- データ削除（adminのみ表示） -->
+      <div class="storage-card" id="deleteSection" style="display:none;border-color:rgba(239,68,68,.25)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--danger)">🗑️ データ削除（管理者専用）</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
+          指定期間のトラブルデータと関連画像を削除します。<strong style="color:var(--danger)">削除は取り消せません</strong>。<br>
+          必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
+          <div>
+            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block">開始日</label>
+            <input type="date" class="search-input" id="delDateFrom" style="min-width:130px;padding:6px 10px">
+          </div>
+          <div>
+            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block">終了日</label>
+            <input type="date" class="search-input" id="delDateTo" style="min-width:130px;padding:6px 10px">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="previewDelete()">件数確認</button>
+        </div>
+        <div id="delPreview" style="display:none;font-size:13px;padding:10px 14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:var(--radius);margin-bottom:12px">
+          <span id="delPreviewText"></span>
+        </div>
+        <button class="btn btn-danger" id="delExecBtn" onclick="execDelete()" style="display:none">🗑️ 削除を実行</button>
       </div>
     </div>
 
@@ -565,6 +592,14 @@ let userPage=1,machinePage=1,productPage=1;
   // lang buttons removed from header
   await loadAll();
   initStorage();
+  // admin権限の場合のみデータ削除セクション表示
+  try {
+    var sess = JSON.parse(localStorage.getItem('traq_session') || '{}');
+    if (sess.role === 'admin') {
+      var ds = document.getElementById('deleteSection');
+      if (ds) ds.style.display = 'block';
+    }
+  } catch(e) {}
 })();
 
 async function loadAll(){
@@ -1025,14 +1060,19 @@ async function initStorage(){
   }
 }
 function updateStorageBar(used, total, pct, fileCount) {
-  const color = pct >= 70 ? 'var(--danger)' : pct >= 50 ? 'var(--warning)' : 'var(--success)';
+  const color = pct >= 80 ? 'var(--danger)' : pct >= 70 ? 'var(--warning)' : 'var(--success)';
   document.getElementById('storageFill').style.width = pct + '%';
   document.getElementById('storageFill').style.background = color;
   document.getElementById('storageLabel').textContent = `${used}MB / ${total}MB (${pct}%)`;
   document.getElementById('storageLabel').style.color = color;
-  var detail = pct >= 70 ? '⚠️ 70%を超えています。不要な画像の削除を推奨します。' : `残り ${Math.round((total - used) * 10) / 10}MB 利用可能`;
+  var detail = pct >= 80 ? '🔴 容量が逼迫しています。バックアップ→削除を推奨します。'
+    : pct >= 70 ? '⚠️ 70%を超えています。不要な画像の削除を推奨します。'
+    : `残り ${Math.round((total - used) * 10) / 10}MB 利用可能`;
   if (typeof fileCount === 'number') detail += `　画像: ${fileCount}件`;
   document.getElementById('storageDetail').textContent = detail;
+  // 80%超で警告バナー表示
+  var banner = document.getElementById('storageWarningBanner');
+  if (banner) banner.style.display = pct >= 80 ? 'block' : 'none';
 }
 function exportImages(){
   const year=document.getElementById('exportYear').value;
@@ -1088,6 +1128,101 @@ function forceReload(){
 
 /* ===== Utils ===== */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ===== Data Delete ===== */
+var _delTroubleIds = [];
+var _delImagePaths = [];
+
+async function previewDelete() {
+  var from = document.getElementById('delDateFrom').value;
+  var to = document.getElementById('delDateTo').value;
+  if (!from || !to) { showToast('開始日・終了日を入力してください', 'error'); return; }
+  if (from > to) { showToast('開始日は終了日以前にしてください', 'error'); return; }
+
+  try {
+    // 対象トラブル取得
+    var troubles = await sbFetch('troubles?select=id&occurred_date=gte.' + from + '&occurred_date=lte.' + to);
+    if (!troubles || troubles.length === 0) {
+      document.getElementById('delPreview').style.display = 'block';
+      document.getElementById('delPreviewText').textContent = '対象データはありません';
+      document.getElementById('delExecBtn').style.display = 'none';
+      _delTroubleIds = [];
+      _delImagePaths = [];
+      return;
+    }
+    _delTroubleIds = troubles.map(function(t) { return t.id; });
+
+    // 関連画像パス取得
+    var images = await sbFetch('trouble_images?select=storage_path&trouble_id=in.(' + _delTroubleIds.join(',') + ')');
+    _delImagePaths = (images || []).map(function(img) { return img.storage_path; }).filter(Boolean);
+
+    var msg = 'トラブル: <strong style="color:var(--danger)">' + _delTroubleIds.length + '件</strong>';
+    msg += '　画像: <strong style="color:var(--danger)">' + _delImagePaths.length + '件</strong>';
+    msg += '<div style="margin-top:6px;font-size:12px;color:var(--text2)">期間: ' + esc(from) + ' ～ ' + esc(to) + '</div>';
+
+    document.getElementById('delPreview').style.display = 'block';
+    document.getElementById('delPreviewText').innerHTML = msg;
+    document.getElementById('delExecBtn').style.display = 'inline-block';
+  } catch(e) {
+    showToast('件数確認エラー: ' + e.message, 'error');
+  }
+}
+
+async function execDelete() {
+  if (_delTroubleIds.length === 0) { showToast('削除対象がありません', 'error'); return; }
+
+  var msg = '本当に削除しますか？\n\n';
+  msg += '・トラブル: ' + _delTroubleIds.length + '件\n';
+  msg += '・画像: ' + _delImagePaths.length + '件\n\n';
+  msg += 'Excel出力・画像バックアップは完了していますか？\nこの操作は取り消せません。';
+  if (!confirm(msg)) return;
+
+  // 二段階確認
+  if (!confirm('最終確認: 本当に削除を実行しますか？')) return;
+
+  document.getElementById('delExecBtn').disabled = true;
+  document.getElementById('delExecBtn').textContent = '削除中...';
+
+  try {
+    // 1) Storage画像削除（バッチ: 最大20件ずつ）
+    if (_delImagePaths.length > 0) {
+      for (var i = 0; i < _delImagePaths.length; i += 20) {
+        var batch = _delImagePaths.slice(i, i + 20);
+        try {
+          await fetch(SB_URL + '/storage/v1/object/trouble-images', {
+            method: 'DELETE',
+            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prefixes: batch })
+          });
+        } catch(e) { /* continue */ }
+      }
+    }
+
+    // 2) trouble_images削除（CASCADE設定あるが明示的に）
+    await sbFetch('trouble_images?trouble_id=in.(' + _delTroubleIds.join(',') + ')', 'DELETE');
+
+    // 3) troubles削除
+    await sbFetch('troubles?id=in.(' + _delTroubleIds.join(',') + ')', 'DELETE');
+
+    showToast(_delTroubleIds.length + '件のトラブルと' + _delImagePaths.length + '件の画像を削除しました', 'success');
+
+    // UI リセット
+    _delTroubleIds = [];
+    _delImagePaths = [];
+    document.getElementById('delPreview').style.display = 'none';
+    document.getElementById('delExecBtn').style.display = 'none';
+    document.getElementById('delExecBtn').disabled = false;
+    document.getElementById('delExecBtn').textContent = '🗑️ 削除を実行';
+
+    // ストレージ再計算
+    initStorage();
+
+  } catch(e) {
+    showToast('削除エラー: ' + e.message, 'error');
+    document.getElementById('delExecBtn').disabled = false;
+    document.getElementById('delExecBtn').textContent = '🗑️ 削除を実行';
+  }
+}
 </script>
 <script src="./update_banner.js"></script>
 </body>

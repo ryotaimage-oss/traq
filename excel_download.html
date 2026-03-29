@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root {
   --orange: #EF9F27;
@@ -326,6 +327,21 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </div>
   </div>
 
+  <!-- 出力オプション -->
+  <div class="section">
+    <div class="section-title">📎 画像出力</div>
+    <div class="form-group" style="margin-bottom:0">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;padding:6px 0">
+        <input type="checkbox" id="include-images" style="width:18px;height:18px;accent-color:var(--orange);cursor:pointer">
+        <span>画像をZIPでまとめてダウンロード</span>
+      </label>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6">
+        対象期間のトラブルに添付された画像をZIPファイルとしてダウンロードします。<br>
+        容量削減前のバックアップに利用できます。
+      </div>
+    </div>
+  </div>
+
   <!-- ダウンロード -->
   <div style="padding-bottom: 24px;">
     <button class="dl-btn" id="dl-btn" onclick="doDownload()" disabled>
@@ -335,6 +351,14 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
       Excelダウンロード
+    </button>
+    <button class="dl-btn" id="dl-img-btn" onclick="doImageDownload()" disabled style="margin-top:10px;background:var(--surface);border:1.5px solid var(--orange);color:var(--orange);display:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      📷 画像ZIPダウンロード
     </button>
   </div>
   </div>
@@ -555,6 +579,11 @@ async function _fetchPreview() {
     document.getElementById('count-equipment').textContent = eqCount;
     document.getElementById('count-mold').textContent      = moldCount;
     document.getElementById('dl-btn').disabled = (eqCount + moldCount === 0);
+    // 画像ZIPボタンも連動
+    var imgBtn = document.getElementById('dl-img-btn');
+    if (imgBtn && imgBtn.style.display !== 'none') {
+      imgBtn.disabled = (eqCount + moldCount === 0);
+    }
   } catch(e) {
     document.getElementById('count-equipment').textContent = '–';
     document.getElementById('count-mold').textContent      = '–';
@@ -746,6 +775,120 @@ function showToast(msg, type) {
   el.classList.remove('hidden');
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(function() { el.classList.add('hidden'); }, 3000);
+}
+
+// ── 画像チェックボックス連動 ──
+document.getElementById('include-images').addEventListener('change', function() {
+  var imgBtn = document.getElementById('dl-img-btn');
+  imgBtn.style.display = this.checked ? 'flex' : 'none';
+  // dlボタンが有効な場合のみ画像ボタンも有効に
+  imgBtn.disabled = document.getElementById('dl-btn').disabled;
+});
+
+// ── 画像ZIPダウンロード ──
+async function doImageDownload() {
+  var from = document.getElementById('date-from').value;
+  var to   = document.getElementById('date-to').value;
+  if (!from || !to) { showToast('期間を指定してください', 'error'); return; }
+
+  document.getElementById('dl-img-btn').disabled = true;
+  showOverlay('画像情報を取得中...');
+
+  try {
+    // 対象期間のトラブルIDを取得
+    var troubles = await sbFetch(
+      'troubles?select=id,occurred_date,shift,machines(machine_no),products(product_code)' +
+      '&occurred_date=gte.' + from + '&occurred_date=lte.' + to +
+      '&order=occurred_date.asc,id.asc'
+    );
+    if (!troubles || troubles.length === 0) {
+      hideOverlay();
+      document.getElementById('dl-img-btn').disabled = false;
+      showToast('対象期間にトラブルがありません', 'error');
+      return;
+    }
+
+    // trouble_imagesから対象のstorage_pathを取得
+    var troubleIds = troubles.map(function(t) { return t.id; });
+    var images = await sbFetch(
+      'trouble_images?select=id,trouble_id,storage_path' +
+      '&trouble_id=in.(' + troubleIds.join(',') + ')' +
+      '&order=trouble_id,id'
+    );
+
+    if (!images || images.length === 0) {
+      hideOverlay();
+      document.getElementById('dl-img-btn').disabled = false;
+      showToast('対象期間に画像がありません', 'error');
+      return;
+    }
+
+    showOverlay('画像をダウンロード中... (0/' + images.length + ')');
+
+    var zip = new JSZip();
+    var downloaded = 0;
+    var failed = 0;
+
+    // 直列で画像を取得（レート制限対策）
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      var path = img.storage_path;
+      if (!path) { failed++; continue; }
+
+      // ファイル名を取得（パスの最後の部分）
+      var parts = path.split('/');
+      var filename = parts[parts.length - 1] || ('image_' + img.id + '.jpg');
+
+      // フォルダ構造: トラブルID/ファイル名
+      var folder = 'trouble_' + img.trouble_id;
+
+      try {
+        var url = SB_URL + '/storage/v1/object/public/trouble-images/' + path;
+        var res = await fetch(url);
+        if (!res.ok) { failed++; continue; }
+        var blob = await res.blob();
+        zip.file(folder + '/' + filename, blob);
+        downloaded++;
+      } catch(e) {
+        failed++;
+      }
+
+      showOverlay('画像をダウンロード中... (' + (i + 1) + '/' + images.length + ')');
+    }
+
+    if (downloaded === 0) {
+      hideOverlay();
+      document.getElementById('dl-img-btn').disabled = false;
+      showToast('画像の取得に失敗しました', 'error');
+      return;
+    }
+
+    showOverlay('ZIPファイル生成中...');
+    var zipBlob = await zip.generateAsync({ type: 'blob' }, function(meta) {
+      showOverlay('ZIPファイル生成中... ' + Math.round(meta.percent) + '%');
+    });
+
+    // ダウンロード
+    var fromStr = from.replace(/-/g, '');
+    var toStr   = to.replace(/-/g, '');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = 'トラブル画像_' + fromStr + '-' + toStr + '.zip';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    hideOverlay();
+    document.getElementById('dl-img-btn').disabled = false;
+
+    var msg = downloaded + '件の画像をダウンロードしました';
+    if (failed > 0) msg += '（' + failed + '件失敗）';
+    showToast(msg, failed > 0 ? 'error' : 'success');
+
+  } catch(e) {
+    hideOverlay();
+    document.getElementById('dl-img-btn').disabled = false;
+    showToast('画像ダウンロード失敗: ' + e.message, 'error');
+  }
 }
 </script>
 <script src="./update_banner.js"></script>
