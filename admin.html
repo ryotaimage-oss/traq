@@ -161,7 +161,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 /* Storage */
 .storage-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px}
 .storage-bar-wrap{background:var(--bg3);border-radius:6px;height:12px;overflow:hidden;margin:10px 0}
-.storage-bar-fill{height:100%;border-radius:6px;transition:width .5s ease}
+.storage-bar-fill{height:100%;border-radius:6px;transition:width .5s ease;min-width:0}
 
 /* Modal */
 .modal-wrap{position:fixed;inset:0;z-index:100;display:none}
@@ -440,6 +440,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <div class="storage-bar-fill" id="storageFill" style="width:0%;background:var(--success)"></div>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-top:4px" id="storageDetail"></div>
+        <div id="orphanCleanup" style="display:none;margin-top:10px">
+          <button class="btn" style="font-size:12px;padding:6px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:var(--radius);cursor:pointer;font-family:inherit;font-weight:600" onclick="cleanOrphanFiles()" id="orphanBtn" data-i18n="storage_clean_orphan">🧹 孤立ファイルを削除</button>
+          <span style="font-size:11px;color:var(--text2);margin-left:8px" id="orphanHint" data-i18n="storage_orphan_hint">DBに紐づかないStorageファイルを削除</span>
+        </div>
       </div>
       <div class="storage-card">
         <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_estimate_title">📊 容量の目安</div>
@@ -648,6 +652,11 @@ btn_preview_count:'件数確認',btn_delete_exec:'🗑️ 削除を実行',
 err_load:function(m){return 'データ読込エラー: '+m;},
 storage_unavailable:'取得できません',
 storage_check_dashboard:'Supabase Storageダッシュボードで確認してください',
+storage_clean_orphan:'🧹 孤立ファイルを削除',
+storage_orphan_hint:'DBに紐づかないStorageファイルを削除',
+storage_orphan_count:function(n){return '孤立ファイル: '+n+'件';},
+storage_orphan_confirm:function(n){return n+'件の孤立ファイルを削除しますか？';},
+storage_orphan_done:function(n){return n+'件の孤立ファイルを削除しました';},
 storage_critical:'🔴 容量が逼迫しています。バックアップ→削除を推奨します。',
 storage_warn70:'⚠️ 70%を超えています。不要な画像の削除を推奨します。',
 storage_remaining:function(mb){return '残り '+mb+'MB 利用可能';},
@@ -738,6 +747,11 @@ btn_preview_count:'Kiểm tra số lượng',btn_delete_exec:'🗑️ Thực hi�
 err_load:function(m){return 'Lỗi tải dữ liệu: '+m;},
 storage_unavailable:'Không thể lấy',
 storage_check_dashboard:'Vui lòng kiểm tra trên Supabase Storage Dashboard',
+storage_clean_orphan:'🧹 Xóa file rác',
+storage_orphan_hint:'Xóa file không liên kết DB',
+storage_orphan_count:function(n){return 'File rác: '+n;},
+storage_orphan_confirm:function(n){return 'Xóa '+n+' file rác?';},
+storage_orphan_done:function(n){return 'Đã xóa '+n+' file rác';},
 storage_critical:'🔴 Dung lượng sắp hết. Khuyến nghị sao lưu → xóa.',
 storage_warn70:'⚠️ Đã vượt 70%. Khuyến nghị xóa hình ảnh không cần thiết.',
 storage_remaining:function(mb){return 'Còn '+mb+'MB khả dụng';},
@@ -828,6 +842,11 @@ btn_preview_count:'Check Count',btn_delete_exec:'🗑️ Execute Delete',
 err_load:function(m){return 'Data load error: '+m;},
 storage_unavailable:'Unable to retrieve',
 storage_check_dashboard:'Please check on Supabase Storage Dashboard',
+storage_clean_orphan:'🧹 Clean orphan files',
+storage_orphan_hint:'Delete storage files not linked to DB',
+storage_orphan_count:function(n){return 'Orphan files: '+n;},
+storage_orphan_confirm:function(n){return 'Delete '+n+' orphan files?';},
+storage_orphan_done:function(n){return 'Deleted '+n+' orphan files';},
 storage_critical:'🔴 Storage is nearly full. Recommend backup → delete.',
 storage_warn70:'⚠️ Over 70%. Recommend deleting unnecessary images.',
 storage_remaining:function(mb){return mb+'MB remaining';},
@@ -1318,10 +1337,10 @@ function isImageFile(name){
   var n=name.toLowerCase();
   return n.endsWith('.jpg')||n.endsWith('.jpeg')||n.endsWith('.png')||n.endsWith('.webp')||n.endsWith('.gif');
 }
+var _storageFiles = []; // 全Storage内ファイルパスを保持
 async function initStorage(){
+  _storageFiles = [];
   try {
-    // trouble_imagesテーブルからレコード数を取得し、DB側のストレージパスからファイル一覧を推定
-    // Supabase Storage list APIでトップレベルフォルダを取得
     var totalBytes = 0;
     var fileCount = 0;
     var res = await fetch(SB_URL + '/storage/v1/object/list/trouble-images', {
@@ -1331,12 +1350,9 @@ async function initStorage(){
     });
     if (res.ok) {
       var items = await res.json();
-      // itemsにはフォルダ（id=null）とファイルが混在
-      // フォルダの場合は中のファイルを再取得
       var folders = items.filter(function(i) { return i.id === null; });
       var files = items.filter(function(i) { return i.id !== null && isImageFile(i.name); });
-      files.forEach(function(f) { if (f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
-      // 各フォルダ内のファイルを取得（最大50フォルダ）
+      files.forEach(function(f) { if (f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; _storageFiles.push('troubles/' + f.name); } });
       for (var fi = 0; fi < Math.min(folders.length, 50); fi++) {
         try {
           var fr = await fetch(SB_URL + '/storage/v1/object/list/trouble-images', {
@@ -1346,7 +1362,7 @@ async function initStorage(){
           });
           if (fr.ok) {
             var subItems = await fr.json();
-            subItems.forEach(function(f) { if (f.id !== null && isImageFile(f.name) && f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
+            subItems.forEach(function(f) { if (f.id !== null && isImageFile(f.name) && f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; _storageFiles.push('troubles/' + folders[fi].name + '/' + f.name); } });
           }
         } catch(e) { /* skip */ }
       }
@@ -1355,14 +1371,59 @@ async function initStorage(){
     var totalMB = 1024;
     var pct = Math.round(usedMB / totalMB * 100);
     updateStorageBar(usedMB, totalMB, pct, fileCount);
+
+    // 孤立ファイル検出: Storageにファイルがあるがtrouble_imagesにレコードがない
+    if (_storageFiles.length > 0) {
+      try {
+        var dbImages = await sbFetch('trouble_images?select=storage_path');
+        var dbPaths = (dbImages || []).map(function(r) { return r.storage_path; });
+        var orphans = _storageFiles.filter(function(sp) { return dbPaths.indexOf(sp) === -1; });
+        if (orphans.length > 0) {
+          _orphanPaths = orphans;
+          var el = document.getElementById('orphanCleanup');
+          if (el) el.style.display = 'block';
+          var hint = document.getElementById('orphanHint');
+          if (hint) hint.textContent = t('storage_orphan_count')(orphans.length);
+        }
+      } catch(e) { /* ignore */ }
+    }
   } catch(e) {
     document.getElementById('storageLabel').textContent = t('storage_unavailable');
     document.getElementById('storageDetail').textContent = t('storage_check_dashboard');
   }
 }
+var _orphanPaths = [];
+async function cleanOrphanFiles() {
+  if (_orphanPaths.length === 0) return;
+  if (!confirm(t('storage_orphan_confirm')(_orphanPaths.length))) return;
+  var btn = document.getElementById('orphanBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ ...';
+  try {
+    for (var i = 0; i < _orphanPaths.length; i += 20) {
+      var batch = _orphanPaths.slice(i, i + 20);
+      await fetch(SB_URL + '/storage/v1/object/trouble-images', {
+        method: 'DELETE',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefixes: batch })
+      });
+    }
+    showToast(t('storage_orphan_done')(_orphanPaths.length), 'success');
+    _orphanPaths = [];
+    document.getElementById('orphanCleanup').style.display = 'none';
+    initStorage();
+  } catch(e) {
+    showToast(t('del_error')(e.message), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t('storage_clean_orphan');
+  }
+}
 function updateStorageBar(used, total, pct, fileCount) {
   const color = pct >= 80 ? 'var(--danger)' : pct >= 70 ? 'var(--warning)' : 'var(--success)';
-  document.getElementById('storageFill').style.width = pct + '%';
+  // 使用量が0より大きいが1%未満の場合、最低1%表示
+  var barPct = (used > 0 && pct < 1) ? 1 : pct;
+  document.getElementById('storageFill').style.width = barPct + '%';
   document.getElementById('storageFill').style.background = color;
   document.getElementById('storageLabel').textContent = `${used}MB / ${total}MB (${pct}%)`;
   document.getElementById('storageLabel').style.color = color;
