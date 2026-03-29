@@ -1043,7 +1043,7 @@ async function checkPushStatus() {
   if (Notification.permission === 'denied') {
     statusEl.className = 'push-status inactive';
     statusIcon.textContent = '🚫';
-    statusText.textContent = t('push_blocked');
+    statusText.textContent = t('push_blocked'); statusText.setAttribute('data-i18n','push_blocked');
     deniedEl.style.display = 'block';
     btnOn.style.display = 'none';
     btnOff.style.display = 'none';
@@ -1055,13 +1055,13 @@ async function checkPushStatus() {
     if (sub) {
       statusEl.className = 'push-status active';
       statusIcon.textContent = '✅';
-      statusText.textContent = t('push_active');
+      statusText.textContent = t('push_active'); statusText.setAttribute('data-i18n','push_active');
       btnOn.style.display = 'none';
       btnOff.style.display = 'block';
     } else {
       statusEl.className = 'push-status inactive';
       statusIcon.textContent = '🔕';
-      statusText.textContent = t('push_inactive');
+      statusText.textContent = t('push_inactive'); statusText.setAttribute('data-i18n','push_inactive');
       btnOn.style.display = 'block';
       btnOff.style.display = 'none';
     }
@@ -1069,7 +1069,7 @@ async function checkPushStatus() {
     console.error('Push status check failed:', e);
     statusEl.className = 'push-status inactive';
     statusIcon.textContent = '⚠️';
-    statusText.textContent = t('push_error');
+    statusText.textContent = t('push_error'); statusText.setAttribute('data-i18n','push_error');
   }
 }
 
@@ -1216,12 +1216,13 @@ function showUpdateBanner(oldVer, newVer){
   if(badge){
     badge.textContent=t('update_available')(newVer);
     badge.className='update-badge';
+    badge.removeAttribute('data-i18n');
   }
 }
 
 function setBadgeLatest(){
   const badge=document.getElementById('updateBadge');
-  if(badge){ badge.textContent=t('update_latest'); badge.className='no-update-badge'; }
+  if(badge){ badge.textContent=t('update_latest'); badge.className='no-update-badge'; badge.setAttribute('data-i18n','update_latest'); }
 }
 
 /* ===== Logout ===== */
