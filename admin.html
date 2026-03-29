@@ -638,7 +638,7 @@ storage_est_image_val:'876MB / 年',
 storage_est_free:'・Supabase無料枠：',storage_est_free_val:'1GB',
 storage_est_free_note:'（超過前に年次エクスポートを推奨）',
 storage_export_title:'🗂️ 画像エクスポート',
-storage_export_desc:'<span data-i18n="storage_export_desc">指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。</span>',
+storage_export_desc:'指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。',
 storage_export_btn:'📥 画像をエクスポート',year_suffix:'年',
 storage_delete_title:'🗑️ データ削除（管理者専用）',
 storage_delete_warn:'削除は取り消せません',
@@ -1313,6 +1313,11 @@ function renderPagination(elId, total, current, entity) {
 }
 
 /* ===== Storage ===== */
+function isImageFile(name){
+  if(!name)return false;
+  var n=name.toLowerCase();
+  return n.endsWith('.jpg')||n.endsWith('.jpeg')||n.endsWith('.png')||n.endsWith('.webp')||n.endsWith('.gif');
+}
 async function initStorage(){
   try {
     // trouble_imagesテーブルからレコード数を取得し、DB側のストレージパスからファイル一覧を推定
@@ -1329,7 +1334,7 @@ async function initStorage(){
       // itemsにはフォルダ（id=null）とファイルが混在
       // フォルダの場合は中のファイルを再取得
       var folders = items.filter(function(i) { return i.id === null; });
-      var files = items.filter(function(i) { return i.id !== null; });
+      var files = items.filter(function(i) { return i.id !== null && isImageFile(i.name); });
       files.forEach(function(f) { if (f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
       // 各フォルダ内のファイルを取得（最大50フォルダ）
       for (var fi = 0; fi < Math.min(folders.length, 50); fi++) {
@@ -1341,7 +1346,7 @@ async function initStorage(){
           });
           if (fr.ok) {
             var subItems = await fr.json();
-            subItems.forEach(function(f) { if (f.id !== null && f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
+            subItems.forEach(function(f) { if (f.id !== null && isImageFile(f.name) && f.metadata && f.metadata.size) { totalBytes += f.metadata.size; fileCount++; } });
           }
         } catch(e) { /* skip */ }
       }
