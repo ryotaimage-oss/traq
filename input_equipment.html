@@ -176,28 +176,28 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <span class="topbar-sub">Trouble Tracking System</span>
   </div>
   <div class="topbar-right">
-    <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
-    <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-    <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
+    <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード">🔄</button>
+    <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替">🌙</button>
+    <button class="hdr-icon-btn" onclick="location.href='settings.html'" data-i18n-title="hdr_settings" title="設定">⚙️</button>
     <div class="hdr-avatar" id="mob-avatar"></div>
   </div>
 </header>
 <div class="page-title-bar">
   <button class="page-back-btn" onclick="goBack()">←</button>
-  <span class="page-title-text">⚙️ 設備トラブル入力</span>
+  <span class="page-title-text" data-i18n="page_title_eq">⚙️ 設備トラブル入力</span>
 </div>
 
 <main class="main">
   <!-- 基本情報 -->
   <div class="section">
-    <div class="section-title">⚙️ 基本情報</div>
+    <div class="section-title" data-i18n="sec_basic">⚙️ 基本情報</div>
     <div class="form-row" style="grid-template-columns:1fr 68px 1fr">
       <div class="form-group">
-        <label class="form-label">発生日<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_date">発生日</span><span class="req">*</span></label>
         <input class="form-input" type="date" id="occurred-date" style="min-width:0">
       </div>
       <div class="form-group">
-        <label class="form-label">シフト<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_shift">シフト</span><span class="req">*</span></label>
         <select class="form-select" id="shift-select" style="padding:12px 28px 12px 6px;text-align:center">
           <option value="1">１S</option>
           <option value="2">２S</option>
@@ -205,109 +205,109 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">ライン<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_line">ライン</span><span class="req">*</span></label>
         <select class="form-select" id="line-select" onchange="onLineChange()" style="min-width:0">
-          <option value="">選択</option>
+          <option value="" data-i18n="ph_select">選択</option>
         </select>
       </div>
     </div>
     <div class="form-row" style="grid-template-columns:100px 1fr">
       <div class="form-group">
-        <label class="form-label">機番<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_machine">機番</span><span class="req">*</span></label>
         <select class="form-select" id="machine-select" onchange="onMachineChange()" disabled style="min-width:0">
-          <option value="">—</option>
+          <option value="" data-i18n="ph_dash">—</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">品番<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_product">品番</span><span class="req">*</span></label>
         <select class="form-select" id="product-select" disabled style="min-width:0">
-          <option value="">—</option>
+          <option value="" data-i18n="ph_dash">—</option>
         </select>
       </div>
     </div>
     <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:2px">
-      <span>報告者:</span><span id="reporter-display" style="font-weight:500;color:var(--text)"></span>
+      <span data-i18n="lbl_reporter">報告者:</span><span id="reporter-display" style="font-weight:500;color:var(--text)"></span>
     </div>
   </div>
 
   <!-- トラブル詳細 -->
   <div class="section">
-    <div class="section-title">📋 トラブル詳細</div>
+    <div class="section-title" data-i18n="sec_detail">📋 トラブル詳細</div>
     <div class="form-row form-row-2">
       <div class="form-group">
-        <label class="form-label">分類<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_category">分類</span><span class="req">*</span></label>
         <select class="form-select" id="category-select">
-          <option value="">選択</option>
+          <option value="" data-i18n="ph_select">選択</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">初発 / 再発<span class="req">*</span></label>
+        <label class="form-label"><span data-i18n="lbl_occurrence">初発 / 再発</span><span class="req">*</span></label>
         <div class="occurrence-group">
-          <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')">初発</button>
-          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')">再発</button>
+          <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')" data-i18n="btn_first">初発</button>
+          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')" data-i18n="btn_recurrence">再発</button>
         </div>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">停止時間<span class="req">*</span> — 開始は必須 / 終了は未定なら空白OK</label>
+      <label class="form-label"><span data-i18n="lbl_stop_time">停止時間</span><span class="req">*</span> <span data-i18n="lbl_stop_note">— 開始は必須 / 終了は未定なら空白OK</span></label>
       <div class="form-row form-row-2" style="margin-bottom:0">
         <div class="drum-col">
-          <div class="drum-col-label">開始時刻</div>
+          <div class="drum-col-label" data-i18n="drum_start">開始時刻</div>
           <div class="drum-pair">
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSH"></div></div>
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dSM"></div></div>
           </div>
-          <div class="drum-pair-labels"><span>時</span><span>分</span></div>
+          <div class="drum-pair-labels"><span data-i18n="drum_h">時</span><span data-i18n="drum_m">分</span></div>
         </div>
         <div class="drum-col">
-          <div class="drum-col-label">終了時刻（任意）</div>
+          <div class="drum-col-label" data-i18n="drum_end">終了時刻（任意）</div>
           <div class="drum-pair">
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEH"></div></div>
             <div class="drum-wrap"><div class="drum-selector"></div><div class="drum-fade-top"></div><div class="drum-fade-bot"></div><div class="drum-list" id="dEM"></div></div>
           </div>
-          <div class="drum-pair-labels"><span>時</span><span>分</span></div>
-          <button class="clear-end-btn" onclick="clearEndTime()">終了時刻をクリア</button>
+          <div class="drum-pair-labels"><span data-i18n="drum_h">時</span><span data-i18n="drum_m">分</span></div>
+          <button class="clear-end-btn" onclick="clearEndTime()" data-i18n="drum_clear_end">終了時刻をクリア</button>
         </div>
       </div>
       <div class="stop-result" id="stop-result">開始時刻を設定してください</div>
       <input type="hidden" id="stop-minutes">
     </div>
     <div class="form-group">
-      <label class="form-label">詳細内容<span class="req">*</span></label>
-      <textarea class="form-textarea" id="detail" placeholder="トラブルの内容を入力してください"></textarea>
+      <label class="form-label"><span data-i18n="lbl_detail">詳細内容</span><span class="req">*</span></label>
+      <textarea class="form-textarea" id="detail" data-i18n-ph="ph_detail" placeholder="トラブルの内容を入力してください"></textarea>
     </div>
   </div>
 
   <!-- 画像 -->
   <div class="section">
-    <div class="section-title">📷 写真</div>
+    <div class="section-title" data-i18n="sec_photo">📷 写真</div>
     <div class="image-area" onclick="document.getElementById('image-input').click()">
-      <div class="image-area-text">タップして写真を追加</div>
-      <div class="image-area-sub">カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮</div>
+      <div class="image-area-text" data-i18n="photo_tap">タップして写真を追加</div>
+      <div class="image-area-sub" data-i18n="photo_sub">カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮</div>
       <input type="file" id="image-input" accept="image/*" multiple class="hidden" onchange="onImageSelect(event)">
     </div>
     <div class="image-previews" id="image-previews"></div>
   </div>
 
   <div class="submit-area">
-    <button class="submit-btn" id="submit-btn" onclick="doSubmit()">送信する</button>
+    <button class="submit-btn" id="submit-btn" onclick="doSubmit()" data-i18n="btn_submit">送信する</button>
   </div>
 </main>
 
 <!-- 下書きバー -->
-<div class="draft-bar">
+<div class="draft-bar" id="draft-bar">
   <div class="draft-status">
     <div class="draft-dot" id="draft-dot"></div>
-    <span id="draft-status-text">下書き未保存</span>
+    <span id="draft-status-text" data-i18n="draft_unsaved">下書き未保存</span>
   </div>
-  <button class="draft-load-btn" onclick="loadDraft()">下書きを読込</button>
+  <button class="draft-load-btn" onclick="loadDraft()" data-i18n="draft_load">下書きを読込</button>
 </div>
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label">一覧</span></button>
-  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span></button>
-  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label">マスタ</span></button>
+  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label" data-i18n="nav_list">一覧</span></button>
+  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span></button>
+  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label" data-i18n="nav_master">マスタ</span></button>
 </nav>
 
 <div class="overlay hidden" id="overlay"><div class="spinner"></div><div class="overlay-text" id="overlay-text">送信中...</div></div>
@@ -315,6 +315,177 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <script>
 (function(){var s=localStorage.getItem('traq_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p)})();
+
+/* ===== i18n ===== */
+var I18N = {
+  ja: {
+    page_title_eq:'⚙️ 設備トラブル入力', page_title_md:'🔧 金型トラブル入力',
+    sec_basic:'⚙️ 基本情報', sec_detail:'📋 トラブル詳細', sec_photo:'📷 写真',
+    lbl_date:'発生日', lbl_shift:'シフト', lbl_line:'ライン',
+    lbl_machine:'機番', lbl_product:'品番',
+    lbl_reporter:'報告者:',
+    lbl_category:'分類', lbl_occurrence:'初発 / 再発',
+    lbl_stop_time:'停止時間',
+    lbl_stop_note:'— 開始は必須 / 終了は未定なら空白OK',
+    lbl_detail:'詳細内容',
+    ph_select:'選択', ph_dash:'—',
+    btn_first:'初発', btn_recurrence:'再発',
+    drum_start:'開始時刻', drum_end:'終了時刻（任意）',
+    drum_h:'時', drum_m:'分',
+    drum_clear_end:'終了時刻をクリア',
+    stop_set_start:'開始時刻を設定してください',
+    stop_start_only:function(s){return '開始: '+s+' ／ 終了: 未定';},
+    stop_full:function(s,e,m){return s+' → '+e+'　'+m+'分';},
+    photo_tap:'タップして写真を追加',
+    photo_sub:'カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮',
+    ph_detail:'トラブルの内容を入力してください',
+    btn_submit:'送信する', btn_resubmit:'修正して再送信',
+    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
+    draft_unsaved:'下書き未保存',
+    draft_saved:function(t){return '下書き保存済み（'+t+'）';},
+    draft_load:'下書きを読込',
+    draft_none:'下書きがありません',
+    draft_loaded:'下書きを読み込みました',
+    draft_load_fail:function(m){return '下書き読込失敗: '+m;},
+    master_load_fail:function(m){return 'マスタ読込失敗: '+m;},
+    master_denied_title:'アクセス制限',
+    master_denied:'マスタはSL・管理者のみ利用できます',
+    v_date:'発生日を入力してください',
+    v_line:'ラインを選択してください',
+    v_machine:'機番を選択してください',
+    v_product:'品番を選択してください',
+    v_category:'分類を選択してください',
+    v_occurrence:'初発/再発を選択してください',
+    v_detail:'詳細内容を入力してください',
+    msg_sending:'送信中...',
+    msg_uploading:'画像をアップロード中...',
+    msg_submitted:'送信しました',
+    msg_resubmitted:'再送信しました',
+    msg_submit_fail:function(m){return '送信失敗: '+m;},
+    msg_data_not_found:'データが見つかりません',
+    msg_load_fail:function(m){return '読込失敗: '+m;},
+    reject_label:'差し戻し理由：',
+    hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
+  },
+  vi: {
+    page_title_eq:'⚙️ Nhập sự cố thiết bị', page_title_md:'🔧 Nhập sự cố khuôn',
+    sec_basic:'⚙️ Thông tin cơ bản', sec_detail:'📋 Chi tiết sự cố', sec_photo:'📷 Ảnh',
+    lbl_date:'Ngày xảy ra', lbl_shift:'Ca', lbl_line:'Dây chuyền',
+    lbl_machine:'Máy', lbl_product:'Mã SP',
+    lbl_reporter:'Người báo:',
+    lbl_category:'Phân loại', lbl_occurrence:'Lần đầu / Tái phát',
+    lbl_stop_time:'Thời gian dừng',
+    lbl_stop_note:'— Bắt đầu bắt buộc / Kết thúc có thể để trống',
+    lbl_detail:'Chi tiết',
+    ph_select:'Chọn', ph_dash:'—',
+    btn_first:'Lần đầu', btn_recurrence:'Tái phát',
+    drum_start:'Giờ bắt đầu', drum_end:'Giờ kết thúc (tuỳ chọn)',
+    drum_h:'Giờ', drum_m:'Phút',
+    drum_clear_end:'Xoá giờ kết thúc',
+    stop_set_start:'Hãy cài giờ bắt đầu',
+    stop_start_only:function(s){return 'Bắt đầu: '+s+' ／ Kết thúc: Chưa xác định';},
+    stop_full:function(s,e,m){return s+' → '+e+'　'+m+' phút';},
+    photo_tap:'Nhấn để thêm ảnh',
+    photo_sub:'Chụp / Chọn ảnh — Tự nén nếu >200KB',
+    ph_detail:'Nhập nội dung sự cố',
+    btn_submit:'Gửi', btn_resubmit:'Sửa và gửi lại',
+    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master',
+    draft_unsaved:'Chưa lưu nháp',
+    draft_saved:function(t){return 'Đã lưu nháp ('+t+')';},
+    draft_load:'Tải bản nháp',
+    draft_none:'Không có bản nháp',
+    draft_loaded:'Đã tải bản nháp',
+    draft_load_fail:function(m){return 'Lỗi tải nháp: '+m;},
+    master_load_fail:function(m){return 'Lỗi tải master: '+m;},
+    master_denied_title:'Hạn chế truy cập',
+    master_denied:'Chỉ SL và Admin mới dùng được Master',
+    v_date:'Hãy nhập ngày xảy ra',
+    v_line:'Hãy chọn dây chuyền',
+    v_machine:'Hãy chọn máy',
+    v_product:'Hãy chọn mã sản phẩm',
+    v_category:'Hãy chọn phân loại',
+    v_occurrence:'Hãy chọn lần đầu / tái phát',
+    v_detail:'Hãy nhập chi tiết',
+    msg_sending:'Đang gửi...',
+    msg_uploading:'Đang tải ảnh lên...',
+    msg_submitted:'Đã gửi',
+    msg_resubmitted:'Đã gửi lại',
+    msg_submit_fail:function(m){return 'Gửi thất bại: '+m;},
+    msg_data_not_found:'Không tìm thấy dữ liệu',
+    msg_load_fail:function(m){return 'Lỗi tải: '+m;},
+    reject_label:'Lý do trả lại:',
+    hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
+  },
+  en: {
+    page_title_eq:'⚙️ Equipment Trouble', page_title_md:'🔧 Mold Trouble',
+    sec_basic:'⚙️ Basic Info', sec_detail:'📋 Trouble Detail', sec_photo:'📷 Photos',
+    lbl_date:'Date', lbl_shift:'Shift', lbl_line:'Line',
+    lbl_machine:'Machine', lbl_product:'Product',
+    lbl_reporter:'Reporter:',
+    lbl_category:'Category', lbl_occurrence:'First / Recurrence',
+    lbl_stop_time:'Downtime',
+    lbl_stop_note:'— Start required / End optional',
+    lbl_detail:'Detail',
+    ph_select:'Select', ph_dash:'—',
+    btn_first:'First', btn_recurrence:'Recurrence',
+    drum_start:'Start time', drum_end:'End time (optional)',
+    drum_h:'H', drum_m:'M',
+    drum_clear_end:'Clear end time',
+    stop_set_start:'Set start time',
+    stop_start_only:function(s){return 'Start: '+s+' ／ End: TBD';},
+    stop_full:function(s,e,m){return s+' → '+e+'　'+m+' min';},
+    photo_tap:'Tap to add photos',
+    photo_sub:'Camera / Gallery — Auto-compress if >200KB',
+    ph_detail:'Describe the trouble',
+    btn_submit:'Submit', btn_resubmit:'Fix & Resubmit',
+    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master',
+    draft_unsaved:'Draft not saved',
+    draft_saved:function(t){return 'Draft saved ('+t+')';},
+    draft_load:'Load draft',
+    draft_none:'No draft found',
+    draft_loaded:'Draft loaded',
+    draft_load_fail:function(m){return 'Draft load failed: '+m;},
+    master_load_fail:function(m){return 'Master load failed: '+m;},
+    master_denied_title:'Access restricted',
+    master_denied:'Master is for SL and Admin only',
+    v_date:'Please enter the date',
+    v_line:'Please select a line',
+    v_machine:'Please select a machine',
+    v_product:'Please select a product',
+    v_category:'Please select a category',
+    v_occurrence:'Please select first/recurrence',
+    v_detail:'Please enter details',
+    msg_sending:'Submitting...',
+    msg_uploading:'Uploading images...',
+    msg_submitted:'Submitted',
+    msg_resubmitted:'Resubmitted',
+    msg_submit_fail:function(m){return 'Submit failed: '+m;},
+    msg_data_not_found:'Data not found',
+    msg_load_fail:function(m){return 'Load failed: '+m;},
+    reject_label:'Rejection reason:',
+    hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
+  }
+};
+var currentLang = localStorage.getItem('traq_lang') || 'ja';
+function t(k) {
+  var v = I18N[currentLang] && I18N[currentLang][k];
+  if (v === undefined) v = I18N.ja[k];
+  return v !== undefined ? v : k;
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+    el.title = t(el.dataset.i18nTitle);
+  });
+  /* Dynamic stop result & draft status */
+  updateStopResult();
+  document.title = 'Traq – ' + t('page_title_eq').replace(/^[^\s]+\s/,'');
+}
 
 var SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
@@ -367,7 +538,7 @@ function showMasterDenied(){
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
   box.style.cssText='background:var(--surface,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">アクセス制限</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">マスタはSL・管理者のみ利用できます</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
@@ -392,29 +563,29 @@ async function loadMasters(){
       sbFetch('machine_products?select=*').catch(function(){return[];})
     ]);
     allLines=r[0]||[];allMachines=r[1]||[];allProducts=r[2]||[];allCategories=r[3]||[];machineProducts=r[4]||[];
-    document.getElementById('line-select').innerHTML='<option value="">選択</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
-    document.getElementById('category-select').innerHTML='<option value="">選択</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
-  }catch(e){showToast('マスタ読込失敗: '+e.message,'error');}
+    document.getElementById('line-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
+    document.getElementById('category-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+  }catch(e){showToast(t('master_load_fail')(e.message),'error');}
 }
 
 function onLineChange(){
   var lineId=parseInt(document.getElementById('line-select').value);
   var ms=document.getElementById('machine-select'),ps=document.getElementById('product-select');
-  ms.innerHTML='<option value="">選択</option>';ps.innerHTML='<option value="">—</option>';ps.disabled=true;
+  ms.innerHTML='<option value="">'+t('ph_select')+'</option>';ps.innerHTML='<option value="">'+t('ph_dash')+'</option>';ps.disabled=true;
   if(!lineId){ms.disabled=true;return;}
   var f=allMachines.filter(function(m){return m.line_id===lineId;});
   f.sort(function(a,b){var na=parseInt(a.machine_no),nb=parseInt(b.machine_no);if(!isNaN(na)&&!isNaN(nb))return na-nb;return a.machine_no.localeCompare(b.machine_no);});
-  ms.innerHTML='<option value="">選択</option>'+f.map(function(m){return '<option value="'+m.id+'">'+m.machine_no+'</option>';}).join('');
+  ms.innerHTML='<option value="">'+t('ph_select')+'</option>'+f.map(function(m){return '<option value="'+m.id+'">'+m.machine_no+'</option>';}).join('');
   ms.disabled=false;saveDraft();
 }
 function onMachineChange(){
   var mid=parseInt(document.getElementById('machine-select').value);
   var ps=document.getElementById('product-select');
-  ps.innerHTML='<option value="">選択</option>';
+  ps.innerHTML='<option value="">'+t('ph_select')+'</option>';
   if(!mid){ps.disabled=true;return;}
   var linked=machineProducts.filter(function(mp){return mp.machine_id===mid;}).map(function(mp){return mp.product_id;});
   var f=linked.length>0?allProducts.filter(function(p){return linked.includes(p.id);}):allProducts;
-  ps.innerHTML='<option value="">選択</option>'+f.map(function(p){return '<option value="'+p.id+'">'+p.product_code+'('+p.product_name+')</option>';}).join('');
+  ps.innerHTML='<option value="">'+t('ph_select')+'</option>'+f.map(function(p){return '<option value="'+p.id+'">'+p.product_code+'('+p.product_name+')</option>';}).join('');
   ps.disabled=false;saveDraft();
 }
 
@@ -459,10 +630,11 @@ function clearEndTime(){endTimeSet=false;drumState.eh=-1;drumState.em=-1;setDrum
 function updateStopResult(){
   var sh=drumState.sh,sm=drumState.sm*5,startStr=String(sh).padStart(2,'0')+':'+String(sm).padStart(2,'0');
   var el=document.getElementById('stop-result');
-  if(!endTimeSet||drumState.eh<0){el.textContent='開始: '+startStr+' ／ 終了: 未定';document.getElementById('stop-minutes').value='';return;}
+  if(!el)return;
+  if(!endTimeSet||drumState.eh<0){el.textContent=t('stop_start_only')(startStr);document.getElementById('stop-minutes').value='';return;}
   var eh=drumState.eh,em=drumState.em*5,endStr=String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0');
   var sMins=sh*60+sm,eMins=eh*60+em;if(eMins<sMins)eMins+=1440;var diff=eMins-sMins;
-  el.textContent=startStr+' → '+endStr+'　'+diff+'分';document.getElementById('stop-minutes').value=diff;
+  el.textContent=t('stop_full')(startStr,endStr,diff);document.getElementById('stop-minutes').value=diff;
 }
 function initDrumDrag(d){
   var el=document.getElementById(d.id),startY=0,startTop=0,dragging=false;
@@ -504,7 +676,7 @@ async function _saveDraft(){
     await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
     await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'equipment',data:getDraftData()});
     document.getElementById('draft-dot').className='draft-dot saved';
-    document.getElementById('draft-status-text').textContent='下書き保存済み（'+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'）';
+    document.getElementById('draft-status-text').textContent=t('draft_saved')(new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}));
   }catch(e){console.warn('下書き保存失敗:',e);}
 }
 function getDraftData(){
@@ -525,7 +697,7 @@ function getDraftData(){
 async function loadDraft(){
   try{
     var rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment&select=data');
-    if(!rows||!rows.length){showToast('下書きがありません','');return;}
+    if(!rows||!rows.length){showToast(t('draft_none'),'');return;}
     var d=rows[0].data;
     if(d.occurred_date) document.getElementById('occurred-date').value=d.occurred_date;
     if(d.shift) document.getElementById('shift-select').value=d.shift;
@@ -542,8 +714,8 @@ async function loadDraft(){
     }
     updateStopResult();
     if(d.detail) document.getElementById('detail').value=d.detail;
-    showToast('下書きを読み込みました','success');
-  }catch(e){showToast('下書き読込失敗: '+e.message,'error');}
+    showToast(t('draft_loaded'),'success');
+  }catch(e){showToast(t('draft_load_fail')(e.message),'error');}
 }
 setInterval(function(){_saveDraft();},30000);
 ['occurred-date','shift-select','line-select','machine-select','product-select','category-select','detail'].forEach(function(id){
@@ -552,20 +724,20 @@ setInterval(function(){_saveDraft();},30000);
 
 /* ── Validation ── */
 function validate(){
-  if(!document.getElementById('occurred-date').value){showToast('発生日を入力してください','error');return false;}
-  if(!document.getElementById('line-select').value){showToast('ラインを選択してください','error');return false;}
-  if(!document.getElementById('machine-select').value){showToast('機番を選択してください','error');return false;}
-  if(!document.getElementById('product-select').value){showToast('品番を選択してください','error');return false;}
-  if(!document.getElementById('category-select').value){showToast('分類を選択してください','error');return false;}
-  if(!selectedOccurrence){showToast('初発/再発を選択してください','error');return false;}
-  if(!document.getElementById('detail').value.trim()){showToast('詳細内容を入力してください','error');return false;}
+  if(!document.getElementById('occurred-date').value){showToast(t('v_date'),'error');return false;}
+  if(!document.getElementById('line-select').value){showToast(t('v_line'),'error');return false;}
+  if(!document.getElementById('machine-select').value){showToast(t('v_machine'),'error');return false;}
+  if(!document.getElementById('product-select').value){showToast(t('v_product'),'error');return false;}
+  if(!document.getElementById('category-select').value){showToast(t('v_category'),'error');return false;}
+  if(!selectedOccurrence){showToast(t('v_occurrence'),'error');return false;}
+  if(!document.getElementById('detail').value.trim()){showToast(t('v_detail'),'error');return false;}
   return true;
 }
 
 /* ── Submit ── */
 async function doSubmit(){
   if(!validate())return;
-  var btn=document.getElementById('submit-btn');btn.disabled=true;showOverlay('送信中...');
+  var btn=document.getElementById('submit-btn');btn.disabled=true;showOverlay(t('msg_sending'));
   try{
     var selectedShift=parseInt(document.getElementById('shift-select').value);
     var td={
@@ -595,7 +767,7 @@ async function doSubmit(){
       tId = result[0].id;
     }
     if(selectedImages.length>0){
-      showOverlay('画像をアップロード中...');
+      showOverlay(t('msg_uploading'));
       for(var i=0;i<selectedImages.length;i++){
         var img=selectedImages[i],ds=td.occurred_date.replace(/-/g,'');
         var ms=document.getElementById('machine-select'),mt=ms.options[ms.selectedIndex]?ms.options[ms.selectedIndex].text:'XX';
@@ -617,8 +789,8 @@ async function doSubmit(){
       }
     }
     if(!editTroubleId) await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment','DELETE');
-    hideOverlay();showToast(editTroubleId?'再送信しました':'送信しました','success');setTimeout(function(){goHome();},1200);
-  }catch(e){hideOverlay();btn.disabled=false;showToast('送信失敗: '+e.message,'error');}
+    hideOverlay();showToast(editTroubleId?t('msg_resubmitted'):t('msg_submitted'),'success');setTimeout(function(){goHome();},1200);
+  }catch(e){hideOverlay();btn.disabled=false;showToast(t('msg_submit_fail')(e.message),'error');}
 }
 
 /* ── Util ── */
@@ -639,7 +811,7 @@ async function loadEditData() {
   if (!editTroubleId) return;
   try {
     var rows = await sbFetch('troubles?id=eq.' + editTroubleId + '&select=*');
-    if (!rows || !rows.length) { showToast('データが見つかりません','error'); return; }
+    if (!rows || !rows.length) { showToast(t('msg_data_not_found'),'error'); return; }
     var r = rows[0];
     if (r.occurred_date) document.getElementById('occurred-date').value = r.occurred_date.slice(0,10);
     if (r.shift) document.getElementById('shift-select').value = String(r.shift);
@@ -670,23 +842,23 @@ async function loadEditData() {
     if (r.detail) document.getElementById('detail').value = r.detail;
     // UI: change submit button label
     var btn = document.getElementById('submit-btn');
-    if (btn) btn.textContent = '修正して再送信';
+    if (btn) btn.textContent = t('btn_resubmit');
     // Show reject reason banner if present
     if (r.reject_reason) {
       var banner = document.createElement('div');
       banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#ef4444;';
-      banner.innerHTML = '<strong style="display:block;font-size:11px;margin-bottom:2px">差し戻し理由：</strong>' + r.reject_reason;
+      banner.innerHTML = '<strong style="display:block;font-size:11px;margin-bottom:2px">' + t('reject_label') + '</strong>' + r.reject_reason;
       var form = document.querySelector('.form-body');
       if (form) form.insertBefore(banner, form.firstChild);
     }
     // Hide draft bar in edit mode
     var dbar = document.querySelector('.draft-bar');
     if (dbar) dbar.style.display = 'none';
-  } catch(e) { showToast('読込失敗: ' + e.message, 'error'); }
+  } catch(e) { showToast(t('msg_load_fail')(e.message), 'error'); }
 }
 
 /* ── Init ── */
-loadMasters().then(function(){ loadEditData(); });initDrums();
+loadMasters().then(function(){ loadEditData(); });initDrums();applyI18n();
 </script>
 <script src="./update_banner.js"></script>
 </body>
