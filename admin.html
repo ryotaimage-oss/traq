@@ -511,6 +511,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 <div class="modal-wrap" id="modalEl"></div>
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 (function(){
   var saved=localStorage.getItem('traq_theme');
@@ -648,6 +649,12 @@ storage_remaining:function(mb){return '残り '+mb+'MB 利用可能';},
 storage_image_count:function(n){return '　画像: '+n+'件';},
 toast_export_start:function(y){return y+'年の画像エクスポートを開始します（Supabase Storageから取得）';},
 toast_excel_todo:'Excel出力機能は今後実装予定です',
+toast_excel_ok:'Excelファイルをダウンロードしました',
+toast_excel_err:function(m){return 'Excel出力エラー: '+m;},
+excel_users_sheet:'ユーザー',excel_machines_sheet:'機番',excel_products_sheet:'品番',
+excel_name:'名前',excel_role:'ロール',excel_active:'状態',excel_active_yes:'有効',excel_active_no:'無効',
+excel_machine_no:'機番',excel_line:'ライン',excel_linked_products:'対応品番',
+excel_product_code:'品番',excel_product_name:'品名',
 toast_activated:'有効にしました',toast_deactivated:'無効にしました',
 err_generic:function(m){return 'エラー: '+m;},
 pagination_of:'件',btn_prev:'← 前へ',btn_next:'次へ →',
@@ -727,6 +734,12 @@ storage_remaining:function(mb){return 'Còn '+mb+'MB khả dụng';},
 storage_image_count:function(n){return '　Hình ảnh: '+n;},
 toast_export_start:function(y){return 'Bắt đầu xuất hình ảnh năm '+y+' (từ Supabase Storage)';},
 toast_excel_todo:'Chức năng xuất Excel sẽ được triển khai sau',
+toast_excel_ok:'Đã tải xuống tệp Excel',
+toast_excel_err:function(m){return 'Lỗi xuất Excel: '+m;},
+excel_users_sheet:'Người dùng',excel_machines_sheet:'Máy',excel_products_sheet:'Sản phẩm',
+excel_name:'Tên',excel_role:'Vai trò',excel_active:'Trạng thái',excel_active_yes:'Hoạt động',excel_active_no:'Ngừng',
+excel_machine_no:'Số máy',excel_line:'Line',excel_linked_products:'SP liên kết',
+excel_product_code:'Mã SP',excel_product_name:'Tên SP',
 toast_activated:'Đã kích hoạt',toast_deactivated:'Đã ngừng',
 err_generic:function(m){return 'Lỗi: '+m;},
 pagination_of:'',btn_prev:'← Trước',btn_next:'Tiếp →',
@@ -806,6 +819,12 @@ storage_remaining:function(mb){return mb+'MB remaining';},
 storage_image_count:function(n){return '  Images: '+n;},
 toast_export_start:function(y){return 'Starting image export for '+y+' (from Supabase Storage)';},
 toast_excel_todo:'Excel export will be implemented soon',
+toast_excel_ok:'Excel file downloaded',
+toast_excel_err:function(m){return 'Excel export error: '+m;},
+excel_users_sheet:'Users',excel_machines_sheet:'Machines',excel_products_sheet:'Products',
+excel_name:'Name',excel_role:'Role',excel_active:'Status',excel_active_yes:'Active',excel_active_no:'Inactive',
+excel_machine_no:'Machine No.',excel_line:'Line',excel_linked_products:'Linked Products',
+excel_product_code:'Code',excel_product_name:'Name',
 toast_activated:'Activated',toast_deactivated:'Deactivated',
 err_generic:function(m){return 'Error: '+m;},
 pagination_of:'',btn_prev:'← Prev',btn_next:'Next →',
@@ -1336,10 +1355,74 @@ function exportImages(){
   showToast(t('toast_export_start')(year),'info');
 }
 
-/* ===== Excel export (placeholder) ===== */
-function exportUsers(){ showToast(t('toast_excel_todo'),'info'); }
-function exportMachines(){ showToast(t('toast_excel_todo'),'info'); }
-function exportProducts(){ showToast(t('toast_excel_todo'),'info'); }
+/* ===== Excel export ===== */
+function exportUsers(){
+  try{
+    var rows=USERS.map(function(u){
+      var roleLabel=u.role==='admin'?'Admin':(u.role==='leader'||u.role==='sl')?'SL':'OP';
+      var active=u.is_active!==false?t('excel_active_yes'):t('excel_active_no');
+      var obj={};
+      obj[t('excel_name')]=u.name||'';
+      obj[t('excel_role')]=roleLabel;
+      obj[t('excel_active')]=active;
+      return obj;
+    });
+    var ws=XLSX.utils.json_to_sheet(rows);
+    /* 列幅自動調整 */
+    ws['!cols']=[{wch:20},{wch:10},{wch:10}];
+    var wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,t('excel_users_sheet'));
+    var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    XLSX.writeFile(wb,'Traq_Users_'+ts+'.xlsx');
+    showToast(t('toast_excel_ok'),'success');
+  }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
+}
+function exportMachines(){
+  try{
+    var rows=MACHINES.map(function(m){
+      var lineName=m.lines?m.lines.name:(LINES.find(function(l){return l.id===m.line_id;})||{}).name||'–';
+      var active=m.is_active!==false?t('excel_active_yes'):t('excel_active_no');
+      /* 紐付き品番をカンマ区切りで結合 */
+      var linkedIds=MACHINE_PRODUCTS.filter(function(mp){return String(mp.machine_id)===String(m.id);}).map(function(mp){return mp.product_id;});
+      var linkedNames=linkedIds.map(function(pid){
+        var p=PRODUCTS.find(function(pr){return String(pr.id)===String(pid);});
+        return p?(p.product_code+' '+p.product_name):'';
+      }).filter(Boolean).join(', ');
+      var obj={};
+      obj[t('excel_machine_no')]=m.machine_no;
+      obj[t('excel_line')]=lineName;
+      obj[t('excel_active')]=active;
+      obj[t('excel_linked_products')]=linkedNames;
+      return obj;
+    });
+    var ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=[{wch:10},{wch:15},{wch:10},{wch:50}];
+    var wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,t('excel_machines_sheet'));
+    var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    XLSX.writeFile(wb,'Traq_Machines_'+ts+'.xlsx');
+    showToast(t('toast_excel_ok'),'success');
+  }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
+}
+function exportProducts(){
+  try{
+    var rows=PRODUCTS.map(function(p){
+      var active=p.is_active!==false?t('excel_active_yes'):t('excel_active_no');
+      var obj={};
+      obj[t('excel_product_code')]=p.product_code||'';
+      obj[t('excel_product_name')]=p.product_name||'';
+      obj[t('excel_active')]=active;
+      return obj;
+    });
+    var ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=[{wch:20},{wch:30},{wch:10}];
+    var wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,t('excel_products_sheet'));
+    var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    XLSX.writeFile(wb,'Traq_Products_'+ts+'.xlsx');
+    showToast(t('toast_excel_ok'),'success');
+  }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
+}
 
 /* ===== Modal ===== */
 function showModal(html){
