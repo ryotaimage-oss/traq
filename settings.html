@@ -57,8 +57,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}
   .app{flex-direction:row}
   .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
@@ -72,9 +70,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
   .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
@@ -87,7 +85,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
 /* Lang buttons */
 .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
-  .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 
 
 /* Scroll */
@@ -222,7 +220,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 <div class="app">
 
   <!-- Sidebar (PC) -->
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
         <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
@@ -253,19 +251,22 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
+        <span class="snav-icon">📋</span>
+        <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
+        <span class="snav-icon">📊</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
+        <span class="snav-icon">📥</span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item" onclick="location.href='admin.html'">
-        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
+        <span class="snav-icon">🔧</span>
+        <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
@@ -287,7 +288,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <span class="snav-icon">🚪</span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
-    </div></aside>
+    </div>
+  </aside>
 
   <!-- Topbar -->
   <header class="topbar">
@@ -573,7 +575,7 @@ var I18N = {
     update_now:'今すぐ更新',
     updating:'最新版に更新しています...',
     logout:'🚪 ログアウト', logout_msg:'ログアウトしました',
-    nav_list:'一覧',nav_excel:'Excelダウンロード', nav_dashboard:'ダッシュボード', nav_master:'マスタ',nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
+    nav_list:'一覧',nav_excel:'Excelダウンロード', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
     hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
     master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
     shift_label:function(s){return s+'直';}, shift_none:'未設定',

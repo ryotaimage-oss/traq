@@ -18,21 +18,14 @@
   --border:#1e293b;--field-border:rgba(255,255,255,0.06);
   --text:#f1f5f9;--muted:#64748b;
   --nav-h:56px;--factory:#2e3a52;--roof:#3d4e6e;
-  --bg2:#111827;
-  --bg3:#1e2d45;
-  --text1:#e8eaf0;
-  --text2:#8b90a0;
-  --danger:#ef4444;
-  --warning:#f59e0b;
-  --navy:#080d18;}
+
+  --bg2:#111827;--bg3:#1e2d45;--text1:#e8eaf0;--text2:#8b90a0;--danger:#ef4444;--warning:#f59e0b;--navy:#080d18;}
 [data-theme="light"]{
   --bg:#e8e6e2;--surface:#ffffff;--surface2:#f0ede8;
   --border:rgba(0,0,0,0.12);--field-border:rgba(0,0,0,0.10);
   --text:#1a1f2e;--muted:#666666;
-  --bg2:#ffffff;
-  --bg3:#f0ede8;
-  --text1:#1a1f2e;
-  --text2:#666666;}
+
+  --bg2:#ffffff;--bg3:#f0ede8;--text1:#1a1f2e;--text2:#666666;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column}
 
@@ -66,8 +59,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
 
 
 
@@ -75,11 +66,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .app{height:100%;display:flex;flex-direction:column}
 .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .sidebar{display:none}
-
-/* ===== PC sidebar ===== */
 @media(min-width:768px){
-  .app{flex-direction:row}
   .bottom-nav{display:none}
+  .app{flex-direction:row}
   .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
   .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
   .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
@@ -99,14 +88,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
   .main-column .main{max-width:700px}
 }
-T0px}}
+@media(min-width:1025px){.sidebar{width:240px}}
 
 /* ===== Main ===== */
 .main{flex:1;padding:16px;max-width:600px;margin:0 auto;width:100%}
@@ -164,7 +153,7 @@ T0px}}
 .submit-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* 下書き */
-.draft-bar{background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);z-index:10;flex-shrink:0}
+.draft-bar{background:var(--bg2);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);z-index:10;flex-shrink:0}
 .draft-status{display:flex;align-items:center;gap:6px}
 .draft-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
 .draft-dot.saved{background:var(--success)}
@@ -198,7 +187,6 @@ T0px}}
 .stop-result{background:var(--surface2);border:1px solid var(--field-border);border-radius:8px;padding:10px 14px;text-align:center;margin-top:10px;font-size:14px;font-weight:500;color:var(--text)}
 .clear-end-btn{width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px;font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
 .clear-end-btn:hover{border-color:var(--orange);color:var(--orange)}
-@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
@@ -234,19 +222,22 @@ T0px}}
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
+        <span class="snav-icon">📋</span>
+        <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
+        <span class="snav-icon">📊</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
+        <span class="snav-icon">📥</span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item" onclick="location.href='admin.html'">
-        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
+        <span class="snav-icon">🔧</span>
+        <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
@@ -269,8 +260,9 @@ T0px}}
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
-    </aside>
+  </aside>
   <div class="main-column">
+
 <header class="topbar">
   <div class="topbar-left">
     <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
@@ -423,21 +415,10 @@ T0px}}
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-    <button class="nav-item" onclick="goHome()">
-      <span class="nav-icon">📋</span>
-      <span class="nav-label" data-i18n="nav_list">一覧</span>
-    </button>
-    <button class="nav-item" onclick="location.href='dashboard.html'">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
-    </button>
-    <button class="nav-item" onclick="goMaster()">
-      <span class="nav-icon">🔧</span>
-      <span class="nav-label" data-i18n="nav_master">マスタ</span>
-    </button>
-  </nav>
-  </div><!-- /.main-column -->
-</div><!-- /.app -->
+  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label" data-i18n="nav_list">一覧</span></button>
+  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span></button>
+  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label" data-i18n="nav_master">マスタ</span></button>
+</nav>
 
 <div class="overlay hidden" id="overlay"><div class="spinner"></div><div class="overlay-text" id="overlay-text">送信中...</div></div>
 <div class="toast hidden" id="toast"></div>
@@ -469,7 +450,7 @@ var I18N = {
     photo_sub:'カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮',
     ph_detail:'トラブルの内容を入力してください',
     btn_submit:'送信する', btn_resubmit:'修正して再送信',
-    nav_list:'一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード',nav_master:'マスタ',nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
+    nav_list:'一覧',nav_excel:'Excelダウンロード',nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
     draft_unsaved:'下書き未保存',
     draft_saved:function(t){return '下書き保存済み（'+t+'）';},
     draft_load:'下書きを読込',
@@ -518,7 +499,7 @@ var I18N = {
     photo_sub:'Chụp / Chọn ảnh — Tự nén nếu >200KB',
     ph_detail:'Nhập nội dung sự cố',
     btn_submit:'Gửi', btn_resubmit:'Sửa và gửi lại',
-    nav_list:'Danh sách',nav_excel:'Tải Excel',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
+    nav_list:'Danh sách',nav_excel:'Tải Excel',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất', nav_dashboard:'Dashboard', nav_master:'Master',
     draft_unsaved:'Chưa lưu nháp',
     draft_saved:function(t){return 'Đã lưu nháp ('+t+')';},
     draft_load:'Tải bản nháp',
@@ -567,7 +548,7 @@ var I18N = {
     photo_sub:'Camera / Gallery — Auto-compress if >200KB',
     ph_detail:'Describe the trouble',
     btn_submit:'Submit', btn_resubmit:'Fix & Resubmit',
-    nav_list:'List',nav_excel:'Excel Download',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout',
+    nav_list:'List',nav_excel:'Excel Download',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout', nav_dashboard:'Dashboard', nav_master:'Master',
     draft_unsaved:'Draft not saved',
     draft_saved:function(t){return 'Draft saved ('+t+')';},
     draft_load:'Load draft',
@@ -1019,6 +1000,8 @@ async function loadEditData() {
 /* ── Init ── */
 loadMasters().then(function(){ loadEditData(); });initDrums();applyI18n();
 </script>
+  </div><!-- /.main-column -->
+</div><!-- /.app -->
 <script src="./update_banner.js"></script>
 </body>
 </html>

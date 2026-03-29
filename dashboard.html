@@ -59,8 +59,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}}
 
 /* ===== Sidebar (PC/Tablet) ===== */
@@ -82,9 +80,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
   .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
@@ -94,7 +92,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 }
-T0px}
+@media(min-width:1025px){
+  .sidebar{width:240px}
 }
 
 
@@ -165,14 +164,13 @@ T0px}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(max-width:767px){.topbar-right .lang-btn{display:none}}
-@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
 <div class="app">
 
   <!-- ===== PC/Tablet Sidebar ===== -->
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
         <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
@@ -203,19 +201,22 @@ T0px}
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
+        <span class="snav-icon">📋</span>
+        <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
+        <span class="snav-icon">📊</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
+        <span class="snav-icon">📥</span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item" onclick="location.href='admin.html'">
-        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
+        <span class="snav-icon">🔧</span>
+        <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
@@ -237,7 +238,8 @@ T0px}
         <span class="snav-icon">🚪</span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
-    </div></aside>
+    </div>
+  </aside>
 
   <!-- ===== Main Column ===== -->
   <div class="main-column">
@@ -423,13 +425,13 @@ async function sbFetch(path){
 let currentLang=localStorage.getItem('traq_lang')||'ja';
 const I18N={
   ja:{page_title:'ダッシュボード',nav_list:'一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード',nav_master:'マスタ',master_denied_title:'アクセス制限',master_denied:'マスタはSL・管理者のみ利用できます',nav_settings:'設定',nav_theme:'テーマ切替',nav_logout:'ログアウト',p7:'直近7日',p30:'直近30日',p90:'直近90日',p_all:'全期間',t_all:'すべて',t_eq:'設備',t_md:'金型',kpi_total:'総件数',kpi_eq:'設備',kpi_md:'金型',kpi_stop:'停止時間(分)',chart1_title:'日別件数推移',chart2_title:'停止時間合計推移（分）',chart3_title:'初発・再発比率',chart4_title:'設備 分類別件数',chart5_title:'金型 異常内容別件数',chart6_title:'再発率（設備 / 金型）',chart7_title:'機番別件数ランキング（上位10）',chart8_title:'品番別件数ランキング（上位10）',first:'初発',rec:'再発',no_data:'データなし'},
-  vi:{page_title:'Thống kê',nav_list:'Danh sách',nav_excel:'Tải Excel',nav_dashboard:'Dashboard',nav_master:'Master',master_denied_title:'Hạn chế truy cập',master_denied:'Chỉ SL và Admin mới dùng được Master',nav_settings:'Cài đặt',nav_theme:'Giao diện',nav_logout:'Đăng xuất',p7:'7 ngày',p30:'30 ngày',p90:'90 ngày',p_all:'Tất cả',t_all:'Tất cả',t_eq:'Thiết bị',t_md:'Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Tỷ lệ tái phát',chart7_title:'Top 10 máy',chart8_title:'Top 10 sản phẩm',first:'Lần đầu',rec:'Tái phát',no_data:'Không có dữ liệu'},
-  en:{page_title:'Dashboard',nav_list:'List',nav_excel:'Excel Download',nav_dashboard:'Dashboard',nav_master:'Master',master_denied_title:'Access restricted',master_denied:'Master is for SL and Admin only',nav_settings:'Settings',nav_theme:'Theme',nav_logout:'Logout',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',first:'First',rec:'Recurrence',no_data:'No data'}
+  vi:{page_title:'Thống kê',nav_list:'Danh sách',nav_dashboard:'Dashboard',nav_master:'Master',master_denied_title:'Hạn chế truy cập',master_denied:'Chỉ SL và Admin mới dùng được Master',nav_settings:'Cài đặt',p7:'7 ngày',p30:'30 ngày',p90:'90 ngày',p_all:'Tất cả',t_all:'Tất cả',t_eq:'Thiết bị',t_md:'Khuôn',kpi_total:'Tổng',kpi_eq:'Thiết bị',kpi_md:'Khuôn',kpi_stop:'Tổng dừng(p)',chart1_title:'Số sự cố theo ngày',chart2_title:'Thời gian dừng (phút)',chart3_title:'Lần đầu / Tái phát',chart4_title:'Thiết bị theo loại',chart5_title:'Khuôn theo loại',chart6_title:'Tỷ lệ tái phát',chart7_title:'Top 10 máy',chart8_title:'Top 10 sản phẩm',first:'Lần đầu',rec:'Tái phát',no_data:'Không có dữ liệu'},
+  en:{page_title:'Dashboard',nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master',master_denied_title:'Access restricted',master_denied:'Master is for SL and Admin only',nav_settings:'Settings',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',first:'First',rec:'Recurrence',no_data:'No data'}
 };
 function t(k){return(I18N[currentLang]||I18N.ja)[k]||(I18N.ja[k]||k)}
 function setLang(l){
   currentLang=l;localStorage.setItem('traq_lang',l);
-  ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});
+  ['ja','vi','en'].forEach(x=>{var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});
   applyI18n();
 }
 function applyI18n(){

@@ -78,8 +78,13 @@ html, body {
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* Lang btns */
-.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
-  .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.lang-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: 5px; padding: 3px 6px;
+  font-family: inherit; font-size: 11px; font-weight: 500;
+  color: var(--text2); cursor: pointer; transition: all .15s;
+}
+.lang-btn.active, .lang-btn:hover { border-color: var(--orange); color: var(--orange); }
 
 /* ===== Scroll area ===== */
 .scroll-area {
@@ -157,7 +162,7 @@ html, body {
 .draft-banner {
   background: rgba(239,159,39,.08);
   border: 1px solid rgba(239,159,39,.25);
-  border-radius: var(--radius);
+  border-radius: 8px;
   padding: 10px 14px;
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 16px;
@@ -274,7 +279,7 @@ html, body {
 }
 .da-btn {
   flex: 1; height: 36px;
-  border-radius: var(--radius);
+  border-radius: 8px;
   font-family: inherit; font-size: 12px; font-weight: 700;
   cursor: pointer; transition: all .12s; border: none;
   display: flex; align-items: center; justify-content: center; gap: 4px;
@@ -307,8 +312,6 @@ html, body {
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
 .nav-item.active{color:var(--orange)}
 .nav-item:hover:not(.active){color:var(--text1)}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
 /* ===== PC sidebar layout ===== */
@@ -378,7 +381,8 @@ html, body {
   .scroll-area { padding-bottom: 24px; }
 }
 
-T0px; }
+@media (min-width: 1025px) {
+  .sidebar { width: 240px; }
   .action-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -418,7 +422,7 @@ T0px; }
 .modal-close-btn {
   width: 100%; height: 48px;
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--radius); font-family: inherit;
+  border-radius: 8px; font-family: inherit;
   font-size: 14px; font-weight: 500; color: var(--text2);
   cursor: pointer; margin-top: 12px; transition: all .15s;
 }
@@ -449,14 +453,14 @@ T0px; }
 .btn-danger {
   flex: 1; height: 48px;
   background: var(--danger); border: none;
-  border-radius: var(--radius); color: #fff;
+  border-radius: 8px; color: #fff;
   font-family: inherit; font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all .15s;
 }
 .btn-cancel {
   flex: 1; height: 48px;
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--radius); color: var(--text1);
+  border-radius: 8px; color: var(--text1);
   font-family: inherit; font-size: 14px; font-weight: 500;
   cursor: pointer; transition: all .15s;
 }
@@ -479,7 +483,6 @@ T0px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
@@ -487,7 +490,7 @@ T0px; }
 <div class="app" id="app">
 
   <!-- ===== Sidebar (PC) ===== -->
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
         <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
@@ -518,9 +521,8 @@ T0px; }
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    </div>
     <nav class="sidebar-nav">
-      <button class="snav-item active" onclick="setTab('home')">
+      <button class="snav-item active" onclick="void(0)">
         <span class="snav-icon">📋</span>
         <span data-i18n="nav_list">一覧</span>
       </button>

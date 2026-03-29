@@ -58,8 +58,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-.nav-icon{font-size:18px;line-height:1}
-.nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}}
 
 /* ===== Sidebar (PC/Tablet) ===== */
@@ -77,15 +75,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .sidebar-name{font-size:13px;font-weight:700}
   .sidebar-role{font-size:11px;color:var(--text2)}
   .sidebar-nav{flex:1;padding:12px 8px}
-.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+  .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
   .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
   .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
   .scroll-area{padding-bottom:24px}
@@ -96,7 +94,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 }
-T0px}
+@media(min-width:1025px){
+  .sidebar{width:240px}
 }
 
 /* Master actions bar */
@@ -206,14 +205,13 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
 <div class="app">
 
   <!-- ===== PC/Tablet Sidebar ===== -->
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
         <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
@@ -244,19 +242,22 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
+        <span class="snav-icon">📋</span>
+        <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
+        <span class="snav-icon">📊</span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
+        <span class="snav-icon">📥</span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
+        <span class="snav-icon">🔧</span>
+        <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
@@ -278,7 +279,8 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <span class="snav-icon">🚪</span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
-    </div></aside>
+    </div>
+  </aside>
 
   <!-- ===== Main Column ===== -->
   <div class="main-column">
@@ -469,7 +471,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
         </div>
         <div style="font-size:12px;color:var(--text2);margin-top:4px" id="storageDetail"></div>
         <div id="orphanCleanup" style="display:none;margin-top:10px">
-          <button class="btn" style="font-size:12px;padding:6px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:var(--radius);cursor:pointer;font-family:inherit;font-weight:600" onclick="cleanOrphanFiles()" id="orphanBtn" data-i18n="storage_clean_orphan">🧹 孤立ファイルを削除</button>
+          <button class="btn" style="font-size:12px;padding:6px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600" onclick="cleanOrphanFiles()" id="orphanBtn" data-i18n="storage_clean_orphan">🧹 孤立ファイルを削除</button>
           <span style="font-size:11px;color:var(--text2);margin-left:8px" id="orphanHint" data-i18n="storage_orphan_hint">DBに紐づかないStorageファイルを削除</span>
         </div>
       </div>
@@ -527,7 +529,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-    <button class="nav-item" onclick="goHome()">
+    <button class="nav-item" onclick="location.href='home_sl.html'">
       <span class="nav-icon">📋</span>
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
@@ -537,7 +539,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     </button>
     <button class="nav-item active" onclick="void(0)">
       <span class="nav-icon">🔧</span>
-      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+      <span class="nav-label" data-i18n="nav_master_short">マスタ</span>
     </button>
   </nav>
   </div><!-- /.main-column -->
@@ -753,7 +755,7 @@ imp_err_invalid_role:'ロールが不正です',
 imp_err_invalid_type:'種別が不正です'
 },
 vi:{
-nav_list:'Danh sách',nav_excel:'Tải Excel',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
+nav_list:'Danh sách',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
 nav_theme:'Đổi giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
 title_reload:'Tải lại',title_theme:'Đổi giao diện',title_settings:'Cài đặt',
 tab_users:'👥 Người dùng',tab_machines:'⚙️ Máy',tab_products:'📦 Sản phẩm',tab_categories:'🏷️ Phân loại',tab_storage:'💾 Lưu trữ',
@@ -877,7 +879,7 @@ imp_err_invalid_role:'Vai trò không hợp lệ',
 imp_err_invalid_type:'Loại không hợp lệ'
 },
 en:{
-nav_list:'List',nav_excel:'Excel Download',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
+nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
 nav_theme:'Toggle Theme',nav_settings:'Settings',nav_logout:'Logout',
 title_reload:'Reload',title_theme:'Toggle Theme',title_settings:'Settings',
 tab_users:'👥 Users',tab_machines:'⚙️ Machines',tab_products:'📦 Products',tab_categories:'🏷️ Categories',tab_storage:'💾 Storage',
@@ -2267,10 +2269,10 @@ function toggleTheme(){
 
 /* ===== Logout ===== */
 function goHome(){
-  try{var s=JSON.parse(localStorage.getItem('traq_session')||'{}');var r=s.role||'';if(r==='leader'||r==='admin')location.href='home_sl.html';else location.href='home.html';}
+  try{var s=JSON.parse(localStorage.getItem('traq_session')||'{}');var r=s.role||'';
+    if(r==='leader'||r==='admin')location.href='home_sl.html';else location.href='home.html';}
   catch(e){location.href='home.html';}
 }
-function goMaster(){void(0);}
 function doLogout(){
   localStorage.removeItem('traq_session');
   location.href='index.html';
