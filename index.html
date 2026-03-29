@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* ===== CSS Variables ===== */
 :root{
   --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
   --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
@@ -25,247 +26,204 @@
 [data-theme="light"]{
   --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
   --text1:#1a1f2e;--text2:#666666;
-  --border:rgba(0,0,0,0.18);--shadow:0 4px 24px rgba(0,0,0,0.12);
+  --border:rgba(0,0,0,0.12);--shadow:0 4px 24px rgba(0,0,0,0.1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .app{min-height:100%;display:flex;flex-direction:column}
 
+/* ===== Progress bar (top 3-segment) ===== */
+.progress-bar{display:flex;height:3px;flex-shrink:0}
+.progress-bar span{flex:1;transition:background .3s}
+.pb-done{background:var(--success)}
+.pb-active{background:var(--orange)}
+.pb-pending{background:var(--border)}
+
 /* ===== Topbar ===== */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;
-  background:#080d18;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-shrink:0;
-}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-text{font-size:15px;font-weight:700;color:var(--orange)}
-.topbar-right{display:flex;align-items:center;gap:6px}
-.lang-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:3px 7px;font-family:inherit;font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s}
-.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-.icon-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:rgba(255,255,255,0.5);transition:all .15s}
-.icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:8px}
+.theme-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;transition:border-color .2s}
+.theme-btn:hover{border-color:var(--orange)}
+.topbar-right{display:flex;align-items:center;gap:4px}
+.lang-btn{padding:3px 7px;border-radius:4px;font-size:10px;font-weight:500;color:var(--text2);border:1px solid var(--border);transition:all .15s}
+.lang-btn.active{color:var(--orange);border-color:rgba(239,159,39,.4);background:rgba(239,159,39,.06)}
+.lang-btn:hover{border-color:rgba(239,159,39,.3)}
 
 /* ===== Main ===== */
-.main{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 16px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:400px;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.card-title{font-size:17px;font-weight:700;margin-bottom:6px}
-.card-hint{font-size:12px;color:var(--text2);margin-bottom:18px}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.logo-area{text-align:center;margin-bottom:6px}
+.sub-logo{color:var(--text2);font-size:9.5px;letter-spacing:.14em;margin:0 0 18px;opacity:.5}
 
-/* ===== Step indicator ===== */
-.steps{display:flex;align-items:center;gap:0;margin-bottom:22px}
-.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
-.step-dot.active{border-color:var(--orange);background:var(--orange);color:var(--navy)}
-.step-dot.done{border-color:var(--success);background:var(--success);color:#fff}
-.step-line{flex:1;height:2px;background:var(--border);margin:0 4px;transition:background .2s}
-.step-line.done{background:var(--success)}
+/* ===== Card ===== */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px 20px;width:100%;max-width:380px;box-shadow:var(--shadow);animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card-title{font-size:16px;font-weight:700;text-align:center;margin:0 0 6px}
+.card-hint{font-size:12px;color:var(--text2);margin-bottom:14px;text-align:center}
+
+/* ===== Stepper ===== */
+.steps{display:flex;justify-content:center;align-items:center;gap:0;margin-bottom:16px}
+.step-item{text-align:center}
+.step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin:0 auto 2px;transition:all .2s;border:1.5px solid var(--border);color:var(--text2);background:transparent}
+.step-dot.active{background:var(--orange);color:var(--navy);border-color:var(--orange)}
+.step-dot.done{background:rgba(16,185,129,.15);border-color:var(--success);color:var(--success);font-size:11px}
+.step-label{font-size:9px;color:var(--text2)}
+.step-label.active{color:var(--orange)}
+.step-label.done{color:var(--success)}
+.step-line{width:28px;height:1.5px;margin:0 4px;margin-bottom:14px;transition:background .2s}
+.step-line.done{background:rgba(16,185,129,.4)}
+.step-line.pending{background:var(--border)}
 
 /* ===== Shift buttons ===== */
-.shift-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
-.shift-btn{
-  background:var(--bg3);border:2px solid var(--border);
-  border-radius:var(--radius);padding:16px 8px;
-  cursor:pointer;font-family:inherit;transition:all .15s;
-  text-align:center;
-}
-.shift-btn:hover{border-color:var(--orange)}
-.shift-btn.active{border-color:var(--orange);background:rgba(239,159,39,0.1)}
-.shift-num{font-size:22px;font-weight:700;color:var(--orange);display:block;line-height:1;margin-bottom:4px}
-.shift-name{font-size:13px;font-weight:700;color:var(--text1);display:block;margin-bottom:3px}
-.shift-time{font-size:10px;color:var(--text2);display:block}
+.shift-grid{display:flex;gap:8px;margin-bottom:8px}
+.shift-btn{flex:1;border-radius:10px;padding:14px 0;text-align:center;border:1.5px solid;transition:transform .1s,box-shadow .2s;cursor:pointer;font-family:inherit}
+.shift-btn:active{transform:scale(.96)}
+.shift-btn.s1{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:#f59e0b}
+.shift-btn.s2{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.25);color:#10b981}
+.shift-btn.s3{background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.25);color:#8b5cf6}
+.shift-btn.s1:hover{border-color:#f59e0b;box-shadow:0 0 12px rgba(245,158,11,.15)}
+.shift-btn.s2:hover{border-color:#10b981;box-shadow:0 0 12px rgba(16,185,129,.15)}
+.shift-btn.s3:hover{border-color:#8b5cf6;box-shadow:0 0 12px rgba(139,92,246,.15)}
+.shift-num{font-size:22px;font-weight:700;display:block;line-height:1;margin-bottom:2px}
+.shift-time{font-size:10px;display:block;opacity:.6}
 
-/* ===== User grid ===== */
-.user-search{
-  width:100%;padding:10px 12px;
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--radius);
-  font-family:inherit;font-size:14px;color:var(--text1);
-  outline:none;margin-bottom:12px;
-  transition:border-color .15s;
-}
+/* ===== User list ===== */
+.user-search{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);outline:none;margin-bottom:10px;transition:border-color .15s}
 .user-search:focus{border-color:var(--orange)}
-.user-search::placeholder{color:var(--text2)}
-.user-grid{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.user-search::placeholder{color:var(--text2);opacity:.5}
+.user-grid{display:flex;flex-direction:column;gap:5px;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .user-grid::-webkit-scrollbar{width:4px}
 .user-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.user-btn{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 12px;background:var(--bg3);
-  border:1px solid var(--border);border-radius:var(--radius);
-  cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;
-  width:100%;
-}
-.user-btn:hover{border-color:var(--orange);background:rgba(239,159,39,0.06)}
-.user-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--orange);color:var(--navy);
-  font-size:14px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.user-avatar.sl{background:var(--warning)}
-.user-avatar.adm{background:var(--danger)}
-.user-name{font-size:14px;font-weight:600;color:var(--text1)}
-.user-role{font-size:11px;color:var(--text2);margin-top:1px}
-.user-role.sl{color:var(--warning)}
+.user-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;width:100%}
+.user-btn:hover{background:rgba(239,159,39,.04);border-color:rgba(239,159,39,.12)}
+.user-btn:active{transform:scale(.98)}
+.user-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.user-avatar.sl{background:rgba(239,159,39,.12);color:var(--orange);border-color:rgba(239,159,39,.25)}
+.user-avatar.adm{background:rgba(239,68,68,.1);color:var(--danger);border-color:rgba(239,68,68,.2)}
+.user-name{font-size:12.5px;font-weight:500;color:var(--text1)}
+.user-role{font-size:10px;color:var(--text2);margin-top:1px}
+.user-role.sl{color:var(--orange)}
 .user-role.adm{color:var(--danger)}
 
 /* ===== PIN ===== */
-.pin-user-info{
-  display:flex;align-items:center;gap:12px;
-  padding:12px;background:var(--bg3);
-  border:1px solid var(--border);border-radius:var(--radius);
-  margin-bottom:20px;
-}
-.pin-avatar{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--orange);color:var(--navy);
-  font-size:16px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.pin-avatar.sl{background:var(--warning)}
-.pin-avatar.adm{background:var(--danger)}
-.pin-user-name{font-size:15px;font-weight:700}
-.pin-user-role{font-size:11px;color:var(--text2);margin-top:2px}
-.pin-user-role.sl{color:var(--warning)}
+.pin-user-info{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:16px}
+.pin-avatar{width:34px;height:34px;border-radius:50%;background:rgba(239,159,39,.1);border:1.5px solid rgba(239,159,39,.25);color:var(--orange);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pin-avatar.sl{background:rgba(239,159,39,.12);border-color:rgba(239,159,39,.3)}
+.pin-avatar.adm{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:var(--danger)}
+.pin-user-name{font-size:13px;font-weight:600}
+.pin-user-role{font-size:10px;color:var(--text2);margin-top:2px}
+.pin-user-role.sl{color:var(--orange)}
 .pin-user-role.adm{color:var(--danger)}
-.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:20px}
-.pin-dot{
-  width:18px;height:18px;border-radius:50%;
-  border:2px solid var(--border);background:transparent;
-  transition:all .15s;
-}
-.pin-dot.filled{background:var(--orange);border-color:var(--orange);transform:scale(1.1)}
-.pin-dot.success{background:var(--success);border-color:var(--success)}
-.pin-dot.error{background:var(--danger);border-color:var(--danger);animation:shake .3s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
-.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.key-btn{
-  height:54px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--radius);font-family:inherit;font-size:22px;font-weight:700;
-  color:var(--text1);cursor:pointer;transition:all .1s;
-  display:flex;align-items:center;justify-content:center;
-}
-.key-btn:active{transform:scale(.94);background:var(--bg1)}
+
+/* PIN boxes */
+.pin-dots{display:flex;justify-content:center;gap:10px;margin-bottom:16px}
+.pin-dot{width:38px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;transition:all .15s;border:1.5px solid var(--border)}
+.pin-dot.filled{background:rgba(239,159,39,.1);border-color:rgba(239,159,39,.45);color:var(--orange)}
+.pin-dot.filled::after{content:'\2022'}
+.pin-dot.success{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.45);color:var(--success)}
+.pin-dot.success::after{content:'\2022'}
+.pin-dot.error{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.45);color:var(--danger);animation:shake .3s}
+.pin-dot.error::after{content:'\2022'}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.pin-error{text-align:center;font-size:12px;color:var(--danger);min-height:18px;margin-bottom:6px}
+
+/* Numpad */
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:220px;margin:0 auto 12px}
+.key-btn{background:var(--bg3);border-radius:10px;padding:12px 0;text-align:center;font-size:18px;font-weight:500;color:var(--text1);transition:all .1s;border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-family:inherit;height:auto}
+.key-btn:hover{border-color:var(--border)}
+.key-btn:active{transform:scale(.93);background:rgba(239,159,39,.08)}
 .key-btn:disabled{opacity:.3;pointer-events:none}
-.key-clear{font-size:12px;font-weight:600;color:var(--text2)}
-.pin-error{text-align:center;font-size:13px;color:var(--danger);min-height:20px;margin-bottom:10px}
-.pin-lock{text-align:center;font-size:13px;color:var(--warning);min-height:20px;margin-bottom:10px}
+.key-clear{font-size:11px;font-weight:600;color:var(--text2)}
+.key-del{background:rgba(239,68,68,.06);color:var(--danger);font-size:14px}
+.key-del:active{background:rgba(239,68,68,.12)}
 
 /* ===== Buttons ===== */
-.btn-primary{
-  width:100%;height:52px;
-  background:var(--orange);border:none;border-radius:var(--radius);
-  font-family:inherit;font-size:16px;font-weight:700;color:var(--navy);
-  cursor:pointer;transition:all .15s;
-}
+.btn-primary{width:100%;height:48px;background:var(--orange);border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;color:var(--navy);cursor:pointer;transition:all .15s}
 .btn-primary:hover{background:var(--orange-dark)}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.btn-secondary{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  width:100%;height:44px;margin-top:10px;
-  background:none;border:1px solid var(--border);border-radius:var(--radius);
-  font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);
-  cursor:pointer;transition:all .15s;
-}
-.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-secondary{display:block;text-align:center;width:100%;margin-top:14px;font-family:inherit;font-size:12px;color:var(--text2);cursor:pointer;transition:color .15s;background:none;border:none}
+.btn-secondary:hover{color:var(--orange)}
 
-/* ===== Loading ===== */
-.loading{text-align:center;padding:24px;color:var(--text2);font-size:14px}
-
-/* ===== Toast ===== */
-.toast{
-  position:fixed;top:64px;left:50%;transform:translateX(-50%);
-  border-radius:20px;padding:8px 20px;font-size:13px;font-weight:500;
-  box-shadow:var(--shadow);z-index:400;white-space:nowrap;
-  animation:fadeIn .2s ease;
-}
+/* ===== Loading / Footer / Toast ===== */
+.loading{text-align:center;padding:20px;color:var(--text2);font-size:12px}
+.footer{text-align:center;padding:8px 0;flex-shrink:0}
+.footer span{font-size:9px;color:var(--text2);opacity:.3;letter-spacing:.08em}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:500;z-index:400;white-space:nowrap;transition:transform .3s ease;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
 .toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
 .toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:767px){.topbar-right .lang-btn{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
-
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar">
+    <span id="pbSeg1" class="pb-active"></span>
+    <span id="pbSeg2" class="pb-pending"></span>
+    <span id="pbSeg3" class="pb-pending"></span>
+  </div>
   <!-- Topbar -->
-  <header class="topbar">
-    <div class="logo">
-      <svg width="80" height="26" viewBox="0 0 200 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="#2e3a52"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="#3d4e6e"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="#EF9F27" opacity=".7"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="#2e3a52"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="#2e3a52"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="#2e3a52"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="#3d4e6e"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="#3d4e6e"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="#3d4e6e"/>
-        <circle cx="12" cy="10" r="3.5" fill="#EF9F27" opacity=".9"/>
-        <circle cx="26" cy="14" r="3" fill="#EF9F27" opacity=".8"/>
-        <circle cx="40" cy="17" r="2.5" fill="#EF9F27" opacity=".7"/>
-        <text x="58" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="#EF9F27">Traq</text>
-      </svg>
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
     </div>
     <div class="topbar-right">
       <button class="lang-btn active" onclick="setLang('ja')" id="lang-ja">JP</button>
       <button class="lang-btn" onclick="setLang('vi')" id="lang-vi">VN</button>
       <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
-      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
     </div>
-  </header>
-
-  <!-- Main -->
+  </div>
   <main class="main">
-
+    <!-- Logo -->
+    <div class="logo-area">
+      <svg width="110" height="50" viewBox="0 0 120 55">
+        <rect x="10" y="16" width="12" height="28" rx="2" fill="#EF9F27" opacity=".6"/>
+        <rect x="26" y="7" width="14" height="37" rx="2" fill="#EF9F27" opacity=".85"/>
+        <rect x="44" y="11" width="12" height="33" rx="2" fill="#EF9F27" opacity=".6"/>
+        <circle cx="16" cy="11" r="3.5" fill="#EF9F27" opacity=".3"/>
+        <circle cx="33" cy="2" r="4" fill="#EF9F27" opacity=".22"/>
+        <circle cx="50" cy="7" r="3" fill="#EF9F27" opacity=".28"/>
+        <text x="64" y="38" font-size="24" font-weight="700" fill="#EF9F27" font-family="sans-serif">Traq</text>
+      </svg>
+    </div>
+    <p class="sub-logo">TROUBLETRACK SYSTEM</p>
     <!-- Step 1: シフト選択 -->
     <div class="card" id="step1">
       <div class="steps">
-        <div class="step-dot active" id="sdot1">1</div>
-        <div class="step-line" id="sline1"></div>
-        <div class="step-dot" id="sdot2">2</div>
-        <div class="step-line" id="sline2"></div>
-        <div class="step-dot" id="sdot3">3</div>
+        <div class="step-item"><div class="step-dot active">1</div><div class="step-label active" data-i18n="step_shift">直</div></div>
+        <div class="step-line pending"></div>
+        <div class="step-item"><div class="step-dot">2</div><div class="step-label" data-i18n="step_name">名前</div></div>
+        <div class="step-line pending"></div>
+        <div class="step-item"><div class="step-dot">3</div><div class="step-label" data-i18n="step_pin">PIN</div></div>
       </div>
       <div class="card-title" data-i18n="shift_title">シフトを選択してください</div>
       <div class="card-hint" data-i18n="shift_hint">本日のシフトを選んでください</div>
       <div class="shift-grid">
-        <button class="shift-btn" onclick="selectShift(1)" id="shift1">
+        <button class="shift-btn s1" onclick="selectShift(1)" id="shift1">
           <span class="shift-num">1</span>
-          <span class="shift-name" data-i18n="shift1_name">1直</span>
-          <span class="shift-time">08:00–16:00</span>
+          <span class="shift-time">08–16</span>
         </button>
-        <button class="shift-btn" onclick="selectShift(2)" id="shift2">
+        <button class="shift-btn s2" onclick="selectShift(2)" id="shift2">
           <span class="shift-num">2</span>
-          <span class="shift-name" data-i18n="shift2_name">2直</span>
-          <span class="shift-time">16:00–24:00</span>
+          <span class="shift-time">16–00</span>
         </button>
-        <button class="shift-btn" onclick="selectShift(3)" id="shift3">
+        <button class="shift-btn s3" onclick="selectShift(3)" id="shift3">
           <span class="shift-num">3</span>
-          <span class="shift-name" data-i18n="shift3_name">3直</span>
-          <span class="shift-time">00:00–08:00</span>
+          <span class="shift-time">00–08</span>
         </button>
       </div>
     </div>
-
     <!-- Step 2: ユーザー選択 -->
     <div class="card" id="step2" style="display:none">
       <div class="steps">
-        <div class="step-dot done" id="sdot1b">✓</div>
-        <div class="step-line done" id="sline1b"></div>
-        <div class="step-dot active" id="sdot2b">2</div>
-        <div class="step-line" id="sline2b"></div>
-        <div class="step-dot" id="sdot3b">3</div>
+        <div class="step-item"><div class="step-dot done">✓</div><div class="step-label done" data-i18n="step_shift">直</div></div>
+        <div class="step-line done"></div>
+        <div class="step-item"><div class="step-dot active">2</div><div class="step-label active" data-i18n="step_name">名前</div></div>
+        <div class="step-line pending"></div>
+        <div class="step-item"><div class="step-dot">3</div><div class="step-label" data-i18n="step_pin">PIN</div></div>
       </div>
       <div class="card-title" data-i18n="user_title">ユーザーを選択してください</div>
       <div class="card-hint" id="shiftBadge"></div>
@@ -277,15 +235,14 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
       <button class="btn-secondary" onclick="goStep(1)">← <span data-i18n="back">もどる</span></button>
     </div>
-
     <!-- Step 3: PIN入力 -->
     <div class="card" id="step3" style="display:none">
       <div class="steps">
-        <div class="step-dot done">✓</div>
+        <div class="step-item"><div class="step-dot done">✓</div><div class="step-label done" data-i18n="step_shift">直</div></div>
         <div class="step-line done"></div>
-        <div class="step-dot done">✓</div>
+        <div class="step-item"><div class="step-dot done">✓</div><div class="step-label done" data-i18n="step_name">名前</div></div>
         <div class="step-line done"></div>
-        <div class="step-dot active">3</div>
+        <div class="step-item"><div class="step-dot active">3</div><div class="step-label active" data-i18n="step_pin">PIN</div></div>
       </div>
       <div class="pin-user-info">
         <div class="pin-avatar" id="pinAvatar"></div>
@@ -314,18 +271,16 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <button class="key-btn" onclick="pinKey('9')">9</button>
           <button class="key-btn key-clear" onclick="pinClear()" data-i18n="pin_clear">クリア</button>
           <button class="key-btn" onclick="pinKey('0')">0</button>
-          <button class="key-btn" onclick="pinDel()">⌫</button>
+          <button class="key-btn key-del" onclick="pinDel()">⌫</button>
         </div>
         <button class="btn-primary" id="loginBtn" onclick="doLogin()" disabled data-i18n="login_btn">ログイン</button>
       </div>
       <button class="btn-secondary" onclick="goStep(2)">← <span data-i18n="back">もどる</span></button>
     </div>
-
   </main>
+  <div class="footer"><span>TROUBLETRACK SYSTEM v2.0</span></div>
 </div>
-
-<div id="toastEl" style="display:none"></div>
-
+<div class="toast" id="toastEl"></div>
 <script>
 (function(){
   var saved=localStorage.getItem('traq_theme');
@@ -334,7 +289,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   var icon=document.getElementById('themeBtn');
   if(icon) icon.textContent=(saved||pref)==='dark'?'🌙':'☀️';
 })();
+</script>
 
+<script>
 /* ===== Supabase ===== */
 const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
@@ -361,6 +318,7 @@ const I18N = {
     pin_error:'PINが違います',
     login_ok: name => `${name} でログインしました`,
     load_error:'ユーザー情報の取得に失敗しました',
+    step_shift:'直', step_name:'名前', step_pin:'PIN',
   },
   vi:{
     shift_title:'Chọn ca làm việc', shift_hint:'Vui lòng chọn ca hôm nay',
@@ -373,6 +331,7 @@ const I18N = {
     pin_error:'PIN không đúng',
     login_ok: name => `Đã đăng nhập: ${name}`,
     load_error:'Không thể tải dữ liệu người dùng',
+    step_shift:'Ca', step_name:'Tên', step_pin:'PIN',
   },
   en:{
     shift_title:'Select your shift', shift_hint:'Choose your shift for today',
@@ -385,6 +344,7 @@ const I18N = {
     pin_error:'Incorrect PIN',
     login_ok: name => `Logged in as ${name}`,
     load_error:'Failed to load users',
+    step_shift:'Shift', step_name:'Name', step_pin:'PIN',
   }
 };
 function t(key, ...args) {
@@ -418,7 +378,6 @@ let ALL_USERS = [];
 
 /* ===== Init ===== */
 (function init() {
-  // テーマ・言語を確実に適用
   const savedTheme = localStorage.getItem('traq_theme') ||
     (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', savedTheme);
@@ -432,7 +391,6 @@ let ALL_USERS = [];
   });
   applyI18n();
 
-  // 既にセッションがあればホームへ
   try {
     const s = localStorage.getItem('traq_session');
     if (s) {
@@ -445,7 +403,6 @@ let ALL_USERS = [];
     }
   } catch(e) {}
 
-  // ユーザー一覧をバックグラウンドで事前取得（失敗しても画面は動く）
   loadUsers();
 })();
 
@@ -479,6 +436,17 @@ function goStep(n) {
     const el = document.getElementById('step'+i);
     if (el) el.style.display = i === n ? 'block' : 'none';
   });
+  updateProgressBar(n);
+}
+
+function updateProgressBar(n) {
+  for (let i = 1; i <= 3; i++) {
+    const seg = document.getElementById('pbSeg' + i);
+    if (!seg) continue;
+    if (i < n) seg.className = 'pb-done';
+    else if (i === n) seg.className = 'pb-active';
+    else seg.className = 'pb-pending';
+  }
 }
 
 /* ===== Step 1: Shift ===== */
@@ -490,7 +458,6 @@ async function selectShift(s) {
   const sb = document.getElementById('shiftBadge');
   if (sb) sb.textContent = t('shift_badge', s);
 
-  // ユーザーがまだ取得できていなければ再取得
   if (ALL_USERS.length === 0) {
     const grid = document.getElementById('userGrid');
     if (grid) grid.innerHTML = '<div class="loading">読み込み中...</div>';
@@ -586,7 +553,6 @@ function clearError() {
   document.getElementById('pinErrorEl').textContent = '';
 }
 
-
 /* ===== Login ===== */
 async function doLogin() {
   const u = state.selectedUser;
@@ -595,13 +561,11 @@ async function doLogin() {
   btn.disabled = true;
   clearError();
   try {
-    // Supabase からPINを取得して照合
     const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,shift,pin');
     if (!rows || rows.length === 0) throw new Error('user not found');
     const dbUser = rows[0];
 
     if (state.pinInput !== dbUser.pin) {
-      // 失敗
       updatePinDots('error');
       document.getElementById('pinErrorEl').textContent = t('pin_error');
       setTimeout(() => {
@@ -613,11 +577,9 @@ async function doLogin() {
       return;
     }
 
-    // 成功
     updatePinDots('success');
 
-    // セッション保存
-    const role = dbUser.role; // worker/leader/admin
+    const role = dbUser.role;
     localStorage.setItem('traq_session', JSON.stringify({
       userId: dbUser.id,
       name: dbUser.name,
@@ -644,18 +606,13 @@ function redirectByRole(role) {
 let toastTimer = null;
 function showToast(msg, type='info') {
   const el = document.getElementById('toastEl');
-  el.innerHTML = `<div class="toast ${type}">${msg}</div>`;
-  el.style.display = 'block';
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  requestAnimationFrame(() => { el.classList.add('show'); });
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
+  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2500);
 }
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW登録失敗:', e));
-  });
-}
-</script>
+<script src="./update_banner.js"></script>
 </body>
 </html>
