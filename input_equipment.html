@@ -57,7 +57,42 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .nav-item:hover:not(.active){color:var(--text)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-@media(min-width:768px){.bottom-nav{display:none}}
+
+
+
+/* ===== App layout ===== */
+.app{height:100%;display:flex;flex-direction:column}
+.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.sidebar{display:none}
+
+/* ===== PC sidebar ===== */
+@media(min-width:768px){
+  .app{flex-direction:row}
+  .bottom-nav{display:none}
+  .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
+  .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
+  .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .sidebar-avatar{width:36px;height:36px;border-radius:50%;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-name{font-size:13px;font-weight:700}
+  .sidebar-role{font-size:11px;color:var(--muted)}
+  .sidebar-nav{flex:1;padding:12px 8px}
+  .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+  .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+  .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+  [data-theme="light"] .role-admin .sidebar-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+  [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+  [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+  .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+  .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item:hover{background:var(--surface2);color:var(--text)}
+  .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
+  .snav-icon{font-size:18px;width:24px;text-align:center}
+  .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+  .topbar{display:none}
+  .main-column .main{max-width:700px}
+}
+@media(min-width:1025px){.sidebar{width:240px}}
 
 /* ===== Main ===== */
 .main{flex:1;padding:16px;max-width:600px;margin:0 auto;width:100%}
@@ -152,7 +187,70 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </style>
 </head>
 <body>
-
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
+        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
+        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
+        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
+        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
+        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
+        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
+        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
+        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
+        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
+        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
+        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
+        <text x="62" y="44" fill="var(--orange)" font-family="'Noto Sans JP',sans-serif" font-size="32" font-weight="800" letter-spacing="-1">Traq</text>
+      </svg>
+    </div>
+    <div class="sidebar-user" id="sb-user-wrap">
+      <div class="sidebar-avatar" id="sb-avatar"></div>
+      <div>
+        <div class="sidebar-name" id="sb-name"></div>
+        <div class="sidebar-role" id="sb-role"></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="snav-item" onclick="goHome()">
+        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
+      </button>
+      <button class="snav-item" onclick="location.href='dashboard.html'">
+        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
+      </button>
+      <button class="snav-item" onclick="location.href='excel_download.html'">
+        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
+      </button>
+      <button class="snav-item" onclick="location.href='admin.html'">
+        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="snav-item" onclick="toggleTheme()">
+        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span data-i18n="nav_theme">テーマ切替</span>
+      </button>
+      <button class="snav-item" style="gap:6px">
+        <span class="snav-icon">🌐</span>
+        <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
+      </button>
+      <button class="snav-item" onclick="location.href='settings.html'">
+        <span class="snav-icon">⚙️</span>
+        <span data-i18n="nav_settings">設定</span>
+      </button>
+      <button class="snav-item" onclick="doLogout()" style="color:var(--error)">
+        <span class="snav-icon">🚪</span>
+        <span data-i18n="nav_logout">ログアウト</span>
+      </button>
+    </div>
+  </aside>
+  <div class="main-column">
 <header class="topbar">
   <div class="topbar-left">
     <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
@@ -305,10 +403,21 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label" data-i18n="nav_list">一覧</span></button>
-  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span></button>
-  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label" data-i18n="nav_master">マスタ</span></button>
-</nav>
+    <button class="nav-item" onclick="goHome()">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
+    </button>
+    <button class="nav-item" onclick="location.href='dashboard.html'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
+    </button>
+    <button class="nav-item" onclick="goMaster()">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+    </button>
+  </nav>
+  </div><!-- /.main-column -->
+</div><!-- /.app -->
 
 <div class="overlay hidden" id="overlay"><div class="spinner"></div><div class="overlay-text" id="overlay-text">送信中...</div></div>
 <div class="toast hidden" id="toast"></div>
@@ -340,7 +449,7 @@ var I18N = {
     photo_sub:'カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮',
     ph_detail:'トラブルの内容を入力してください',
     btn_submit:'送信する', btn_resubmit:'修正して再送信',
-    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
+    nav_list:'一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード',nav_master:'マスタ',nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
     draft_unsaved:'下書き未保存',
     draft_saved:function(t){return '下書き保存済み（'+t+'）';},
     draft_load:'下書きを読込',
@@ -389,7 +498,7 @@ var I18N = {
     photo_sub:'Chụp / Chọn ảnh — Tự nén nếu >200KB',
     ph_detail:'Nhập nội dung sự cố',
     btn_submit:'Gửi', btn_resubmit:'Sửa và gửi lại',
-    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master',
+    nav_list:'Danh sách',nav_excel:'Tải Excel',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
     draft_unsaved:'Chưa lưu nháp',
     draft_saved:function(t){return 'Đã lưu nháp ('+t+')';},
     draft_load:'Tải bản nháp',
@@ -438,7 +547,7 @@ var I18N = {
     photo_sub:'Camera / Gallery — Auto-compress if >200KB',
     ph_detail:'Describe the trouble',
     btn_submit:'Submit', btn_resubmit:'Fix & Resubmit',
-    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master',
+    nav_list:'List',nav_excel:'Excel Download',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout',
     draft_unsaved:'Draft not saved',
     draft_saved:function(t){return 'Draft saved ('+t+')';},
     draft_load:'Load draft',
@@ -471,6 +580,11 @@ function t(k) {
   var v = I18N[currentLang] && I18N[currentLang][k];
   if (v === undefined) v = I18N.ja[k];
   return v !== undefined ? v : k;
+}
+function setLang(l){
+  currentLang=l;localStorage.setItem('traq_lang',l);
+  ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});
+  applyI18n();
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -521,6 +635,28 @@ function initChip(){
   var tb=document.querySelector('.topbar');
   if(tb){tb.classList.remove('role-op','role-sl','role-admin');tb.classList.add(classMap[role]||'role-op');}
   var av=document.getElementById('mob-avatar');if(av) av.textContent=name?name.charAt(0):'?';
+  // PC sidebar
+  var sbWrap=document.getElementById('sb-user-wrap');
+  if(sbWrap){sbWrap.className='sidebar-user '+(classMap[role]||'role-op');}
+  var sbAv=document.getElementById('sb-avatar');
+  if(sbAv)sbAv.textContent=name?name.charAt(0):'?';
+  var sbNm=document.getElementById('sb-name');
+  if(sbNm)sbNm.textContent=name||'';
+  var sbRl=document.getElementById('sb-role');
+  if(sbRl){
+    var rlbl={admin:'Admin',leader:'SL',sl:'SL',op:'OP',worker:'OP'};
+    var slbl={'1':'1直','2':'2直','3':'3直'};
+    sbRl.textContent=(rlbl[role]||'OP')+' / '+(slbl[s.default_shift]||'');
+  }
+  var sbThIcon=document.getElementById('sb-theme-icon');
+  if(sbThIcon)sbThIcon.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'🌙':'☀️';
+  // sidebar lang buttons
+  var cl=localStorage.getItem('traq_lang')||'ja';
+  ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===cl);});
+}
+function doLogout(){
+  localStorage.removeItem('traq_session');
+  location.href='index.html';
 }
 function goHome(){
   try{var r=session?session.role:'';if(r==='leader'||r==='admin') location.href='home_sl.html';else location.href='home.html';}
@@ -801,7 +937,7 @@ function showOverlay(t){document.getElementById('overlay-text').textContent=t;do
 function hideOverlay(){document.getElementById('overlay').classList.add('hidden');}
 var toastTimer=null;
 function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3000);}
-function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';}
+function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';var sti=document.getElementById('sb-theme-icon');if(sti)sti.textContent=next==='dark'?'🌙':'☀️';}
 
 /* ── Edit mode (rejected resubmit) ── */
 var editTroubleId = null;

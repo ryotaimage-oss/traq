@@ -57,6 +57,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   .sidebar-name { font-size: 13px; font-weight: 700; }
   .sidebar-role { font-size: 11px; color: var(--muted); }
   .sidebar-nav { flex: 1; padding: 12px 8px; }
+.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
   .snav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all .15s; font-size: 13px; font-weight: 500; color: var(--muted); border: none; background: none; font-family: inherit; width: 100%; text-align: left; }
   .snav-item:hover { background: var(--surface2); color: var(--text); }
   .snav-item.active { background: rgba(239,159,39,.12); color: var(--orange); font-weight: 700; }
@@ -214,30 +216,38 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span data-i18n="sb_list">一覧</span>
+        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span data-i18n="sb_dashboard">ダッシュボード</span>
+        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">📥</span><span data-i18n="sb_excel">Excel出力</span>
+        <span class="snav-icon">📥</span><span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
-      <button class="snav-item" onclick="goMaster()">
-        <span class="snav-icon">🔧</span><span data-i18n="sb_master">マスタ管理</span>
+      <button class="snav-item" onclick="location.href='admin.html'">
+        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span><span data-i18n="sb_theme">テーマ切替</span>
+        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span data-i18n="nav_theme">テーマ切替</span>
+      </button>
+      <button class="snav-item" style="gap:6px">
+        <span class="snav-icon">🌐</span>
+        <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon">⚙️</span><span data-i18n="sb_settings">設定</span>
+        <span class="snav-icon">⚙️</span>
+        <span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--error)">
-        <span class="snav-icon">🚪</span><span data-i18n="sb_logout">ログアウト</span>
+        <span class="snav-icon">🚪</span>
+        <span data-i18n="nav_logout">ログアウト</span>
       </button>
-    </div>
-  </aside>
+    </div></aside>
 
   <!-- ===== Main Column ===== -->
   <div class="main-column">
@@ -366,7 +376,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-    <button class="nav-item" onclick="location.href='home_sl.html'">
+    <button class="nav-item" onclick="goHome()">
       <span class="nav-icon">📋</span>
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
@@ -419,7 +429,7 @@ var I18N = {
     img_desc:'対象期間のトラブルに添付された画像をZIPファイルとしてダウンロードします。',
     img_desc2:'容量削減前のバックアップに利用できます。',
     btn_excel:'Excelダウンロード', btn_img_zip:'📷 画像ZIPダウンロード',
-    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
+    nav_list:'一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード',nav_master:'マスタ',nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
     sb_list:'一覧', sb_dashboard:'ダッシュボード', sb_excel:'Excel出力', sb_master:'マスタ管理',
     sb_theme:'テーマ切替', sb_settings:'設定', sb_logout:'ログアウト',
     hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
@@ -464,7 +474,7 @@ var I18N = {
     img_desc:'Tải ảnh đính kèm trong khoảng thời gian dưới dạng ZIP.',
     img_desc2:'Dùng để sao lưu trước khi xoá dữ liệu.',
     btn_excel:'Tải Excel', btn_img_zip:'📷 Tải ZIP ảnh',
-    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master',
+    nav_list:'Danh sách',nav_excel:'Tải Excel',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
     sb_list:'Danh sách', sb_dashboard:'Dashboard', sb_excel:'Xuất Excel', sb_master:'Quản lý Master',
     sb_theme:'Đổi giao diện', sb_settings:'Cài đặt', sb_logout:'Đăng xuất',
     hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
@@ -509,7 +519,7 @@ var I18N = {
     img_desc:'Download attached images for the selected period as a ZIP file.',
     img_desc2:'Useful for backup before clearing storage.',
     btn_excel:'Download Excel', btn_img_zip:'📷 Download Image ZIP',
-    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master',
+    nav_list:'List',nav_excel:'Excel Download',nav_dashboard:'Dashboard',nav_master:'Master',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout',
     sb_list:'List', sb_dashboard:'Dashboard', sb_excel:'Excel Export', sb_master:'Master',
     sb_theme:'Toggle theme', sb_settings:'Settings', sb_logout:'Logout',
     hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
@@ -616,6 +626,11 @@ function initChip(){
   // PC sidebar
   var sbWrap=document.getElementById('sb-user-wrap');
   if(sbWrap){sbWrap.className='sidebar-user '+(classMap[role]||'role-op');}
+  var sbThIcon=document.getElementById('sb-theme-icon');
+  if(sbThIcon)sbThIcon.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'🌙':'☀️';
+  // sidebar lang buttons
+  var cl=localStorage.getItem('traq_lang')||'ja';
+  ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===cl);});
   var sbAv=document.getElementById('sb-avatar');if(sbAv) sbAv.textContent=initial;
   var sbName=document.getElementById('sb-name');if(sbName) sbName.textContent=name;
   var sbRole=document.getElementById('sb-role');if(sbRole) sbRole.textContent=roleLabels[role]||role;
@@ -626,6 +641,11 @@ function goHome(){
     if(r==='leader'||r==='admin') location.href='home_sl.html';
     else location.href='home.html';
   }catch(e){location.href='home.html';}
+}
+function setLang(l){
+  currentLang=l;localStorage.setItem('traq_lang',l);
+  ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});
+  applyI18n();
 }
 function toggleTheme(){
   var h=document.documentElement;
