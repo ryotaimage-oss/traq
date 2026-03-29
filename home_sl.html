@@ -221,6 +221,23 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
+/* Select mode */
+.select-toggle{display:none;padding:4px 10px;border:1px solid rgba(239,159,39,0.3);border-radius:6px;background:none;font-family:inherit;font-size:11px;font-weight:600;color:var(--orange);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.select-toggle:hover{background:rgba(239,159,39,.08)}
+.select-toggle.done{color:var(--text2);border-color:var(--border)}
+.tcard.selectable{cursor:pointer}
+.tcard.selected{border-color:var(--danger)!important;border-width:1.5px}
+.tcard-checkbox{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.tcard-checkbox.checked{background:var(--danger);border-color:var(--danger)}
+.tcard-checkbox svg{display:none}
+.tcard-checkbox.checked svg{display:block}
+.delete-bar{position:fixed;left:0;right:0;z-index:100;background:rgba(239,68,68,.95);display:none;align-items:center;justify-content:space-between;padding:10px 16px;backdrop-filter:blur(8px);box-shadow:0 -2px 12px rgba(0,0,0,.25)}
+.delete-bar.visible{display:flex}
+.delete-bar-count{color:#fff;font-size:13px;font-weight:600}
+.delete-bar-actions{display:flex;gap:8px}
+.delete-bar .db-cancel{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.delete-bar .db-delete{background:#fff;color:var(--danger);border:none;border-radius:6px;padding:8px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -286,6 +303,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </button>
     </nav>
     <div class="sidebar-bottom">
+      <button class="snav-item" id="sbSelectBtn" onclick="toggleSelectMode()">
+        <span class="snav-icon">☑️</span>
+        <span data-i18n="btn_select">選択削除</span>
+      </button>
       <button class="snav-item" onclick="toggleTheme()">
         <span class="snav-icon" id="sb-theme-icon">🌙</span>
         <span data-i18n="nav_theme">テーマ切替</span>
@@ -334,6 +355,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <span class="topbar-sub">Trouble Tracking System</span>
       </div>
       <div class="topbar-right">
+        <button class="select-toggle" id="selectToggleBtn" onclick="toggleSelectMode()">選択</button>
         <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
         <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
         <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
@@ -385,6 +407,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <!-- List -->
       <div class="trouble-list" id="troubleList"></div>
 
+    </div>
+  </div>
+
+  <!-- Delete bar (select mode) -->
+  <div class="delete-bar" id="deleteBar">
+    <span class="delete-bar-count" id="deleteBarCount">0件選択中</span>
+    <div class="delete-bar-actions">
+      <button class="db-cancel" onclick="exitSelectMode()">キャンセル</button>
+      <button class="db-delete" onclick="deleteSelected()">削除</button>
     </div>
   </div>
 
@@ -449,6 +480,13 @@ const I18N = {
     logout_done:'ログアウトしました',
     empty_pending:'承認待ちの投稿はありません 👍',
     empty_all:'投稿データがありません',
+    btn_select:'選択削除', btn_select_done:'完了',
+    selected_count:(n)=>`${n}件選択中`,
+    delete_confirm_title:'トラブル削除',
+    delete_confirm_msg:(n)=>`${n}件のトラブルを削除します。\nこの操作は取り消せません。`,
+    delete_excel_warn:'Excel出力は済んでいますか？\n削除したデータは復元できません。',
+    delete_done:(n)=>`${n}件を削除しました`,
+    delete_error:'削除に失敗しました',
   },
   vi:{
     nav_pending:'Chờ duyệt', nav_all:'Tất cả', nav_input:'Nhập sự cố',
@@ -481,6 +519,13 @@ const I18N = {
     logout_done:'Đã đăng xuất',
     empty_pending:'Không có sự cố nào chờ duyệt 👍',
     empty_all:'Chưa có dữ liệu',
+    btn_select:'Chọn để xoá', btn_select_done:'Xong',
+    selected_count:(n)=>`Đã chọn ${n}`,
+    delete_confirm_title:'Xoá sự cố',
+    delete_confirm_msg:(n)=>`Xoá ${n} sự cố.\nThao tác này không thể hoàn tác.`,
+    delete_excel_warn:'Bạn đã xuất Excel chưa?\nDữ liệu đã xoá không thể khôi phục.',
+    delete_done:(n)=>`Đã xoá ${n} sự cố`,
+    delete_error:'Xoá thất bại',
   },
   en:{
     nav_pending:'Pending', nav_all:'All Data', nav_input:'入力',
@@ -513,6 +558,13 @@ const I18N = {
     logout_done:'Logged out',
     empty_pending:'No pending submissions 👍',
     empty_all:'No data yet',
+    btn_select:'Select & delete', btn_select_done:'Done',
+    selected_count:(n)=>`${n} selected`,
+    delete_confirm_title:'Delete troubles',
+    delete_confirm_msg:(n)=>`Delete ${n} trouble(s).\nThis action cannot be undone.`,
+    delete_excel_warn:'Have you exported to Excel?\nDeleted data cannot be recovered.',
+    delete_done:(n)=>`${n} item(s) deleted`,
+    delete_error:'Deletion failed',
   }
 };
 let currentLang = localStorage.getItem('traq_lang')||'ja';
@@ -524,6 +576,7 @@ function setLang(lang){
     if(b2) b2.classList.toggle('active',l===lang);
   });
   applyI18n(); renderList();
+  updateSelectButtons(selectMode);
 }
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
@@ -557,6 +610,8 @@ const SESSION = (() => {
 let TROUBLES = [];
 let mainTab = 'pending';
 let typeFilter = 'all';
+let selectMode = false;
+let selectedIds = new Set();
 
 /* ===== Init ===== */
 (async function init(){
@@ -593,6 +648,9 @@ let typeFilter = 'all';
   if (sbName) sbName.textContent = name;
 
   applyI18n();
+  // SL/adminは選択削除ボタンを表示
+  var selBtn = document.getElementById('selectToggleBtn');
+  if (selBtn) selBtn.style.display = 'inline-block';
   await loadTroubles();
 
   // Push通知タップ時: ?detail={troubleId} で詳細モーダルを自動表示
@@ -702,6 +760,7 @@ function initTheme(){
 /* ===== Tabs ===== */
 function setMainTab(tab){
   mainTab=tab;
+  if(selectMode) exitSelectMode();
   ['pending','all','approved','rejected'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
@@ -763,6 +822,8 @@ function buildCard(tr,idx){
   div.setAttribute('data-id', tr.id);
   div.style.animationDelay=`${idx*0.04}s`;
   if(tr._actioned) div.classList.add('actioned');
+  if(selectMode) div.classList.add('selectable');
+  if(selectMode && selectedIds.has(tr.id)) div.classList.add('selected');
 
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
@@ -771,7 +832,7 @@ function buildCard(tr,idx){
   const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
 
   let actionsHTML='';
-  if(tr.status==='pending'){
+  if(!selectMode && tr.status==='pending'){
     actionsHTML=`
       <div class="card-actions">
         <button class="ca-btn ca-approve" onclick="event.stopPropagation();quickApprove(${tr.id})">${t('btn_approve')}</button>
@@ -784,10 +845,20 @@ function buildCard(tr,idx){
     rejectHTML=`<div style="margin-top:6px;padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:var(--danger)"><strong style="display:block;font-size:10px;margin-bottom:2px">差し戻し理由：</strong>${tr.reject_reason}</div>`;
   }
 
+  const isChecked = selectMode && selectedIds.has(tr.id);
+  const checkboxHTML = selectMode
+    ? `<div class="tcard-checkbox ${isChecked?'checked':''}"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
+    : '';
+
+  const onClickTop = selectMode
+    ? `onclick="event.stopPropagation();toggleSelectCard(${tr.id})"`
+    : `onclick="openDetail(${tr.id})"`;
+
   div.innerHTML=`
-    <div class="tcard-top" onclick="openDetail(${tr.id})">
+    <div class="tcard-top" ${onClickTop}>
       <div class="tcard-header">
-        <div class="tcard-meta">
+        <div class="tcard-meta" style="${selectMode?'display:flex;align-items:center;gap:8px':''}">
+          ${checkboxHTML}
           <span class="tcard-type ${typeClass}">${typeLabel}</span>
           <span class="status-badge status-${tr.status}">${statusLabel}</span>
           <span class="tcard-date">${tr.date.replace(/-/g,'/')} ${t('shift_label',tr.shift)}</span>
@@ -1009,6 +1080,116 @@ function showToast(msg,type='info'){
   el.style.display='block';
   if(toastTimer) clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>{ el.style.display='none'; },2500);
+}
+
+/* ===== Select Mode (SL/admin delete) ===== */
+function toggleSelectMode(){
+  if(selectMode) exitSelectMode(); else enterSelectMode();
+}
+
+function enterSelectMode(){
+  selectMode = true;
+  selectedIds.clear();
+  updateSelectButtons(true);
+  renderList();
+  updateDeleteBar();
+}
+
+function exitSelectMode(){
+  selectMode = false;
+  selectedIds.clear();
+  updateSelectButtons(false);
+  renderList();
+  updateDeleteBar();
+}
+
+function updateSelectButtons(active){
+  // Mobile topbar
+  var btn = document.getElementById('selectToggleBtn');
+  if(btn){
+    btn.textContent = active ? t('btn_select_done') : t('btn_select');
+    btn.classList.toggle('done', active);
+  }
+  // PC sidebar
+  var sbBtn = document.getElementById('sbSelectBtn');
+  if(sbBtn){
+    var label = sbBtn.querySelector('[data-i18n="btn_select"]');
+    if(label) label.textContent = active ? t('btn_select_done') : t('btn_select');
+    sbBtn.classList.toggle('active', active);
+  }
+}
+
+function toggleSelectCard(id){
+  if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
+  // 即時のDOM更新（全体再描画せず）
+  var card = document.querySelector('[data-id="'+id+'"]');
+  if(card){
+    card.classList.toggle('selected', selectedIds.has(id));
+    var cb = card.querySelector('.tcard-checkbox');
+    if(cb) cb.classList.toggle('checked', selectedIds.has(id));
+  }
+  updateDeleteBar();
+}
+
+function updateDeleteBar(){
+  var bar = document.getElementById('deleteBar');
+  if(!bar) return;
+  if(selectMode && selectedIds.size > 0){
+    bar.classList.add('visible');
+    // ボトムナビの上に配置
+    var bnav = document.querySelector('.bottom-nav');
+    bar.style.bottom = bnav ? (bnav.offsetHeight + 'px') : '0';
+    document.getElementById('deleteBarCount').textContent = t('selected_count', selectedIds.size);
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+async function deleteSelected(){
+  var count = selectedIds.size;
+  if(count === 0) return;
+
+  // 二段階確認
+  if(!confirm(t('delete_excel_warn'))) return;
+  if(!confirm(t('delete_confirm_msg', count))) return;
+
+  var ids = Array.from(selectedIds);
+  try {
+    // 1) 関連画像のStorageパスを取得
+    var imgFilter = ids.map(function(id){ return 'trouble_id.eq.' + id; }).join(',');
+    var images = [];
+    try {
+      images = await sbFetch('trouble_images?select=id,storage_path&or=(' + imgFilter + ')');
+    } catch(e){ console.warn('画像取得エラー:', e); }
+
+    // 2) Storageから画像を削除（個別DELETE）
+    if(images && images.length > 0){
+      for(var i = 0; i < images.length; i++){
+        try {
+          var imgPath = images[i].storage_path;
+          await fetch(SB_URL + '/storage/v1/object/trouble-images/' + imgPath, {
+            method: 'DELETE',
+            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+          });
+        } catch(e){ console.warn('Storage削除エラー:', e); }
+      }
+    }
+
+    // 3) trouble_images レコード削除（CASCADE で自動削除されるがフォールバック）
+    // troubles を削除すれば ON DELETE CASCADE で trouble_images も消える
+
+    // 4) troubles を削除
+    var troubleFilter = ids.map(function(id){ return 'id.eq.' + id; }).join(',');
+    await sbFetch('troubles?or=(' + troubleFilter + ')', 'DELETE');
+
+    // 5) ローカル状態を更新
+    TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
+    exitSelectMode();
+    showToast(t('delete_done', count), 'success');
+  } catch(e){
+    console.error('削除エラー:', e);
+    showToast(t('delete_error') + ': ' + e.message, 'error');
+  }
 }
 
 /* ===== Logout ===== */
