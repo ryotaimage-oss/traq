@@ -314,6 +314,8 @@ html, body {
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
 /* ===== PC sidebar layout ===== */
 @media (min-width: 768px) {
   .bottom-nav { display: none; }
@@ -342,15 +344,15 @@ html, body {
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .sidebar-name { font-size: 13px; font-weight: 700; }
-  .sidebar-role { font-size: 11px; }
+  .sidebar-role { font-size: 11px; color: var(--text2); }
   .sidebar-nav { flex: 1; padding: 12px 8px; }
   .snav-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: var(--radius);
+    padding: 10px 12px; border-radius: 8px;
     cursor: pointer; transition: all .15s;
     font-size: 13px; font-weight: 500; color: var(--text2);
     border: none; background: none; font-family: inherit;
-    width: 100%; text-align: left; position: relative;
+    width: 100%; text-align: left;
   }
   .snav-item:hover { background: var(--bg3); color: var(--text1); }
   .snav-item.active { background: rgba(239,159,39,.12); color: var(--orange); font-weight: 700; }
@@ -368,6 +370,12 @@ html, body {
     border-top: 1px solid var(--border);
     display: flex; flex-direction: column; gap: 4px;
   }
+  .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+  .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+  .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+  [data-theme="light"] .role-admin .sidebar-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+  [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+  [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
   .topbar { display: none; }
   .main-column {
     flex: 1; display: flex; flex-direction: column; overflow: hidden;
@@ -375,8 +383,7 @@ html, body {
   .scroll-area { padding-bottom: 24px; }
 }
 
-@media (min-width: 1025px) {
-  .sidebar { width: 240px; }
+T0px; }
   .action-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -477,6 +484,7 @@ html, body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
@@ -518,7 +526,7 @@ html, body {
     <nav class="sidebar-nav">
       <button class="snav-item active" onclick="setTab('home')">
         <span class="snav-icon">📋</span>
-        <span data-i18n="nav_all">一覧</span>
+        <span data-i18n="nav_all">全データ一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
         <span class="snav-icon">📊</span>
@@ -684,7 +692,7 @@ html, body {
 ============================================= */
 const I18N = {
   ja: {
-    nav_list:'一覧', nav_all:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
+    nav_list:'一覧', nav_all:'全データ一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
     nav_excel:'Excelダウンロード', btn_select:'選択削除',
     nav_theme:'テーマ切替', nav_logout:'ログアウト', master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
@@ -715,7 +723,7 @@ const I18N = {
     logout_msg:'ログアウトしました',
   },
   vi: {
-    nav_list:'Danh sách', nav_all:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Cài đặt',
+    nav_list:'Danh sách', nav_all:'Tất cả dữ liệu', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Cài đặt',
     nav_excel:'Tải Excel', btn_select:'Chọn xóa',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất', master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
@@ -745,7 +753,7 @@ const I18N = {
     logout_msg:'Đã đăng xuất',
   },
   en: {
-    nav_list:'List', nav_all:'List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
+    nav_list:'List', nav_all:'All Data', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
     nav_excel:'Excel Download', btn_select:'Select & Delete',
     nav_theme:'Toggle theme', nav_logout:'Logout', master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
     btn_eq:'Equipment\nTrouble', btn_md:'Mold\nTrouble',

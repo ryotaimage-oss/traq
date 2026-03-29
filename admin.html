@@ -58,6 +58,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
 @media(min-width:768px){.bottom-nav{display:none}}
 
 /* ===== Sidebar (PC/Tablet) ===== */
@@ -77,10 +79,13 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .sidebar-nav{flex:1;padding:12px 8px}
 .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
+  .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
   .scroll-area{padding-bottom:24px}
@@ -91,8 +96,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 }
-@media(min-width:1025px){
-  .sidebar{width:240px}
+T0px}
 }
 
 /* Master actions bar */
@@ -202,6 +206,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(min-width:1025px){.sidebar{width:240px}}
 </style>
 </head>
 <body>
