@@ -204,9 +204,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <span class="topbar-sub">Trouble Tracking System</span>
     </div>
     <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-      <button class="hdr-icon-btn" onclick="void(0)" title="設定" style="color:var(--orange);border-color:var(--orange)">⚙️</button>
+      <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード">🔄</button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替">🌙</button>
+      <button class="hdr-icon-btn" onclick="void(0)" data-i18n-title="hdr_settings" title="設定" style="color:var(--orange);border-color:var(--orange)">⚙️</button>
       <div class="hdr-avatar" id="mob-avatar"></div>
     </div>
   </header>
@@ -217,11 +217,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:18px">🆕</span>
         <div>
-          <div style="font-size:13px;font-weight:700;color:var(--orange)" id="updateBannerTitle">新しいバージョンがあります</div>
+          <div style="font-size:13px;font-weight:700;color:var(--orange)" id="updateBannerTitle" data-i18n="update_banner_title">新しいバージョンがあります</div>
           <div style="font-size:11px;color:var(--text2)" id="updateBannerSub"></div>
         </div>
       </div>
-      <button onclick="forceReload()" style="background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;flex-shrink:0;margin-left:10px">
+      <button onclick="forceReload()" style="background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;flex-shrink:0;margin-left:10px" data-i18n="update_now">
         今すぐ更新
       </button>
     </div>
@@ -244,14 +244,14 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
     <!-- 表示設定 -->
     <div class="section" style="animation-delay:.05s">
-      <div class="section-label">表示設定</div>
+      <div class="section-label" data-i18n="sec_display">表示設定</div>
       <div class="setting-group">
         <div class="setting-row" onclick="toggleTheme()">
           <div class="setting-row-left">
             <div class="setting-icon" style="background:rgba(139,144,160,.1)">🌙</div>
             <div>
-              <div class="setting-name">ダークモード</div>
-              <div class="setting-desc">画面の明暗を切り替えます</div>
+              <div class="setting-name" data-i18n="dark_mode">ダークモード</div>
+              <div class="setting-desc" data-i18n="dark_mode_desc">画面の明暗を切り替えます</div>
             </div>
           </div>
           <div class="setting-row-right">
@@ -264,8 +264,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <div class="setting-row-left">
             <div class="setting-icon" style="background:rgba(96,165,250,.1)">🌐</div>
             <div>
-              <div class="setting-name">言語</div>
-              <div class="setting-desc">アプリの表示言語</div>
+              <div class="setting-name" data-i18n="lang_label">言語</div>
+              <div class="setting-desc" data-i18n="lang_desc">アプリの表示言語</div>
             </div>
           </div>
           <div class="setting-row-right">
@@ -281,15 +281,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
     <!-- アカウント設定 -->
     <div class="section" style="animation-delay:.1s">
-      <div class="section-label">アカウント</div>
+      <div class="section-label" data-i18n="sec_account">アカウント</div>
       <div class="setting-group">
 
         <div class="setting-row" onclick="setSection('pin')">
           <div class="setting-row-left">
             <div class="setting-icon" style="background:rgba(239,68,68,.1)">🔑</div>
             <div>
-              <div class="setting-name">PIN変更</div>
-              <div class="setting-desc">ログイン用4桁PINを変更します</div>
+              <div class="setting-name" data-i18n="pin_change">PIN変更</div>
+              <div class="setting-desc" data-i18n="pin_change_desc">ログイン用4桁PINを変更します</div>
             </div>
           </div>
           <div class="setting-row-right">
@@ -301,8 +301,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <div class="setting-row-left">
             <div class="setting-icon" style="background:rgba(239,159,39,.12)">📱</div>
             <div>
-              <div class="setting-name">ホーム画面に追加する</div>
-              <div class="setting-desc">アプリとしてショートカット登録</div>
+              <div class="setting-name" data-i18n="add_home">ホーム画面に追加する</div>
+              <div class="setting-desc" data-i18n="add_home_desc">アプリとしてショートカット登録</div>
             </div>
           </div>
           <div class="setting-row-right">
@@ -343,11 +343,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <div id="pinSuccessArea" style="display:none">
           <div class="pin-success-wrap">
             <div class="pin-success-icon">✅</div>
-            <div class="pin-success-text">PINを変更しました</div>
+            <div class="pin-success-text" data-i18n="pin_done">PINを変更しました</div>
           </div>
         </div>
         <div style="text-align:center;margin-top:10px">
-          <button onclick="setSection(null)" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit">キャンセル</button>
+          <button onclick="setSection(null)" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit" data-i18n="pin_cancel">キャンセル</button>
         </div>
       </div>
     </div>
@@ -355,7 +355,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
     <!-- バージョン情報 -->
     <div class="section" style="animation-delay:.2s">
-      <div class="section-label">バージョン情報</div>
+      <div class="section-label" data-i18n="sec_version">バージョン情報</div>
       <div class="version-card">
         <div class="version-header">
           <div class="version-logo">
@@ -376,17 +376,17 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </div>
         <div class="version-rows">
           <div class="version-row">
-            <span class="version-key">バージョン</span>
+            <span class="version-key" data-i18n="version_label">バージョン</span>
             <span class="version-val" id="versionVal">v1.0.0</span>
           </div>
           <div class="version-row">
-            <span class="version-key">リリース日</span>
+            <span class="version-key" data-i18n="release_date">リリース日</span>
             <span class="version-val">2026/03/26</span>
           </div>
           <div class="version-row">
-            <span class="version-key">アップデート</span>
+            <span class="version-key" data-i18n="update_label">アップデート</span>
             <span class="version-val" id="updateStatus">
-              <span class="no-update-badge" id="updateBadge">確認中...</span>
+              <span class="no-update-badge" id="updateBadge" data-i18n="update_checking">確認中...</span>
             </span>
           </div>
 
@@ -396,7 +396,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
     <!-- ログアウト -->
     <div class="section" style="animation-delay:.25s">
-      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s">
+      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s" data-i18n="logout">
         🚪 ログアウト
       </button>
     </div>
@@ -408,15 +408,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   <nav class="bottom-nav">
     <button class="nav-item" onclick="goHome()">
       <span class="nav-icon">📋</span>
-      <span class="nav-label">一覧</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">ダッシュボード</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
     <button class="nav-item" onclick="goMaster()">
       <span class="nav-icon">🔧</span>
-      <span class="nav-label">マスタ</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
     </button>
   </nav>
 </div>
@@ -428,6 +428,144 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
   document.documentElement.setAttribute('data-theme',saved||pref);
 })();
+/* ===== i18n ===== */
+var I18N = {
+  ja: {
+    sec_display:'表示設定', sec_account:'アカウント', sec_version:'バージョン情報',
+    dark_mode:'ダークモード', dark_mode_desc:'画面の明暗を切り替えます',
+    lang_label:'言語', lang_desc:'アプリの表示言語',
+    pin_change:'PIN変更', pin_change_desc:'ログイン用4桁PINを変更します',
+    add_home:'ホーム画面に追加する', add_home_desc:'アプリとしてショートカット登録',
+    version_label:'バージョン', release_date:'リリース日', update_label:'アップデート',
+    update_checking:'確認中...', update_latest:'最新版です',
+    update_available:function(v){return 'v'+v+' に更新可能';},
+    update_banner_title:'新しいバージョンがあります',
+    update_now:'今すぐ更新',
+    updating:'最新版に更新しています...',
+    logout:'🚪 ログアウト', logout_msg:'ログアウトしました',
+    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
+    hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
+    master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
+    shift_label:function(s){return s+'直';}, shift_none:'未設定',
+    pin_step:function(n){return 'ステップ '+n+' / 3';},
+    pin_s1:'現在のPINを入力してください', pin_s2:'新しいPINを入力してください（4桁）', pin_s3:'新しいPINをもう一度入力してください',
+    pin_easy:'簡単すぎるPINは使用できません', pin_mismatch:'PINが一致しません。もう一度入力してください',
+    pin_wrong:'PINが違います', pin_done:'PINを変更しました', pin_cancel:'キャンセル',
+    pin_session_err:'セッションエラー', pin_user_not_found:'ユーザーが見つかりません',
+    pin_save_fail:function(m){return '保存エラー: '+m;},
+    pin_error:function(m){return 'エラー: '+m;},
+    add_home_title:'ホーム画面に追加', add_home_added:'ホーム画面に追加しました！',
+    add_home_ios_label:'📱 iPhoneでのホーム画面追加手順',
+    add_home_ios_1:'Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ',
+    add_home_ios_2:'メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ',
+    add_home_ios_3:'名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ',
+    add_home_ios_done:'ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。',
+    add_home_android_label:'🤖 Androidでのホーム画面追加手順',
+    add_home_android_1:'Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ',
+    add_home_android_2:'<span class="add-home-highlight">「ホーム画面に追加」</span> を選択',
+    add_home_android_done:'「追加」をタップすれば完了です！',
+    add_home_pc_label:'💻 PCでのインストール手順',
+    add_home_pc_1:'Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック',
+    add_home_pc_done:'「インストール」をクリックすれば完了です！',
+    add_home_url_label:'URLをコピー', add_home_copy:'コピー', add_home_copied:'コピー済み ✓', add_home_copy_fail:'コピーできませんでした',
+    add_home_close:'閉じる',
+    lang_changed:'日本語に変更しました',
+  },
+  vi: {
+    sec_display:'Cài đặt hiển thị', sec_account:'Tài khoản', sec_version:'Thông tin phiên bản',
+    dark_mode:'Chế độ tối', dark_mode_desc:'Chuyển đổi sáng/tối',
+    lang_label:'Ngôn ngữ', lang_desc:'Ngôn ngữ hiển thị',
+    pin_change:'Đổi PIN', pin_change_desc:'Đổi mã PIN 4 số để đăng nhập',
+    add_home:'Thêm vào màn hình chính', add_home_desc:'Tạo lối tắt ứng dụng',
+    version_label:'Phiên bản', release_date:'Ngày phát hành', update_label:'Cập nhật',
+    update_checking:'Đang kiểm tra...', update_latest:'Đã là phiên bản mới nhất',
+    update_available:function(v){return 'Có thể cập nhật v'+v;},
+    update_banner_title:'Có phiên bản mới',
+    update_now:'Cập nhật ngay',
+    updating:'Đang cập nhật...',
+    logout:'🚪 Đăng xuất', logout_msg:'Đã đăng xuất',
+    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master',
+    hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
+    master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
+    shift_label:function(s){return 'Ca '+s;}, shift_none:'Chưa cài',
+    pin_step:function(n){return 'Bước '+n+' / 3';},
+    pin_s1:'Nhập PIN hiện tại', pin_s2:'Nhập PIN mới (4 số)', pin_s3:'Nhập lại PIN mới',
+    pin_easy:'PIN quá đơn giản', pin_mismatch:'PIN không khớp. Hãy thử lại',
+    pin_wrong:'Sai PIN', pin_done:'Đã đổi PIN', pin_cancel:'Huỷ',
+    pin_session_err:'Lỗi phiên', pin_user_not_found:'Không tìm thấy người dùng',
+    pin_save_fail:function(m){return 'Lỗi lưu: '+m;},
+    pin_error:function(m){return 'Lỗi: '+m;},
+    add_home_title:'Thêm vào màn hình chính', add_home_added:'Đã thêm vào màn hình chính!',
+    add_home_ios_label:'📱 Hướng dẫn thêm trên iPhone',
+    add_home_ios_1:'Nhấn nút <span class="add-home-highlight">Chia sẻ (口↑)</span> ở dưới thanh địa chỉ Safari',
+    add_home_ios_2:'Cuộn menu và nhấn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
+    add_home_ios_3:'Đặt tên <span class="add-home-highlight">"Traq"</span> rồi nhấn "Thêm"',
+    add_home_ios_done:'Biểu tượng sẽ xuất hiện trên màn hình chính!',
+    add_home_android_label:'🤖 Hướng dẫn thêm trên Android',
+    add_home_android_1:'Nhấn menu Chrome <span class="add-home-highlight">(⋮)</span>',
+    add_home_android_2:'Chọn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
+    add_home_android_done:'Nhấn "Thêm" là xong!',
+    add_home_pc_label:'💻 Hướng dẫn cài trên PC',
+    add_home_pc_1:'Nhấn <span class="add-home-highlight">biểu tượng cài đặt (⊕)</span> ở thanh địa chỉ Chrome',
+    add_home_pc_done:'Nhấn "Cài đặt" là xong!',
+    add_home_url_label:'Sao chép URL', add_home_copy:'Sao chép', add_home_copied:'Đã sao chép ✓', add_home_copy_fail:'Không thể sao chép',
+    add_home_close:'Đóng',
+    lang_changed:'Đã chuyển sang tiếng Việt',
+  },
+  en: {
+    sec_display:'Display', sec_account:'Account', sec_version:'Version Info',
+    dark_mode:'Dark Mode', dark_mode_desc:'Toggle light/dark appearance',
+    lang_label:'Language', lang_desc:'App display language',
+    pin_change:'Change PIN', pin_change_desc:'Change your 4-digit login PIN',
+    add_home:'Add to Home Screen', add_home_desc:'Create an app shortcut',
+    version_label:'Version', release_date:'Release Date', update_label:'Update',
+    update_checking:'Checking...', update_latest:'Up to date',
+    update_available:function(v){return 'v'+v+' available';},
+    update_banner_title:'New version available',
+    update_now:'Update now',
+    updating:'Updating...',
+    logout:'🚪 Logout', logout_msg:'Logged out',
+    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master',
+    hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
+    master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
+    shift_label:function(s){return 'Shift '+s;}, shift_none:'Not set',
+    pin_step:function(n){return 'Step '+n+' / 3';},
+    pin_s1:'Enter your current PIN', pin_s2:'Enter new PIN (4 digits)', pin_s3:'Confirm new PIN',
+    pin_easy:'PIN is too simple', pin_mismatch:'PINs do not match. Try again',
+    pin_wrong:'Wrong PIN', pin_done:'PIN changed', pin_cancel:'Cancel',
+    pin_session_err:'Session error', pin_user_not_found:'User not found',
+    pin_save_fail:function(m){return 'Save error: '+m;},
+    pin_error:function(m){return 'Error: '+m;},
+    add_home_title:'Add to Home Screen', add_home_added:'Added to home screen!',
+    add_home_ios_label:'📱 How to add on iPhone',
+    add_home_ios_1:'Tap the <span class="add-home-highlight">Share button (口↑)</span> below the Safari address bar',
+    add_home_ios_2:'Scroll and tap <span class="add-home-highlight">"Add to Home Screen"</span>',
+    add_home_ios_3:'Name it <span class="add-home-highlight">"Traq"</span> and tap "Add"',
+    add_home_ios_done:'The icon will appear on your home screen!',
+    add_home_android_label:'🤖 How to add on Android',
+    add_home_android_1:'Tap Chrome menu <span class="add-home-highlight">(⋮)</span>',
+    add_home_android_2:'Select <span class="add-home-highlight">"Add to Home screen"</span>',
+    add_home_android_done:'Tap "Add" and you\'re done!',
+    add_home_pc_label:'💻 How to install on PC',
+    add_home_pc_1:'Click the <span class="add-home-highlight">install icon (⊕)</span> in Chrome\'s address bar',
+    add_home_pc_done:'Click "Install" and you\'re done!',
+    add_home_url_label:'Copy URL', add_home_copy:'Copy', add_home_copied:'Copied ✓', add_home_copy_fail:'Copy failed',
+    add_home_close:'Close',
+    lang_changed:'Switched to English',
+  }
+};
+function t(k) {
+  var v = I18N[currentLang] && I18N[currentLang][k];
+  if (v === undefined) v = I18N.ja[k];
+  return v !== undefined ? v : k;
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) { el.title = t(el.dataset.i18nTitle); });
+  document.title = 'Traq – ' + t('hdr_settings');
+}
+
 /* ===== Version ===== */
 const APP_VERSION = '1.0.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
@@ -495,8 +633,8 @@ function setLang(lang){
   ['ja','vi','en'].forEach(l=>{
     var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===lang);
   });
-  var labels={ja:'日本語に変更しました',vi:'Đã chuyển sang tiếng Việt',en:'Switched to English'};
-  showToast(labels[lang]||labels.ja,'success');
+  applyI18n();
+  showToast(t('lang_changed'),'success');
 }
 
 
@@ -521,7 +659,7 @@ function initUserInfo(){
   const roleEl=document.getElementById('userRoleBadge');
   roleEl.textContent=u.role==='admin'?'admin':u.role==='sl'?'SL':'OP';
   roleEl.className='role-badge role-'+u.role;
-  const shiftLabel=u.shift?`${u.shift}直`:'未設定';
+  const shiftLabel=u.shift?t('shift_label')(u.shift):t('shift_none');
   const shiftEl=document.getElementById('userShiftLabel');
   if(shiftEl) shiftEl.textContent=shiftLabel;
 }
@@ -546,21 +684,15 @@ let pinInput='';
 let newPin='';
 // PIN照合はSupabase DB（traq_usersテーブルのpinカラム）で行う
 
-const PIN_STEPS={
-  ja:['現在のPINを入力してください','新しいPINを入力してください（4桁）','新しいPINをもう一度入力してください'],
-  vi:['Nhập PIN hiện tại','Nhập PIN mới (4 số)','Nhập lại PIN mới'],
-  en:['Enter your current PIN','Enter new PIN (4 digits)','Confirm new PIN'],
-};
-
 function resetPinFlow(){
   pinStep=1; pinInput=''; newPin='';
   updatePinUI();
 }
 
 function updatePinUI(){
-  const steps=PIN_STEPS[currentLang]||PIN_STEPS.ja;
+  var steps=[t('pin_s1'),t('pin_s2'),t('pin_s3')];
   document.getElementById('pinTitle').textContent=steps[pinStep-1];
-  document.getElementById('pinStepLabel').textContent=`ステップ ${pinStep} / 3`;
+  document.getElementById('pinStepLabel').textContent=t('pin_step')(pinStep);
   document.getElementById('pinError').textContent='';
   document.getElementById('pinSuccessArea').style.display='none';
   document.getElementById('pinKeypadArea').style.display='block';
@@ -594,7 +726,7 @@ function handlePinComplete(){
     // 新PIN記憶
     if(pinInput==='0000'||pinInput==='1234'){
       updatePinDots('error');
-      document.getElementById('pinError').textContent='簡単すぎるPINは使用できません';
+      document.getElementById('pinError').textContent=t('pin_easy');
       setTimeout(()=>{pinInput='';updatePinDots();},700);
       return;
     }
@@ -607,7 +739,7 @@ function handlePinComplete(){
       saveNewPin(newPin);
     } else {
       updatePinDots('error');
-      document.getElementById('pinError').textContent='PINが一致しません。もう一度入力してください';
+      document.getElementById('pinError').textContent=t('pin_mismatch');
       setTimeout(()=>{pinInput='';pinStep=2;newPin='';updatePinUI();},800);
     }
   }
@@ -615,36 +747,36 @@ function handlePinComplete(){
 
 /* ===== Supabase PIN処理 ===== */
 async function verifyCurrentPin(pin) {
-  if (!SESSION) { showToast('セッションエラー','error'); return; }
+  if (!SESSION) { showToast(t('pin_session_err'),'error'); return; }
   try {
     const rows = await sbFetch('traq_users?id=eq.' + SESSION.userId + '&select=pin');
-    if (!rows || rows.length === 0) throw new Error('ユーザーが見つかりません');
+    if (!rows || rows.length === 0) throw new Error(t('pin_user_not_found'));
     const dbPin = rows[0].pin;
     if (pin === dbPin) {
       pinStep = 2; pinInput = '';
       updatePinUI();
     } else {
       updatePinDots('error');
-      document.getElementById('pinError').textContent = 'PINが違います';
+      document.getElementById('pinError').textContent = t('pin_wrong');
       setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
     }
   } catch(e) {
     updatePinDots('error');
-    document.getElementById('pinError').textContent = 'エラー: ' + e.message;
+    document.getElementById('pinError').textContent = t('pin_error')(e.message);
     setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
   }
 }
 
 async function saveNewPin(pin) {
-  if (!SESSION) { showToast('セッションエラー','error'); return; }
+  if (!SESSION) { showToast(t('pin_session_err'),'error'); return; }
   try {
     await sbFetch('traq_users?id=eq.' + SESSION.userId, 'PATCH', { pin: pin });
     document.getElementById('pinKeypadArea').style.display = 'none';
     document.getElementById('pinSuccessArea').style.display = 'block';
-    showToast('PINを変更しました', 'success');
+    showToast(t('pin_done'), 'success');
     setTimeout(() => setSection(null), 2000);
   } catch(e) {
-    showToast('保存エラー: ' + e.message, 'error');
+    showToast(t('pin_save_fail')(e.message), 'error');
     setTimeout(() => { pinInput = ''; pinStep = 1; updatePinUI(); }, 800);
   }
 }
@@ -661,7 +793,7 @@ function openAddHomeModal(){
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(result=>{
-      if(result.outcome==='accepted') showToast('ホーム画面に追加しました！','success');
+      if(result.outcome==='accepted') showToast(t('add_home_added'),'success');
       deferredPrompt=null;
     });
     return;
@@ -675,7 +807,7 @@ function openAddHomeModal(){
   var baseUrl=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
   if(!baseUrl.endsWith('/')) baseUrl+='/';
   document.getElementById('addHomeUrl').textContent=baseUrl;
-  document.getElementById('addHomeCopyBtn').textContent='コピー';
+  document.getElementById('addHomeCopyBtn').textContent=t('add_home_copy');
   document.getElementById('addHomeModal').classList.remove('hidden');
   document.body.style.overflow='hidden';
 }
@@ -690,17 +822,17 @@ function copyUrl(){
   var url=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
   if(!url.endsWith('/')) url+='/';
   navigator.clipboard.writeText(url).then(()=>{
-    document.getElementById('addHomeCopyBtn').textContent='コピー済み ✓';
-    setTimeout(()=>{ document.getElementById('addHomeCopyBtn').textContent='コピー'; },2000);
+    document.getElementById('addHomeCopyBtn').textContent=t('add_home_copied');
+    setTimeout(()=>{ document.getElementById('addHomeCopyBtn').textContent=t('add_home_copy'); },2000);
   }).catch(()=>{
-    showToast('コピーできませんでした','error');
+    showToast(t('add_home_copy_fail'),'error');
   });
 }
 
 
 /* ===== Force reload ===== */
 function forceReload(){
-  showToast('最新版に更新しています...','info');
+  showToast(t('updating'),'info');
   // 新バージョンとして保存（次回起動で「最新版」と表示される）
   localStorage.setItem('traq_last_version', APP_VERSION);
   // Service Worker のキャッシュをクリアして強制リロード
@@ -755,20 +887,20 @@ function showUpdateBanner(oldVer, newVer){
     if(sub) sub.textContent=`v${oldVer} → v${newVer}`;
   }
   if(badge){
-    badge.textContent=`v${newVer} に更新可能`;
+    badge.textContent=t('update_available')(newVer);
     badge.className='update-badge';
   }
 }
 
 function setBadgeLatest(){
   const badge=document.getElementById('updateBadge');
-  if(badge){ badge.textContent='最新版です'; badge.className='no-update-badge'; }
+  if(badge){ badge.textContent=t('update_latest'); badge.className='no-update-badge'; }
 }
 
 /* ===== Logout ===== */
 function doLogout(){
   localStorage.removeItem('traq_session');
-  showToast('ログアウトしました','info');
+  showToast(t('logout_msg'),'info');
   setTimeout(()=>{location.href='index.html'},1000);
 }
 
@@ -793,7 +925,7 @@ function showMasterDenied(){
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
   box.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">アクセス制限</div><div style="font-size:13px;color:var(--text2);line-height:1.6">マスタはSL・管理者のみ利用できます</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
@@ -819,6 +951,7 @@ function showToast(msg,type='info'){
   });
   initUserInfo();
   checkVersion();
+  applyI18n();
 })();
 </script>
 
@@ -827,70 +960,70 @@ function showToast(msg,type='info'){
 <div class="modal-overlay hidden" id="addHomeModal" onclick="closeAddHomeModal(event)">
   <div class="modal-sheet" id="addHomeSheet">
     <div class="modal-header">
-      <div class="modal-title">ホーム画面に追加</div>
+      <div class="modal-title" data-i18n="add_home_title">ホーム画面に追加</div>
       <button class="modal-close" onclick="closeAddHomeModalDirect()">✕</button>
     </div>
 
     <!-- iOS手順 -->
     <div id="addHomeIos">
-      <div class="add-home-device-label">📱 iPhoneでのホーム画面追加手順</div>
+      <div class="add-home-device-label" data-i18n-html="add_home_ios_label">📱 iPhoneでのホーム画面追加手順</div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
-        <div>Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ</div>
+        <div data-i18n-html="add_home_ios_1">Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ</div>
       </div>
       <div class="add-home-step">
         <div class="add-home-step-num">2</div>
-        <div>メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ</div>
+        <div data-i18n-html="add_home_ios_2">メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ</div>
       </div>
       <div class="add-home-step">
         <div class="add-home-step-num">3</div>
-        <div>名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ</div>
+        <div data-i18n-html="add_home_ios_3">名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ</div>
       </div>
       <div class="add-home-step add-home-step-done">
         <div class="add-home-step-num add-home-step-num-done">✓</div>
-        <div style="color:var(--success)">ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。</div>
+        <div style="color:var(--success)" data-i18n="add_home_ios_done">ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。</div>
       </div>
     </div>
 
     <!-- Android手順 -->
     <div id="addHomeAndroid" class="hidden">
-      <div class="add-home-device-label">🤖 Androidでのホーム画面追加手順</div>
+      <div class="add-home-device-label" data-i18n-html="add_home_android_label">🤖 Androidでのホーム画面追加手順</div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
-        <div>Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ</div>
+        <div data-i18n-html="add_home_android_1">Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ</div>
       </div>
       <div class="add-home-step">
         <div class="add-home-step-num">2</div>
-        <div><span class="add-home-highlight">「ホーム画面に追加」</span> を選択</div>
+        <div data-i18n-html="add_home_android_2"><span class="add-home-highlight">「ホーム画面に追加」</span> を選択</div>
       </div>
       <div class="add-home-step add-home-step-done">
         <div class="add-home-step-num add-home-step-num-done">✓</div>
-        <div style="color:var(--success)">「追加」をタップすれば完了です！</div>
+        <div style="color:var(--success)" data-i18n="add_home_android_done">「追加」をタップすれば完了です！</div>
       </div>
     </div>
 
     <!-- PC手順 -->
     <div id="addHomePc" class="hidden">
-      <div class="add-home-device-label">💻 PCでのインストール手順</div>
+      <div class="add-home-device-label" data-i18n-html="add_home_pc_label">💻 PCでのインストール手順</div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
-        <div>Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック</div>
+        <div data-i18n-html="add_home_pc_1">Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック</div>
       </div>
       <div class="add-home-step add-home-step-done">
         <div class="add-home-step-num add-home-step-num-done">✓</div>
-        <div style="color:var(--success)">「インストール」をクリックすれば完了です！</div>
+        <div style="color:var(--success)" data-i18n="add_home_pc_done">「インストール」をクリックすれば完了です！</div>
       </div>
     </div>
 
     <div class="add-home-divider"></div>
 
-    <div class="add-home-url-label">URLをコピー</div>
+    <div class="add-home-url-label" data-i18n="add_home_url_label">URLをコピー</div>
     <div class="add-home-url-row">
       <div class="add-home-url-text" id="addHomeUrl"></div>
-      <button class="add-home-copy-btn" id="addHomeCopyBtn" onclick="copyUrl()">コピー</button>
+      <button class="add-home-copy-btn" id="addHomeCopyBtn" onclick="copyUrl()" data-i18n="add_home_copy">コピー</button>
     </div>
 
-    <button class="add-home-close-btn" onclick="closeAddHomeModalDirect()">閉じる</button>
+    <button class="add-home-close-btn" onclick="closeAddHomeModalDirect()" data-i18n="add_home_close">閉じる</button>
   </div>
 </div>
 
