@@ -1399,20 +1399,38 @@ async function cleanOrphanFiles() {
   var btn = document.getElementById('orphanBtn');
   btn.disabled = true;
   btn.textContent = '⏳ ...';
+  var deleted = 0;
+  var errors = [];
   try {
-    for (var i = 0; i < _orphanPaths.length; i += 20) {
-      var batch = _orphanPaths.slice(i, i + 20);
-      var resp = await fetch(SB_URL + '/storage/v1/object/remove/trouble-images', {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prefixes: batch })
-      });
-      if (!resp.ok) console.warn('Storage remove failed:', await resp.text());
+    // 1ファイルずつ個別削除
+    for (var i = 0; i < _orphanPaths.length; i++) {
+      var filePath = _orphanPaths[i];
+      try {
+        var resp = await fetch(SB_URL + '/storage/v1/object/trouble-images/' + filePath, {
+          method: 'DELETE',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+        });
+        if (resp.ok) {
+          deleted++;
+        } else {
+          var errText = await resp.text();
+          errors.push(filePath + ': ' + resp.status + ' ' + errText);
+          console.error('Storage delete failed:', filePath, resp.status, errText);
+        }
+      } catch(e) {
+        errors.push(filePath + ': ' + e.message);
+        console.error('Storage delete error:', filePath, e);
+      }
     }
-    showToast(t('storage_orphan_done')(_orphanPaths.length), 'success');
+    if (errors.length > 0) {
+      showToast('削除: ' + deleted + '件成功, ' + errors.length + '件失敗', 'error');
+      console.error('Delete errors:', errors);
+    } else {
+      showToast(t('storage_orphan_done')(deleted), 'success');
+    }
     _orphanPaths = [];
     document.getElementById('orphanCleanup').style.display = 'none';
-    setTimeout(function(){ initStorage(); }, 1000);
+    setTimeout(function(){ initStorage(); }, 1500);
   } catch(e) {
     showToast(t('del_error')(e.message), 'error');
   } finally {
@@ -1703,15 +1721,13 @@ async function execDelete() {
   document.getElementById('delExecBtn').textContent = t('del_in_progress');
 
   try {
-    // 1) Storage画像削除（バッチ: 最大20件ずつ）
+    // 1) Storage画像削除（1ファイルずつ）
     if (_delImagePaths.length > 0) {
-      for (var i = 0; i < _delImagePaths.length; i += 20) {
-        var batch = _delImagePaths.slice(i, i + 20);
+      for (var i = 0; i < _delImagePaths.length; i++) {
         try {
-          await fetch(SB_URL + '/storage/v1/object/remove/trouble-images', {
-            method: 'POST',
-            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prefixes: batch })
+          await fetch(SB_URL + '/storage/v1/object/trouble-images/' + _delImagePaths[i], {
+            method: 'DELETE',
+            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
           });
         } catch(e) { /* continue */ }
       }
