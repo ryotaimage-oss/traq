@@ -1402,16 +1402,17 @@ async function cleanOrphanFiles() {
   try {
     for (var i = 0; i < _orphanPaths.length; i += 20) {
       var batch = _orphanPaths.slice(i, i + 20);
-      await fetch(SB_URL + '/storage/v1/object/trouble-images', {
-        method: 'DELETE',
+      var resp = await fetch(SB_URL + '/storage/v1/object/remove/trouble-images', {
+        method: 'POST',
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ prefixes: batch })
       });
+      if (!resp.ok) console.warn('Storage remove failed:', await resp.text());
     }
     showToast(t('storage_orphan_done')(_orphanPaths.length), 'success');
     _orphanPaths = [];
     document.getElementById('orphanCleanup').style.display = 'none';
-    initStorage();
+    setTimeout(function(){ initStorage(); }, 1000);
   } catch(e) {
     showToast(t('del_error')(e.message), 'error');
   } finally {
@@ -1707,8 +1708,8 @@ async function execDelete() {
       for (var i = 0; i < _delImagePaths.length; i += 20) {
         var batch = _delImagePaths.slice(i, i + 20);
         try {
-          await fetch(SB_URL + '/storage/v1/object/trouble-images', {
-            method: 'DELETE',
+          await fetch(SB_URL + '/storage/v1/object/remove/trouble-images', {
+            method: 'POST',
             headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
             body: JSON.stringify({ prefixes: batch })
           });
@@ -1732,8 +1733,8 @@ async function execDelete() {
     document.getElementById('delExecBtn').disabled = false;
     document.getElementById('delExecBtn').textContent = t('btn_delete_exec');
 
-    // ストレージ再計算
-    initStorage();
+    // ストレージ再計算（1秒後にAPI反映を待つ）
+    setTimeout(function(){ initStorage(); }, 1000);
 
   } catch(e) {
     showToast(t('del_error')(e.message), 'error');
