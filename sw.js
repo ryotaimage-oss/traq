@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v2';
+const CACHE_NAME = 'traq-v3';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -35,7 +35,6 @@ self.addEventListener('activate', event => {
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
     ).then(() => {
-      // 全クライアントに更新完了を通知
       return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
         clients.forEach(client => {
           client.postMessage({ type: 'UPDATE_AVAILABLE', version: CACHE_NAME });
@@ -99,24 +98,51 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Push通知受信
+// ===== Push通知 =====
+
+// Push通知を受信
 self.addEventListener('push', event => {
-  if (!event.data) return;
-  const data = event.data.json();
+  var data = { title: 'Traq', body: '新しい通知があります', url: '/home_sl.html' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch (e) {
+    // パース失敗時はデフォルト値を使用
+  }
+
+  var options = {
+    body: data.body,
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: 'traq-trouble-' + Date.now(),
+    renotify: true,
+    data: { url: data.url || '/home_sl.html' },
+    vibrate: [200, 100, 200],
+    actions: [{ action: 'open', title: '確認する' }]
+  };
+
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Traq', {
-      body: data.body || '',
-      icon: './icons/icon-192.png',
-      badge: './icons/icon-192.png',
-      data: data.url || './home_sl.html',
-    })
+    self.registration.showNotification(data.title || 'Traq', options)
   );
 });
 
-// Push通知タップ時
+// 通知タップ時
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+
+  var targetUrl = (event.notification.data && event.notification.data.url) || '/home_sl.html';
+  var fullUrl = new URL(targetUrl, self.location.origin).href;
+
   event.waitUntil(
-    clients.openWindow(event.notification.data || './home_sl.html')
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
+      // 既に開いているTraqタブがあればフォーカス
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.includes('home_sl') && 'focus' in client) {
+          return client.focus().then(function(c) { c.navigate(fullUrl); });
+        }
+      }
+      // なければ新しいタブで開く
+      if (clients.openWindow) return clients.openWindow(fullUrl);
+    })
   );
 });
