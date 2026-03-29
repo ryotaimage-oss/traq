@@ -1,14 +1,18 @@
 /**
  * update_banner.js
- * 全ページ共通：SW更新検知 → ボトムバナー表示
+ * 全ページ共通：
+ *   1) SW更新検知 → ボトムバナー表示
+ *   2) Push通知タップ → ナビゲーション（Cache API / postMessage）
  * 使い方: <script src="./update_banner.js"></script> を各ページに追加
  */
 (function() {
+  // ============================================================
+  //  ① SW更新バナー（既存機能）
+  // ============================================================
   var BANNER_ID   = 'traq-update-banner';
   var STYLE_ID    = 'traq-update-style';
-  var SNOOZED_KEY = 'traq_update_snoozed'; // 「後で」を押した時刻
+  var SNOOZED_KEY = 'traq_update_snoozed';
 
-  // スタイル注入
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var s = document.createElement('style');
@@ -40,7 +44,6 @@
     document.head.appendChild(s);
   }
 
-  // バナー生成
   function createBanner() {
     if (document.getElementById(BANNER_ID)) return;
     var el = document.createElement('div');
@@ -57,15 +60,12 @@
     document.body.appendChild(el);
   }
 
-  // バナー表示
   function showBanner() {
-    // 「後で」を押してから30分以内は表示しない
     var snoozed = parseInt(localStorage.getItem(SNOOZED_KEY) || '0');
     if (snoozed && Date.now() - snoozed < 30 * 60 * 1000) return;
 
     injectStyle();
     createBanner();
-    // ボトムナビの高さ分だけずらす（ボトムナビがある場合）
     var bnav = document.querySelector('.bottom-nav');
     var offset = bnav ? bnav.offsetHeight : 0;
     var banner = document.getElementById(BANNER_ID);
@@ -80,10 +80,8 @@
     });
   }
 
-  // 今すぐ更新
   window._traqUpdateNow = function() {
     localStorage.removeItem(SNOOZED_KEY);
-    // SW全キャッシュ削除 → リロード
     if ('caches' in window) {
       caches.keys().then(function(keys) {
         return Promise.all(keys.map(function(k) { return caches.delete(k); }));
@@ -95,7 +93,6 @@
     }
   };
 
-  // 後で（30分スヌーズ）
   window._traqUpdateLater = function() {
     localStorage.setItem(SNOOZED_KEY, Date.now().toString());
     var b = document.getElementById(BANNER_ID);
@@ -105,15 +102,112 @@
     }
   };
 
-  // SW登録 & メッセージ受信
+  // ============================================================
+  //  ② Push通知タップ → ナビゲーション
+  //     sw.js の notificationclick が Cache API (traq-push-nav)
+  //     にナビ先URLを保存済み。ここで読み取ってナビゲーションする。
+  // ============================================================
+
+  var PUSH_NAV_CACHE = 'traq-push-nav';
+  var PUSH_NAV_KEY   = '/__push_nav__';
+  var _pushNavProcessing = false; // 二重実行防止
+
+  /**
+   * Cache API からナビ先URLを読み取り → 削除 → ナビゲーション
+   * sw.js がどのページで通知タップされても、このスクリプトが
+   * 全ページで読み込まれているため確実にキャッチできる。
+   */
+  function checkPushNav() {
+    if (_pushNavProcessing) return;
+    if (!('caches' in window)) return;
+
+    _pushNavProcessing = true;
+
+    caches.open(PUSH_NAV_CACHE).then(function(cache) {
+      return cache.match(PUSH_NAV_KEY);
+    }).then(function(response) {
+      if (!response) {
+        _pushNavProcessing = false;
+        return;
+      }
+      return response.text().then(function(targetUrl) {
+        // キャッシュを即削除（次回の重複ナビゲーション防止）
+        return caches.open(PUSH_NAV_CACHE).then(function(cache) {
+          return cache.delete(PUSH_NAV_KEY);
+        }).then(function() {
+          return targetUrl;
+        });
+      });
+    }).then(function(targetUrl) {
+      if (!targetUrl) {
+        _pushNavProcessing = false;
+        return;
+      }
+      navigateTo(targetUrl);
+    }).catch(function(err) {
+      console.warn('Push nav check error:', err);
+      _pushNavProcessing = false;
+    });
+  }
+
+  /**
+   * ナビゲーション実行
+   * 現在のページと同一URLならリロード、違えば遷移
+   */
+  function navigateTo(targetUrl) {
+    try {
+      var target = new URL(targetUrl, location.origin);
+      var current = new URL(location.href);
+
+      // パス + クエリが同一なら何もしない（既に該当ページにいる）
+      // ただし ?detail= 付きの場合はリロードして詳細を開く
+      if (target.pathname === current.pathname && target.search === current.search) {
+        _pushNavProcessing = false;
+        return;
+      }
+
+      // 同一パスだがクエリ異なる（?detail=xxx 追加など）→ 遷移
+      // 異なるパス → 遷移
+      location.href = target.pathname + target.search;
+    } catch (e) {
+      console.warn('Push nav error:', e);
+      _pushNavProcessing = false;
+    }
+  }
+
+  // ============================================================
+  //  ③ SW登録 & イベントリスナー
+  // ============================================================
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(function(e) {
       console.warn('SW登録失敗:', e);
     });
 
+    // SW → ページへのメッセージ受信
     navigator.serviceWorker.addEventListener('message', function(event) {
-      if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+      if (!event.data) return;
+
+      // SW更新バナー
+      if (event.data.type === 'UPDATE_AVAILABLE') {
         showBanner();
+      }
+
+      // Push通知タップからの直接ナビゲーション（postMessage経由）
+      // iOS PWAではアプリがフォアグラウンドの時のみ有効
+      if (event.data.type === 'PUSH_NAV' && event.data.url) {
+        // Cache APIにも書き込まれているが、postMessageが先に届いた場合は
+        // こちらで処理してキャッシュも削除
+        if (!_pushNavProcessing) {
+          _pushNavProcessing = true;
+          // キャッシュ削除（checkPushNavとの競合防止）
+          if ('caches' in window) {
+            caches.open(PUSH_NAV_CACHE).then(function(cache) {
+              return cache.delete(PUSH_NAV_KEY);
+            }).catch(function() {});
+          }
+          navigateTo(event.data.url);
+        }
       }
     });
 
@@ -133,4 +227,27 @@
       });
     });
   }
+
+  // ============================================================
+  //  ④ visibilitychange でPushナビゲーションチェック
+  //     iOS PWA: 通知タップ → アプリがフォアグラウンドに戻る
+  //     → visibilitychange fired → Cache APIを読む → ナビゲーション
+  // ============================================================
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      checkPushNav();
+    }
+  });
+
+  // ページ初回ロード時もチェック（通知タップで新規タブが開いた場合）
+  // DOMContentLoaded後に少し遅延して実行（SW登録完了を待つ）
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(checkPushNav, 300);
+    });
+  } else {
+    setTimeout(checkPushNav, 300);
+  }
+
 })();

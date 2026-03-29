@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v6';
+const CACHE_NAME = 'traq-v7';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -131,13 +131,13 @@ self.addEventListener('notificationclick', event => {
   var fullUrl = new URL(targetUrl, self.location.origin).href;
 
   event.waitUntil(
-    // ナビ先URLをキャッシュに保存（ページ側で読み取る）
+    // 1) Cache APIにナビ先URLを保存（ページ側 update_banner.js で読み取る）
     caches.open('traq-push-nav').then(function(cache) {
       return cache.put('/__push_nav__', new Response(fullUrl));
     }).then(function() {
       return clients.matchAll({ type: 'window', includeUncontrolled: true });
     }).then(function(windowClients) {
-      // 既存タブがあればpostMessage + フォーカス
+      // 2) 既存タブがあれば postMessage + focus
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url.includes('ryotaimage-oss.github.io/traq')) {
@@ -145,7 +145,7 @@ self.addEventListener('notificationclick', event => {
           return client.focus();
         }
       }
-      // なければ新規タブ
+      // 3) なければ新規タブ（iOS PWAでは効かない場合があるがフォールバック）
       return clients.openWindow(fullUrl);
     })
   );
