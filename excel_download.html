@@ -214,27 +214,27 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span><span>一覧</span>
+        <span class="snav-icon">📋</span><span data-i18n="sb_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span>ダッシュボード</span>
+        <span class="snav-icon">📊</span><span data-i18n="sb_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">📥</span><span>Excel出力</span>
+        <span class="snav-icon">📥</span><span data-i18n="sb_excel">Excel出力</span>
       </button>
       <button class="snav-item" onclick="goMaster()">
-        <span class="snav-icon">🔧</span><span>マスタ管理</span>
+        <span class="snav-icon">🔧</span><span data-i18n="sb_master">マスタ管理</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span><span>テーマ切替</span>
+        <span class="snav-icon" id="sb-theme-icon">🌙</span><span data-i18n="sb_theme">テーマ切替</span>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon">⚙️</span><span>設定</span>
+        <span class="snav-icon">⚙️</span><span data-i18n="sb_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--error)">
-        <span class="snav-icon">🚪</span><span>ログアウト</span>
+        <span class="snav-icon">🚪</span><span data-i18n="sb_logout">ログアウト</span>
       </button>
     </div>
   </aside>
@@ -265,15 +265,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       <span class="topbar-sub">Trouble Tracking System</span>
     </div>
     <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
+      <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード">🔄</button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替">🌙</button>
+      <button class="hdr-icon-btn" onclick="location.href='settings.html'" data-i18n-title="hdr_settings" title="設定">⚙️</button>
       <div class="hdr-avatar" id="mob-avatar"></div>
     </div>
   </header>
 <div class="page-title-bar">
   <button class="page-back-btn" onclick="goBack()">←</button>
-  <span class="page-title-text">📥 Excel出力</span>
+  <span class="page-title-text" data-i18n="page_title">📥 Excel出力</span>
 </div>
 
 <main class="main">
@@ -281,22 +281,22 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
   <!-- 期間指定 -->
   <div class="section">
-    <div class="section-title">📅 出力期間</div>
+    <div class="section-title" data-i18n="sec_period">📅 出力期間</div>
 
     <div class="preset-group">
-      <button class="preset-btn" id="preset-week"  onclick="setPreset('week')">今週</button>
-      <button class="preset-btn" id="preset-month" onclick="setPreset('month')">今月</button>
-      <button class="preset-btn" id="preset-prev"  onclick="setPreset('prev')">先月</button>
-      <button class="preset-btn" id="preset-all"   onclick="setPreset('all')">全期間</button>
+      <button class="preset-btn" id="preset-week"  onclick="setPreset('week')"data-i18n="preset_week">今週</button>
+      <button class="preset-btn" id="preset-month" onclick="setPreset('month')"data-i18n="preset_month">今月</button>
+      <button class="preset-btn" id="preset-prev"  onclick="setPreset('prev')"data-i18n="preset_prev">先月</button>
+      <button class="preset-btn" id="preset-all"   onclick="setPreset('all')"data-i18n="preset_all">全期間</button>
     </div>
 
     <div class="date-range">
       <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">開始日</label>
+        <label class="form-label" data-i18n="lbl_from">開始日</label>
         <input class="form-input" type="date" id="date-from" onchange="onDateChange()">
       </div>
       <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">終了日</label>
+        <label class="form-label" data-i18n="lbl_to">終了日</label>
         <input class="form-input" type="date" id="date-to" onchange="onDateChange()">
       </div>
     </div>
@@ -304,11 +304,11 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
   <!-- プレビュー -->
   <div class="section" id="preview-section">
-    <div class="section-title">📊 件数プレビュー</div>
+    <div class="section-title" data-i18n="sec_preview">📊 件数プレビュー</div>
     <div class="preview-card">
       <div>
-        <div class="preview-label">⚙️ 設備トラブル</div>
-        <div class="preview-sub">設備トラブル_期間.xlsx</div>
+        <div class="preview-label" data-i18n="preview_eq">⚙️ 設備トラブル</div>
+        <div class="preview-sub" data-i18n="preview_eq_file">設備トラブル_期間.xlsx</div>
       </div>
       <div style="text-align:right">
         <div class="preview-count" id="count-equipment">–</div>
@@ -317,8 +317,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     </div>
     <div class="preview-card">
       <div>
-        <div class="preview-label">🔩 金型トラブル</div>
-        <div class="preview-sub">金型トラブル_期間.xlsx</div>
+        <div class="preview-label" data-i18n="preview_md">🔩 金型トラブル</div>
+        <div class="preview-sub" data-i18n="preview_md_file">金型トラブル_期間.xlsx</div>
       </div>
       <div style="text-align:right">
         <div class="preview-count" id="count-mold">–</div>
@@ -329,15 +329,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
   <!-- 出力オプション -->
   <div class="section">
-    <div class="section-title">📎 画像出力</div>
+    <div class="section-title" data-i18n="sec_image">📎 画像出力</div>
     <div class="form-group" style="margin-bottom:0">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;padding:6px 0">
         <input type="checkbox" id="include-images" style="width:18px;height:18px;accent-color:var(--orange);cursor:pointer">
-        <span>画像をZIPでまとめてダウンロード</span>
+        <span data-i18n="img_check">画像をZIPでまとめてダウンロード</span>
       </label>
       <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6">
-        対象期間のトラブルに添付された画像をZIPファイルとしてダウンロードします。<br>
-        容量削減前のバックアップに利用できます。
+        <span data-i18n="img_desc">対象期間のトラブルに添付された画像をZIPファイルとしてダウンロードします。</span><br>
+        <span data-i18n="img_desc2">容量削減前のバックアップに利用できます。</span>
       </div>
     </div>
   </div>
@@ -350,7 +350,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      Excelダウンロード
+      <span data-i18n="btn_excel">Excelダウンロード</span>
     </button>
     <button class="dl-btn" id="dl-img-btn" onclick="doImageDownload()" disabled style="margin-top:10px;background:var(--surface);border:1.5px solid var(--orange);color:var(--orange);display:none">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -358,7 +358,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      📷 画像ZIPダウンロード
+      <span data-i18n="btn_img_zip">📷 画像ZIPダウンロード</span>
     </button>
   </div>
   </div>
@@ -368,15 +368,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 <nav class="bottom-nav">
     <button class="nav-item" onclick="location.href='home_sl.html'">
       <span class="nav-icon">📋</span>
-      <span class="nav-label">一覧</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">ダッシュボード</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
     <button class="nav-item" onclick="goMaster()">
       <span class="nav-icon">🔧</span>
-      <span class="nav-label">マスタ</span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
     </button>
   </nav>
   </div><!-- /.main-column -->
@@ -385,7 +385,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 <!-- ローディング -->
 <div class="overlay hidden" id="overlay">
   <div class="spinner"></div>
-  <div class="overlay-text" id="overlay-text">データ取得中...</div>
+  <div class="overlay-text" id="overlay-text" data-i18n="overlay_fetching">データ取得中...</div>
 </div>
 
 <!-- トースト -->
@@ -404,6 +404,156 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+
+/* ===== i18n ===== */
+var I18N = {
+  ja: {
+    page_title:'📥 Excel出力',
+    sec_period:'📅 出力期間', sec_preview:'📊 件数プレビュー', sec_image:'📎 画像出力',
+    preset_week:'今週', preset_month:'今月', preset_prev:'先月', preset_all:'全期間',
+    lbl_from:'開始日', lbl_to:'終了日',
+    preview_eq:'⚙️ 設備トラブル', preview_md:'🔩 金型トラブル',
+    preview_eq_file:'設備トラブル_期間.xlsx', preview_md_file:'金型トラブル_期間.xlsx',
+    unit_count:'件',
+    img_check:'画像をZIPでまとめてダウンロード',
+    img_desc:'対象期間のトラブルに添付された画像をZIPファイルとしてダウンロードします。',
+    img_desc2:'容量削減前のバックアップに利用できます。',
+    btn_excel:'Excelダウンロード', btn_img_zip:'📷 画像ZIPダウンロード',
+    nav_list:'一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
+    sb_list:'一覧', sb_dashboard:'ダッシュボード', sb_excel:'Excel出力', sb_master:'マスタ管理',
+    sb_theme:'テーマ切替', sb_settings:'設定', sb_logout:'ログアウト',
+    hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
+    master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
+    overlay_fetching:'データ取得中...',
+    overlay_img_info:'画像情報を取得中...',
+    overlay_img_dl:function(i,n){return '画像をダウンロード中... ('+i+'/'+n+')';},
+    overlay_zip:'ZIPファイル生成中...',
+    overlay_zip_pct:function(p){return 'ZIPファイル生成中... '+p+'%';},
+    overlay_eq_gen:'設備Excel生成中...', overlay_md_gen:'金型Excel生成中...',
+    msg_no_period:'期間を指定してください',
+    msg_no_data:'対象データがありません',
+    msg_count_fail:function(m){return '件数取得失敗: '+m;},
+    msg_dl_done:function(eq,md){var s='';if(eq>0)s+='設備'+eq+'件';if(eq>0&&md>0)s+=' / ';if(md>0)s+='金型'+md+'件';return s+' ダウンロード完了';},
+    msg_dl_fail:function(m){return 'ダウンロード失敗: '+m;},
+    msg_no_trouble:'対象期間にトラブルがありません',
+    msg_no_images:'対象期間に画像がありません',
+    msg_img_fail:'画像の取得に失敗しました',
+    msg_img_done:function(n,f){var s=n+'件の画像をダウンロードしました';if(f>0)s+='（'+f+'件失敗）';return s;},
+    msg_img_dl_fail:function(m){return '画像ダウンロード失敗: '+m;},
+    xl_no:'No', xl_date:'発生日', xl_shift:'シフト', xl_line:'ライン', xl_machine:'機番',
+    xl_pcode:'品番コード', xl_pname:'品番名', xl_category:'分類', xl_occurrence:'初発/再発',
+    xl_stop_start:'停止開始', xl_stop_end:'停止終了', xl_stop_min:'停止分数',
+    xl_detail:'詳細内容', xl_reporter:'報告者', xl_status:'ステータス',
+    xl_approver:'承認者', xl_approved_at:'承認日時', xl_reject:'差戻しコメント',
+    xl_eq_sheet:'設備トラブル', xl_md_sheet:'金型トラブル',
+    xl_eq_file:function(f,t){return '設備トラブル_'+f+'-'+t+'.xlsx';},
+    xl_md_file:function(f,t){return '金型トラブル_'+f+'-'+t+'.xlsx';},
+    xl_img_file:function(f,t){return 'トラブル画像_'+f+'-'+t+'.zip';},
+    st_draft:'下書き', st_pending:'承認待ち', st_approved:'承認済', st_rejected:'差戻し',
+    occ_first:'初発', occ_rec:'再発',
+  },
+  vi: {
+    page_title:'📥 Xuất Excel',
+    sec_period:'📅 Khoảng thời gian', sec_preview:'📊 Xem trước số lượng', sec_image:'📎 Xuất ảnh',
+    preset_week:'Tuần này', preset_month:'Tháng này', preset_prev:'Tháng trước', preset_all:'Tất cả',
+    lbl_from:'Từ ngày', lbl_to:'Đến ngày',
+    preview_eq:'⚙️ Sự cố thiết bị', preview_md:'🔩 Sự cố khuôn',
+    preview_eq_file:'SuCo_ThietBi_period.xlsx', preview_md_file:'SuCo_Khuon_period.xlsx',
+    unit_count:'件',
+    img_check:'Tải ảnh dạng ZIP',
+    img_desc:'Tải ảnh đính kèm trong khoảng thời gian dưới dạng ZIP.',
+    img_desc2:'Dùng để sao lưu trước khi xoá dữ liệu.',
+    btn_excel:'Tải Excel', btn_img_zip:'📷 Tải ZIP ảnh',
+    nav_list:'Danh sách', nav_dashboard:'Dashboard', nav_master:'Master',
+    sb_list:'Danh sách', sb_dashboard:'Dashboard', sb_excel:'Xuất Excel', sb_master:'Quản lý Master',
+    sb_theme:'Đổi giao diện', sb_settings:'Cài đặt', sb_logout:'Đăng xuất',
+    hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
+    master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
+    overlay_fetching:'Đang tải dữ liệu...',
+    overlay_img_info:'Đang lấy thông tin ảnh...',
+    overlay_img_dl:function(i,n){return 'Đang tải ảnh... ('+i+'/'+n+')';},
+    overlay_zip:'Đang tạo ZIP...',
+    overlay_zip_pct:function(p){return 'Đang tạo ZIP... '+p+'%';},
+    overlay_eq_gen:'Đang tạo Excel thiết bị...', overlay_md_gen:'Đang tạo Excel khuôn...',
+    msg_no_period:'Hãy chọn khoảng thời gian',
+    msg_no_data:'Không có dữ liệu',
+    msg_count_fail:function(m){return 'Lỗi đếm: '+m;},
+    msg_dl_done:function(eq,md){var s='';if(eq>0)s+='Thiết bị '+eq;if(eq>0&&md>0)s+=' / ';if(md>0)s+='Khuôn '+md;return s+' — Hoàn tất';},
+    msg_dl_fail:function(m){return 'Tải thất bại: '+m;},
+    msg_no_trouble:'Không có sự cố trong khoảng thời gian',
+    msg_no_images:'Không có ảnh trong khoảng thời gian',
+    msg_img_fail:'Không tải được ảnh',
+    msg_img_done:function(n,f){var s='Đã tải '+n+' ảnh';if(f>0)s+=' ('+f+' thất bại)';return s;},
+    msg_img_dl_fail:function(m){return 'Lỗi tải ảnh: '+m;},
+    xl_no:'No', xl_date:'Ngày', xl_shift:'Ca', xl_line:'Dây chuyền', xl_machine:'Máy',
+    xl_pcode:'Mã SP', xl_pname:'Tên SP', xl_category:'Phân loại', xl_occurrence:'Lần đầu/Tái phát',
+    xl_stop_start:'Bắt đầu dừng', xl_stop_end:'Kết thúc dừng', xl_stop_min:'Phút dừng',
+    xl_detail:'Chi tiết', xl_reporter:'Người báo', xl_status:'Trạng thái',
+    xl_approver:'Người duyệt', xl_approved_at:'Ngày duyệt', xl_reject:'Lý do trả lại',
+    xl_eq_sheet:'Thiet_Bi', xl_md_sheet:'Khuon',
+    xl_eq_file:function(f,t){return 'SuCo_ThietBi_'+f+'-'+t+'.xlsx';},
+    xl_md_file:function(f,t){return 'SuCo_Khuon_'+f+'-'+t+'.xlsx';},
+    xl_img_file:function(f,t){return 'Anh_SuCo_'+f+'-'+t+'.zip';},
+    st_draft:'Nháp', st_pending:'Chờ duyệt', st_approved:'Đã duyệt', st_rejected:'Trả lại',
+    occ_first:'Lần đầu', occ_rec:'Tái phát',
+  },
+  en: {
+    page_title:'📥 Excel Export',
+    sec_period:'📅 Export Period', sec_preview:'📊 Count Preview', sec_image:'📎 Image Export',
+    preset_week:'This Week', preset_month:'This Month', preset_prev:'Last Month', preset_all:'All',
+    lbl_from:'From', lbl_to:'To',
+    preview_eq:'⚙️ Equipment Trouble', preview_md:'🔩 Mold Trouble',
+    preview_eq_file:'Equipment_Trouble_period.xlsx', preview_md_file:'Mold_Trouble_period.xlsx',
+    unit_count:'',
+    img_check:'Download images as ZIP',
+    img_desc:'Download attached images for the selected period as a ZIP file.',
+    img_desc2:'Useful for backup before clearing storage.',
+    btn_excel:'Download Excel', btn_img_zip:'📷 Download Image ZIP',
+    nav_list:'List', nav_dashboard:'Dashboard', nav_master:'Master',
+    sb_list:'List', sb_dashboard:'Dashboard', sb_excel:'Excel Export', sb_master:'Master',
+    sb_theme:'Toggle theme', sb_settings:'Settings', sb_logout:'Logout',
+    hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
+    master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
+    overlay_fetching:'Fetching data...',
+    overlay_img_info:'Fetching image info...',
+    overlay_img_dl:function(i,n){return 'Downloading images... ('+i+'/'+n+')';},
+    overlay_zip:'Generating ZIP...',
+    overlay_zip_pct:function(p){return 'Generating ZIP... '+p+'%';},
+    overlay_eq_gen:'Generating Equipment Excel...', overlay_md_gen:'Generating Mold Excel...',
+    msg_no_period:'Please select a period',
+    msg_no_data:'No data found',
+    msg_count_fail:function(m){return 'Count failed: '+m;},
+    msg_dl_done:function(eq,md){var s='';if(eq>0)s+='Equipment '+eq;if(eq>0&&md>0)s+=' / ';if(md>0)s+='Mold '+md;return s+' — Download complete';},
+    msg_dl_fail:function(m){return 'Download failed: '+m;},
+    msg_no_trouble:'No troubles in the selected period',
+    msg_no_images:'No images in the selected period',
+    msg_img_fail:'Failed to fetch images',
+    msg_img_done:function(n,f){var s=n+' images downloaded';if(f>0)s+=' ('+f+' failed)';return s;},
+    msg_img_dl_fail:function(m){return 'Image download failed: '+m;},
+    xl_no:'No', xl_date:'Date', xl_shift:'Shift', xl_line:'Line', xl_machine:'Machine',
+    xl_pcode:'Product Code', xl_pname:'Product Name', xl_category:'Category', xl_occurrence:'First/Recurrence',
+    xl_stop_start:'Stop Start', xl_stop_end:'Stop End', xl_stop_min:'Stop Minutes',
+    xl_detail:'Detail', xl_reporter:'Reporter', xl_status:'Status',
+    xl_approver:'Approver', xl_approved_at:'Approved At', xl_reject:'Reject Comment',
+    xl_eq_sheet:'Equipment', xl_md_sheet:'Mold',
+    xl_eq_file:function(f,t){return 'Equipment_Trouble_'+f+'-'+t+'.xlsx';},
+    xl_md_file:function(f,t){return 'Mold_Trouble_'+f+'-'+t+'.xlsx';},
+    xl_img_file:function(f,t){return 'Trouble_Images_'+f+'-'+t+'.zip';},
+    st_draft:'Draft', st_pending:'Pending', st_approved:'Approved', st_rejected:'Rejected',
+    occ_first:'First', occ_rec:'Recurrence',
+  }
+};
+var currentLang = localStorage.getItem('traq_lang') || 'ja';
+function t(k) {
+  var v = I18N[currentLang] && I18N[currentLang][k];
+  if (v === undefined) v = I18N.ja[k];
+  return v !== undefined ? v : k;
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) { el.title = t(el.dataset.i18nTitle); });
+  document.title = 'Traq – ' + t('page_title').replace(/^[^\s]+\s/,'');
+}
 
 async function sbFetch(path) {
   var res = await fetch(SB_URL + '/rest/v1/' + path, {
@@ -428,6 +578,7 @@ var session = null;
     location.href = 'home.html'; return;
   }
   initChip();
+  applyI18n();
   // デフォルトは今月
   setPreset('month');
 })();
@@ -446,7 +597,7 @@ function showMasterDenied(){
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
   box.style.cssText='background:var(--bg2,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">アクセス制限</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">マスタはSL・管理者のみ利用できます</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 // ── ヘッダーチップ初期化 ──
@@ -587,7 +738,7 @@ async function _fetchPreview() {
   } catch(e) {
     document.getElementById('count-equipment').textContent = '–';
     document.getElementById('count-mold').textContent      = '–';
-    showToast('件数取得失敗: ' + e.message, 'error');
+    showToast(t('msg_count_fail')(e.message), 'error');
   }
 }
 
@@ -617,10 +768,10 @@ function buildQuery(from, to, type, countOnly) {
 async function doDownload() {
   var from = document.getElementById('date-from').value;
   var to   = document.getElementById('date-to').value;
-  if (!from || !to) { showToast('期間を指定してください', 'error'); return; }
+  if (!from || !to) { showToast(t('msg_no_period'), 'error'); return; }
 
   document.getElementById('dl-btn').disabled = true;
-  showOverlay('データ取得中...');
+  showOverlay(t('overlay_fetching'));
 
   try {
     var rows = await sbFetch(buildQuery(from, to, null, false));
@@ -631,7 +782,7 @@ async function doDownload() {
     if (eqRows.length === 0 && moldRows.length === 0) {
       hideOverlay();
       document.getElementById('dl-btn').disabled = false;
-      showToast('対象データがありません', 'error');
+      showToast(t('msg_no_data'), 'error');
       return;
     }
 
@@ -640,52 +791,48 @@ async function doDownload() {
 
     // 設備ファイル
     if (eqRows.length > 0) {
-      showOverlay('設備Excel生成中...');
+      showOverlay(t('overlay_eq_gen'));
       var wbEq = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbEq, buildSheet(eqRows), '設備トラブル');
-      XLSX.writeFile(wbEq, '設備トラブル_' + fromStr + '-' + toStr + '.xlsx');
+      XLSX.utils.book_append_sheet(wbEq, buildSheet(eqRows), t('xl_eq_sheet'));
+      XLSX.writeFile(wbEq, t('xl_eq_file')(fromStr, toStr));
     }
 
     // 金型ファイル
     if (moldRows.length > 0) {
-      showOverlay('金型Excel生成中...');
+      showOverlay(t('overlay_md_gen'));
       var wbMd = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbMd, buildSheet(moldRows), '金型トラブル');
-      XLSX.writeFile(wbMd, '金型トラブル_' + fromStr + '-' + toStr + '.xlsx');
+      XLSX.utils.book_append_sheet(wbMd, buildSheet(moldRows), t('xl_md_sheet'));
+      XLSX.writeFile(wbMd, t('xl_md_file')(fromStr, toStr));
     }
 
     hideOverlay();
-    var msg = '';
-    if (eqRows.length > 0) msg += '設備' + eqRows.length + '件';
-    if (eqRows.length > 0 && moldRows.length > 0) msg += ' / ';
-    if (moldRows.length > 0) msg += '金型' + moldRows.length + '件';
-    showToast(msg + ' ダウンロード完了', 'success');
+    showToast(t('msg_dl_done')(eqRows.length, moldRows.length), 'success');
     document.getElementById('dl-btn').disabled = false;
 
   } catch(e) {
     hideOverlay();
     document.getElementById('dl-btn').disabled = false;
-    showToast('ダウンロード失敗: ' + e.message, 'error');
+    showToast(t('msg_dl_fail')(e.message), 'error');
   }
 }
 
 // ── シート生成 ────────────────────────────────────────────
 function buildSheet(rows) {
   var HEADERS = [
-    'No', '発生日', 'シフト', 'ライン', '機番', '品番コード', '品番名',
-    '分類', '初発/再発', '停止開始', '停止終了', '停止分数',
-    '詳細内容', '報告者', 'ステータス', '承認者', '承認日時', '差戻しコメント'
+    t('xl_no'), t('xl_date'), t('xl_shift'), t('xl_line'), t('xl_machine'), t('xl_pcode'), t('xl_pname'),
+    t('xl_category'), t('xl_occurrence'), t('xl_stop_start'), t('xl_stop_end'), t('xl_stop_min'),
+    t('xl_detail'), t('xl_reporter'), t('xl_status'), t('xl_approver'), t('xl_approved_at'), t('xl_reject')
   ];
 
   var statusLabel = {
-    'draft':    '下書き',
-    'pending':  '承認待ち',
-    'approved': '承認済',
-    'rejected': '差戻し'
+    'draft':    t('st_draft'),
+    'pending':  t('st_pending'),
+    'approved': t('st_approved'),
+    'rejected': t('st_rejected')
   };
   var occLabel = {
-    'first':      '初発',
-    'recurrence': '再発'
+    'first':      t('occ_first'),
+    'recurrence': t('occ_rec')
   };
 
   var data = [HEADERS];
@@ -789,10 +936,10 @@ document.getElementById('include-images').addEventListener('change', function() 
 async function doImageDownload() {
   var from = document.getElementById('date-from').value;
   var to   = document.getElementById('date-to').value;
-  if (!from || !to) { showToast('期間を指定してください', 'error'); return; }
+  if (!from || !to) { showToast(t('msg_no_period'), 'error'); return; }
 
   document.getElementById('dl-img-btn').disabled = true;
-  showOverlay('画像情報を取得中...');
+  showOverlay(t('overlay_img_info'));
 
   try {
     // 対象期間のトラブルIDを取得
@@ -804,7 +951,7 @@ async function doImageDownload() {
     if (!troubles || troubles.length === 0) {
       hideOverlay();
       document.getElementById('dl-img-btn').disabled = false;
-      showToast('対象期間にトラブルがありません', 'error');
+      showToast(t('msg_no_trouble'), 'error');
       return;
     }
 
@@ -819,11 +966,11 @@ async function doImageDownload() {
     if (!images || images.length === 0) {
       hideOverlay();
       document.getElementById('dl-img-btn').disabled = false;
-      showToast('対象期間に画像がありません', 'error');
+      showToast(t('msg_no_images'), 'error');
       return;
     }
 
-    showOverlay('画像をダウンロード中... (0/' + images.length + ')');
+    showOverlay(t('overlay_img_dl')(0, images.length));
 
     var zip = new JSZip();
     var downloaded = 0;
@@ -853,19 +1000,19 @@ async function doImageDownload() {
         failed++;
       }
 
-      showOverlay('画像をダウンロード中... (' + (i + 1) + '/' + images.length + ')');
+      showOverlay(t('overlay_img_dl')(i + 1, images.length));
     }
 
     if (downloaded === 0) {
       hideOverlay();
       document.getElementById('dl-img-btn').disabled = false;
-      showToast('画像の取得に失敗しました', 'error');
+      showToast(t('msg_img_fail'), 'error');
       return;
     }
 
-    showOverlay('ZIPファイル生成中...');
+    showOverlay(t('overlay_zip'));
     var zipBlob = await zip.generateAsync({ type: 'blob' }, function(meta) {
-      showOverlay('ZIPファイル生成中... ' + Math.round(meta.percent) + '%');
+      showOverlay(t('overlay_zip_pct')(Math.round(meta.percent)));
     });
 
     // ダウンロード
@@ -873,21 +1020,20 @@ async function doImageDownload() {
     var toStr   = to.replace(/-/g, '');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(zipBlob);
-    a.download = 'トラブル画像_' + fromStr + '-' + toStr + '.zip';
+    a.download = t('xl_img_file')(fromStr, toStr);
     a.click();
     URL.revokeObjectURL(a.href);
 
     hideOverlay();
     document.getElementById('dl-img-btn').disabled = false;
 
-    var msg = downloaded + '件の画像をダウンロードしました';
-    if (failed > 0) msg += '（' + failed + '件失敗）';
+    var msg = t('msg_img_done')(downloaded, failed);
     showToast(msg, failed > 0 ? 'error' : 'success');
 
   } catch(e) {
     hideOverlay();
     document.getElementById('dl-img-btn').disabled = false;
-    showToast('画像ダウンロード失敗: ' + e.message, 'error');
+    showToast(t('msg_img_dl_fail')(e.message), 'error');
   }
 }
 </script>
