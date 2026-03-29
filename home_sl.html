@@ -599,13 +599,20 @@ let typeFilter = 'all';
   var params = new URLSearchParams(location.search);
   var detailId = params.get('detail');
   if (detailId) {
-    // URLパラメータをクリア（リロード時に再表示しない）
     history.replaceState(null, '', location.pathname);
-    // 該当トラブルがあればモーダルを開く
     var found = TROUBLES.find(function(tr) { return String(tr.id) === String(detailId); });
     if (found) {
       setTimeout(function() { openDetail(found.id); }, 300);
     }
+  }
+
+  // SW からの通知ナビゲーション指示を受信
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'PUSH_NAV' && event.data.url) {
+        location.href = event.data.url;
+      }
+    });
   }
 })();
 

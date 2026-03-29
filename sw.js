@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v3';
+const CACHE_NAME = 'traq-v5';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -134,15 +134,14 @@ self.addEventListener('notificationclick', event => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
-      // 既に開いているTraqタブがあればフォーカス
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url.includes('home_sl') && 'focus' in client) {
-          return client.focus().then(function(c) { c.navigate(fullUrl); });
+        if (client.url.includes('ryotaimage-oss.github.io/traq')) {
+          client.postMessage({ type: 'PUSH_NAV', url: fullUrl });
+          return client.focus();
         }
       }
-      // なければ新しいタブで開く
-      if (clients.openWindow) return clients.openWindow(fullUrl);
+      return clients.openWindow(fullUrl);
     })
   );
 });
