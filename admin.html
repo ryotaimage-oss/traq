@@ -91,6 +91,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .sidebar{width:240px}
 }
 
+/* Master actions bar */
+.master-actions-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.master-actions-bar .btn{font-size:12px;padding:6px 14px}
+
 /* Tab bar */
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
 .tab-bar::-webkit-scrollbar{display:none}
@@ -296,6 +300,12 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')" data-i18n="tab_storage">💾 ストレージ</button>
   </div>
 
+  <div class="master-actions-bar">
+    <button class="btn btn-secondary btn-sm" onclick="exportAllMasters()" data-i18n="btn_export_all">📥 マスタExcel出力</button>
+    <button class="btn btn-primary btn-sm" onclick="triggerImport()" data-i18n="btn_import_all">📤 Excelインポート</button>
+    <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none" onchange="processImportFile(this)">
+  </div>
+
   <div class="scroll-area" id="scrollArea">
   <div class="inner">
 
@@ -304,7 +314,6 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <div class="section-header">
         <span class="section-title" data-i18n="sec_users">👥 ユーザー管理</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportUsers()" data-i18n="btn_excel">📥 Excel出力</button>
           <button class="btn btn-primary btn-sm" onclick="openUserModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
@@ -335,7 +344,6 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <div class="section-header">
         <span class="section-title" data-i18n="sec_machines">⚙️ 機番マスタ</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportMachines()" data-i18n="btn_excel">📥 Excel出力</button>
           <button class="btn btn-primary btn-sm" onclick="openMachineModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
@@ -366,7 +374,6 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <div class="section-header">
         <span class="section-title" data-i18n="sec_products">📦 品番マスタ</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportProducts()" data-i18n="btn_excel">📥 Excel出力</button>
           <button class="btn btn-primary btn-sm" onclick="openProductModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
@@ -692,7 +699,31 @@ btn_delete:'削除',
 master_del_confirm:function(n){return '「'+n+'」を削除しますか？\nこの操作は取り消せません。';},
 master_del_has_ref:function(n){return n+'件のトラブルが参照中のため削除できません';},
 master_del_done:'削除しました',
-master_del_error:function(m){return '削除エラー: '+m;}
+master_del_error:function(m){return '削除エラー: '+m;},
+btn_export_all:'📥 マスタExcel出力',btn_import_all:'📤 Excelインポート',
+excel_categories_sheet:'分類',excel_links_sheet:'紐づけ',
+excel_cat_type:'種別',excel_cat_name:'分類名',excel_sort_order:'順序',
+excel_shift:'シフト',excel_memo:'メモ',
+imp_no_file:'ファイルを選択してください',
+imp_invalid_format:'Excelファイルの形式が不正です',
+imp_no_changes:'変更はありません',
+imp_preview_title:'📋 インポートプレビュー',
+imp_sheet:'シート',imp_new:'新規',imp_update:'更新',imp_skip:'変更なし',imp_error:'エラー',
+imp_deactivate_missing:'Excelに無い既存データを無効化する',
+imp_deactivate_warn:function(n){return n+'件が無効化されます';},
+imp_confirm:'インポート実行',
+imp_importing:'インポート中...',
+imp_done:function(n,u){return '完了: 新規'+n+'件、更新'+u+'件';},
+imp_error_msg:function(m){return 'インポートエラー: '+m;},
+imp_row_error:function(r,m){return '行'+r+': '+m;},
+imp_err_line_not_found:'ライン名が見つかりません',
+imp_err_machine_not_found:'機番が見つかりません',
+imp_err_product_not_found:'品番が見つかりません',
+imp_err_empty_name:'名前が空です',
+imp_err_empty_code:'品番が空です',
+imp_err_empty_cat_name:'分類名が空です',
+imp_err_invalid_role:'ロールが不正です',
+imp_err_invalid_type:'種別が不正です'
 },
 vi:{
 nav_list:'Danh sách',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
@@ -792,7 +823,31 @@ btn_delete:'Xoá',
 master_del_confirm:function(n){return 'Xoá "'+n+'"?\nThao tác này không thể hoàn tác.';},
 master_del_has_ref:function(n){return 'Không thể xoá vì có '+n+' sự cố đang tham chiếu';},
 master_del_done:'Đã xoá',
-master_del_error:function(m){return 'Lỗi xoá: '+m;}
+master_del_error:function(m){return 'Lỗi xoá: '+m;},
+btn_export_all:'📥 Xuất Excel master',btn_import_all:'📤 Nhập Excel',
+excel_categories_sheet:'Phân loại',excel_links_sheet:'Liên kết',
+excel_cat_type:'Loại',excel_cat_name:'Tên phân loại',excel_sort_order:'Thứ tự',
+excel_shift:'Ca',excel_memo:'Ghi chú',
+imp_no_file:'Vui lòng chọn tệp',
+imp_invalid_format:'Định dạng tệp Excel không hợp lệ',
+imp_no_changes:'Không có thay đổi',
+imp_preview_title:'📋 Xem trước nhập liệu',
+imp_sheet:'Sheet',imp_new:'Mới',imp_update:'Cập nhật',imp_skip:'Không đổi',imp_error:'Lỗi',
+imp_deactivate_missing:'Ngừng dữ liệu không có trong Excel',
+imp_deactivate_warn:function(n){return n+' mục sẽ bị ngừng';},
+imp_confirm:'Thực hiện nhập',
+imp_importing:'Đang nhập...',
+imp_done:function(n,u){return 'Hoàn tất: '+n+' mới, '+u+' cập nhật';},
+imp_error_msg:function(m){return 'Lỗi nhập: '+m;},
+imp_row_error:function(r,m){return 'Dòng '+r+': '+m;},
+imp_err_line_not_found:'Không tìm thấy line',
+imp_err_machine_not_found:'Không tìm thấy số máy',
+imp_err_product_not_found:'Không tìm thấy mã SP',
+imp_err_empty_name:'Tên trống',
+imp_err_empty_code:'Mã SP trống',
+imp_err_empty_cat_name:'Tên phân loại trống',
+imp_err_invalid_role:'Vai trò không hợp lệ',
+imp_err_invalid_type:'Loại không hợp lệ'
 },
 en:{
 nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
@@ -892,7 +947,31 @@ btn_delete:'Delete',
 master_del_confirm:function(n){return 'Delete "'+n+'"?\nThis action cannot be undone.';},
 master_del_has_ref:function(n){return 'Cannot delete: '+n+' trouble(s) referencing this item';},
 master_del_done:'Deleted',
-master_del_error:function(m){return 'Delete error: '+m;}
+master_del_error:function(m){return 'Delete error: '+m;},
+btn_export_all:'📥 Export Master Excel',btn_import_all:'📤 Import Excel',
+excel_categories_sheet:'Categories',excel_links_sheet:'Links',
+excel_cat_type:'Type',excel_cat_name:'Category',excel_sort_order:'Order',
+excel_shift:'Shift',excel_memo:'Memo',
+imp_no_file:'Please select a file',
+imp_invalid_format:'Invalid Excel file format',
+imp_no_changes:'No changes detected',
+imp_preview_title:'📋 Import preview',
+imp_sheet:'Sheet',imp_new:'New',imp_update:'Update',imp_skip:'No change',imp_error:'Error',
+imp_deactivate_missing:'Deactivate items not in Excel',
+imp_deactivate_warn:function(n){return n+' item(s) will be deactivated';},
+imp_confirm:'Execute import',
+imp_importing:'Importing...',
+imp_done:function(n,u){return 'Done: '+n+' new, '+u+' updated';},
+imp_error_msg:function(m){return 'Import error: '+m;},
+imp_row_error:function(r,m){return 'Row '+r+': '+m;},
+imp_err_line_not_found:'Line name not found',
+imp_err_machine_not_found:'Machine not found',
+imp_err_product_not_found:'Product code not found',
+imp_err_empty_name:'Name is empty',
+imp_err_empty_code:'Code is empty',
+imp_err_empty_cat_name:'Category name is empty',
+imp_err_invalid_role:'Invalid role',
+imp_err_invalid_type:'Invalid type'
 }
 };
 function t(k){var d=I18N[currentLang]||I18N.ja;var v=d[k];if(v!==undefined)return v;return I18N.ja[k]!==undefined?I18N.ja[k]:k;}
@@ -1617,73 +1696,519 @@ async function exportImages(){
   }
 }
 
-/* ===== Excel export ===== */
-function exportUsers(){
+/* ===== Unified Master Export & Import ===== */
+function exportAllMasters(){
   try{
-    var rows=USERS.map(function(u){
-      var roleLabel=u.role==='admin'?'Admin':(u.role==='leader'||u.role==='sl')?'SL':'OP';
-      var active=u.is_active!==false?t('excel_active_yes'):t('excel_active_no');
-      var obj={};
-      obj[t('excel_name')]=u.name||'';
-      obj[t('excel_role')]=roleLabel;
-      obj[t('excel_active')]=active;
-      return obj;
-    });
-    var ws=XLSX.utils.json_to_sheet(rows);
-    /* 列幅自動調整 */
-    ws['!cols']=[{wch:20},{wch:10},{wch:10}];
     var wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,t('excel_users_sheet'));
+    var activeYes=t('excel_active_yes'), activeNo=t('excel_active_no');
+
+    /* Sheet 1: Users */
+    var uRows=USERS.map(function(u){
+      var rl=u.role==='admin'?'Admin':(u.role==='leader'||u.role==='sl')?'SL':'OP';
+      var o={};
+      o[t('excel_name')]=u.name||'';
+      o[t('excel_role')]=rl;
+      o[t('excel_shift')]=u.shift||'';
+      o[t('excel_active')]=u.is_active!==false?activeYes:activeNo;
+      return o;
+    });
+    var ws1=XLSX.utils.json_to_sheet(uRows);
+    ws1['!cols']=[{wch:20},{wch:10},{wch:8},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws1,t('excel_users_sheet'));
+
+    /* Sheet 2: Machines */
+    var mRows=MACHINES.map(function(m){
+      var ln=m.lines?m.lines.name:(LINES.find(function(l){return String(l.id)===String(m.line_id);})||{}).name||'';
+      var o={};
+      o[t('excel_line')]=ln;
+      o[t('excel_machine_no')]=m.machine_no;
+      o[t('excel_memo')]=m.memo||'';
+      o[t('excel_active')]=m.is_active!==false?activeYes:activeNo;
+      return o;
+    });
+    var ws2=XLSX.utils.json_to_sheet(mRows);
+    ws2['!cols']=[{wch:15},{wch:10},{wch:25},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws2,t('excel_machines_sheet'));
+
+    /* Sheet 3: Products */
+    var pRows=PRODUCTS.map(function(p){
+      var o={};
+      o[t('excel_product_code')]=p.product_code||'';
+      o[t('excel_product_name')]=p.product_name||'';
+      o[t('excel_memo')]=p.memo||'';
+      o[t('excel_active')]=p.is_active!==false?activeYes:activeNo;
+      return o;
+    });
+    var ws3=XLSX.utils.json_to_sheet(pRows);
+    ws3['!cols']=[{wch:20},{wch:30},{wch:25},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws3,t('excel_products_sheet'));
+
+    /* Sheet 4: Categories */
+    var cRows=CATEGORIES.map(function(c){
+      var o={};
+      o[t('excel_cat_type')]=c.type==='equipment'?t('type_equipment'):t('type_mold');
+      o[t('excel_cat_name')]=c.name||'';
+      o[t('excel_sort_order')]=c.sort_order!=null?c.sort_order:'';
+      o[t('excel_active')]=c.is_active!==false?activeYes:activeNo;
+      return o;
+    });
+    var ws4=XLSX.utils.json_to_sheet(cRows);
+    ws4['!cols']=[{wch:12},{wch:25},{wch:8},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws4,t('excel_categories_sheet'));
+
+    /* Sheet 5: Links (machine_products) */
+    var lRows=MACHINE_PRODUCTS.map(function(mp){
+      var m=MACHINES.find(function(x){return String(x.id)===String(mp.machine_id);});
+      var p=PRODUCTS.find(function(x){return String(x.id)===String(mp.product_id);});
+      var ln=m&&m.lines?m.lines.name:(m?(LINES.find(function(l){return String(l.id)===String(m.line_id);})||{}).name:'');
+      var o={};
+      o[t('excel_line')]=ln||'';
+      o[t('excel_machine_no')]=m?m.machine_no:'';
+      o[t('excel_product_code')]=p?p.product_code:'';
+      return o;
+    });
+    var ws5=XLSX.utils.json_to_sheet(lRows);
+    ws5['!cols']=[{wch:15},{wch:10},{wch:20}];
+    XLSX.utils.book_append_sheet(wb,ws5,t('excel_links_sheet'));
+
     var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
-    XLSX.writeFile(wb,'Traq_Users_'+ts+'.xlsx');
+    XLSX.writeFile(wb,'Traq_Master_'+ts+'.xlsx');
     showToast(t('toast_excel_ok'),'success');
   }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
 }
-function exportMachines(){
-  try{
-    var rows=MACHINES.map(function(m){
-      var lineName=m.lines?m.lines.name:(LINES.find(function(l){return l.id===m.line_id;})||{}).name||'–';
-      var active=m.is_active!==false?t('excel_active_yes'):t('excel_active_no');
-      /* 紐付き品番をカンマ区切りで結合 */
-      var linkedIds=MACHINE_PRODUCTS.filter(function(mp){return String(mp.machine_id)===String(m.id);}).map(function(mp){return mp.product_id;});
-      var linkedNames=linkedIds.map(function(pid){
-        var p=PRODUCTS.find(function(pr){return String(pr.id)===String(pid);});
-        return p?(p.product_code+' '+p.product_name):'';
-      }).filter(Boolean).join(', ');
-      var obj={};
-      obj[t('excel_machine_no')]=m.machine_no;
-      obj[t('excel_line')]=lineName;
-      obj[t('excel_active')]=active;
-      obj[t('excel_linked_products')]=linkedNames;
-      return obj;
-    });
-    var ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[{wch:10},{wch:15},{wch:10},{wch:50}];
-    var wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,t('excel_machines_sheet'));
-    var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
-    XLSX.writeFile(wb,'Traq_Machines_'+ts+'.xlsx');
-    showToast(t('toast_excel_ok'),'success');
-  }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
+
+/* ===== Import ===== */
+function triggerImport(){
+  var inp=document.getElementById('importFileInput');
+  inp.value='';
+  inp.click();
 }
-function exportProducts(){
-  try{
-    var rows=PRODUCTS.map(function(p){
-      var active=p.is_active!==false?t('excel_active_yes'):t('excel_active_no');
-      var obj={};
-      obj[t('excel_product_code')]=p.product_code||'';
-      obj[t('excel_product_name')]=p.product_name||'';
-      obj[t('excel_active')]=active;
-      return obj;
+
+function processImportFile(input){
+  if(!input.files||!input.files[0]){return;}
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=new Uint8Array(e.target.result);
+      var workbook=XLSX.read(data,{type:'array'});
+      analyzeAndPreview(workbook);
+    }catch(err){
+      showToast(t('imp_invalid_format'),'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* header name → internal key mapping (language-independent) */
+function buildHeaderMap(){
+  return {
+    users:{ name:t('excel_name'), role:t('excel_role'), shift:t('excel_shift'), is_active:t('excel_active') },
+    machines:{ line:t('excel_line'), machine_no:t('excel_machine_no'), memo:t('excel_memo'), is_active:t('excel_active') },
+    products:{ product_code:t('excel_product_code'), product_name:t('excel_product_name'), memo:t('excel_memo'), is_active:t('excel_active') },
+    categories:{ type:t('excel_cat_type'), name:t('excel_cat_name'), sort_order:t('excel_sort_order'), is_active:t('excel_active') },
+    links:{ line:t('excel_line'), machine_no:t('excel_machine_no'), product_code:t('excel_product_code') }
+  };
+}
+
+/* reverse: from localized header text → internal key */
+function reverseMap(map){
+  var r={};
+  Object.keys(map).forEach(function(k){ r[map[k]]=k; });
+  return r;
+}
+
+/* parse a sheet into array of objects with internal keys */
+function parseSheet(workbook, sheetName, headerMap){
+  var idx=workbook.SheetNames.indexOf(sheetName);
+  if(idx===-1) return null;
+  var raw=XLSX.utils.sheet_to_json(workbook.Sheets[sheetName],{defval:''});
+  if(!raw||!raw.length) return [];
+  var rev=reverseMap(headerMap);
+  return raw.map(function(row,i){
+    var obj={_row:i+2};
+    Object.keys(row).forEach(function(hdr){
+      var key=rev[hdr];
+      if(key) obj[key]=String(row[hdr]).trim();
     });
-    var ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[{wch:20},{wch:30},{wch:10}];
-    var wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,t('excel_products_sheet'));
-    var d=new Date();var ts=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
-    XLSX.writeFile(wb,'Traq_Products_'+ts+'.xlsx');
-    showToast(t('toast_excel_ok'),'success');
-  }catch(e){showToast(t('toast_excel_err')(e.message),'error');}
+    return obj;
+  });
+}
+
+/* find matching sheet by localized name */
+function findSheet(workbook, i18nKey){
+  var name=t(i18nKey);
+  if(workbook.SheetNames.indexOf(name)>=0) return name;
+  /* fallback: try ja name */
+  var jaName=I18N.ja[i18nKey];
+  if(jaName&&workbook.SheetNames.indexOf(jaName)>=0) return jaName;
+  return null;
+}
+
+var _importPlan=null; /* stored for executeImport */
+
+function analyzeAndPreview(workbook){
+  var hmap=buildHeaderMap();
+  var plan={users:null,machines:null,products:null,categories:null,links:null};
+  var activeYes=t('excel_active_yes');
+
+  /* --- Users --- */
+  var uSheet=findSheet(workbook,'excel_users_sheet');
+  if(uSheet){
+    var uRows=parseSheet(workbook,uSheet,hmap.users);
+    if(uRows&&uRows.length){
+      plan.users={newRows:[],updateRows:[],skipRows:[],errorRows:[],missingIds:[]};
+      var roleMap={'OP':'worker','op':'worker','SL':'leader','sl':'leader','Admin':'admin','admin':'admin'};
+      uRows.forEach(function(r){
+        if(!r.name){plan.users.errorRows.push({row:r._row,msg:t('imp_err_empty_name')});return;}
+        var role=roleMap[(r.role||'').trim()]||null;
+        if(!role){plan.users.errorRows.push({row:r._row,msg:t('imp_err_invalid_role')});return;}
+        var existing=USERS.find(function(u){return u.name===r.name;});
+        var isActive=r.is_active?r.is_active===activeYes:true;
+        if(existing){
+          if(existing.role===role&&(existing.shift||'')===(r.shift||'')&&(existing.is_active!==false)===isActive){
+            plan.users.skipRows.push(r);
+          }else{
+            r._id=existing.id;r._role=role;r._isActive=isActive;
+            plan.users.updateRows.push(r);
+          }
+        }else{
+          r._role=role;r._isActive=isActive;
+          plan.users.newRows.push(r);
+        }
+      });
+      /* missing: existing users not in Excel */
+      var excelNames=uRows.map(function(r){return r.name;}).filter(Boolean);
+      USERS.forEach(function(u){
+        if(u.is_active!==false&&excelNames.indexOf(u.name)===-1) plan.users.missingIds.push(u.id);
+      });
+    }
+  }
+
+  /* --- Machines --- */
+  var mSheet=findSheet(workbook,'excel_machines_sheet');
+  if(mSheet){
+    var mRows=parseSheet(workbook,mSheet,hmap.machines);
+    if(mRows&&mRows.length){
+      plan.machines={newRows:[],updateRows:[],skipRows:[],errorRows:[],missingIds:[]};
+      mRows.forEach(function(r){
+        if(!r.machine_no&&r.machine_no!==0){plan.machines.errorRows.push({row:r._row,msg:t('imp_err_empty_name')});return;}
+        var no=parseInt(r.machine_no,10);
+        if(isNaN(no)){plan.machines.errorRows.push({row:r._row,msg:t('imp_err_empty_name')});return;}
+        var line=LINES.find(function(l){return l.name===r.line;});
+        if(!line){plan.machines.errorRows.push({row:r._row,msg:t('imp_err_line_not_found')+' ('+r.line+')'});return;}
+        var existing=MACHINES.find(function(m){return m.machine_no===no&&String(m.line_id)===String(line.id);});
+        var isActive=r.is_active?r.is_active===activeYes:true;
+        if(existing){
+          if((existing.memo||'')===(r.memo||'')&&(existing.is_active!==false)===isActive){
+            plan.machines.skipRows.push(r);
+          }else{
+            r._id=existing.id;r._lineId=line.id;r._no=no;r._isActive=isActive;
+            plan.machines.updateRows.push(r);
+          }
+        }else{
+          r._lineId=line.id;r._no=no;r._isActive=isActive;
+          plan.machines.newRows.push(r);
+        }
+      });
+      var excelKeys=mRows.map(function(r){
+        var line=LINES.find(function(l){return l.name===r.line;});
+        return line?String(line.id)+'_'+parseInt(r.machine_no,10):'';
+      }).filter(Boolean);
+      MACHINES.forEach(function(m){
+        if(m.is_active!==false&&excelKeys.indexOf(String(m.line_id)+'_'+m.machine_no)===-1) plan.machines.missingIds.push(m.id);
+      });
+    }
+  }
+
+  /* --- Products --- */
+  var pSheet=findSheet(workbook,'excel_products_sheet');
+  if(pSheet){
+    var pRows=parseSheet(workbook,pSheet,hmap.products);
+    if(pRows&&pRows.length){
+      plan.products={newRows:[],updateRows:[],skipRows:[],errorRows:[],missingIds:[]};
+      pRows.forEach(function(r){
+        if(!r.product_code){plan.products.errorRows.push({row:r._row,msg:t('imp_err_empty_code')});return;}
+        var existing=PRODUCTS.find(function(p){return p.product_code===r.product_code;});
+        var isActive=r.is_active?r.is_active===activeYes:true;
+        if(existing){
+          if((existing.product_name||'')===(r.product_name||'')&&(existing.memo||'')===(r.memo||'')&&(existing.is_active!==false)===isActive){
+            plan.products.skipRows.push(r);
+          }else{
+            r._id=existing.id;r._isActive=isActive;
+            plan.products.updateRows.push(r);
+          }
+        }else{
+          r._isActive=isActive;
+          plan.products.newRows.push(r);
+        }
+      });
+      var excelCodes=pRows.map(function(r){return r.product_code;}).filter(Boolean);
+      PRODUCTS.forEach(function(p){
+        if(p.is_active!==false&&excelCodes.indexOf(p.product_code)===-1) plan.products.missingIds.push(p.id);
+      });
+    }
+  }
+
+  /* --- Categories --- */
+  var cSheet=findSheet(workbook,'excel_categories_sheet');
+  if(cSheet){
+    var cRows=parseSheet(workbook,cSheet,hmap.categories);
+    if(cRows&&cRows.length){
+      plan.categories={newRows:[],updateRows:[],skipRows:[],errorRows:[],missingIds:[]};
+      var typeMap={};
+      typeMap[t('type_equipment')]='equipment';typeMap[t('type_mold')]='mold';
+      typeMap[I18N.ja.type_equipment]='equipment';typeMap[I18N.ja.type_mold]='mold';
+      cRows.forEach(function(r){
+        if(!r.name){plan.categories.errorRows.push({row:r._row,msg:t('imp_err_empty_cat_name')});return;}
+        var typ=typeMap[(r.type||'').trim()]||null;
+        if(!typ){plan.categories.errorRows.push({row:r._row,msg:t('imp_err_invalid_type')+' ('+r.type+')'});return;}
+        var existing=CATEGORIES.find(function(c){return c.name===r.name&&c.type===typ;});
+        var so=r.sort_order!==''?parseInt(r.sort_order,10):0;
+        var isActive=r.is_active?r.is_active===activeYes:true;
+        if(existing){
+          if(existing.sort_order===so&&(existing.is_active!==false)===isActive){
+            plan.categories.skipRows.push(r);
+          }else{
+            r._id=existing.id;r._type=typ;r._so=so;r._isActive=isActive;
+            plan.categories.updateRows.push(r);
+          }
+        }else{
+          r._type=typ;r._so=so;r._isActive=isActive;
+          plan.categories.newRows.push(r);
+        }
+      });
+      var excelCatKeys=cRows.map(function(r){var typ=typeMap[(r.type||'').trim()];return typ?typ+'_'+r.name:'';}).filter(Boolean);
+      CATEGORIES.forEach(function(c){
+        if(c.is_active!==false&&excelCatKeys.indexOf(c.type+'_'+c.name)===-1) plan.categories.missingIds.push(c.id);
+      });
+    }
+  }
+
+  /* --- Links --- */
+  var lSheet=findSheet(workbook,'excel_links_sheet');
+  if(lSheet){
+    var lRows=parseSheet(workbook,lSheet,hmap.links);
+    if(lRows&&lRows.length){
+      plan.links={newRows:[],skipRows:[],errorRows:[]};
+      lRows.forEach(function(r){
+        var line=LINES.find(function(l){return l.name===r.line;});
+        if(!line){plan.links.errorRows.push({row:r._row,msg:t('imp_err_line_not_found')});return;}
+        var mNo=parseInt(r.machine_no,10);
+        var machine=MACHINES.find(function(m){return m.machine_no===mNo&&String(m.line_id)===String(line.id);});
+        if(!machine){plan.links.errorRows.push({row:r._row,msg:t('imp_err_machine_not_found')+' ('+r.machine_no+')'});return;}
+        var product=PRODUCTS.find(function(p){return p.product_code===r.product_code;});
+        if(!product){plan.links.errorRows.push({row:r._row,msg:t('imp_err_product_not_found')+' ('+r.product_code+')'});return;}
+        var exists=MACHINE_PRODUCTS.find(function(mp){return String(mp.machine_id)===String(machine.id)&&String(mp.product_id)===String(product.id);});
+        if(exists){plan.links.skipRows.push(r);}
+        else{r._machineId=machine.id;r._productId=product.id;plan.links.newRows.push(r);}
+      });
+    }
+  }
+
+  /* Check if anything to do */
+  var hasChanges=false;
+  ['users','machines','products','categories'].forEach(function(k){
+    if(plan[k]&&(plan[k].newRows.length||plan[k].updateRows.length)) hasChanges=true;
+  });
+  if(plan.links&&plan.links.newRows.length) hasChanges=true;
+  if(!hasChanges){
+    var hasErrors=false;
+    ['users','machines','products','categories','links'].forEach(function(k){
+      if(plan[k]&&plan[k].errorRows&&plan[k].errorRows.length) hasErrors=true;
+    });
+    if(!hasErrors){showToast(t('imp_no_changes'),'info');return;}
+  }
+
+  _importPlan=plan;
+  showImportPreview(plan);
+}
+
+function showImportPreview(plan){
+  var sheetOrder=[
+    {key:'users',label:t('excel_users_sheet')},
+    {key:'machines',label:t('excel_machines_sheet')},
+    {key:'products',label:t('excel_products_sheet')},
+    {key:'categories',label:t('excel_categories_sheet')},
+    {key:'links',label:t('excel_links_sheet')}
+  ];
+  var rows='';
+  sheetOrder.forEach(function(s){
+    var p=plan[s.key];
+    if(!p) return;
+    var nw=p.newRows?p.newRows.length:0;
+    var up=p.updateRows?p.updateRows.length:0;
+    var sk=p.skipRows?p.skipRows.length:0;
+    var er=p.errorRows?p.errorRows.length:0;
+    if(nw+up+sk+er===0) return;
+    rows+='<tr><td style="font-weight:600">'+esc(s.label)+'</td>';
+    rows+='<td style="color:var(--success)">'+(nw||'-')+'</td>';
+    rows+='<td style="color:var(--orange)">'+(up||'-')+'</td>';
+    rows+='<td style="color:var(--text2)">'+(sk||'-')+'</td>';
+    rows+='<td style="color:var(--danger)">'+(er||'-')+'</td></tr>';
+  });
+
+  /* error details */
+  var errDetail='';
+  sheetOrder.forEach(function(s){
+    var p=plan[s.key];
+    if(!p||!p.errorRows||!p.errorRows.length) return;
+    p.errorRows.forEach(function(e){
+      errDetail+='<div style="font-size:12px;color:var(--danger);padding:2px 0">'+esc(s.label)+' '+t('imp_row_error')(e.row,e.msg)+'</div>';
+    });
+  });
+
+  /* deactivate checkbox */
+  var totalMissing=0;
+  ['users','machines','products','categories'].forEach(function(k){
+    if(plan[k]&&plan[k].missingIds) totalMissing+=plan[k].missingIds.length;
+  });
+  var deactHtml='';
+  if(totalMissing>0){
+    deactHtml='<label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer">';
+    deactHtml+='<input type="checkbox" id="impDeactivateCb">';
+    deactHtml+='<span>'+t('imp_deactivate_missing')+' <span style="color:var(--warning)">'+t('imp_deactivate_warn')(totalMissing)+'</span></span>';
+    deactHtml+='</label>';
+  }
+
+  var modalHtml='<div style="padding:24px;max-height:70vh;overflow-y:auto">';
+  modalHtml+='<h3 style="margin-bottom:16px;font-size:16px">'+t('imp_preview_title')+'</h3>';
+  modalHtml+='<table style="width:100%;font-size:13px;border-collapse:collapse">';
+  modalHtml+='<thead><tr style="border-bottom:1px solid var(--border)">';
+  modalHtml+='<th style="text-align:left;padding:6px">'+t('imp_sheet')+'</th>';
+  modalHtml+='<th style="padding:6px">'+t('imp_new')+'</th>';
+  modalHtml+='<th style="padding:6px">'+t('imp_update')+'</th>';
+  modalHtml+='<th style="padding:6px">'+t('imp_skip')+'</th>';
+  modalHtml+='<th style="padding:6px">'+t('imp_error')+'</th>';
+  modalHtml+='</tr></thead><tbody>'+rows+'</tbody></table>';
+  if(errDetail) modalHtml+='<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,0.08);border-radius:8px">'+errDetail+'</div>';
+  modalHtml+=deactHtml;
+  modalHtml+='<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">';
+  modalHtml+='<button class="btn btn-secondary" onclick="closeModal()">'+t('btn_cancel')+'</button>';
+  modalHtml+='<button class="btn btn-primary" onclick="executeImport()">'+t('imp_confirm')+'</button>';
+  modalHtml+='</div></div>';
+
+  showModal(modalHtml);
+}
+
+async function executeImport(){
+  if(!_importPlan){closeModal();return;}
+  var plan=_importPlan;
+  var deactivate=false;
+  var cb=document.getElementById('impDeactivateCb');
+  if(cb) deactivate=cb.checked;
+
+  closeModal();
+  showToast(t('imp_importing'),'info');
+
+  try{
+    var totalNew=0,totalUpdate=0;
+
+    /* --- Users --- */
+    if(plan.users){
+      for(var i=0;i<plan.users.newRows.length;i++){
+        var r=plan.users.newRows[i];
+        await sbFetch('traq_users','POST',{name:r.name,role:r._role,shift:r.shift?parseInt(r.shift,10):null,is_active:r._isActive,pin:'0000'});
+        totalNew++;
+      }
+      for(var i=0;i<plan.users.updateRows.length;i++){
+        var r=plan.users.updateRows[i];
+        await sbFetch('traq_users?id=eq.'+r._id,'PATCH',{role:r._role,shift:r.shift?parseInt(r.shift,10):null,is_active:r._isActive});
+        totalUpdate++;
+      }
+      if(deactivate&&plan.users.missingIds.length){
+        for(var i=0;i<plan.users.missingIds.length;i++){
+          await sbFetch('traq_users?id=eq.'+plan.users.missingIds[i],'PATCH',{is_active:false});
+        }
+      }
+    }
+
+    /* --- Machines --- */
+    if(plan.machines){
+      for(var i=0;i<plan.machines.newRows.length;i++){
+        var r=plan.machines.newRows[i];
+        await sbFetch('machines','POST',{machine_no:r._no,line_id:r._lineId,memo:r.memo||null,is_active:r._isActive});
+        totalNew++;
+      }
+      for(var i=0;i<plan.machines.updateRows.length;i++){
+        var r=plan.machines.updateRows[i];
+        await sbFetch('machines?id=eq.'+r._id,'PATCH',{memo:r.memo||null,is_active:r._isActive});
+        totalUpdate++;
+      }
+      if(deactivate&&plan.machines.missingIds.length){
+        for(var i=0;i<plan.machines.missingIds.length;i++){
+          await sbFetch('machines?id=eq.'+plan.machines.missingIds[i],'PATCH',{is_active:false});
+        }
+      }
+    }
+
+    /* --- Products --- */
+    if(plan.products){
+      for(var i=0;i<plan.products.newRows.length;i++){
+        var r=plan.products.newRows[i];
+        await sbFetch('products','POST',{product_code:r.product_code,product_name:r.product_name||'',memo:r.memo||null,is_active:r._isActive});
+        totalNew++;
+      }
+      for(var i=0;i<plan.products.updateRows.length;i++){
+        var r=plan.products.updateRows[i];
+        await sbFetch('products?id=eq.'+r._id,'PATCH',{product_name:r.product_name||'',memo:r.memo||null,is_active:r._isActive});
+        totalUpdate++;
+      }
+      if(deactivate&&plan.products.missingIds.length){
+        for(var i=0;i<plan.products.missingIds.length;i++){
+          await sbFetch('products?id=eq.'+plan.products.missingIds[i],'PATCH',{is_active:false});
+        }
+      }
+    }
+
+    /* --- Categories --- */
+    if(plan.categories){
+      for(var i=0;i<plan.categories.newRows.length;i++){
+        var r=plan.categories.newRows[i];
+        await sbFetch('categories','POST',{type:r._type,name:r.name,sort_order:r._so,is_active:r._isActive});
+        totalNew++;
+      }
+      for(var i=0;i<plan.categories.updateRows.length;i++){
+        var r=plan.categories.updateRows[i];
+        await sbFetch('categories?id=eq.'+r._id,'PATCH',{sort_order:r._so,is_active:r._isActive});
+        totalUpdate++;
+      }
+      if(deactivate&&plan.categories.missingIds.length){
+        for(var i=0;i<plan.categories.missingIds.length;i++){
+          await sbFetch('categories?id=eq.'+plan.categories.missingIds[i],'PATCH',{is_active:false});
+        }
+      }
+    }
+
+    /* --- Links (machine_products) --- after above because new machines/products may have been created */
+    if(plan.links&&plan.links.newRows.length){
+      /* Reload machines & products to get new IDs */
+      var freshM=await sbFetch('machines?select=*,lines(name)&order=machine_no');
+      var freshP=await sbFetch('products?select=*&order=product_code');
+      MACHINES=freshM||MACHINES;
+      PRODUCTS=freshP||PRODUCTS;
+
+      for(var i=0;i<plan.links.newRows.length;i++){
+        var r=plan.links.newRows[i];
+        /* Re-resolve IDs since new machines/products may have been added above */
+        var line=LINES.find(function(l){return l.name===r.line;});
+        var mNo=parseInt(r.machine_no,10);
+        var machine=MACHINES.find(function(m){return m.machine_no===mNo&&String(m.line_id)===String(line.id);});
+        var product=PRODUCTS.find(function(p){return p.product_code===r.product_code;});
+        if(machine&&product){
+          await sbFetch('machine_products','POST',{machine_id:machine.id,product_id:product.id});
+          totalNew++;
+        }
+      }
+    }
+
+    /* Reload all data */
+    await loadAll();
+    showToast(t('imp_done')(totalNew,totalUpdate),'success');
+    _importPlan=null;
+  }catch(e){
+    showToast(t('imp_error_msg')(e.message),'error');
+  }
 }
 
 /* ===== Modal ===== */
