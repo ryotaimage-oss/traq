@@ -175,6 +175,19 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .add-home-copy-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s}
 .add-home-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
 .add-home-close-btn{width:100%;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
+
+/* ===== Push通知 ===== */
+.push-desc{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.push-status{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border-radius:var(--radius);margin-bottom:12px;font-size:13px}
+.push-status.active{background:rgba(16,185,129,0.12);color:var(--success)}
+.push-status.inactive{background:rgba(239,68,68,0.12);color:var(--danger)}
+.btn-push{width:100%;padding:12px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-push:not(.btn-push-off){background:var(--orange);color:#000}
+.btn-push:not(.btn-push-off):hover{background:var(--orange-dark)}
+.btn-push:disabled{opacity:.5;cursor:not-allowed}
+.btn-push-off{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-push-off:hover{border-color:var(--danger);color:var(--danger)}
+.push-warn{font-size:12px;color:var(--warning);line-height:1.5;margin-top:8px}
 </style>
 </head>
 <body>
@@ -309,6 +322,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
             <span class="setting-arrow">›</span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Push通知設定（SL・adminのみ表示） -->
+    <div class="section" id="sec-push" style="animation-delay:.12s">
+      <div class="section-label" data-i18n="push_title">Push通知</div>
+      <div class="setting-group" style="padding:16px">
+        <p class="push-desc" data-i18n="push_desc">トラブル報告が提出されたときにプッシュ通知を受け取ります。</p>
+        <div id="push-status" class="push-status">
+          <span id="push-status-icon">⏳</span>
+          <span id="push-status-text" data-i18n="push_checking">確認中...</span>
+        </div>
+        <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
+          <span data-i18n="push_enable">🔔 通知をオンにする</span>
+        </button>
+        <button id="btn-push-off" class="btn-push btn-push-off" onclick="unsubscribePush()" style="display:none">
+          <span data-i18n="push_disable">🔕 通知をオフにする</span>
+        </button>
+        <p id="push-unsupported" class="push-warn" style="display:none" data-i18n="push_unsupported">このブラウザはPush通知に対応していません。</p>
+        <p id="push-ios-hint" class="push-warn" style="display:none" data-i18n="push_ios_hint">iOSでPush通知を受け取るにはホーム画面に追加してください。</p>
+        <p id="push-denied" class="push-warn" style="display:none" data-i18n="push_denied">通知がブロックされています。ブラウザの設定から許可してください。</p>
       </div>
     </div>
 
@@ -470,6 +504,15 @@ var I18N = {
     add_home_url_label:'URLをコピー', add_home_copy:'コピー', add_home_copied:'コピー済み ✓', add_home_copy_fail:'コピーできませんでした',
     add_home_close:'閉じる',
     lang_changed:'日本語に変更しました',
+    push_title:'Push通知', push_desc:'トラブル報告が提出されたときにプッシュ通知を受け取ります。',
+    push_checking:'確認中...', push_active:'Push通知: オン', push_inactive:'Push通知: オフ',
+    push_blocked:'Push通知: ブロック中', push_error:'エラーが発生しました',
+    push_enable:'🔔 通知をオンにする', push_disable:'🔕 通知をオフにする',
+    push_unsupported:'このブラウザはPush通知に対応していません。',
+    push_ios_hint:'iOSでPush通知を受け取るにはホーム画面に追加してください。',
+    push_denied:'通知がブロックされています。ブラウザの設定から許可してください。',
+    push_permission_denied:'通知の許可が拒否されました',
+    push_enabled_toast:'Push通知をオンにしました', push_disabled_toast:'Push通知をオフにしました',
   },
   vi: {
     sec_display:'Cài đặt hiển thị', sec_account:'Tài khoản', sec_version:'Thông tin phiên bản',
@@ -511,6 +554,15 @@ var I18N = {
     add_home_url_label:'Sao chép URL', add_home_copy:'Sao chép', add_home_copied:'Đã sao chép ✓', add_home_copy_fail:'Không thể sao chép',
     add_home_close:'Đóng',
     lang_changed:'Đã chuyển sang tiếng Việt',
+    push_title:'Thông báo đẩy', push_desc:'Nhận thông báo khi có báo cáo sự cố mới.',
+    push_checking:'Đang kiểm tra...', push_active:'Thông báo đẩy: BẬT', push_inactive:'Thông báo đẩy: TẮT',
+    push_blocked:'Thông báo đẩy: Bị chặn', push_error:'Đã xảy ra lỗi',
+    push_enable:'🔔 Bật thông báo', push_disable:'🔕 Tắt thông báo',
+    push_unsupported:'Trình duyệt này không hỗ trợ thông báo đẩy.',
+    push_ios_hint:'Để nhận thông báo trên iOS, hãy thêm vào màn hình chính.',
+    push_denied:'Thông báo đang bị chặn. Vui lòng cho phép trong cài đặt trình duyệt.',
+    push_permission_denied:'Quyền thông báo bị từ chối',
+    push_enabled_toast:'Đã bật thông báo đẩy', push_disabled_toast:'Đã tắt thông báo đẩy',
   },
   en: {
     sec_display:'Display', sec_account:'Account', sec_version:'Version Info',
@@ -552,6 +604,15 @@ var I18N = {
     add_home_url_label:'Copy URL', add_home_copy:'Copy', add_home_copied:'Copied ✓', add_home_copy_fail:'Copy failed',
     add_home_close:'Close',
     lang_changed:'Switched to English',
+    push_title:'Push Notifications', push_desc:'Receive notifications when a trouble report is submitted.',
+    push_checking:'Checking...', push_active:'Push notifications: ON', push_inactive:'Push notifications: OFF',
+    push_blocked:'Push notifications: Blocked', push_error:'An error occurred',
+    push_enable:'🔔 Enable notifications', push_disable:'🔕 Disable notifications',
+    push_unsupported:'This browser does not support push notifications.',
+    push_ios_hint:'To receive push notifications on iOS, add to home screen first.',
+    push_denied:'Notifications are blocked. Please allow in browser settings.',
+    push_permission_denied:'Notification permission denied',
+    push_enabled_toast:'Push notifications enabled', push_disabled_toast:'Push notifications disabled',
   }
 };
 function t(k) {
@@ -830,6 +891,160 @@ function copyUrl(){
 }
 
 
+/* ===== Push通知 ===== */
+var VAPID_PUBLIC_KEY = 'BMzCoc6rT3rOEQF4VJtADkz4v7o6SYT7NoMLMoMCOrSmrqcWci90CKzAPWu6MOsmz84XsrEkWa4eMCOd0QNPZCo';
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+function initPush() {
+  var sec = document.getElementById('sec-push');
+  if (!sec) return;
+  var session = JSON.parse(localStorage.getItem('traq_session') || '{}');
+  if (session.role === 'worker') { sec.style.display = 'none'; return; }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    document.getElementById('push-unsupported').style.display = 'block';
+    document.getElementById('push-status').style.display = 'none';
+    return;
+  }
+  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (isIos && !isStandalone) {
+    document.getElementById('push-ios-hint').style.display = 'block';
+  }
+  checkPushStatus();
+}
+
+async function checkPushStatus() {
+  var statusEl = document.getElementById('push-status');
+  var statusIcon = document.getElementById('push-status-icon');
+  var statusText = document.getElementById('push-status-text');
+  var btnOn = document.getElementById('btn-push-on');
+  var btnOff = document.getElementById('btn-push-off');
+  var deniedEl = document.getElementById('push-denied');
+  if (Notification.permission === 'denied') {
+    statusEl.className = 'push-status inactive';
+    statusIcon.textContent = '🚫';
+    statusText.textContent = t('push_blocked');
+    deniedEl.style.display = 'block';
+    btnOn.style.display = 'none';
+    btnOff.style.display = 'none';
+    return;
+  }
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      statusEl.className = 'push-status active';
+      statusIcon.textContent = '✅';
+      statusText.textContent = t('push_active');
+      btnOn.style.display = 'none';
+      btnOff.style.display = 'block';
+    } else {
+      statusEl.className = 'push-status inactive';
+      statusIcon.textContent = '🔕';
+      statusText.textContent = t('push_inactive');
+      btnOn.style.display = 'block';
+      btnOff.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('Push status check failed:', e);
+    statusEl.className = 'push-status inactive';
+    statusIcon.textContent = '⚠️';
+    statusText.textContent = t('push_error');
+  }
+}
+
+async function subscribePush() {
+  var btnOn = document.getElementById('btn-push-on');
+  btnOn.disabled = true;
+  btnOn.textContent = '⏳ ...';
+  try {
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      showToast(t('push_permission_denied'), 'error');
+      btnOn.disabled = false;
+      btnOn.innerHTML = '<span data-i18n="push_enable">' + t('push_enable') + '</span>';
+      checkPushStatus();
+      return;
+    }
+    var reg = await navigator.serviceWorker.ready;
+    var existing = await reg.pushManager.getSubscription();
+    if (existing) await existing.unsubscribe();
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    var session = JSON.parse(localStorage.getItem('traq_session') || '{}');
+    var subJson = sub.toJSON();
+    var postBody = {
+      user_id: session.userId,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth_key: subJson.keys.auth
+    };
+    // 直接fetchで409を正確にハンドリング
+    var resp = await fetch(SB_URL + '/rest/v1/push_subscriptions', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify(postBody)
+    });
+    if (!resp.ok) {
+      if (resp.status === 409) {
+        // UNIQUE制約違反 → PATCHで更新
+        await fetch(SB_URL + '/rest/v1/push_subscriptions?endpoint=eq.' + encodeURIComponent(subJson.endpoint), {
+          method: 'PATCH',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+          body: JSON.stringify({ user_id: session.userId, p256dh: subJson.keys.p256dh, auth_key: subJson.keys.auth })
+        });
+      } else {
+        throw new Error('Save failed: ' + resp.status);
+      }
+    }
+    showToast(t('push_enabled_toast'), 'success');
+    checkPushStatus();
+  } catch (e) {
+    console.error('Subscribe error:', e);
+    showToast(t('push_error'), 'error');
+  } finally {
+    btnOn.disabled = false;
+    btnOn.innerHTML = '<span data-i18n="push_enable">' + t('push_enable') + '</span>';
+  }
+}
+
+async function unsubscribePush() {
+  var btnOff = document.getElementById('btn-push-off');
+  btnOff.disabled = true;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      var endpoint = sub.endpoint;
+      await sub.unsubscribe();
+      try {
+        await fetch(SB_URL + '/rest/v1/push_subscriptions?endpoint=eq.' + encodeURIComponent(endpoint), {
+          method: 'DELETE',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+        });
+      } catch(e) { /* ignore */ }
+    }
+    showToast(t('push_disabled_toast'), 'success');
+    checkPushStatus();
+  } catch (e) {
+    console.error('Unsubscribe error:', e);
+    showToast(t('push_error'), 'error');
+  } finally {
+    btnOff.disabled = false;
+  }
+}
+
+
 /* ===== Force reload ===== */
 function forceReload(){
   showToast(t('updating'),'info');
@@ -952,6 +1167,7 @@ function showToast(msg,type='info'){
   initUserInfo();
   checkVersion();
   applyI18n();
+  initPush();
 })();
 </script>
 
