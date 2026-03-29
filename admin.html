@@ -454,12 +454,16 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
           <span data-i18n="storage_export_desc">指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。</span>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <select class="filter-select" id="exportYear" style="width:auto">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
           </select>
-          <button class="btn btn-primary" onclick="exportImages()" data-i18n="storage_export_btn">📥 画像をエクスポート</button>
+          <button class="btn btn-primary" id="exportImgBtn" onclick="exportImages()" data-i18n="storage_export_btn">📥 画像をエクスポート</button>
+        </div>
+        <div id="exportProgress" style="display:none;margin-top:12px">
+          <div class="storage-bar-wrap"><div class="storage-bar-fill" id="exportProgressFill" style="width:0%;background:var(--orange)"></div></div>
+          <div style="font-size:12px;color:var(--text2)" id="exportProgressText"></div>
         </div>
       </div>
       <!-- データ削除（adminのみ表示） -->
@@ -512,6 +516,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 (function(){
   var saved=localStorage.getItem('traq_theme');
@@ -647,7 +652,12 @@ storage_critical:'🔴 容量が逼迫しています。バックアップ→削
 storage_warn70:'⚠️ 70%を超えています。不要な画像の削除を推奨します。',
 storage_remaining:function(mb){return '残り '+mb+'MB 利用可能';},
 storage_image_count:function(n){return '　画像: '+n+'件';},
-toast_export_start:function(y){return y+'年の画像エクスポートを開始します（Supabase Storageから取得）';},
+toast_export_start:function(y){return y+'年の画像エクスポートを開始します';},
+toast_export_progress:function(cur,total){return '画像取得中... '+cur+' / '+total;},
+toast_export_zipping:'ZIPファイル作成中...',
+toast_export_done:function(n){return n+'件の画像をZIPでダウンロードしました';},
+toast_export_empty:'対象期間の画像はありません',
+toast_export_err:function(m){return '画像エクスポートエラー: '+m;},
 toast_excel_todo:'Excel出力機能は今後実装予定です',
 toast_excel_ok:'Excelファイルをダウンロードしました',
 toast_excel_err:function(m){return 'Excel出力エラー: '+m;},
@@ -732,7 +742,12 @@ storage_critical:'🔴 Dung lượng sắp hết. Khuyến nghị sao lưu → x
 storage_warn70:'⚠️ Đã vượt 70%. Khuyến nghị xóa hình ảnh không cần thiết.',
 storage_remaining:function(mb){return 'Còn '+mb+'MB khả dụng';},
 storage_image_count:function(n){return '　Hình ảnh: '+n;},
-toast_export_start:function(y){return 'Bắt đầu xuất hình ảnh năm '+y+' (từ Supabase Storage)';},
+toast_export_start:function(y){return 'Bắt đầu xuất hình ảnh năm '+y;},
+toast_export_progress:function(cur,total){return 'Đang tải hình... '+cur+' / '+total;},
+toast_export_zipping:'Đang tạo tệp ZIP...',
+toast_export_done:function(n){return 'Đã tải xuống '+n+' hình ảnh dạng ZIP';},
+toast_export_empty:'Không có hình ảnh trong khoảng thời gian này',
+toast_export_err:function(m){return 'Lỗi xuất hình ảnh: '+m;},
 toast_excel_todo:'Chức năng xuất Excel sẽ được triển khai sau',
 toast_excel_ok:'Đã tải xuống tệp Excel',
 toast_excel_err:function(m){return 'Lỗi xuất Excel: '+m;},
@@ -817,7 +832,12 @@ storage_critical:'🔴 Storage is nearly full. Recommend backup → delete.',
 storage_warn70:'⚠️ Over 70%. Recommend deleting unnecessary images.',
 storage_remaining:function(mb){return mb+'MB remaining';},
 storage_image_count:function(n){return '  Images: '+n;},
-toast_export_start:function(y){return 'Starting image export for '+y+' (from Supabase Storage)';},
+toast_export_start:function(y){return 'Starting image export for '+y;},
+toast_export_progress:function(cur,total){return 'Fetching images... '+cur+' / '+total;},
+toast_export_zipping:'Creating ZIP file...',
+toast_export_done:function(n){return 'Downloaded '+n+' images as ZIP';},
+toast_export_empty:'No images found for this period',
+toast_export_err:function(m){return 'Image export error: '+m;},
 toast_excel_todo:'Excel export will be implemented soon',
 toast_excel_ok:'Excel file downloaded',
 toast_excel_err:function(m){return 'Excel export error: '+m;},
@@ -1350,9 +1370,107 @@ function updateStorageBar(used, total, pct, fileCount) {
   var banner = document.getElementById('storageWarningBanner');
   if (banner) banner.style.display = pct >= 80 ? 'block' : 'none';
 }
-function exportImages(){
-  const year=document.getElementById('exportYear').value;
-  showToast(t('toast_export_start')(year),'info');
+async function exportImages(){
+  var year=document.getElementById('exportYear').value;
+  var btn=document.getElementById('exportImgBtn');
+  var progWrap=document.getElementById('exportProgress');
+  var progFill=document.getElementById('exportProgressFill');
+  var progText=document.getElementById('exportProgressText');
+
+  btn.disabled=true;
+  progWrap.style.display='block';
+  progFill.style.width='0%';
+  progText.textContent=t('toast_export_start')(year);
+
+  try{
+    /* 1) 該当年のtrouble_imagesを取得（troublesテーブルとjoin） */
+    var dateFrom=year+'-01-01';
+    var dateTo=year+'-12-31';
+    var images=await sbFetch(
+      'trouble_images?select=id,storage_path,troubles!inner(occurred_date)'+
+      '&troubles.occurred_date=gte.'+dateFrom+
+      '&troubles.occurred_date=lte.'+dateTo+
+      '&order=created_at'
+    );
+
+    if(!images||images.length===0){
+      showToast(t('toast_export_empty'),'info');
+      btn.disabled=false;
+      progWrap.style.display='none';
+      return;
+    }
+
+    var total=images.length;
+    var zip=new JSZip();
+    var fetched=0;
+    var failed=0;
+
+    /* 2) 各画像をfetchしてZIPに追加（5並列） */
+    var queue=images.slice();
+    var concurrency=5;
+    var running=0;
+
+    await new Promise(function(resolve,reject){
+      function next(){
+        if(queue.length===0&&running===0){resolve();return;}
+        while(running<concurrency&&queue.length>0){
+          running++;
+          var img=queue.shift();
+          (function(item){
+            var path=item.storage_path||'';
+            var url=SB_URL+'/storage/v1/object/public/trouble-images/'+path;
+            var filename=path.split('/').pop()||('image_'+item.id+'.jpg');
+
+            fetch(url).then(function(res){
+              if(!res.ok)throw new Error(res.status);
+              return res.blob();
+            }).then(function(blob){
+              zip.file(filename,blob);
+              fetched++;
+              var pct=Math.round(fetched/total*90);
+              progFill.style.width=pct+'%';
+              progText.textContent=t('toast_export_progress')(fetched,total);
+              running--;
+              next();
+            }).catch(function(){
+              failed++;
+              fetched++;
+              var pct=Math.round(fetched/total*90);
+              progFill.style.width=pct+'%';
+              progText.textContent=t('toast_export_progress')(fetched,total);
+              running--;
+              next();
+            });
+          })(img);
+        }
+      }
+      next();
+    });
+
+    /* 3) ZIP生成・ダウンロード */
+    progText.textContent=t('toast_export_zipping');
+    progFill.style.width='95%';
+
+    var content=await zip.generateAsync({type:'blob'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(content);
+    a.download='Traq_Images_'+year+'.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+
+    progFill.style.width='100%';
+    var downloaded=total-failed;
+    progText.textContent=t('toast_export_done')(downloaded);
+    showToast(t('toast_export_done')(downloaded),'success');
+
+  }catch(e){
+    showToast(t('toast_export_err')(e.message),'error');
+    progText.textContent=t('toast_export_err')(e.message);
+  }finally{
+    btn.disabled=false;
+  }
 }
 
 /* ===== Excel export ===== */
