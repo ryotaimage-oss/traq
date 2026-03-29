@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v5';
+const CACHE_NAME = 'traq-v6';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -32,7 +32,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && k !== 'traq-push-nav').map(k => caches.delete(k))
       )
     ).then(() => {
       return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
@@ -105,9 +105,7 @@ self.addEventListener('push', event => {
   var data = { title: 'Traq', body: '新しい通知があります', url: '/home_sl.html' };
   try {
     if (event.data) data = event.data.json();
-  } catch (e) {
-    // パース失敗時はデフォルト値を使用
-  }
+  } catch (e) {}
 
   var options = {
     body: data.body,
@@ -125,7 +123,7 @@ self.addEventListener('push', event => {
   );
 });
 
-// 通知タップ時
+// 通知タップ時 — Cache APIにナビ先URLを保存してからアプリを開く
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
@@ -133,7 +131,13 @@ self.addEventListener('notificationclick', event => {
   var fullUrl = new URL(targetUrl, self.location.origin).href;
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
+    // ナビ先URLをキャッシュに保存（ページ側で読み取る）
+    caches.open('traq-push-nav').then(function(cache) {
+      return cache.put('/__push_nav__', new Response(fullUrl));
+    }).then(function() {
+      return clients.matchAll({ type: 'window', includeUncontrolled: true });
+    }).then(function(windowClients) {
+      // 既存タブがあればpostMessage + フォーカス
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url.includes('ryotaimage-oss.github.io/traq')) {
@@ -141,6 +145,7 @@ self.addEventListener('notificationclick', event => {
           return client.focus();
         }
       }
+      // なければ新規タブ
       return clients.openWindow(fullUrl);
     })
   );

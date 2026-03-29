@@ -606,7 +606,7 @@ let typeFilter = 'all';
     }
   }
 
-  // SW からの通知ナビゲーション指示を受信
+  // SW からの通知ナビゲーション（postMessage）
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', function(event) {
       if (event.data && event.data.type === 'PUSH_NAV' && event.data.url) {
@@ -614,6 +614,24 @@ let typeFilter = 'all';
       }
     });
   }
+
+  // iOS PWA用: visibilitychange でキャッシュからナビ先URLを読み取る
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState !== 'visible') return;
+    if (!('caches' in window)) return;
+    caches.open('traq-push-nav').then(function(cache) {
+      return cache.match('/__push_nav__');
+    }).then(function(resp) {
+      if (!resp) return;
+      return resp.text().then(function(url) {
+        // キャッシュを削除（1回限り）
+        caches.delete('traq-push-nav');
+        if (url && url !== location.href) {
+          location.href = url;
+        }
+      });
+    }).catch(function() {});
+  });
 })();
 
 /* ===== Load from Supabase ===== */
