@@ -233,24 +233,24 @@ tr:hover td{background:rgba(239,159,39,.04)}
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="location.href='home_sl.html'">
-        <span class="snav-icon">📋</span><span>一覧</span>
+        <span class="snav-icon">📋</span><span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span><span>ダッシュボード</span>
+        <span class="snav-icon">📊</span><span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">🔧</span><span>マスタ管理</span>
+        <span class="snav-icon">🔧</span><span data-i18n="nav_master">マスタ管理</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span><span>テーマ切替</span>
+        <span class="snav-icon" id="sb-theme-icon">🌙</span><span data-i18n="nav_theme">テーマ切替</span>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon">⚙️</span><span>設定</span>
+        <span class="snav-icon">⚙️</span><span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
-        <span class="snav-icon">🚪</span><span>ログアウト</span>
+        <span class="snav-icon">🚪</span><span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
   </aside>
@@ -281,19 +281,19 @@ tr:hover td{background:rgba(239,159,39,.04)}
       <span class="topbar-sub">Trouble Tracking System</span>
     </div>
     <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替">🌙</button>
-      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定">⚙️</button>
+      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード" data-i18n-title="title_reload">🔄</button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替" data-i18n-title="title_theme">🌙</button>
+      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定" data-i18n-title="title_settings">⚙️</button>
       <div class="hdr-avatar" id="mob-avatar"></div>
     </div>
   </header>
 
   <div class="tab-bar">
-    <button class="tab-item active" id="tab-users"    onclick="setTab('users')">👥 ユーザー</button>
-    <button class="tab-item"        id="tab-machines" onclick="setTab('machines')">⚙️ 機番</button>
-    <button class="tab-item"        id="tab-products" onclick="setTab('products')">📦 品番</button>
-    <button class="tab-item"        id="tab-categories" onclick="setTab('categories')">🏷️ 分類</button>
-    <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')">💾 ストレージ</button>
+    <button class="tab-item active" id="tab-users"    onclick="setTab('users')" data-i18n="tab_users">👥 ユーザー</button>
+    <button class="tab-item"        id="tab-machines" onclick="setTab('machines')" data-i18n="tab_machines">⚙️ 機番</button>
+    <button class="tab-item"        id="tab-products" onclick="setTab('products')" data-i18n="tab_products">📦 品番</button>
+    <button class="tab-item"        id="tab-categories" onclick="setTab('categories')" data-i18n="tab_categories">🏷️ 分類</button>
+    <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')" data-i18n="tab_storage">💾 ストレージ</button>
   </div>
 
   <div class="scroll-area" id="scrollArea">
@@ -302,29 +302,29 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== USERS ===== -->
     <div class="panel active" id="panel-users">
       <div class="section-header">
-        <span class="section-title">👥 ユーザー管理</span>
+        <span class="section-title" data-i18n="sec_users">👥 ユーザー管理</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportUsers()">📥 Excel出力</button>
-          <button class="btn btn-primary btn-sm" onclick="openUserModal()">＋ 追加</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportUsers()" data-i18n="btn_excel">📥 Excel出力</button>
+          <button class="btn btn-primary btn-sm" onclick="openUserModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
       <div class="search-bar">
-        <input class="search-input" type="text" id="userSearch" placeholder="名前で検索..." oninput="renderUsers()">
+        <input class="search-input" type="text" id="userSearch" placeholder="名前で検索..." data-i18n-ph="ph_user_search" oninput="renderUsers()">
         <select class="filter-select" id="userRoleFilter" onchange="renderUsers()">
-          <option value="">全ロール</option>
-          <option value="worker">OP</option>
-          <option value="leader">SL</option>
-          <option value="admin">Admin</option>
+          <option value="" data-i18n="filter_all_roles">全ロール</option>
+          <option value="worker" data-i18n="role_op">OP</option>
+          <option value="leader" data-i18n="role_sl">SL</option>
+          <option value="admin" data-i18n="role_admin">Admin</option>
         </select>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th class="sortable" onclick="sortTable('user','name')">名前</th><th class="sortable" onclick="sortTable('user','role')">ロール</th><th style="text-align:right">操作</th>
+              <th class="sortable" onclick="sortTable('user','name')" data-i18n="th_name">名前</th><th class="sortable" onclick="sortTable('user','role')" data-i18n="th_role">ロール</th><th style="text-align:right" data-i18n="th_actions">操作</th>
             </tr>
           </thead>
-          <tbody id="userTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
+          <tbody id="userTable"><tr class="loading-row"><td colspan="3" data-i18n="loading">読み込み中...</td></tr></tbody>
         </table>
       </div>
       <div class="pagination" id="userPagination"></div>
@@ -333,29 +333,29 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== MACHINES ===== -->
     <div class="panel" id="panel-machines">
       <div class="section-header">
-        <span class="section-title">⚙️ 機番マスタ</span>
+        <span class="section-title" data-i18n="sec_machines">⚙️ 機番マスタ</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportMachines()">📥 Excel出力</button>
-          <button class="btn btn-primary btn-sm" onclick="openMachineModal()">＋ 追加</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportMachines()" data-i18n="btn_excel">📥 Excel出力</button>
+          <button class="btn btn-primary btn-sm" onclick="openMachineModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
       <div class="search-bar">
-        <input class="search-input" type="text" id="machineSearch" placeholder="機番で検索..." oninput="renderMachines()">
+        <input class="search-input" type="text" id="machineSearch" placeholder="機番で検索..." data-i18n-ph="ph_machine_search" oninput="renderMachines()">
         <select class="filter-select" id="machineLineFilter" onchange="renderMachines()">
-          <option value="">全ライン</option>
+          <option value="" data-i18n="filter_all_lines">全ライン</option>
         </select>
         <select class="filter-select" id="machineActiveFilter" onchange="renderMachines()">
-          <option value="">全状態</option>
-          <option value="true">有効</option>
-          <option value="false">無効</option>
+          <option value="" data-i18n="filter_all_status">全状態</option>
+          <option value="true" data-i18n="filter_active">有効</option>
+          <option value="false" data-i18n="filter_inactive">無効</option>
         </select>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th class="sortable" onclick="sortTable('machine','machine_no')">機番</th><th class="sortable" onclick="sortTable('machine','line')">ライン</th><th class="sortable" onclick="sortTable('machine','is_active')">状態</th><th style="text-align:right">操作</th></tr>
+            <tr><th class="sortable" onclick="sortTable('machine','machine_no')" data-i18n="th_machine_no">機番</th><th class="sortable" onclick="sortTable('machine','line')" data-i18n="th_line">ライン</th><th class="sortable" onclick="sortTable('machine','is_active')" data-i18n="th_status">状態</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr>
           </thead>
-          <tbody id="machineTable"><tr class="loading-row"><td colspan="4">読み込み中...</td></tr></tbody>
+          <tbody id="machineTable"><tr class="loading-row"><td colspan="4" data-i18n="loading">読み込み中...</td></tr></tbody>
         </table>
       </div>
       <div class="pagination" id="machinePagination"></div>
@@ -364,26 +364,26 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== PRODUCTS ===== -->
     <div class="panel" id="panel-products">
       <div class="section-header">
-        <span class="section-title">📦 品番マスタ</span>
+        <span class="section-title" data-i18n="sec_products">📦 品番マスタ</span>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="exportProducts()">📥 Excel出力</button>
-          <button class="btn btn-primary btn-sm" onclick="openProductModal()">＋ 追加</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportProducts()" data-i18n="btn_excel">📥 Excel出力</button>
+          <button class="btn btn-primary btn-sm" onclick="openProductModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
       <div class="search-bar">
-        <input class="search-input" type="text" id="productSearch" placeholder="品番・品名で検索..." oninput="renderProducts()">
+        <input class="search-input" type="text" id="productSearch" placeholder="品番・品名で検索..." data-i18n-ph="ph_product_search" oninput="renderProducts()">
         <select class="filter-select" id="productActiveFilter" onchange="renderProducts()">
-          <option value="">全状態</option>
-          <option value="true">有効</option>
-          <option value="false">無効</option>
+          <option value="" data-i18n="filter_all_status">全状態</option>
+          <option value="true" data-i18n="filter_active">有効</option>
+          <option value="false" data-i18n="filter_inactive">無効</option>
         </select>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th class="sortable" onclick="sortTable('product','product_code')">品番</th><th class="sortable" onclick="sortTable('product','product_name')">品名</th><th class="sortable" onclick="sortTable('product','is_active')">状態</th><th style="text-align:right">操作</th></tr>
+            <tr><th class="sortable" onclick="sortTable('product','product_code')" data-i18n="th_product_code">品番</th><th class="sortable" onclick="sortTable('product','product_name')" data-i18n="th_product_name">品名</th><th class="sortable" onclick="sortTable('product','is_active')" data-i18n="th_status">状態</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr>
           </thead>
-          <tbody id="productTable"><tr class="loading-row"><td colspan="4">読み込み中...</td></tr></tbody>
+          <tbody id="productTable"><tr class="loading-row"><td colspan="4" data-i18n="loading">読み込み中...</td></tr></tbody>
         </table>
       </div>
       <div class="pagination" id="productPagination"></div>
@@ -392,30 +392,30 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== CATEGORIES ===== -->
     <div class="panel" id="panel-categories">
       <div class="section-header">
-        <span class="section-title">🏷️ 分類マスタ</span>
+        <span class="section-title" data-i18n="sec_categories">🏷️ 分類マスタ</span>
         <div class="header-actions">
-          <button class="btn btn-primary btn-sm" onclick="openCategoryModal()">＋ 追加</button>
+          <button class="btn btn-primary btn-sm" onclick="openCategoryModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
       </div>
       <div class="search-bar">
-        <input class="search-input" type="text" id="catSearch" placeholder="分類名で検索..." oninput="renderCategories()">
+        <input class="search-input" type="text" id="catSearch" placeholder="分類名で検索..." data-i18n-ph="ph_cat_search" oninput="renderCategories()">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">⚙️ 設備分類</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_equipment">⚙️ 設備分類</span></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th class="sortable" onclick="sortTable('catEq','name')">分類名</th><th class="sortable" onclick="sortTable('catEq','sort_order')">順序</th><th style="text-align:right">操作</th></tr></thead>
-              <tbody id="catEqTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
+              <thead><tr><th class="sortable" onclick="sortTable('catEq','name')" data-i18n="th_cat_name">分類名</th><th class="sortable" onclick="sortTable('catEq','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
+              <tbody id="catEqTable"><tr class="loading-row"><td colspan="3" data-i18n="loading">読み込み中...</td></tr></tbody>
             </table>
           </div>
         </div>
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">🔧 金型分類</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_mold">🔧 金型分類</span></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th class="sortable" onclick="sortTable('catMd','name')">分類名</th><th class="sortable" onclick="sortTable('catMd','sort_order')">順序</th><th style="text-align:right">操作</th></tr></thead>
-              <tbody id="catMdTable"><tr class="loading-row"><td colspan="3">読み込み中...</td></tr></tbody>
+              <thead><tr><th class="sortable" onclick="sortTable('catMd','name')" data-i18n="th_cat_name">分類名</th><th class="sortable" onclick="sortTable('catMd','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
+              <tbody id="catMdTable"><tr class="loading-row"><td colspan="3" data-i18n="loading">読み込み中...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -425,16 +425,16 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== STORAGE ===== -->
     <div class="panel" id="panel-storage">
       <div id="storageWarningBanner" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.6">
-        <div style="font-weight:700;color:var(--danger);margin-bottom:4px">⚠️ ストレージ使用量が80%を超えています</div>
-        <div style="color:var(--text2)">Excelバックアップ → データ削除 を推奨します。<br><a href="excel_download.html" style="color:var(--orange);text-decoration:underline;font-weight:600">Excel出力画面へ →</a></div>
+        <div style="font-weight:700;color:var(--danger);margin-bottom:4px" data-i18n="storage_warning_title">⚠️ ストレージ使用量が80%を超えています</div>
+        <div style="color:var(--text2)"><span data-i18n="storage_warning_msg">Excelバックアップ → データ削除 を推奨します。</span><br><a href="excel_download.html" style="color:var(--orange);text-decoration:underline;font-weight:600" data-i18n="storage_warning_link">Excel出力画面へ →</a></div>
       </div>
       <div class="section-header">
-        <span class="section-title">💾 ストレージ管理</span>
+        <span class="section-title" data-i18n="sec_storage">💾 ストレージ管理</span>
       </div>
       <div class="storage-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:13px;font-weight:700">使用量</span>
-          <span style="font-size:13px;font-weight:700" id="storageLabel">計算中...</span>
+          <span style="font-size:13px;font-weight:700" data-i18n="storage_usage">使用量</span>
+          <span style="font-size:13px;font-weight:700" id="storageLabel" data-i18n="storage_calculating">計算中...</span>
         </div>
         <div class="storage-bar-wrap">
           <div class="storage-bar-fill" id="storageFill" style="width:0%;background:var(--success)"></div>
@@ -442,48 +442,47 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <div style="font-size:12px;color:var(--text2);margin-top:4px" id="storageDetail"></div>
       </div>
       <div class="storage-card">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px">📊 容量の目安</div>
-        <div style="font-size:13px;color:var(--text2);line-height:2">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_estimate_title">📊 容量の目安</div>
+        <div style="font-size:13px;color:var(--text2);line-height:2" id="storageEstContent">
           <div>・テキストデータ：約1.2MB / 年</div>
           <div>・画像（200KB×最大12件/日×365日）：最大 <strong style="color:var(--text1)">876MB / 年</strong></div>
           <div>・Supabase無料枠：<strong style="color:var(--text1)">1GB</strong>（超過前に年次エクスポートを推奨）</div>
         </div>
       </div>
       <div class="storage-card">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px">🗂️ 画像エクスポート</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_export_title">🗂️ 画像エクスポート</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
-          指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。
+          <span data-i18n="storage_export_desc">指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。</span>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <select class="filter-select" id="exportYear" style="width:auto">
-            <option value="2026">2026年</option>
-            <option value="2025">2025年</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
           </select>
-          <button class="btn btn-primary" onclick="exportImages()">📥 画像をエクスポート</button>
+          <button class="btn btn-primary" onclick="exportImages()" data-i18n="storage_export_btn">📥 画像をエクスポート</button>
         </div>
       </div>
       <!-- データ削除（adminのみ表示） -->
       <div class="storage-card" id="deleteSection" style="display:none;border-color:rgba(239,68,68,.25)">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--danger)">🗑️ データ削除（管理者専用）</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--danger)" data-i18n="storage_delete_title">🗑️ データ削除（管理者専用）</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
-          指定期間のトラブルデータと関連画像を削除します。<strong style="color:var(--danger)">削除は取り消せません</strong>。<br>
-          必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。
+          <span id="delDescText">指定期間のトラブルデータと関連画像を削除します。<strong style="color:var(--danger)">削除は取り消せません</strong>。<br>必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。</span>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
           <div>
-            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block">開始日</label>
+            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block" data-i18n="label_date_from">開始日</label>
             <input type="date" class="search-input" id="delDateFrom" style="min-width:130px;padding:6px 10px">
           </div>
           <div>
-            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block">終了日</label>
+            <label class="form-label" style="font-size:11px;color:var(--text2);margin-bottom:3px;display:block" data-i18n="label_date_to">終了日</label>
             <input type="date" class="search-input" id="delDateTo" style="min-width:130px;padding:6px 10px">
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="previewDelete()">件数確認</button>
+          <button class="btn btn-secondary btn-sm" onclick="previewDelete()" data-i18n="btn_preview_count">件数確認</button>
         </div>
         <div id="delPreview" style="display:none;font-size:13px;padding:10px 14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:var(--radius);margin-bottom:12px">
           <span id="delPreviewText"></span>
         </div>
-        <button class="btn btn-danger" id="delExecBtn" onclick="execDelete()" style="display:none">🗑️ 削除を実行</button>
+        <button class="btn btn-danger" id="delExecBtn" onclick="execDelete()" style="display:none" data-i18n="btn_delete_exec">🗑️ 削除を実行</button>
       </div>
     </div>
 
@@ -494,15 +493,15 @@ tr:hover td{background:rgba(239,159,39,.04)}
   <nav class="bottom-nav">
     <button class="nav-item" onclick="location.href='home_sl.html'">
       <span class="nav-icon">📋</span>
-      <span class="nav-label">一覧</span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">ダッシュボード</span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
     <button class="nav-item active" onclick="void(0)">
       <span class="nav-icon">🔧</span>
-      <span class="nav-label">マスタ</span>
+      <span class="nav-label" data-i18n="nav_master_short">マスタ</span>
     </button>
   </nav>
   </div><!-- /.main-column -->
@@ -553,7 +552,7 @@ function initChip(){
   var role=s.role||'worker';
   var initial=name?name.charAt(0):'?';
   var classMap={worker:'role-op',leader:'role-sl',admin:'role-admin'};
-  var roleLabels={worker:'OP',leader:'SL',admin:'Admin'};
+  var roleLabels={worker:t('role_op'),leader:t('role_sl'),admin:t('role_admin')};
   var topbar=document.querySelector('.topbar');
   if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(classMap[role]||'role-op');}
   var av=document.getElementById('mob-avatar');
@@ -573,7 +572,262 @@ function initChip(){
 let currentLang=localStorage.getItem('traq_lang')||'ja';
 function setLang(l){
   currentLang=l;localStorage.setItem('traq_lang',l);
-  // lang buttons removed from header
+  applyI18n();
+  renderUsers();renderMachines();renderProducts();renderCategories();
+  initChip();
+  updateDeleteDesc();
+  updateStorageEstimate();
+  document.title='Traq – '+(currentLang==='vi'?'Quản lý':currentLang==='en'?'Admin':'管理者画面');
+  // re-render tab labels
+  var tabs={users:'tab_users',machines:'tab_machines',products:'tab_products',categories:'tab_categories',storage:'tab_storage'};
+  Object.keys(tabs).forEach(function(k){var el=document.getElementById('tab-'+k);if(el)el.textContent=t(tabs[k]);});
+}
+
+var I18N={
+ja:{
+nav_list:'一覧',nav_dashboard:'ダッシュボード',nav_master:'マスタ管理',nav_master_short:'マスタ',
+nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
+title_reload:'リロード',title_theme:'テーマ切替',title_settings:'設定',
+tab_users:'👥 ユーザー',tab_machines:'⚙️ 機番',tab_products:'📦 品番',tab_categories:'🏷️ 分類',tab_storage:'💾 ストレージ',
+sec_users:'👥 ユーザー管理',btn_excel:'📥 Excel出力',btn_add:'＋ 追加',
+ph_user_search:'名前で検索...',filter_all_roles:'全ロール',
+th_name:'名前',th_role:'ロール',th_actions:'操作',
+loading:'読み込み中...',no_match:'該当なし',
+btn_edit:'編集',btn_reset_pin:'PIN初期化',
+modal_user_edit:'ユーザー編集',modal_user_add:'ユーザー追加',
+label_name:'名前',label_role:'ロール',label_init_pin:'初期PIN',
+btn_cancel:'キャンセル',btn_save:'保存',
+toast_saved:'保存しました',err_name_required:'名前を入力してください',
+confirm_pin_reset:function(n){return n+' のPINを「0000」に初期化しますか？';},
+toast_pin_reset:'PINを初期化しました',
+sec_machines:'⚙️ 機番マスタ',ph_machine_search:'機番で検索...',
+filter_all_lines:'全ライン',filter_all_status:'全状態',filter_active:'有効',filter_inactive:'無効',
+th_machine_no:'機番',th_line:'ライン',th_status:'状態',
+suffix_machine:'号機',badge_active:'有効',badge_inactive:'無効',
+btn_deactivate:'無効化',btn_activate:'有効化',
+modal_machine_edit:'機番編集',modal_machine_add:'機番追加',
+label_machine_no:'機番',label_line:'ライン',label_linked_products:'対応品番',
+select_placeholder:'選択してください',no_products:'品番が未登録です',
+err_machine_no:'機番を入力してください',err_line_required:'ラインを選択してください',
+sec_products:'📦 品番マスタ',ph_product_search:'品番・品名で検索...',
+th_product_code:'品番',th_product_name:'品名',
+modal_product_edit:'品番編集',modal_product_add:'品番追加',
+label_product_code:'品番',label_product_name:'品名',
+err_product_required:'品番・品名を入力してください',
+sec_categories:'🏷️ 分類マスタ',ph_cat_search:'分類名で検索...',
+cat_equipment:'⚙️ 設備分類',cat_mold:'🔧 金型分類',
+th_cat_name:'分類名',th_sort_order:'順序',cat_none:'なし',
+modal_cat_edit:'分類編集',modal_cat_add:'分類追加',
+label_type:'種別',type_equipment:'設備',type_mold:'金型',
+label_cat_name:'分類名',label_sort_order:'表示順',
+err_cat_name:'分類名を入力してください',
+storage_warning_title:'⚠️ ストレージ使用量が80%を超えています',
+storage_warning_msg:'Excelバックアップ → データ削除 を推奨します。',
+storage_warning_link:'Excel出力画面へ →',
+sec_storage:'💾 ストレージ管理',storage_usage:'使用量',storage_calculating:'計算中...',
+storage_estimate_title:'📊 容量の目安',
+storage_est_text:'・テキストデータ：約1.2MB / 年',
+storage_est_image:'・画像（200KB×最大12件/日×365日）：最大',
+storage_est_image_val:'876MB / 年',
+storage_est_free:'・Supabase無料枠：',storage_est_free_val:'1GB',
+storage_est_free_note:'（超過前に年次エクスポートを推奨）',
+storage_export_title:'🗂️ 画像エクスポート',
+storage_export_desc:'<span data-i18n="storage_export_desc">指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。</span>',
+storage_export_btn:'📥 画像をエクスポート',year_suffix:'年',
+storage_delete_title:'🗑️ データ削除（管理者専用）',
+storage_delete_warn:'削除は取り消せません',
+storage_delete_desc:'必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。',
+label_date_from:'開始日',label_date_to:'終了日',
+btn_preview_count:'件数確認',btn_delete_exec:'🗑️ 削除を実行',
+err_load:function(m){return 'データ読込エラー: '+m;},
+storage_unavailable:'取得できません',
+storage_check_dashboard:'Supabase Storageダッシュボードで確認してください',
+storage_critical:'🔴 容量が逼迫しています。バックアップ→削除を推奨します。',
+storage_warn70:'⚠️ 70%を超えています。不要な画像の削除を推奨します。',
+storage_remaining:function(mb){return '残り '+mb+'MB 利用可能';},
+storage_image_count:function(n){return '　画像: '+n+'件';},
+toast_export_start:function(y){return y+'年の画像エクスポートを開始します（Supabase Storageから取得）';},
+toast_excel_todo:'Excel出力機能は今後実装予定です',
+toast_activated:'有効にしました',toast_deactivated:'無効にしました',
+err_generic:function(m){return 'エラー: '+m;},
+pagination_of:'件',btn_prev:'← 前へ',btn_next:'次へ →',
+err_dates_required:'開始日・終了日を入力してください',
+err_date_order:'開始日は終了日以前にしてください',
+del_no_data:'対象データはありません',
+del_preview:function(tc,ic,f,t){return 'トラブル: <strong style="color:var(--danger)">'+tc+'件</strong>　画像: <strong style="color:var(--danger)">'+ic+'件</strong><div style="margin-top:6px;font-size:12px;color:var(--text2)">期間: '+f+' ～ '+t+'</div>';},
+del_confirm:function(tc,ic){return '本当に削除しますか？\n\n・トラブル: '+tc+'件\n・画像: '+ic+'件\n\nExcel出力・画像バックアップは完了していますか？\nこの操作は取り消せません。';},
+del_final_confirm:'最終確認: 本当に削除を実行しますか？',
+del_no_target:'削除対象がありません',del_in_progress:'削除中...',
+del_success:function(tc,ic){return tc+'件のトラブルと'+ic+'件の画像を削除しました';},
+del_error:function(m){return '削除エラー: '+m;},
+del_count_error:function(m){return '件数確認エラー: '+m;},
+role_op:'OP',role_sl:'SL',role_admin:'Admin'
+},
+vi:{
+nav_list:'Danh sách',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
+nav_theme:'Đổi giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
+title_reload:'Tải lại',title_theme:'Đổi giao diện',title_settings:'Cài đặt',
+tab_users:'👥 Người dùng',tab_machines:'⚙️ Máy',tab_products:'📦 Sản phẩm',tab_categories:'🏷️ Phân loại',tab_storage:'💾 Lưu trữ',
+sec_users:'👥 Quản lý người dùng',btn_excel:'📥 Xuất Excel',btn_add:'＋ Thêm',
+ph_user_search:'Tìm theo tên...',filter_all_roles:'Tất cả vai trò',
+th_name:'Tên',th_role:'Vai trò',th_actions:'Thao tác',
+loading:'Đang tải...',no_match:'Không có kết quả',
+btn_edit:'Sửa',btn_reset_pin:'Đặt lại PIN',
+modal_user_edit:'Sửa người dùng',modal_user_add:'Thêm người dùng',
+label_name:'Tên',label_role:'Vai trò',label_init_pin:'PIN ban đầu',
+btn_cancel:'Hủy',btn_save:'Lưu',
+toast_saved:'Đã lưu',err_name_required:'Vui lòng nhập tên',
+confirm_pin_reset:function(n){return 'Đặt lại PIN của '+n+' về "0000"?';},
+toast_pin_reset:'Đã đặt lại PIN',
+sec_machines:'⚙️ Master máy',ph_machine_search:'Tìm theo số máy...',
+filter_all_lines:'Tất cả line',filter_all_status:'Tất cả trạng thái',filter_active:'Hoạt động',filter_inactive:'Ngừng',
+th_machine_no:'Số máy',th_line:'Line',th_status:'Trạng thái',
+suffix_machine:'',badge_active:'Hoạt động',badge_inactive:'Ngừng',
+btn_deactivate:'Ngừng',btn_activate:'Kích hoạt',
+modal_machine_edit:'Sửa máy',modal_machine_add:'Thêm máy',
+label_machine_no:'Số máy',label_line:'Line',label_linked_products:'Sản phẩm liên kết',
+select_placeholder:'Vui lòng chọn',no_products:'Chưa có sản phẩm',
+err_machine_no:'Vui lòng nhập số máy',err_line_required:'Vui lòng chọn line',
+sec_products:'📦 Master sản phẩm',ph_product_search:'Tìm theo mã/tên sản phẩm...',
+th_product_code:'Mã SP',th_product_name:'Tên SP',
+modal_product_edit:'Sửa sản phẩm',modal_product_add:'Thêm sản phẩm',
+label_product_code:'Mã sản phẩm',label_product_name:'Tên sản phẩm',
+err_product_required:'Vui lòng nhập mã và tên sản phẩm',
+sec_categories:'🏷️ Master phân loại',ph_cat_search:'Tìm theo tên phân loại...',
+cat_equipment:'⚙️ Phân loại thiết bị',cat_mold:'🔧 Phân loại khuôn',
+th_cat_name:'Tên phân loại',th_sort_order:'Thứ tự',cat_none:'Không có',
+modal_cat_edit:'Sửa phân loại',modal_cat_add:'Thêm phân loại',
+label_type:'Loại',type_equipment:'Thiết bị',type_mold:'Khuôn',
+label_cat_name:'Tên phân loại',label_sort_order:'Thứ tự hiển thị',
+err_cat_name:'Vui lòng nhập tên phân loại',
+storage_warning_title:'⚠️ Dung lượng lưu trữ đã vượt 80%',
+storage_warning_msg:'Khuyến nghị sao lưu Excel → Xóa dữ liệu.',
+storage_warning_link:'Đến trang xuất Excel →',
+sec_storage:'💾 Quản lý lưu trữ',storage_usage:'Dung lượng',storage_calculating:'Đang tính...',
+storage_estimate_title:'📊 Ước tính dung lượng',
+storage_est_text:'・Dữ liệu văn bản: khoảng 1.2MB / năm',
+storage_est_image:'・Hình ảnh (200KB×tối đa 12/ngày×365 ngày): tối đa',
+storage_est_image_val:'876MB / năm',
+storage_est_free:'・Supabase miễn phí: ',storage_est_free_val:'1GB',
+storage_est_free_note:' (khuyến nghị xuất hàng năm trước khi vượt)',
+storage_export_title:'🗂️ Xuất hình ảnh',
+storage_export_desc:'Tải xuống hình ảnh trong khoảng thời gian chỉ định. Dùng cho sao lưu hàng năm.',
+storage_export_btn:'📥 Xuất hình ảnh',year_suffix:'',
+storage_delete_title:'🗑️ Xóa dữ liệu (chỉ quản trị viên)',
+storage_delete_warn:'Không thể hoàn tác',
+storage_delete_desc:'Vui lòng hoàn tất sao lưu Excel và xuất ZIP hình ảnh trước.',
+label_date_from:'Từ ngày',label_date_to:'Đến ngày',
+btn_preview_count:'Kiểm tra số lượng',btn_delete_exec:'🗑️ Thực hiện xóa',
+err_load:function(m){return 'Lỗi tải dữ liệu: '+m;},
+storage_unavailable:'Không thể lấy',
+storage_check_dashboard:'Vui lòng kiểm tra trên Supabase Storage Dashboard',
+storage_critical:'🔴 Dung lượng sắp hết. Khuyến nghị sao lưu → xóa.',
+storage_warn70:'⚠️ Đã vượt 70%. Khuyến nghị xóa hình ảnh không cần thiết.',
+storage_remaining:function(mb){return 'Còn '+mb+'MB khả dụng';},
+storage_image_count:function(n){return '　Hình ảnh: '+n;},
+toast_export_start:function(y){return 'Bắt đầu xuất hình ảnh năm '+y+' (từ Supabase Storage)';},
+toast_excel_todo:'Chức năng xuất Excel sẽ được triển khai sau',
+toast_activated:'Đã kích hoạt',toast_deactivated:'Đã ngừng',
+err_generic:function(m){return 'Lỗi: '+m;},
+pagination_of:'',btn_prev:'← Trước',btn_next:'Tiếp →',
+err_dates_required:'Vui lòng nhập ngày bắt đầu và kết thúc',
+err_date_order:'Ngày bắt đầu phải trước ngày kết thúc',
+del_no_data:'Không có dữ liệu đối tượng',
+del_preview:function(tc,ic,f,t){return 'Sự cố: <strong style="color:var(--danger)">'+tc+'</strong>　Hình ảnh: <strong style="color:var(--danger)">'+ic+'</strong><div style="margin-top:6px;font-size:12px;color:var(--text2)">Khoảng thời gian: '+f+' ～ '+t+'</div>';},
+del_confirm:function(tc,ic){return 'Bạn có chắc muốn xóa?\n\n・Sự cố: '+tc+'\n・Hình ảnh: '+ic+'\n\nĐã hoàn tất xuất Excel và sao lưu hình ảnh chưa?\nThao tác này không thể hoàn tác.';},
+del_final_confirm:'Xác nhận cuối cùng: Thực sự xóa?',
+del_no_target:'Không có đối tượng xóa',del_in_progress:'Đang xóa...',
+del_success:function(tc,ic){return 'Đã xóa '+tc+' sự cố và '+ic+' hình ảnh';},
+del_error:function(m){return 'Lỗi xóa: '+m;},
+del_count_error:function(m){return 'Lỗi kiểm tra số lượng: '+m;},
+role_op:'OP',role_sl:'SL',role_admin:'Admin'
+},
+en:{
+nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
+nav_theme:'Toggle Theme',nav_settings:'Settings',nav_logout:'Logout',
+title_reload:'Reload',title_theme:'Toggle Theme',title_settings:'Settings',
+tab_users:'👥 Users',tab_machines:'⚙️ Machines',tab_products:'📦 Products',tab_categories:'🏷️ Categories',tab_storage:'💾 Storage',
+sec_users:'👥 User Management',btn_excel:'📥 Export Excel',btn_add:'＋ Add',
+ph_user_search:'Search by name...',filter_all_roles:'All Roles',
+th_name:'Name',th_role:'Role',th_actions:'Actions',
+loading:'Loading...',no_match:'No results',
+btn_edit:'Edit',btn_reset_pin:'Reset PIN',
+modal_user_edit:'Edit User',modal_user_add:'Add User',
+label_name:'Name',label_role:'Role',label_init_pin:'Initial PIN',
+btn_cancel:'Cancel',btn_save:'Save',
+toast_saved:'Saved',err_name_required:'Please enter a name',
+confirm_pin_reset:function(n){return 'Reset PIN for '+n+' to "0000"?';},
+toast_pin_reset:'PIN has been reset',
+sec_machines:'⚙️ Machine Master',ph_machine_search:'Search by machine no...',
+filter_all_lines:'All Lines',filter_all_status:'All Status',filter_active:'Active',filter_inactive:'Inactive',
+th_machine_no:'Machine No.',th_line:'Line',th_status:'Status',
+suffix_machine:'',badge_active:'Active',badge_inactive:'Inactive',
+btn_deactivate:'Deactivate',btn_activate:'Activate',
+modal_machine_edit:'Edit Machine',modal_machine_add:'Add Machine',
+label_machine_no:'Machine No.',label_line:'Line',label_linked_products:'Linked Products',
+select_placeholder:'Please select',no_products:'No products registered',
+err_machine_no:'Please enter a machine number',err_line_required:'Please select a line',
+sec_products:'📦 Product Master',ph_product_search:'Search by code/name...',
+th_product_code:'Code',th_product_name:'Name',
+modal_product_edit:'Edit Product',modal_product_add:'Add Product',
+label_product_code:'Product Code',label_product_name:'Product Name',
+err_product_required:'Please enter code and name',
+sec_categories:'🏷️ Category Master',ph_cat_search:'Search by category...',
+cat_equipment:'⚙️ Equipment Categories',cat_mold:'🔧 Mold Categories',
+th_cat_name:'Category',th_sort_order:'Order',cat_none:'None',
+modal_cat_edit:'Edit Category',modal_cat_add:'Add Category',
+label_type:'Type',type_equipment:'Equipment',type_mold:'Mold',
+label_cat_name:'Category Name',label_sort_order:'Display Order',
+err_cat_name:'Please enter a category name',
+storage_warning_title:'⚠️ Storage usage exceeds 80%',
+storage_warning_msg:'Recommend: Excel backup → Delete data.',
+storage_warning_link:'Go to Excel Export →',
+sec_storage:'💾 Storage Management',storage_usage:'Usage',storage_calculating:'Calculating...',
+storage_estimate_title:'📊 Capacity Estimate',
+storage_est_text:'・Text data: approx. 1.2MB / year',
+storage_est_image:'・Images (200KB×max 12/day×365 days): max',
+storage_est_image_val:'876MB / year',
+storage_est_free:'・Supabase free tier: ',storage_est_free_val:'1GB',
+storage_est_free_note:' (annual export recommended before exceeding)',
+storage_export_title:'🗂️ Image Export',
+storage_export_desc:'Download images for a specified period. Intended for annual backup.',
+storage_export_btn:'📥 Export Images',year_suffix:'',
+storage_delete_title:'🗑️ Delete Data (Admin Only)',
+storage_delete_warn:'Cannot be undone',
+storage_delete_desc:'Please complete Excel backup and image ZIP export first.',
+label_date_from:'Start Date',label_date_to:'End Date',
+btn_preview_count:'Check Count',btn_delete_exec:'🗑️ Execute Delete',
+err_load:function(m){return 'Data load error: '+m;},
+storage_unavailable:'Unable to retrieve',
+storage_check_dashboard:'Please check on Supabase Storage Dashboard',
+storage_critical:'🔴 Storage is nearly full. Recommend backup → delete.',
+storage_warn70:'⚠️ Over 70%. Recommend deleting unnecessary images.',
+storage_remaining:function(mb){return mb+'MB remaining';},
+storage_image_count:function(n){return '  Images: '+n;},
+toast_export_start:function(y){return 'Starting image export for '+y+' (from Supabase Storage)';},
+toast_excel_todo:'Excel export will be implemented soon',
+toast_activated:'Activated',toast_deactivated:'Deactivated',
+err_generic:function(m){return 'Error: '+m;},
+pagination_of:'',btn_prev:'← Prev',btn_next:'Next →',
+err_dates_required:'Please enter start and end dates',
+err_date_order:'Start date must be before end date',
+del_no_data:'No matching data',
+del_preview:function(tc,ic,f,t){return 'Troubles: <strong style="color:var(--danger)">'+tc+'</strong>　Images: <strong style="color:var(--danger)">'+ic+'</strong><div style="margin-top:6px;font-size:12px;color:var(--text2)">Period: '+f+' ～ '+t+'</div>';},
+del_confirm:function(tc,ic){return 'Are you sure you want to delete?\n\n・Troubles: '+tc+'\n・Images: '+ic+'\n\nHave you completed Excel export and image backup?\nThis action cannot be undone.';},
+del_final_confirm:'Final confirmation: Really delete?',
+del_no_target:'No items to delete',del_in_progress:'Deleting...',
+del_success:function(tc,ic){return 'Deleted '+tc+' troubles and '+ic+' images';},
+del_error:function(m){return 'Delete error: '+m;},
+del_count_error:function(m){return 'Count check error: '+m;},
+role_op:'OP',role_sl:'SL',role_admin:'Admin'
+}
+};
+function t(k){var d=I18N[currentLang]||I18N.ja;var v=d[k];if(v!==undefined)return v;return I18N.ja[k]!==undefined?I18N.ja[k]:k;}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n');var v=t(k);if(typeof v==='string')el.textContent=v;});
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){var k=el.getAttribute('data-i18n-html');var v=t(k);if(typeof v==='string')el.innerHTML=v;});
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){var k=el.getAttribute('data-i18n-ph');var v=t(k);if(typeof v==='string')el.placeholder=v;});
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){var k=el.getAttribute('data-i18n-title');var v=t(k);if(typeof v==='string')el.title=v;});
 }
 
 /* ===== Data stores ===== */
@@ -589,9 +843,12 @@ let userPage=1,machinePage=1,productPage=1;
   var sbti=document.getElementById('sb-theme-icon');if(sbti)sbti.textContent=th==='dark'?'🌙':'☀️';
   initChip();
   const l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
-  // lang buttons removed from header
   await loadAll();
   initStorage();
+  applyI18n();
+  updateDeleteDesc();
+  updateStorageEstimate();
+  document.title='Traq – '+(currentLang==='vi'?'Quản lý':currentLang==='en'?'Admin':'管理者画面');
   // admin権限の場合のみデータ削除セクション表示
   try {
     var sess = JSON.parse(localStorage.getItem('traq_session') || '{}');
@@ -621,7 +878,7 @@ async function loadAll(){
       sel.appendChild(o);
     });
     renderUsers();renderMachines();renderProducts();renderCategories();
-  }catch(e){showToast('データ読込エラー: '+e.message,'error');}
+  }catch(e){showToast(t('err_load')(e.message),'error');}
 }
 
 /* ===== Tab ===== */
@@ -653,7 +910,7 @@ function renderUsers(){
   const start=(userPage-1)*PAGE_SIZE;
   const page=list.slice(start,start+PAGE_SIZE);
   const tbody=document.getElementById('userTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">該当なし</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">'+t('no_match')+'</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
   tbody.innerHTML=page.map(u=>{
     const role=u.role==='admin'?'admin':u.role==='leader'||u.role==='sl'?'sl':'op';
     const rl=role==='admin'?'Admin':role==='sl'?'SL':'OP';
@@ -662,8 +919,8 @@ function renderUsers(){
       <td style="font-weight:600">${esc(u.name)}</td>
       <td><span class="badge ${bc}">${rl}</span></td>
       <td><div class="td-actions">
-        <button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">編集</button>
-        <button class="btn btn-secondary btn-sm" onclick="resetPin('${u.id}','${esc(u.name)}')">PIN初期化</button>
+        <button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">${t('btn_edit')}</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetPin('${u.id}','${esc(u.name)}')">${t('btn_reset_pin')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -672,24 +929,24 @@ function renderUsers(){
 function openUserModal(id){
   const u=id?USERS.find(x=>String(x.id)===String(id)):null;
   showModal(`
-    <div class="modal-title">${u?'ユーザー編集':'ユーザー追加'}</div>
-    <div class="form-group"><label class="form-label">名前</label><input class="form-input" id="m-name" value="${u?esc(u.name):''}"></div>
-    <div class="form-group"><label class="form-label">ロール</label>
+    <div class="modal-title">${u?t('modal_user_edit'):t('modal_user_add')}</div>
+    <div class="form-group"><label class="form-label">${t('label_name')}</label><input class="form-input" id="m-name" value="${u?esc(u.name):''}"></div>
+    <div class="form-group"><label class="form-label">${t('label_role')}</label>
       <select class="form-select" id="m-role">
         <option value="worker" ${u&&u.role==='worker'?'selected':''}>OP</option>
         <option value="leader" ${u&&(u.role==='leader'||u.role==='sl')?'selected':''}>SL</option>
         <option value="admin"  ${u&&u.role==='admin'?'selected':''}>Admin</option>
       </select></div>
-    ${!u?'<div class="form-group"><label class="form-label">初期PIN</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
+    ${!u?'<div class="form-group"><label class="form-label">'+t('label_init_pin')+'</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-      <button class="btn-save" onclick="saveUser('${u?u.id:''}')">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
+      <button class="btn-save" onclick="saveUser('${u?u.id:''}')">${t('btn_save')}</button>
     </div>`);
 }
 async function saveUser(id){
   const name=document.getElementById('m-name').value.trim();
   const role=document.getElementById('m-role').value;
-  if(!name){showToast('名前を入力してください','error');return;}
+  if(!name){showToast(t('err_name_required'),'error');return;}
   try{
     if(id){
       const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role});
@@ -700,15 +957,15 @@ async function saveUser(id){
       const created=await sbFetch('traq_users','POST',{name,role,pin,is_active:true});
       if(created&&created[0])USERS.push(created[0]);
     }
-    closeModal();renderUsers();showToast('保存しました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+    closeModal();renderUsers();showToast(t('toast_saved'),'success');
+  }catch(e){showToast(t('err_generic')(e.message),'error');}
 }
 async function resetPin(id,name){
-  if(!confirm(`${name} のPINを「0000」に初期化しますか？`))return;
+  if(!confirm(t('confirm_pin_reset')(name)))return;
   try{
     await sbFetch('traq_users?id=eq.'+id,'PATCH',{pin:'0000'});
-    showToast('PINを初期化しました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+    showToast(t('toast_pin_reset'),'success');
+  }catch(e){showToast(t('err_generic')(e.message),'error');}
 }
 
 /* ===== MACHINES ===== */
@@ -735,17 +992,17 @@ function renderMachines(){
   const total=list.length;
   const page=list.slice((machinePage-1)*PAGE_SIZE,machinePage*PAGE_SIZE);
   const tbody=document.getElementById('machineTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="4">該当なし</td></tr>';renderPagination('machinePagination',total,machinePage,'machine');return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="4">'+t('no_match')+'</td></tr>';renderPagination('machinePagination',total,machinePage,'machine');return;}
   tbody.innerHTML=page.map(m=>{
     const lineName=m.lines?m.lines.name:(LINES.find(l=>l.id===m.line_id)?.name||'–');
     const active=m.is_active!==false;
     return`<tr>
-      <td style="font-weight:600">${esc(String(m.machine_no))}号機</td>
+      <td style="font-weight:600">${esc(String(m.machine_no))}${t('suffix_machine')}</td>
       <td>${esc(lineName)}</td>
-      <td><span class="badge ${active?'badge-active':'badge-inactive'}">${active?'有効':'無効'}</span></td>
+      <td><span class="badge ${active?'badge-active':'badge-inactive'}">${active?t('badge_active'):t('badge_inactive')}</span></td>
       <td><div class="td-actions">
-        <button class="btn btn-secondary btn-sm" onclick="openMachineModal('${m.id}')">編集</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleActive('machines','${m.id}',${active},'MACHINES','renderMachines')">${active?'無効化':'有効化'}</button>
+        <button class="btn btn-secondary btn-sm" onclick="openMachineModal('${m.id}')">${t('btn_edit')}</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleActive('machines','${m.id}',${active},'MACHINES','renderMachines')">${active?t('btn_deactivate'):t('btn_activate')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -753,7 +1010,7 @@ function renderMachines(){
 }
 function openMachineModal(id){
   const m=id?MACHINES.find(x=>String(x.id)===String(id)):null;
-  const lineOpts=(m?'':'<option value="">選択してください</option>')+LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+  const lineOpts=(m?'':'<option value="">'+t('select_placeholder')+'</option>')+LINES.map(l=>`<option value="${l.id}" ${m&&m.line_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
   const linked=m?MACHINE_PRODUCTS.filter(mp=>String(mp.machine_id)===String(m.id)).map(mp=>mp.product_id):[];
   const activeProducts=PRODUCTS.filter(p=>p.is_active!==false);
   const cbHtml=activeProducts.map(p=>{
@@ -761,20 +1018,20 @@ function openMachineModal(id){
     return '<label><input type="checkbox" value="'+p.id+'" '+checked+'>'+esc(p.product_code)+' ('+esc(p.product_name)+')</label>';
   }).join('');
   showModal(`
-    <div class="modal-title">${m?'機番編集':'機番追加'}</div>
-    <div class="form-group"><label class="form-label">機番</label><input class="form-input" id="m-no" type="number" value="${m?m.machine_no:''}" placeholder="例: 12"></div>
-    <div class="form-group"><label class="form-label">ライン</label><select class="form-select" id="m-line">${lineOpts}</select></div>
-    <div class="form-group"><label class="form-label">対応品番</label><div class="cb-grid" id="m-products">${cbHtml||'<span style="color:var(--text2);font-size:12px">品番が未登録です</span>'}</div></div>
+    <div class="modal-title">${m?t('modal_machine_edit'):t('modal_machine_add')}</div>
+    <div class="form-group"><label class="form-label">${t('label_machine_no')}</label><input class="form-input" id="m-no" type="number" value="${m?m.machine_no:''}" placeholder="例: 12"></div>
+    <div class="form-group"><label class="form-label">${t('label_line')}</label><select class="form-select" id="m-line">${lineOpts}</select></div>
+    <div class="form-group"><label class="form-label">${t('label_linked_products')}</label><div class="cb-grid" id="m-products">${cbHtml||'<span style="color:var(--text2);font-size:12px">'+t('no_products')+'</span>'}</div></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-      <button class="btn-save" onclick="saveMachine('${m?m.id:''}')">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
+      <button class="btn-save" onclick="saveMachine('${m?m.id:''}')">${t('btn_save')}</button>
     </div>`);
 }
 async function saveMachine(id){
   const no=parseInt(document.getElementById('m-no').value);
   const lineId=parseInt(document.getElementById('m-line').value);
-  if(!no){showToast('機番を入力してください','error');return;}
-  if(!lineId){showToast('ラインを選択してください','error');return;}
+  if(!no){showToast(t('err_machine_no'),'error');return;}
+  if(!lineId){showToast(t('err_line_required'),'error');return;}
   // チェックされた品番IDを取得
   const checkedIds=Array.from(document.querySelectorAll('#m-products input[type="checkbox"]:checked')).map(cb=>parseInt(cb.value));
   try{
@@ -798,8 +1055,8 @@ async function saveMachine(id){
         if(inserted)MACHINE_PRODUCTS=MACHINE_PRODUCTS.concat(inserted);
       }
     }
-    closeModal();renderMachines();showToast('保存しました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+    closeModal();renderMachines();showToast(t('toast_saved'),'success');
+  }catch(e){showToast(t('err_generic')(e.message),'error');}
 }
 
 /* ===== PRODUCTS ===== */
@@ -825,16 +1082,16 @@ function renderProducts(){
   const total=list.length;
   const page=list.slice((productPage-1)*PAGE_SIZE,productPage*PAGE_SIZE);
   const tbody=document.getElementById('productTable');
-  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="4">該当なし</td></tr>';renderPagination('productPagination',total,productPage,'product');return;}
+  if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="4">'+t('no_match')+'</td></tr>';renderPagination('productPagination',total,productPage,'product');return;}
   tbody.innerHTML=page.map(p=>{
     const active=p.is_active!==false;
     return`<tr>
       <td style="font-weight:600">${esc(p.product_code||'')}</td>
       <td>${esc(p.product_name||'')}</td>
-      <td><span class="badge ${active?'badge-active':'badge-inactive'}">${active?'有効':'無効'}</span></td>
+      <td><span class="badge ${active?'badge-active':'badge-inactive'}">${active?t('badge_active'):t('badge_inactive')}</span></td>
       <td><div class="td-actions">
-        <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">編集</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleActive('products','${p.id}',${active},'PRODUCTS','renderProducts')">${active?'無効化':'有効化'}</button>
+        <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">${t('btn_edit')}</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleActive('products','${p.id}',${active},'PRODUCTS','renderProducts')">${active?t('btn_deactivate'):t('btn_activate')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -843,18 +1100,18 @@ function renderProducts(){
 function openProductModal(id){
   const p=id?PRODUCTS.find(x=>String(x.id)===String(id)):null;
   showModal(`
-    <div class="modal-title">${p?'品番編集':'品番追加'}</div>
-    <div class="form-group"><label class="form-label">品番</label><input class="form-input" id="m-code" value="${p?esc(p.product_code||''):''}"></div>
-    <div class="form-group"><label class="form-label">品名</label><input class="form-input" id="m-pname" value="${p?esc(p.product_name||''):''}"></div>
+    <div class="modal-title">${p?t('modal_product_edit'):t('modal_product_add')}</div>
+    <div class="form-group"><label class="form-label">${t('label_product_code')}</label><input class="form-input" id="m-code" value="${p?esc(p.product_code||''):''}"></div>
+    <div class="form-group"><label class="form-label">${t('label_product_name')}</label><input class="form-input" id="m-pname" value="${p?esc(p.product_name||''):''}"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-      <button class="btn-save" onclick="saveProduct('${p?p.id:''}')">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
+      <button class="btn-save" onclick="saveProduct('${p?p.id:''}')">${t('btn_save')}</button>
     </div>`);
 }
 async function saveProduct(id){
   const code=document.getElementById('m-code').value.trim();
   const name=document.getElementById('m-pname').value.trim();
-  if(!code||!name){showToast('品番・品名を入力してください','error');return;}
+  if(!code||!name){showToast(t('err_product_required'),'error');return;}
   try{
     if(id){
       const updated=await sbFetch('products?id=eq.'+id,'PATCH',{product_code:code,product_name:name});
@@ -864,8 +1121,8 @@ async function saveProduct(id){
       const created=await sbFetch('products','POST',{product_code:code,product_name:name,is_active:true});
       if(created&&created[0])PRODUCTS.push(created[0]);
     }
-    closeModal();renderProducts();showToast('保存しました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+    closeModal();renderProducts();showToast(t('toast_saved'),'success');
+  }catch(e){showToast(t('err_generic')(e.message),'error');}
 }
 
 /* ===== CATEGORIES ===== */
@@ -892,13 +1149,13 @@ function renderCategories(){
 }
 function renderCatTable(tbodyId,list){
   const tbody=document.getElementById(tbodyId);
-  if(!list.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">なし</td></tr>';return;}
+  if(!list.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">'+t('cat_none')+'</td></tr>';return;}
   tbody.innerHTML=list.map(c=>{
     return`<tr>
       <td style="font-weight:600">${esc(c.name)}</td>
       <td style="color:var(--text2)">${c.sort_order}</td>
       <td><div class="td-actions">
-        <button class="btn btn-secondary btn-sm" onclick="openCategoryModal('${c.id}')">編集</button>
+        <button class="btn btn-secondary btn-sm" onclick="openCategoryModal('${c.id}')">${t('btn_edit')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -906,24 +1163,24 @@ function renderCatTable(tbodyId,list){
 function openCategoryModal(id){
   const c=id?CATEGORIES.find(x=>String(x.id)===String(id)):null;
   showModal(`
-    <div class="modal-title">${c?'分類編集':'分類追加'}</div>
-    <div class="form-group"><label class="form-label">種別</label>
+    <div class="modal-title">${c?t('modal_cat_edit'):t('modal_cat_add')}</div>
+    <div class="form-group"><label class="form-label">${t('label_type')}</label>
       <select class="form-select" id="m-ctype" ${c?'disabled':''}>
-        <option value="equipment" ${c&&c.type==='equipment'?'selected':''}>設備</option>
-        <option value="mold" ${c&&c.type==='mold'?'selected':''}>金型</option>
+        <option value="equipment" ${c&&c.type==='equipment'?'selected':''}>${t('type_equipment')}</option>
+        <option value="mold" ${c&&c.type==='mold'?'selected':''}>${t('type_mold')}</option>
       </select></div>
-    <div class="form-group"><label class="form-label">分類名</label><input class="form-input" id="m-cname" value="${c?esc(c.name):''}"></div>
-    <div class="form-group"><label class="form-label">表示順</label><input class="form-input" id="m-csort" type="number" value="${c?c.sort_order:99}"></div>
+    <div class="form-group"><label class="form-label">${t('label_cat_name')}</label><input class="form-input" id="m-cname" value="${c?esc(c.name):''}"></div>
+    <div class="form-group"><label class="form-label">${t('label_sort_order')}</label><input class="form-input" id="m-csort" type="number" value="${c?c.sort_order:99}"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-      <button class="btn-save" onclick="saveCategory('${c?c.id:''}')">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
+      <button class="btn-save" onclick="saveCategory('${c?c.id:''}')">${t('btn_save')}</button>
     </div>`);
 }
 async function saveCategory(id){
   const type=document.getElementById('m-ctype').value;
   const name=document.getElementById('m-cname').value.trim();
   const sort=parseInt(document.getElementById('m-csort').value)||99;
-  if(!name){showToast('分類名を入力してください','error');return;}
+  if(!name){showToast(t('err_cat_name'),'error');return;}
   try{
     if(id){
       const updated=await sbFetch('categories?id=eq.'+id,'PATCH',{name,sort_order:sort});
@@ -933,8 +1190,8 @@ async function saveCategory(id){
       const created=await sbFetch('categories','POST',{type,name,sort_order:sort,is_active:true});
       if(created&&created[0])CATEGORIES.push(created[0]);
     }
-    closeModal();renderCategories();showToast('保存しました','success');
-  }catch(e){showToast('エラー: '+e.message,'error');}
+    closeModal();renderCategories();showToast(t('toast_saved'),'success');
+  }catch(e){showToast(t('err_generic')(e.message),'error');}
 }
 
 /* ===== 共通: 有効/無効トグル ===== */
@@ -948,8 +1205,8 @@ async function toggleActive(table, id, currentActive, dataKey, renderFn) {
     const idx = arr.findIndex(x => String(x.id) === String(id));
     if (idx >= 0) arr[idx].is_active = newVal;
     RENDER_MAP[renderFn]();
-    showToast(newVal ? '有効にしました' : '無効にしました', 'success');
-  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+    showToast(newVal ? t('toast_activated') : t('toast_deactivated'), 'success');
+  } catch(e) { showToast(t('err_generic')(e.message), 'error'); }
 }
 
 /* ===== Sort ===== */
@@ -1009,10 +1266,10 @@ function renderPagination(elId, total, current, entity) {
   if (pages <= 1) { el.innerHTML = ''; return; }
   const start = (current - 1) * PAGE_SIZE + 1;
   const end = Math.min(current * PAGE_SIZE, total);
-  el.innerHTML = `<span>${start}–${end} / ${total}件</span><div class="page-btns">
-    <button class="page-btn" onclick="goPage('${entity}',${current - 1})" ${current <= 1 ? 'disabled' : ''}>← 前へ</button>
+  el.innerHTML = `<span>${start}–${end} / ${total}${t('pagination_of')}</span><div class="page-btns">
+    <button class="page-btn" onclick="goPage('${entity}',${current - 1})" ${current <= 1 ? 'disabled' : ''}>${t('btn_prev')}</button>
     <button class="page-btn active">${current} / ${pages}</button>
-    <button class="page-btn" onclick="goPage('${entity}',${current + 1})" ${current >= pages ? 'disabled' : ''}>次へ →</button>
+    <button class="page-btn" onclick="goPage('${entity}',${current + 1})" ${current >= pages ? 'disabled' : ''}>${t('btn_next')}</button>
   </div>`;
 }
 
@@ -1055,8 +1312,8 @@ async function initStorage(){
     var pct = Math.round(usedMB / totalMB * 100);
     updateStorageBar(usedMB, totalMB, pct, fileCount);
   } catch(e) {
-    document.getElementById('storageLabel').textContent = '取得できません';
-    document.getElementById('storageDetail').textContent = 'Supabase Storageダッシュボードで確認してください';
+    document.getElementById('storageLabel').textContent = t('storage_unavailable');
+    document.getElementById('storageDetail').textContent = t('storage_check_dashboard');
   }
 }
 function updateStorageBar(used, total, pct, fileCount) {
@@ -1065,10 +1322,10 @@ function updateStorageBar(used, total, pct, fileCount) {
   document.getElementById('storageFill').style.background = color;
   document.getElementById('storageLabel').textContent = `${used}MB / ${total}MB (${pct}%)`;
   document.getElementById('storageLabel').style.color = color;
-  var detail = pct >= 80 ? '🔴 容量が逼迫しています。バックアップ→削除を推奨します。'
-    : pct >= 70 ? '⚠️ 70%を超えています。不要な画像の削除を推奨します。'
-    : `残り ${Math.round((total - used) * 10) / 10}MB 利用可能`;
-  if (typeof fileCount === 'number') detail += `　画像: ${fileCount}件`;
+  var detail = pct >= 80 ? t('storage_critical')
+    : pct >= 70 ? t('storage_warn70')
+    : t('storage_remaining')(Math.round((total - used) * 10) / 10);
+  if (typeof fileCount === 'number') detail += t('storage_image_count')(fileCount);
   document.getElementById('storageDetail').textContent = detail;
   // 80%超で警告バナー表示
   var banner = document.getElementById('storageWarningBanner');
@@ -1076,13 +1333,13 @@ function updateStorageBar(used, total, pct, fileCount) {
 }
 function exportImages(){
   const year=document.getElementById('exportYear').value;
-  showToast(`${year}年の画像エクスポートを開始します（Supabase Storageから取得）`,'info');
+  showToast(t('toast_export_start')(year),'info');
 }
 
 /* ===== Excel export (placeholder) ===== */
-function exportUsers(){ showToast('Excel出力機能は今後実装予定です','info'); }
-function exportMachines(){ showToast('Excel出力機能は今後実装予定です','info'); }
-function exportProducts(){ showToast('Excel出力機能は今後実装予定です','info'); }
+function exportUsers(){ showToast(t('toast_excel_todo'),'info'); }
+function exportMachines(){ showToast(t('toast_excel_todo'),'info'); }
+function exportProducts(){ showToast(t('toast_excel_todo'),'info'); }
 
 /* ===== Modal ===== */
 function showModal(html){
@@ -1136,15 +1393,15 @@ var _delImagePaths = [];
 async function previewDelete() {
   var from = document.getElementById('delDateFrom').value;
   var to = document.getElementById('delDateTo').value;
-  if (!from || !to) { showToast('開始日・終了日を入力してください', 'error'); return; }
-  if (from > to) { showToast('開始日は終了日以前にしてください', 'error'); return; }
+  if (!from || !to) { showToast(t('err_dates_required'), 'error'); return; }
+  if (from > to) { showToast(t('err_date_order'), 'error'); return; }
 
   try {
     // 対象トラブル取得
     var troubles = await sbFetch('troubles?select=id&occurred_date=gte.' + from + '&occurred_date=lte.' + to);
     if (!troubles || troubles.length === 0) {
       document.getElementById('delPreview').style.display = 'block';
-      document.getElementById('delPreviewText').textContent = '対象データはありません';
+      document.getElementById('delPreviewText').textContent = t('del_no_data');
       document.getElementById('delExecBtn').style.display = 'none';
       _delTroubleIds = [];
       _delImagePaths = [];
@@ -1156,32 +1413,26 @@ async function previewDelete() {
     var images = await sbFetch('trouble_images?select=storage_path&trouble_id=in.(' + _delTroubleIds.join(',') + ')');
     _delImagePaths = (images || []).map(function(img) { return img.storage_path; }).filter(Boolean);
 
-    var msg = 'トラブル: <strong style="color:var(--danger)">' + _delTroubleIds.length + '件</strong>';
-    msg += '　画像: <strong style="color:var(--danger)">' + _delImagePaths.length + '件</strong>';
-    msg += '<div style="margin-top:6px;font-size:12px;color:var(--text2)">期間: ' + esc(from) + ' ～ ' + esc(to) + '</div>';
+    var msg = t('del_preview')(_delTroubleIds.length, _delImagePaths.length, esc(from), esc(to));
 
     document.getElementById('delPreview').style.display = 'block';
     document.getElementById('delPreviewText').innerHTML = msg;
     document.getElementById('delExecBtn').style.display = 'inline-block';
   } catch(e) {
-    showToast('件数確認エラー: ' + e.message, 'error');
+    showToast(t('del_count_error')(e.message), 'error');
   }
 }
 
 async function execDelete() {
-  if (_delTroubleIds.length === 0) { showToast('削除対象がありません', 'error'); return; }
+  if (_delTroubleIds.length === 0) { showToast(t('del_no_target'), 'error'); return; }
 
-  var msg = '本当に削除しますか？\n\n';
-  msg += '・トラブル: ' + _delTroubleIds.length + '件\n';
-  msg += '・画像: ' + _delImagePaths.length + '件\n\n';
-  msg += 'Excel出力・画像バックアップは完了していますか？\nこの操作は取り消せません。';
-  if (!confirm(msg)) return;
+  if (!confirm(t('del_confirm')(_delTroubleIds.length, _delImagePaths.length))) return;
 
   // 二段階確認
-  if (!confirm('最終確認: 本当に削除を実行しますか？')) return;
+  if (!confirm(t('del_final_confirm'))) return;
 
   document.getElementById('delExecBtn').disabled = true;
-  document.getElementById('delExecBtn').textContent = '削除中...';
+  document.getElementById('delExecBtn').textContent = t('del_in_progress');
 
   try {
     // 1) Storage画像削除（バッチ: 最大20件ずつ）
@@ -1204,7 +1455,7 @@ async function execDelete() {
     // 3) troubles削除
     await sbFetch('troubles?id=in.(' + _delTroubleIds.join(',') + ')', 'DELETE');
 
-    showToast(_delTroubleIds.length + '件のトラブルと' + _delImagePaths.length + '件の画像を削除しました', 'success');
+    showToast(t('del_success')(_delTroubleIds.length, _delImagePaths.length), 'success');
 
     // UI リセット
     _delTroubleIds = [];
@@ -1212,16 +1463,30 @@ async function execDelete() {
     document.getElementById('delPreview').style.display = 'none';
     document.getElementById('delExecBtn').style.display = 'none';
     document.getElementById('delExecBtn').disabled = false;
-    document.getElementById('delExecBtn').textContent = '🗑️ 削除を実行';
+    document.getElementById('delExecBtn').textContent = t('btn_delete_exec');
 
     // ストレージ再計算
     initStorage();
 
   } catch(e) {
-    showToast('削除エラー: ' + e.message, 'error');
+    showToast(t('del_error')(e.message), 'error');
     document.getElementById('delExecBtn').disabled = false;
-    document.getElementById('delExecBtn').textContent = '🗑️ 削除を実行';
+    document.getElementById('delExecBtn').textContent = t('btn_delete_exec');
   }
+}
+
+/* ===== i18n dynamic content helpers ===== */
+function updateDeleteDesc(){
+  var el=document.getElementById('delDescText');
+  if(!el)return;
+  el.innerHTML='指定期間のトラブルデータと関連画像を削除します。<strong style="color:var(--danger)">'+t('storage_delete_warn')+'</strong>。<br>'+t('storage_delete_desc');
+}
+function updateStorageEstimate(){
+  var el=document.getElementById('storageEstContent');
+  if(!el)return;
+  el.innerHTML='<div>'+t('storage_est_text')+'</div>'
+    +'<div>'+t('storage_est_image')+' <strong style="color:var(--text1)">'+t('storage_est_image_val')+'</strong></div>'
+    +'<div>'+t('storage_est_free')+'<strong style="color:var(--text1)">'+t('storage_est_free_val')+'</strong>'+t('storage_est_free_note')+'</div>';
 }
 </script>
 <script src="./update_banner.js"></script>
