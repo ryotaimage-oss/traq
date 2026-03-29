@@ -687,7 +687,12 @@ del_no_target:'削除対象がありません',del_in_progress:'削除中...',
 del_success:function(tc,ic){return tc+'件のトラブルと'+ic+'件の画像を削除しました';},
 del_error:function(m){return '削除エラー: '+m;},
 del_count_error:function(m){return '件数確認エラー: '+m;},
-role_op:'OP',role_sl:'SL',role_admin:'Admin'
+role_op:'OP',role_sl:'SL',role_admin:'Admin',
+btn_delete:'削除',
+master_del_confirm:function(n){return '「'+n+'」を削除しますか？\nこの操作は取り消せません。';},
+master_del_has_ref:function(n){return n+'件のトラブルが参照中のため削除できません';},
+master_del_done:'削除しました',
+master_del_error:function(m){return '削除エラー: '+m;}
 },
 vi:{
 nav_list:'Danh sách',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
@@ -782,7 +787,12 @@ del_no_target:'Không có đối tượng xóa',del_in_progress:'Đang xóa...',
 del_success:function(tc,ic){return 'Đã xóa '+tc+' sự cố và '+ic+' hình ảnh';},
 del_error:function(m){return 'Lỗi xóa: '+m;},
 del_count_error:function(m){return 'Lỗi kiểm tra số lượng: '+m;},
-role_op:'OP',role_sl:'SL',role_admin:'Admin'
+role_op:'OP',role_sl:'SL',role_admin:'Admin',
+btn_delete:'Xoá',
+master_del_confirm:function(n){return 'Xoá "'+n+'"?\nThao tác này không thể hoàn tác.';},
+master_del_has_ref:function(n){return 'Không thể xoá vì có '+n+' sự cố đang tham chiếu';},
+master_del_done:'Đã xoá',
+master_del_error:function(m){return 'Lỗi xoá: '+m;}
 },
 en:{
 nav_list:'List',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
@@ -877,7 +887,12 @@ del_no_target:'No items to delete',del_in_progress:'Deleting...',
 del_success:function(tc,ic){return 'Deleted '+tc+' troubles and '+ic+' images';},
 del_error:function(m){return 'Delete error: '+m;},
 del_count_error:function(m){return 'Count check error: '+m;},
-role_op:'OP',role_sl:'SL',role_admin:'Admin'
+role_op:'OP',role_sl:'SL',role_admin:'Admin',
+btn_delete:'Delete',
+master_del_confirm:function(n){return 'Delete "'+n+'"?\nThis action cannot be undone.';},
+master_del_has_ref:function(n){return 'Cannot delete: '+n+' trouble(s) referencing this item';},
+master_del_done:'Deleted',
+master_del_error:function(m){return 'Delete error: '+m;}
 }
 };
 function t(k){var d=I18N[currentLang]||I18N.ja;var v=d[k];if(v!==undefined)return v;return I18N.ja[k]!==undefined?I18N.ja[k]:k;}
@@ -979,6 +994,7 @@ function renderUsers(){
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">${t('btn_edit')}</button>
         <button class="btn btn-secondary btn-sm" onclick="resetPin('${u.id}','${esc(u.name)}')">${t('btn_reset_pin')}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMasterItem('traq_users','${u.id}','reporter_id','${esc(u.name)}','USERS','renderUsers')">${t('btn_delete')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1061,6 +1077,7 @@ function renderMachines(){
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openMachineModal('${m.id}')">${t('btn_edit')}</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleActive('machines','${m.id}',${active},'MACHINES','renderMachines')">${active?t('btn_deactivate'):t('btn_activate')}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMasterItem('machines','${m.id}','machine_id','${esc(String(m.machine_no))}','MACHINES','renderMachines')">${t('btn_delete')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1150,6 +1167,7 @@ function renderProducts(){
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">${t('btn_edit')}</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleActive('products','${p.id}',${active},'PRODUCTS','renderProducts')">${active?t('btn_deactivate'):t('btn_activate')}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMasterItem('products','${p.id}','product_id','${esc(p.product_code||'')}','PRODUCTS','renderProducts')">${t('btn_delete')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1214,6 +1232,7 @@ function renderCatTable(tbodyId,list){
       <td style="color:var(--text2)">${c.sort_order}</td>
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openCategoryModal('${c.id}')">${t('btn_edit')}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMasterItem('categories','${c.id}','category_id','${esc(c.name)}','CATEGORIES','renderCategories')">${t('btn_delete')}</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1265,6 +1284,46 @@ async function toggleActive(table, id, currentActive, dataKey, renderFn) {
     RENDER_MAP[renderFn]();
     showToast(newVal ? t('toast_activated') : t('toast_deactivated'), 'success');
   } catch(e) { showToast(t('err_generic')(e.message), 'error'); }
+}
+
+/* ===== 共通: マスタ削除（FK制約チェック付き） ===== */
+async function deleteMasterItem(table, id, fkColumn, displayName, dataKey, renderFn) {
+  try {
+    // 1) FK制約チェック: troublesテーブルで参照されているか確認
+    var refRows = await sbFetch('troubles?select=id&' + fkColumn + '=eq.' + id + '&limit=1', 'GET', null);
+    // Supabase REST APIはヘッダーでcount取得する方が正確だが、簡易的に件数チェック
+    // 1件でもあれば削除不可
+    if (refRows && refRows.length > 0) {
+      // 正確な件数を取得
+      var countRows = await sbFetch('troubles?select=id&' + fkColumn + '=eq.' + id);
+      var cnt = countRows ? countRows.length : 1;
+      showToast(t('master_del_has_ref')(cnt), 'error');
+      return;
+    }
+
+    // 2) 確認ダイアログ
+    if (!confirm(t('master_del_confirm')(displayName))) return;
+
+    // 3) 関連データの削除（machinesの場合はmachine_productsも削除）
+    if (table === 'machines') {
+      await sbFetch('machine_products?machine_id=eq.' + id, 'DELETE');
+      MACHINE_PRODUCTS = MACHINE_PRODUCTS.filter(function(mp) { return String(mp.machine_id) !== String(id); });
+    }
+
+    // 4) 本体レコード削除
+    await sbFetch(table + '?id=eq.' + id, 'DELETE');
+
+    // 5) ローカル配列から削除
+    var arr = DATA_MAP[dataKey]();
+    var idx = arr.findIndex(function(x) { return String(x.id) === String(id); });
+    if (idx >= 0) arr.splice(idx, 1);
+
+    // 6) 再描画
+    RENDER_MAP[renderFn]();
+    showToast(t('master_del_done'), 'success');
+  } catch(e) {
+    showToast(t('master_del_error')(e.message), 'error');
+  }
 }
 
 /* ===== Sort ===== */
