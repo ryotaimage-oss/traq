@@ -730,6 +730,7 @@ function onMachineChange(){
 /* ── Occurrence ── */
 var selectedOccurrence=null;
 function selectOccurrence(val){
+  if(val==='repeat')val='recurrence';
   selectedOccurrence=val;
   document.getElementById('btn-first').classList.toggle('selected',val==='first');
   document.getElementById('btn-repeat').classList.toggle('selected',val==='recurrence');
@@ -889,7 +890,7 @@ async function doSubmit(){
       machine_id:parseInt(document.getElementById('machine-select').value)||null,
       product_id:parseInt(document.getElementById('product-select').value)||null,
       category_id:parseInt(document.getElementById('category-select').value)||null,
-      occurrence:selectedOccurrence||'first',
+      occurrence:(selectedOccurrence==='repeat'?'recurrence':selectedOccurrence)||'first',
       stop_start:(function(){var h=drumState.sh,m=drumState.sm*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})(),
       stop_end:endTimeSet&&drumState.eh>=0?(function(){var h=drumState.eh,m=drumState.em*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})():null,
       stop_minutes:(function(){var v=document.getElementById('stop-minutes').value;return v?parseInt(v):null;})(),
