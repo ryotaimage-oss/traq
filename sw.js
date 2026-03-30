@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v7';
+const CACHE_NAME = 'traq-v8';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -16,33 +16,43 @@ const STATIC_ASSETS = [
 ];
 
 // インストール：静的リソースをキャッシュ
+// isUpdate フラグ：古いSWが存在していた場合のみ true
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC_ASSETS).catch(err => {
-        console.warn('SW: 一部ファイルのキャッシュに失敗:', err);
-      });
-    })
+    caches.keys().then(keys => {
+      // traq-push-nav以外の既存キャッシュがあれば「更新」
+      self._isUpdate = keys.some(k => k !== 'traq-push-nav' && k !== CACHE_NAME);
+    }).then(() =>
+      caches.open(CACHE_NAME).then(cache => {
+        return cache.addAll(STATIC_ASSETS).catch(err => {
+          console.warn('SW: 一部ファイルのキャッシュに失敗:', err);
+        });
+      })
+    )
   );
   self.skipWaiting();
 });
 
-// アクティベート：古いキャッシュを削除 → 全クライアントに更新通知
+// アクティベート：古いキャッシュを削除
+// 実際に更新があった場合のみクライアントに通知
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.filter(k => k !== CACHE_NAME && k !== 'traq-push-nav').map(k => caches.delete(k))
       )
-    ).then(() => {
-      return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
-        clients.forEach(client => {
-          client.postMessage({ type: 'UPDATE_AVAILABLE', version: CACHE_NAME });
-        });
-      });
-    })
+    ).then(() => self.clients.claim())
+     .then(() => {
+       // 古いSWからの更新時のみバナーを表示
+       if (self._isUpdate) {
+         return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
+           clients.forEach(client => {
+             client.postMessage({ type: 'UPDATE_AVAILABLE', version: CACHE_NAME });
+           });
+         });
+       }
+     })
   );
-  self.clients.claim();
 });
 
 // フェッチ戦略
