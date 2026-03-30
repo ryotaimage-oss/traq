@@ -549,8 +549,6 @@ tr:hover td{background:rgba(239,159,39,.04)}
 <div class="modal-wrap" id="modalEl"></div>
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 (function(){
   var saved=localStorage.getItem('traq_theme');
@@ -559,6 +557,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
   var btn=document.getElementById('themeBtn');
   if(btn)btn.textContent=(saved||pref)==='dark'?'🌙':'☀️';
 })();
+</script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
 
 /* ===== Supabase ===== */
 const SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
@@ -1138,7 +1140,7 @@ async function saveUser(id){
       if(idx>=0&&updated&&updated[0])USERS[idx]={...USERS[idx],...updated[0]};
     }else{
       const pin=document.getElementById('m-pin')?.value||'0000';
-      const created=await sbFetch('traq_users','POST',{name,role,pin,is_active:true});
+      const created=await sbFetch('traq_users','POST',{name,role,pin,is_active:true,shift:1});
       if(created&&created[0])USERS.push(created[0]);
     }
     closeModal();renderUsers();showToast(t('toast_saved'),'success');
@@ -2139,12 +2141,12 @@ async function executeImport(){
     if(plan.users){
       for(var i=0;i<plan.users.newRows.length;i++){
         var r=plan.users.newRows[i];
-        await sbFetch('traq_users','POST',{name:r.name,role:r._role,shift:r.shift?parseInt(r.shift,10):null,is_active:r._isActive,pin:'0000'});
+        await sbFetch('traq_users','POST',{name:r.name,role:r._role,shift:r.shift?parseInt(r.shift,10):1,is_active:r._isActive,pin:'0000'});
         totalNew++;
       }
       for(var i=0;i<plan.users.updateRows.length;i++){
         var r=plan.users.updateRows[i];
-        await sbFetch('traq_users?id=eq.'+r._id,'PATCH',{role:r._role,shift:r.shift?parseInt(r.shift,10):null,is_active:r._isActive});
+        await sbFetch('traq_users?id=eq.'+r._id,'PATCH',{role:r._role,shift:r.shift?parseInt(r.shift,10):1,is_active:r._isActive});
         totalUpdate++;
       }
       if(deactivate&&plan.users.missingIds.length){
