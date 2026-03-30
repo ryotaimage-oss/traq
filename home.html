@@ -1047,7 +1047,7 @@ async function sendDraft(id) {
     await sbFetch('troubles', 'POST', {
       trouble_type: tr.type, status: 'pending',
       occurred_date: tr.date || null, shift: tr.shift,
-      detail: tr.detail, occurrence: tr.occurrence || 'first',
+      detail: tr.detail, occurrence: (tr.occurrence==='repeat'?'recurrence':(tr.occurrence||'first')),
       stop_minutes: tr.stop_minutes || null, reporter_id: SESSION.userId
     });
     await sbFetch('drafts?id=eq.' + tr._draftId, 'DELETE');
