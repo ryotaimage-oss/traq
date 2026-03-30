@@ -464,6 +464,7 @@ const I18N = {
     btn_close:'閉じる',
     approve_confirm:'この内容を承認しますか？',
     approve_done:'承認しました',
+    stop_input_title:'停止時間を入力', stop_input_hint:'承認前に停止時間（分）を入力してください', stop_unit:'分',
     reject_title:'差し戻し理由', reject_hint:'差し戻し理由を入力してください（任意）',
     reject_placeholder:'例：詳細内容が不足しています',
     reject_confirm:'差し戻す', reject_cancel:'キャンセル',
@@ -503,6 +504,7 @@ const I18N = {
     btn_close:'Đóng',
     approve_confirm:'Bạn có muốn duyệt nội dung này không?',
     approve_done:'Đã duyệt',
+    stop_input_title:'Nhập thời gian dừng', stop_input_hint:'Vui lòng nhập thời gian dừng (phút) trước khi duyệt', stop_unit:'phút',
     reject_title:'Lý do trả lại', reject_hint:'Nhập lý do trả lại (tùy chọn)',
     reject_placeholder:'Ví dụ: Nội dung chưa đầy đủ',
     reject_confirm:'Trả lại', reject_cancel:'Huỷ',
@@ -542,6 +544,7 @@ const I18N = {
     btn_close:'Close',
     approve_confirm:'Approve this submission?',
     approve_done:'Approved',
+    stop_input_title:'Enter downtime', stop_input_hint:'Please enter downtime (minutes) before approving', stop_unit:'min',
     reject_title:'Rejection Reason', reject_hint:'Enter rejection reason (optional)',
     reject_placeholder:'e.g. Please add more detail',
     reject_confirm:'Reject', reject_cancel:'Cancel',
@@ -905,17 +908,69 @@ function editRejected(id){
 async function quickApprove(id){
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
+  // 停止時間が未入力なら入力モーダルを表示
+  if(!tr.stop_minutes && tr.stop_minutes !== 0){
+    openStopTimeModal(id);
+    return;
+  }
+  doApprove(id, tr.stop_minutes);
+}
+
+function openStopTimeModal(id){
+  const tr = TROUBLES.find(x => x.id === id);
+  if(!tr) return;
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${t('stop_input_title')}</div>
+    <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
+    <p class="reject-hint">${t('stop_input_hint')}</p>
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0 16px">
+      <input type="number" id="stopTimeInput" min="0" style="
+        flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);
+        border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:600;
+        color:var(--text1);outline:none;text-align:center;
+      " placeholder="0" inputmode="numeric">
+      <span style="font-size:14px;color:var(--text2);font-weight:500">${t('stop_unit')}</span>
+    </div>
+    <button class="btn-approve" onclick="submitStopAndApprove(${id})" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+    <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
+  `,true);
+  setTimeout(()=>{var el=document.getElementById('stopTimeInput');if(el){el.focus();el.select();}},100);
+}
+
+function submitStopAndApprove(id){
+  var input = document.getElementById('stopTimeInput');
+  var val = input ? parseInt(input.value, 10) : NaN;
+  if(isNaN(val) || val < 0){
+    input.style.borderColor = 'var(--danger)';
+    input.focus();
+    return;
+  }
+  closeModal();
+  doApprove(id, val);
+}
+
+async function doApprove(id, stopMinutes){
+  const tr = TROUBLES.find(x => x.id === id);
+  if (!tr) return;
   const card = document.querySelector(`[data-id="${id}"]`);
   if (card) card.classList.add('actioned');
   try {
-    await sbFetch('troubles?id=eq.' + id, 'PATCH', {
+    var patch = {
       status: 'approved',
       approver_id: SESSION.userId,
       approved_at: new Date().toISOString()
-    });
+    };
+    if(stopMinutes !== undefined && stopMinutes !== null){
+      patch.stop_minutes = stopMinutes;
+    }
+    await sbFetch('troubles?id=eq.' + id, 'PATCH', patch);
     tr.status = 'approved';
     tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
+    if(stopMinutes !== undefined && stopMinutes !== null){
+      tr.stop_minutes = stopMinutes;
+    }
     tr._actioned = true;
     renderList();
     showToast(t('approve_done'), 'success');
