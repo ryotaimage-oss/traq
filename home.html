@@ -1184,6 +1184,18 @@ function showToast(msg, type='') {
   toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
+/* ===== UTC→JST変換 ===== */
+function utcToJST(isoStr){
+  if(!isoStr) return '';
+  var s=isoStr.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s)&&!/[+-]\d{2}/.test(s)) s+='Z';
+  var d=new Date(s);
+  if(isNaN(d.getTime())) return isoStr.slice(0,16).replace('T',' ');
+  var jst=new Date(d.getTime()+9*60*60*1000);
+  var y=jst.getUTCFullYear(),mo=String(jst.getUTCMonth()+1).padStart(2,'0'),dy=String(jst.getUTCDate()).padStart(2,'0'),h=String(jst.getUTCHours()).padStart(2,'0'),mi=String(jst.getUTCMinutes()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy+' '+h+':'+mi;
+}
+
 /* ===== Load from Supabase ===== */
 async function loadTroubles() {
   TROUBLES = [];
@@ -1205,9 +1217,9 @@ async function loadTroubles() {
       stop_minutes: r.stop_minutes,
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : SESSION.name,
-      submitted_at: r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '',
+      submitted_at: utcToJST(r.created_at),
       approved_by: r.approver_id ? '承認済み' : null,
-      approved_at: r.approved_at ? r.approved_at.slice(0,16).replace('T',' ') : null,
+      approved_at: utcToJST(r.approved_at) || null,
       reject_reason: r.reject_reason || null,
       line_id: r.line_id, machine_id: r.machine_id,
       product_id: r.product_id, category_id: r.category_id,
@@ -1226,7 +1238,7 @@ async function loadTroubles() {
         product_code: d.product_code || '', product_name: d.product_name || '',
         category: d.category_name || '', occurrence: d.occurrence || 'first',
         stop_minutes: d.stop_minutes || null, detail: d.detail || '',
-        submitted_by: SESSION.name, submitted_at: dr.updated_at ? dr.updated_at.slice(0,16).replace('T',' ') : '',
+        submitted_by: SESSION.name, submitted_at: utcToJST(dr.updated_at),
         approved_by: null, approved_at: null, reject_reason: null,
       });
     });

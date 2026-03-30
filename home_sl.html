@@ -690,6 +690,18 @@ let selectedIds = new Set();
 })();
 
 /* ===== Load from Supabase ===== */
+/* ===== UTC→JST変換 ===== */
+function utcToJST(isoStr){
+  if(!isoStr) return '';
+  var s=isoStr.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s)&&!/[+-]\d{2}/.test(s)) s+='Z';
+  var d=new Date(s);
+  if(isNaN(d.getTime())) return isoStr.slice(0,16).replace('T',' ');
+  var jst=new Date(d.getTime()+9*60*60*1000);
+  var y=jst.getUTCFullYear(),mo=String(jst.getUTCMonth()+1).padStart(2,'0'),dy=String(jst.getUTCDate()).padStart(2,'0'),h=String(jst.getUTCHours()).padStart(2,'0'),mi=String(jst.getUTCMinutes()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy+' '+h+':'+mi;
+}
+
 async function loadTroubles() {
   try {
     let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100';
@@ -710,9 +722,9 @@ async function loadTroubles() {
       stop_minutes: r.stop_minutes,
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : '',
-      submitted_at: r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '',
+      submitted_at: utcToJST(r.created_at),
       approved_by: r.approver_id ? '承認済み' : null,
-      approved_at: r.approved_at ? r.approved_at.slice(0,16).replace('T',' ') : null,
+      approved_at: utcToJST(r.approved_at) || null,
       reject_reason: r.reject_reason || null,
     }));
   } catch(e) {
@@ -902,6 +914,7 @@ async function quickApprove(id){
       approved_at: new Date().toISOString()
     });
     tr.status = 'approved';
+    tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
     renderList();
     showToast(t('approve_done'), 'success');
@@ -942,6 +955,7 @@ async function doReject(id){
     });
     tr.status = 'rejected';
     tr.reject_reason = reason || null;
+    tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
     renderList();
     showToast(t('reject_done'), 'error');
