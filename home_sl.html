@@ -253,6 +253,21 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(min-width:1025px){.sidebar{width:240px}}
+/* ===== Drum (approve end-time modal) ===== */
+.drum-wrap{display:flex;align-items:flex-start;gap:4px;justify-content:center}
+.drum{width:64px;height:120px;overflow:hidden;position:relative;border-radius:var(--radius);background:var(--bg3)}
+.drum-highlight{position:absolute;top:40px;left:0;right:0;height:40px;border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);pointer-events:none;z-index:1}
+.drum-inner{display:flex;flex-direction:column;align-items:center}
+.drum-cell{height:40px;width:100%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:400;color:var(--text2);cursor:pointer;user-select:none;transition:font-size .15s}
+.drum-cell.active{font-size:21px;font-weight:700;color:var(--text1)}
+.drum-colon{font-size:20px;font-weight:700;color:var(--text2);align-self:center;margin-top:40px}
+.drum-unit{font-size:10px;color:var(--text2);text-align:center;margin-top:3px}
+.approve-start-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:var(--radius);margin-bottom:10px}
+.approve-start-label{font-size:12px;color:var(--text2)}
+.approve-start-val{font-size:16px;font-weight:700;color:var(--text1);font-family:'Noto Sans JP',sans-serif;letter-spacing:1px}
+.approve-calc-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius);margin-bottom:14px}
+.approve-calc-label{font-size:12px;color:var(--success)}
+.approve-calc-val{font-size:18px;font-weight:700;color:var(--success)}
 </style>
 </head>
 <body>
@@ -465,7 +480,8 @@ const I18N = {
     btn_close:'閉じる',
     approve_confirm:'この内容を承認しますか？',
     approve_done:'承認しました',
-    stop_input_title:'停止時間を入力', stop_input_hint:'承認前に停止時間（分）を入力してください', stop_unit:'分',
+    stop_input_title:'終了時刻を入力して承認', stop_input_hint:'承認前に停止時間（分）を入力してください', stop_unit:'分',
+    stop_start_label:'開始時刻', stop_end_label:'終了時刻', stop_calc_label:'停止時間（自動計算）', hour_unit:'時', min_unit:'分',
     reject_title:'差し戻し理由', reject_hint:'差し戻し理由を入力してください（任意）',
     reject_placeholder:'例：詳細内容が不足しています',
     reject_confirm:'差し戻す', reject_cancel:'キャンセル',
@@ -505,7 +521,8 @@ const I18N = {
     btn_close:'Đóng',
     approve_confirm:'Bạn có muốn duyệt nội dung này không?',
     approve_done:'Đã duyệt',
-    stop_input_title:'Nhập thời gian dừng', stop_input_hint:'Vui lòng nhập thời gian dừng (phút) trước khi duyệt', stop_unit:'phút',
+    stop_input_title:'Nhập giờ kết thúc để duyệt', stop_input_hint:'Vui lòng nhập thời gian dừng (phút) trước khi duyệt', stop_unit:'phút',
+    stop_start_label:'Giờ bắt đầu', stop_end_label:'Giờ kết thúc', stop_calc_label:'Thời gian dừng (tự động)', hour_unit:'giờ', min_unit:'phút',
     reject_title:'Lý do trả lại', reject_hint:'Nhập lý do trả lại (tùy chọn)',
     reject_placeholder:'Ví dụ: Nội dung chưa đầy đủ',
     reject_confirm:'Trả lại', reject_cancel:'Huỷ',
@@ -545,7 +562,8 @@ const I18N = {
     btn_close:'Close',
     approve_confirm:'Approve this submission?',
     approve_done:'Approved',
-    stop_input_title:'Enter downtime', stop_input_hint:'Please enter downtime (minutes) before approving', stop_unit:'min',
+    stop_input_title:'Enter end time to approve', stop_input_hint:'Please enter downtime (minutes) before approving', stop_unit:'min',
+    stop_start_label:'Start time', stop_end_label:'End time', stop_calc_label:'Downtime (auto)', hour_unit:'h', min_unit:'m',
     reject_title:'Rejection Reason', reject_hint:'Enter rejection reason (optional)',
     reject_placeholder:'e.g. Please add more detail',
     reject_confirm:'Reject', reject_cancel:'Cancel',
@@ -724,6 +742,8 @@ async function loadTroubles() {
       category: r.categories ? r.categories.name : '',
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
+      stop_start: r.stop_start || null,
+      stop_end: r.stop_end || null,
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : '',
       submitted_at: utcToJST(r.created_at),
@@ -909,49 +929,135 @@ function editRejected(id){
 async function quickApprove(id){
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
-  // 停止時間が未入力なら入力モーダルを表示
-  if(!tr.stop_minutes && tr.stop_minutes !== 0){
+  // 終了時刻が未入力なら入力モーダルを表示
+  if(!tr.stop_end){
     openStopTimeModal(id);
     return;
   }
-  doApprove(id, tr.stop_minutes);
+  doApprove(id, null, null);
 }
+
+var _drumState = {eh:0, em:0, startH:0, startM:0, approveId:null};
 
 function openStopTimeModal(id){
   const tr = TROUBLES.find(x => x.id === id);
   if(!tr) return;
-  showModal(`
-    <div class="modal-handle"></div>
-    <div class="modal-title">${t('stop_input_title')}</div>
-    <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
-    <p class="reject-hint">${t('stop_input_hint')}</p>
-    <div style="display:flex;align-items:center;gap:8px;margin:12px 0 16px">
-      <input type="number" id="stopTimeInput" min="0" style="
-        flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);
-        border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:600;
-        color:var(--text1);outline:none;text-align:center;
-      " placeholder="0" inputmode="numeric">
-      <span style="font-size:14px;color:var(--text2);font-weight:500">${t('stop_unit')}</span>
-    </div>
-    <button class="btn-approve" onclick="submitStopAndApprove(${id})" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
-    <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
-  `,true);
-  setTimeout(()=>{var el=document.getElementById('stopTimeInput');if(el){el.focus();el.select();}},100);
+  _drumState.approveId = id;
+
+  // stop_startがある場合はドラムUI、ない場合は直接入力フォールバック
+  if(tr.stop_start){
+    var sp = tr.stop_start.split(':');
+    _drumState.startH = parseInt(sp[0])||0;
+    _drumState.startM = parseInt(sp[1])||0;
+    // 初期値: 開始+30分
+    var initMin = (_drumState.startH*60 + _drumState.startM) + 30;
+    _drumState.eh = Math.floor(initMin/60) % 24;
+    _drumState.em = Math.floor((initMin%60)/5);
+
+    showModal(`
+      <div class="modal-handle"></div>
+      <div class="modal-title">${t('stop_input_title')}</div>
+      <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
+      <div class="approve-start-row">
+        <span class="approve-start-label">${t('stop_start_label')}</span>
+        <span class="approve-start-val">${String(_drumState.startH).padStart(2,'0')}:${String(_drumState.startM).padStart(2,'0')}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${t('stop_end_label')}</div>
+      <div class="drum-wrap" style="margin-bottom:10px">
+        <div><div class="drum" id="adH"><div class="drum-highlight"></div><div class="drum-inner" id="adH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+        <span class="drum-colon">:</span>
+        <div><div class="drum" id="adM"><div class="drum-highlight"></div><div class="drum-inner" id="adM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+      </div>
+      <div class="approve-calc-row">
+        <span class="approve-calc-label">${t('stop_calc_label')}</span>
+        <span class="approve-calc-val" id="approveCalc">--</span>
+      </div>
+      <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+      <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
+    `,true);
+    setTimeout(function(){renderApproveDrums();calcApproveTime();},50);
+  } else {
+    // stop_startがない→直接分入力
+    showModal(`
+      <div class="modal-handle"></div>
+      <div class="modal-title">${t('stop_input_title')}</div>
+      <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
+      <p class="reject-hint">${t('stop_input_hint')}</p>
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0 16px">
+        <input type="number" id="stopTimeInput" min="0" style="flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:600;color:var(--text1);outline:none;text-align:center" placeholder="0" inputmode="numeric">
+        <span style="font-size:14px;color:var(--text2);font-weight:500">${t('stop_unit')}</span>
+      </div>
+      <button onclick="submitMinutesApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+      <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
+    `,true);
+    setTimeout(function(){var el=document.getElementById('stopTimeInput');if(el){el.focus();el.select();}},100);
+  }
 }
 
-function submitStopAndApprove(id){
+function renderApproveDrums(){
+  renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, function(dir){
+    _drumState.eh = (_drumState.eh + dir + 24) % 24;
+    renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, arguments.callee);
+    calcApproveTime();
+  });
+  renderOneDrum('adM', 12, _drumState.em, function(v){return String(v*5).padStart(2,'0');}, function(dir){
+    _drumState.em = (_drumState.em + dir + 12) % 12;
+    renderOneDrum('adM', 12, _drumState.em, function(v){return String(v*5).padStart(2,'0');}, arguments.callee);
+    calcApproveTime();
+  });
+}
+
+function renderOneDrum(id, total, current, fmt, onTap){
+  var el = document.getElementById(id + '-inner');
+  if(!el) return;
+  var prev = (current - 1 + total) % total;
+  var next = (current + 1) % total;
+  var items = [prev, current, next];
+  el.innerHTML = '';
+  items.forEach(function(v, i){
+    var d = document.createElement('div');
+    d.className = 'drum-cell' + (i === 1 ? ' active' : '');
+    d.textContent = fmt(v);
+    d.style.touchAction = 'manipulation';
+    (function(dir){
+      d.onclick = function(){ if(dir !== 0) onTap(dir); };
+    })(i === 0 ? -1 : i === 2 ? 1 : 0);
+    el.appendChild(d);
+  });
+}
+
+function calcApproveTime(){
+  var sm = _drumState.startH * 60 + _drumState.startM;
+  var em = _drumState.eh * 60 + _drumState.em * 5;
+  if(em <= sm) em += 24 * 60;
+  var diff = em - sm;
+  var el = document.getElementById('approveCalc');
+  if(el) el.textContent = diff + t('stop_unit');
+}
+
+function submitDrumApprove(){
+  var sm = _drumState.startH * 60 + _drumState.startM;
+  var em = _drumState.eh * 60 + _drumState.em * 5;
+  if(em <= sm) em += 24 * 60;
+  var stopMinutes = em - sm;
+  var endStr = String(_drumState.eh).padStart(2,'0') + ':' + String(_drumState.em * 5).padStart(2,'0') + ':00';
+  closeModal();
+  doApprove(_drumState.approveId, stopMinutes, endStr);
+}
+
+function submitMinutesApprove(){
   var input = document.getElementById('stopTimeInput');
   var val = input ? parseInt(input.value, 10) : NaN;
   if(isNaN(val) || val < 0){
-    input.style.borderColor = 'var(--danger)';
-    input.focus();
+    if(input) input.style.borderColor = 'var(--danger)';
+    if(input) input.focus();
     return;
   }
   closeModal();
-  doApprove(id, val);
+  doApprove(_drumState.approveId, val, null);
 }
 
-async function doApprove(id, stopMinutes){
+async function doApprove(id, stopMinutes, stopEnd){
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
   const card = document.querySelector(`[data-id="${id}"]`);
@@ -965,12 +1071,18 @@ async function doApprove(id, stopMinutes){
     if(stopMinutes !== undefined && stopMinutes !== null){
       patch.stop_minutes = stopMinutes;
     }
+    if(stopEnd){
+      patch.stop_end = stopEnd;
+    }
     await sbFetch('troubles?id=eq.' + id, 'PATCH', patch);
     tr.status = 'approved';
     tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     if(stopMinutes !== undefined && stopMinutes !== null){
       tr.stop_minutes = stopMinutes;
+    }
+    if(stopEnd){
+      tr.stop_end = stopEnd;
     }
     tr._actioned = true;
     renderList();
