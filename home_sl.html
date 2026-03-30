@@ -427,6 +427,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </button>
       <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
         <span data-i18n="tab_rejected">差し戻し</span>
+        <span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span>
       </button>
     </div>
 
@@ -874,6 +875,9 @@ function updateBadges(){
   document.getElementById('tab-badge-pending').textContent=cnt;
   const sbBadge=document.getElementById('sb-badge');
   if(sbBadge) sbBadge.textContent=cnt;
+  const rejCnt=TROUBLES.filter(tr=>tr.status==='rejected').length;
+  const rejBadge=document.getElementById('tab-badge-rejected');
+  if(rejBadge){rejBadge.textContent=rejCnt;rejBadge.style.display=rejCnt>0?'inline-flex':'none';}
 }
 
 /* ===== Render list ===== */
