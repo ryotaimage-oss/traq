@@ -999,7 +999,7 @@ async function loadEditData() {
 }
 
 /* ── Init ── */
-loadMasters().then(function(){ loadEditData(); });initDrums();applyI18n();
+loadMasters().then(function(){ loadEditData(); if(!editTroubleId&&new URLSearchParams(location.search).has('draft'))loadDraft(); });initDrums();applyI18n();
 </script>
   </div><!-- /.main-column -->
 </div><!-- /.app -->
