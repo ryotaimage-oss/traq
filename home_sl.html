@@ -454,51 +454,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
-    <!-- Action cards -->
-    <div class="action-grid" style="padding:12px 14px 0;margin-bottom:0">
-      <div class="action-card" onclick="location.href='input_equipment.html'">
-        <div class="action-icon"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect x="11" y="27" width="10" height="3" rx="1" fill="var(--orange)" opacity=".5"/><rect x="13" y="22" width="6" height="6" rx="1.5" fill="var(--orange)" opacity=".75"/><path d="M16 22L16 15" stroke="var(--orange)" stroke-width="3.5" stroke-linecap="round"/><circle cx="16" cy="15" r="2.2" fill="var(--orange)"/><path d="M14.2 14L9 9" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/><circle cx="9" cy="9" r="2" fill="var(--orange)"/><path d="M7.5 7.5L5 5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round"/><rect x="2" y="2.5" width="5" height="3.5" rx="1" fill="var(--orange)"/></svg></div>
-        <div class="action-label" data-i18n="btn_eq">設備異常 入力</div>
-        <div class="action-arrow">›</div>
-      </div>
-      <div class="action-card" onclick="location.href='input_mold.html'">
-        <div class="action-icon" style="background:rgba(168,85,247,.12)"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect x="5" y="2" width="22" height="5" rx="0.8" fill="#c084fc"/><rect x="7" y="9" width="18" height="6" rx="0.8" fill="#c084fc" opacity=".85"/><rect x="7" y="17" width="18" height="6" rx="0.8" fill="#c084fc" opacity=".7"/><rect x="5" y="25" width="22" height="5" rx="0.8" fill="#c084fc" opacity=".55"/><rect x="12" y="26" width="3" height="3" rx="0.3" fill="#7c3aed" opacity=".4"/><rect x="17" y="26" width="3" height="3" rx="0.3" fill="#7c3aed" opacity=".4"/></svg></div>
-        <div class="action-label" data-i18n="btn_md">金型異常 入力</div>
-        <div class="action-arrow">›</div>
-      </div>
-    </div>
-
-    <!-- Draft banner -->
-    <div class="draft-banner" id="draftBanner" onclick="setMainTab('draft')" style="display:none">
-      <div class="draft-banner-left">
-        <span class="draft-count" id="draftCount">0</span>
-        <span class="draft-banner-label" data-i18n="draft_label">件の下書きがあります</span>
-      </div>
-      <span class="draft-banner-right" data-i18n="draft_confirm">確認する →</span>
-    </div>
-
-    <!-- Tab bar -->
-    <div class="tab-bar" id="tabBar">
-      <button class="tab-item active" id="tab-pending" onclick="setMainTab('pending')">
-        <span data-i18n="tab_pending">承認待ち</span>
-        <span class="tab-badge" id="tab-badge-pending">0</span>
-      </button>
-      <button class="tab-item" id="tab-all" onclick="setMainTab('all')">
-        <span data-i18n="tab_all">全件</span>
-      </button>
-      <button class="tab-item" id="tab-draft" onclick="setMainTab('draft')">
-        <span data-i18n="tab_draft">下書き</span>
-        <span class="tab-badge" id="tab-badge-draft" style="display:none">0</span>
-      </button>
-      <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
-        <span data-i18n="tab_approved">承認済み</span>
-      </button>
-      <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
-        <span data-i18n="tab_rejected">差し戻し</span>
-        <span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span>
-      </button>
-    </div>
-
     <!-- Scroll area -->
     <div class="scroll-area" id="scrollArea">
 
@@ -507,8 +462,53 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <span class="date-text" id="dateText"></span>
       </div>
 
+      <!-- Action cards -->
+      <div class="action-grid">
+        <div class="action-card" onclick="location.href='input_equipment.html'">
+          <div class="action-icon"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect x="11" y="27" width="10" height="3" rx="1" fill="var(--orange)" opacity=".5"/><rect x="13" y="22" width="6" height="6" rx="1.5" fill="var(--orange)" opacity=".75"/><path d="M16 22L16 15" stroke="var(--orange)" stroke-width="3.5" stroke-linecap="round"/><circle cx="16" cy="15" r="2.2" fill="var(--orange)"/><path d="M14.2 14L9 9" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/><circle cx="9" cy="9" r="2" fill="var(--orange)"/><path d="M7.5 7.5L5 5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round"/><rect x="2" y="2.5" width="5" height="3.5" rx="1" fill="var(--orange)"/></svg></div>
+          <div class="action-label" data-i18n="btn_eq">設備異常 入力</div>
+          <div class="action-arrow">›</div>
+        </div>
+        <div class="action-card" onclick="location.href='input_mold.html'">
+          <div class="action-icon" style="background:rgba(168,85,247,.12)"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect x="5" y="2" width="22" height="5" rx="0.8" fill="#c084fc"/><rect x="7" y="9" width="18" height="6" rx="0.8" fill="#c084fc" opacity=".85"/><rect x="7" y="17" width="18" height="6" rx="0.8" fill="#c084fc" opacity=".7"/><rect x="5" y="25" width="22" height="5" rx="0.8" fill="#c084fc" opacity=".55"/><rect x="12" y="26" width="3" height="3" rx="0.3" fill="#7c3aed" opacity=".4"/><rect x="17" y="26" width="3" height="3" rx="0.3" fill="#7c3aed" opacity=".4"/></svg></div>
+          <div class="action-label" data-i18n="btn_md">金型異常 入力</div>
+          <div class="action-arrow">›</div>
+        </div>
+      </div>
+
+      <!-- Draft banner -->
+      <div class="draft-banner" id="draftBanner" onclick="setMainTab('draft')" style="display:none">
+        <div class="draft-banner-left">
+          <span class="draft-count" id="draftCount">0</span>
+          <span class="draft-banner-label" data-i18n="draft_label">件の下書きがあります</span>
+        </div>
+        <span class="draft-banner-right" data-i18n="draft_confirm">確認する →</span>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar" id="tabBar">
+        <button class="tab-item active" id="tab-pending" onclick="setMainTab('pending')">
+          <span data-i18n="tab_pending">承認待ち</span>
+          <span class="tab-badge" id="tab-badge-pending">0</span>
+        </button>
+        <button class="tab-item" id="tab-all" onclick="setMainTab('all')">
+          <span data-i18n="tab_all">全件</span>
+        </button>
+        <button class="tab-item" id="tab-draft" onclick="setMainTab('draft')">
+          <span data-i18n="tab_draft">下書き</span>
+          <span class="tab-badge" id="tab-badge-draft" style="display:none">0</span>
+        </button>
+        <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
+          <span data-i18n="tab_approved">承認済み</span>
+        </button>
+        <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
+          <span data-i18n="tab_rejected">差し戻し</span>
+          <span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span>
+        </button>
+      </div>
+
       <!-- Type filter -->
-      <div class="filter-row">
+      <div class="filter-row" id="typeFilterRow">
         <button class="ftab active" id="ftab-all2"  onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
         <button class="ftab"        id="ftab-eq"    onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
         <button class="ftab"        id="ftab-md"    onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
