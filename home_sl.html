@@ -205,6 +205,44 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   font-size: 16px; color: var(--orange); opacity: .6;
 }
 
+/* Timeline (全件) */
+.tl-filter-area{padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+.tl-filter-row{display:flex;gap:7px;align-items:center}
+.tl-flabel{font-size:11px;color:var(--text2);white-space:nowrap;min-width:30px}
+.tl-datebox{flex:1;padding:5px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text1);font-family:inherit}
+.tl-datesep{font-size:11px;color:var(--text2)}
+.tl-linesel{flex:1;padding:5px 7px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text1);font-family:inherit;-webkit-appearance:none}
+.tl-cnt{text-align:right;font-size:11px;color:var(--text2);padding:5px 14px 2px;flex-shrink:0}
+.tl-list{display:flex;flex-direction:column;padding:10px 14px}
+.tl-sep{display:flex;align-items:center;gap:8px;margin:8px 0 7px}
+.tl-sep-line{flex:1;height:1px;background:var(--border)}
+.tl-sep-label{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:500}
+.tl-item{display:flex;gap:9px;margin-bottom:10px}
+.tl-col{display:flex;flex-direction:column;align-items:center;width:14px;flex-shrink:0}
+.tl-dot{width:11px;height:11px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.tl-dot.pending{background:var(--warning)}
+.tl-dot.approved{background:var(--success)}
+.tl-dot.rejected{background:var(--danger)}
+.tl-dot.draft{background:#4b5563}
+.tl-vl{width:1px;flex:1;background:var(--border);margin-top:3px}
+.tl-card{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .15s}
+.tl-card:hover{border-color:rgba(239,159,39,.3)}
+.tl-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.tl-machine{font-size:14px;font-weight:700;color:var(--text1)}
+.tl-time{font-size:11px;color:var(--text2)}
+.tl-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.tl-pill{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700}
+.tl-pill.eq{background:rgba(59,130,246,.15);color:#60a5fa}
+.tl-pill.md{background:rgba(168,85,247,.15);color:#c084fc}
+.tl-pill.pending{background:rgba(245,158,11,.15);color:var(--warning)}
+.tl-pill.approved{background:rgba(16,185,129,.12);color:var(--success)}
+.tl-pill.rejected{background:rgba(239,68,68,.12);color:var(--danger)}
+.tl-pill.draft{background:rgba(139,144,160,.12);color:var(--text2)}
+.tl-product{font-size:11px;color:var(--text2);margin-bottom:4px}
+.tl-detail{font-size:12px;color:var(--text1);line-height:1.4;margin-bottom:5px}
+.tl-footer{display:flex;justify-content:space-between;align-items:center;padding-top:5px;border-top:1px solid var(--border)}
+.tl-who{font-size:11px;color:var(--text2)}
+
 /* Bottom nav */
 .bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
@@ -507,15 +545,37 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </button>
       </div>
 
-      <!-- Type filter -->
+      <!-- Type filter (非全件タブ用) -->
       <div class="filter-row" id="typeFilterRow">
         <button class="ftab active" id="ftab-all2"  onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
         <button class="ftab"        id="ftab-eq"    onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
         <button class="ftab"        id="ftab-md"    onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
       </div>
 
-      <!-- List -->
+      <!-- 全件タイムラインフィルター -->
+      <div class="tl-filter-area" id="tlFilterArea" style="display:none">
+        <div class="tl-filter-row">
+          <span class="tl-flabel" data-i18n="tl_date">日付</span>
+          <input type="date" class="tl-datebox" id="tlDateFrom">
+          <span class="tl-datesep">〜</span>
+          <input type="date" class="tl-datebox" id="tlDateTo">
+        </div>
+        <div class="tl-filter-row">
+          <span class="tl-flabel" data-i18n="tl_line">ライン</span>
+          <select class="tl-linesel" id="tlLineSelect" onchange="renderTimeline()">
+            <option value="" data-i18n="tl_all_lines">すべてのライン</option>
+          </select>
+          <button class="ftab active" id="tl-ftab-all" onclick="setTlType('all')"  data-i18n="filter_all">すべて</button>
+          <button class="ftab"        id="tl-ftab-eq"  onclick="setTlType('eq')"   data-i18n="filter_eq">設備</button>
+          <button class="ftab"        id="tl-ftab-md"  onclick="setTlType('md')"   data-i18n="filter_md">金型</button>
+        </div>
+      </div>
+      <div class="tl-cnt" id="tlCnt" style="display:none"></div>
+
+      <!-- 通常リスト -->
       <div class="trouble-list" id="troubleList"></div>
+      <!-- タイムラインリスト -->
+      <div id="timelineList" style="display:none"></div>
 
     </div>
   </div>
@@ -568,6 +628,7 @@ const I18N = {
     btn_eq_short:'設備異常', btn_md_short:'金型異常',
     tab_pending:'承認待ち', tab_all:'全件', tab_draft:'下書き', tab_approved:'承認済み', tab_rejected:'差し戻し',
     filter_all:'すべて', filter_eq:'設備', filter_md:'金型',
+    tl_date:'日付', tl_line:'ライン', tl_all_lines:'すべてのライン',
     type_eq:'設備', type_md:'金型',
     status_pending:'承認待ち', status_approved:'承認済み', status_rejected:'差し戻し', status_draft:'下書き',
     occ_first:'初発', occ_rec:'再発',
@@ -614,6 +675,7 @@ const I18N = {
     btn_eq_short:'Thiết bị', btn_md_short:'Khuôn',
     tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_draft:'Nháp', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
     filter_all:'Tất cả', filter_eq:'Thiết bị', filter_md:'Khuôn',
+    tl_date:'Ngày', tl_line:'Dây', tl_all_lines:'Tất cả dây chuyền',
     type_eq:'Thiết bị', type_md:'Khuôn',
     status_pending:'Chờ duyệt', status_approved:'Đã duyệt', status_rejected:'Trả lại', status_draft:'Nháp',
     occ_first:'Lần đầu', occ_rec:'Tái phát',
@@ -660,6 +722,7 @@ const I18N = {
     btn_eq_short:'Equipment', btn_md_short:'Mold',
     tab_pending:'Pending', tab_all:'All', tab_draft:'Draft', tab_approved:'Approved', tab_rejected:'Rejected',
     filter_all:'All', filter_eq:'Equipment', filter_md:'Mold',
+    tl_date:'Date', tl_line:'Line', tl_all_lines:'All lines',
     type_eq:'Equipment', type_md:'Mold',
     status_pending:'Pending', status_approved:'Approved', status_rejected:'Rejected', status_draft:'Draft',
     occ_first:'First', occ_rec:'Recurrence',
@@ -739,8 +802,10 @@ const SESSION = (() => {
 
 /* ===== State ===== */
 let TROUBLES = [];
+let TL_DATA = [];
 let mainTab = 'pending';
 let typeFilter = 'all';
+let tlTypeFilter = 'all';
 let selectMode = false;
 let selectedIds = new Set();
 
@@ -936,7 +1001,17 @@ function setMainTab(tab){
   ['pending','all','draft','approved','rejected'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
-  renderList();
+  const isAll = tab === 'all';
+  document.getElementById('typeFilterRow').style.display  = isAll ? 'none' : '';
+  document.getElementById('tlFilterArea').style.display   = isAll ? '' : 'none';
+  document.getElementById('tlCnt').style.display          = isAll ? '' : 'none';
+  document.getElementById('troubleList').style.display    = isAll ? 'none' : '';
+  document.getElementById('timelineList').style.display   = isAll ? '' : 'none';
+  if (isAll) {
+    loadTimeline();
+  } else {
+    renderList();
+  }
   document.getElementById('scrollArea').scrollTo(0,0);
 }
 function setTab(tab){
@@ -948,6 +1023,120 @@ function setTypeFilter(f){
   typeFilter=f;
   ['all2','eq','md'].forEach(k=>document.getElementById('ftab-'+k).classList.toggle('active',k===(f==='all'?'all2':f)));
   renderList();
+}
+
+function setTlType(f) {
+  tlTypeFilter = f;
+  ['all','eq','md'].forEach(k => document.getElementById('tl-ftab-'+k).classList.toggle('active', k===f));
+  renderTimeline();
+}
+
+async function loadTimeline() {
+  document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
+  try {
+    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
+    TL_DATA = (rows || []).map(r => ({
+      id: r.id, type: r.trouble_type, status: r.status,
+      date: (r.occurred_date || '').slice(0,10),
+      shift: r.shift ? String(r.shift) : '',
+      line: r.lines ? r.lines.name : '',
+      machine: r.machines ? r.machines.machine_no : '',
+      product_code: r.products ? r.products.product_code : '',
+      product_name: r.products ? r.products.product_name : '',
+      category: r.categories ? r.categories.name : '',
+      occurrence: r.occurrence || 'first',
+      stop_minutes: r.stop_minutes,
+      reject_reason: r.reject_reason || null,
+      detail: r.detail || '',
+      submitted_by: r.traq_users ? r.traq_users.name : '',
+      submitted_at: utcToJST(r.created_at),
+    }));
+    buildLineOptions();
+    setDefaultDates();
+    renderTimeline();
+  } catch(e) {
+    document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div>読み込みエラー</div></div>';
+  }
+}
+
+function buildLineOptions() {
+  const sel = document.getElementById('tlLineSelect');
+  const current = sel.value;
+  const lines = [...new Set(TL_DATA.filter(r=>r.line).map(r=>r.line))].sort();
+  sel.innerHTML = '<option value="">すべてのライン</option>';
+  lines.forEach(ln => {
+    const opt = document.createElement('option');
+    opt.value = ln; opt.textContent = ln;
+    if(ln === current) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function setDefaultDates() {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  const fmt = d => d.toISOString().slice(0,10);
+  const fromEl = document.getElementById('tlDateFrom');
+  const toEl = document.getElementById('tlDateTo');
+  if(!fromEl.value) fromEl.value = fmt(monday);
+  if(!toEl.value) toEl.value = fmt(now);
+  fromEl.onchange = renderTimeline;
+  toEl.onchange = renderTimeline;
+}
+
+function renderTimeline() {
+  const from = document.getElementById('tlDateFrom').value;
+  const to   = document.getElementById('tlDateTo').value;
+  const line = document.getElementById('tlLineSelect').value;
+  const filtered = TL_DATA.filter(r => {
+    if(r.status === 'draft') return false;
+    if(from && r.date < from) return false;
+    if(to   && r.date > to)   return false;
+    if(line && r.line !== line) return false;
+    if(tlTypeFilter === 'eq' && r.type !== 'equipment') return false;
+    if(tlTypeFilter === 'md' && r.type !== 'mold') return false;
+    return true;
+  });
+  document.getElementById('tlCnt').textContent = TL_DATA.filter(r=>r.status!=='draft').length + '件中 ' + filtered.length + '件表示';
+  if(filtered.length === 0) {
+    document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div>該当する投稿はありません</div></div>';
+    return;
+  }
+  const groups = {};
+  filtered.forEach(r => { if(!groups[r.date]) groups[r.date]=[]; groups[r.date].push(r); });
+  const container = document.getElementById('timelineList');
+  container.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'tl-list';
+  const dayNames = ['日','月','火','水','木','金','土'];
+  Object.keys(groups).sort().reverse().forEach(date => {
+    const sep = document.createElement('div');
+    sep.className = 'tl-sep';
+    const d = new Date(date + 'T00:00:00');
+    sep.innerHTML = '<div class="tl-sep-line"></div><span class="tl-sep-label">' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + dayNames[d.getDay()] + '）</span><div class="tl-sep-line"></div>';
+    wrap.appendChild(sep);
+    groups[date].forEach(r => {
+      const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
+      const typeClass = r.type === 'equipment' ? 'eq' : 'md';
+      const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
+      const item = document.createElement('div');
+      item.className = 'tl-item';
+      item.innerHTML =
+        '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
+        '<div class="tl-card">' +
+          '<div class="tl-card-head"><span class="tl-machine">' + r.line + ' — ' + r.machine + '号機</span><span class="tl-time">' + timeStr + '</span></div>' +
+          '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
+          (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
+          '<div class="tl-detail">' + r.detail + '</div>' +
+          '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
+        '</div>';
+      item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
+      wrap.appendChild(item);
+    });
+  });
+  container.appendChild(wrap);
 }
 
 /* ===== Badges ===== */
@@ -1349,7 +1538,7 @@ async function doReject(id){
 
 /* ===== Detail modal ===== */
 function openDetail(id){
-  const tr=TROUBLES.find(x=>x.id===id);
+  const tr=TROUBLES.find(x=>x.id===id) || TL_DATA.find(x=>x.id===id);
   if(!tr) return;
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
@@ -1610,10 +1799,12 @@ function doLogout(){
 
 /* ===== ページ復帰時にデータ再読み込み ===== */
 window.addEventListener('pageshow', function(e) {
-  if (e.persisted) { loadTroubles(); }
+  if (e.persisted) { if (mainTab === 'all') { loadTimeline(); } else { loadTroubles(); } }
 });
 document.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'visible') { loadTroubles(); }
+  if (document.visibilityState === 'visible') {
+    if (mainTab === 'all') { loadTimeline(); } else { loadTroubles(); }
+  }
 });
 </script>
 <script src="./update_banner.js"></script>
