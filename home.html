@@ -1201,7 +1201,7 @@ async function loadTroubles() {
   TROUBLES = [];
   try {
     const rows = await sbFetch(
-      'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)' +
+      'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)' +
       '&reporter_id=eq.' + SESSION.userId + '&order=created_at.desc&limit=50'
     );
     TROUBLES = (rows || []).map(r => ({
@@ -1218,7 +1218,7 @@ async function loadTroubles() {
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : SESSION.name,
       submitted_at: utcToJST(r.created_at),
-      approved_by: r.approver_id ? '承認済み' : null,
+      approved_by: r.approver ? r.approver.name : null,
       approved_at: utcToJST(r.approved_at) || null,
       reject_reason: r.reject_reason || null,
       line_id: r.line_id, machine_id: r.machine_id,

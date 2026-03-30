@@ -704,7 +704,7 @@ function utcToJST(isoStr){
 
 async function loadTroubles() {
   try {
-    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100';
+    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&order=created_at.desc&limit=100';
     if (SESSION.shift) q += '&shift=eq.' + encodeURIComponent(SESSION.shift);
     const rows = await sbFetch(q);
     TROUBLES = (rows || []).map(r => ({
@@ -723,7 +723,7 @@ async function loadTroubles() {
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : '',
       submitted_at: utcToJST(r.created_at),
-      approved_by: r.approver_id ? '承認済み' : null,
+      approved_by: r.approver ? r.approver.name : null,
       approved_at: utcToJST(r.approved_at) || null,
       reject_reason: r.reject_reason || null,
     }));
@@ -914,6 +914,7 @@ async function quickApprove(id){
       approved_at: new Date().toISOString()
     });
     tr.status = 'approved';
+    tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
     renderList();
@@ -955,6 +956,7 @@ async function doReject(id){
     });
     tr.status = 'rejected';
     tr.reject_reason = reason || null;
+    tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
     renderList();
