@@ -190,25 +190,18 @@ html, body {
 .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
 .section-link { font-size: 12px; color: var(--orange); cursor: pointer; }
 
-/* ===== Filter tabs ===== */
-.filter-tabs {
-  display: flex; gap: 6px;
-  margin-bottom: 12px;
-  overflow-x: auto; padding-bottom: 2px;
-  animation: fadeIn .3s .18s ease both;
-}
-.filter-tabs::-webkit-scrollbar { display: none; }
-.ftab {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 5px 12px;
-  font-family: inherit; font-size: 12px; font-weight: 500;
-  color: var(--text2); cursor: pointer; white-space: nowrap;
-  transition: all .15s; flex-shrink: 0;
-}
-.ftab.active {
-  background: var(--orange); border-color: var(--orange);
-  color: var(--navy); font-weight: 700;
-}
+/* ===== Tab bar ===== */
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-item{flex:1;min-width:72px;padding:11px 6px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative}
+.tab-item.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;vertical-align:middle}
+
+/* ===== Filter chips (type) ===== */
+.filter-row{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0}
+.filter-row::-webkit-scrollbar{display:none}
+.ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
 
 /* ===== Trouble cards ===== */
 .trouble-list { display: flex; flex-direction: column; gap: 8px; }
@@ -627,7 +620,7 @@ html, body {
       </div>
 
       <!-- Draft banner -->
-      <div class="draft-banner" id="draftBanner" onclick="setFilter('draft')" style="display:none">
+      <div class="draft-banner" id="draftBanner" onclick="setMainTab('draft')" style="display:none">
         <div class="draft-banner-left">
           <span class="draft-count" id="draftCount">0</span>
           <span class="draft-label" data-i18n="draft_label">件の下書きがあります</span>
@@ -635,20 +628,32 @@ html, body {
         <span class="draft-banner-right" data-i18n="draft_confirm">確認する →</span>
       </div>
 
-      <!-- Post list section -->
-      <div class="section-header">
-        <span class="section-title" data-i18n="section_list">投稿一覧</span>
-        <span class="section-link" onclick="setFilter('all')" data-i18n="show_all">すべて表示</span>
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab-item active" id="tab-draft"    onclick="setMainTab('draft')">
+          <span data-i18n="tab_draft">下書き</span>
+          <span class="tab-badge" id="tab-badge-draft" style="display:none">0</span>
+        </button>
+        <button class="tab-item" id="tab-pending"  onclick="setMainTab('pending')">
+          <span data-i18n="tab_pending">承認待ち</span>
+          <span class="tab-badge" id="tab-badge-pending" style="display:none">0</span>
+        </button>
+        <button class="tab-item" id="tab-all"      onclick="setMainTab('all')">
+          <span data-i18n="tab_all">全件</span>
+        </button>
+        <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
+          <span data-i18n="tab_approved">承認済み</span>
+        </button>
+        <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
+          <span data-i18n="tab_rejected">差し戻し</span>
+          <span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span>
+        </button>
       </div>
-
-      <!-- Filter tabs -->
-      <div class="filter-tabs">
-        <button class="ftab active" id="ftab-all"      onclick="setFilter('all')"      data-i18n="filter_all">すべて</button>
-        <button class="ftab"        id="ftab-draft"    onclick="setFilter('draft')"    data-i18n="filter_draft">下書き</button>
-        <button class="ftab"        id="ftab-pending"  onclick="setFilter('pending')"  data-i18n="filter_pending">承認待ち</button>
-        <button class="ftab"        id="ftab-approved" onclick="setFilter('approved')" data-i18n="filter_approved">承認済み</button>
-        <button class="ftab"        id="ftab-eq"       onclick="setFilter('eq')"       data-i18n="filter_eq">設備</button>
-        <button class="ftab"        id="ftab-md"       onclick="setFilter('md')"       data-i18n="filter_md">金型</button>
+      <!-- Type filter -->
+      <div class="filter-row">
+        <button class="ftab active" id="ftab-all2" onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
+        <button class="ftab"        id="ftab-eq"   onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
+        <button class="ftab"        id="ftab-md"   onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
       </div>
 
       <!-- Trouble list -->
@@ -697,6 +702,7 @@ const I18N = {
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
     section_list:'投稿一覧', show_all:'すべて表示',
+    tab_draft:'下書き', tab_pending:'承認待ち', tab_all:'全件', tab_approved:'承認済み', tab_rejected:'差し戻し',
     filter_all:'すべて', filter_draft:'下書き', filter_pending:'承認待ち',
     filter_approved:'承認済み', filter_eq:'設備', filter_md:'金型',
     type_eq:'設備', type_md:'金型',
@@ -711,6 +717,7 @@ const I18N = {
     del_confirm:'削除する', del_cancel:'キャンセル',
     send_done:'承認待ちに送信しました',
     del_done:'下書きを削除しました',
+    empty_draft:'下書きはありません 📝', empty_pending:'承認待ちの投稿はありません 👍', empty_all:'投稿はありません 📭',
     reject_label:'差し戻し理由：',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
     detail_date:'日付', detail_shift:'直', detail_line:'ライン',
@@ -728,6 +735,7 @@ const I18N = {
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
     draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
     section_list:'Danh sách', show_all:'Xem tất cả',
+    tab_draft:'Nháp', tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
     filter_all:'Tất cả', filter_draft:'Nháp', filter_pending:'Chờ duyệt',
     filter_approved:'Đã duyệt', filter_eq:'Thiết bị', filter_md:'Khuôn',
     type_eq:'Thiết bị', type_md:'Khuôn',
@@ -741,6 +749,7 @@ const I18N = {
     del_confirm:'Xoá', del_cancel:'Huỷ',
     send_done:'Đã gửi chờ duyệt',
     del_done:'Đã xoá bản nháp',
+    empty_draft:'Không có bản nháp 📝', empty_pending:'Không có sự cố chờ duyệt 👍', empty_all:'Không có bản ghi 📭',
     reject_label:'Lý do trả lại:',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
     detail_date:'Ngày', detail_shift:'Ca', detail_line:'Dây chuyền',
@@ -758,6 +767,7 @@ const I18N = {
     btn_eq:'Equipment\nTrouble', btn_md:'Mold\nTrouble',
     draft_label:'draft(s) unsent', draft_confirm:'Review →',
     section_list:'Post List', show_all:'Show all',
+    tab_draft:'Draft', tab_pending:'Pending', tab_all:'All', tab_approved:'Approved', tab_rejected:'Rejected',
     filter_all:'All', filter_draft:'Draft', filter_pending:'Pending',
     filter_approved:'Approved', filter_eq:'Equipment', filter_md:'Mold',
     type_eq:'Equipment', type_md:'Mold',
@@ -771,6 +781,7 @@ const I18N = {
     del_confirm:'Delete', del_cancel:'Cancel',
     send_done:'Submitted for approval',
     del_done:'Draft deleted',
+    empty_draft:'No drafts 📝', empty_pending:'No pending submissions 👍', empty_all:'No records 📭',
     reject_label:'Rejection reason:',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
     detail_date:'Date', detail_shift:'Shift', detail_line:'Line',
@@ -830,7 +841,8 @@ const SESSION = (() => {
 
 /* ===== Data ===== */
 let TROUBLES = [];
-let currentFilter = 'all';
+let mainTab = 'draft';
+let typeFilter = 'all';
 
 /* ===== Role helper ===== */
 function getRoleClass(role) {
@@ -891,7 +903,8 @@ function renderList() {
     draftBanner.style.display = 'none';
   }
   if (list.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>${t('filter_'+currentFilter) || ''} の投稿はありません</div></div>`;
+    const emptyMsg = mainTab==='draft'?t('empty_draft'):mainTab==='pending'?t('empty_pending'):t('empty_all');
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>${emptyMsg}</div></div>`;
     return;
   }
   container.innerHTML = '';
@@ -900,13 +913,13 @@ function renderList() {
 
 function getFilteredList() {
   return TROUBLES.filter(tr => {
-    if (currentFilter === 'all')      return true;
-    if (currentFilter === 'draft')    return tr.status === 'draft';
-    if (currentFilter === 'pending')  return tr.status === 'pending';
-    if (currentFilter === 'approved') return tr.status === 'approved';
-    if (currentFilter === 'eq')       return tr.type === 'equipment';
-    if (currentFilter === 'md')       return tr.type === 'mold';
-    return true;
+    const statusOk = mainTab==='draft'    ? tr.status==='draft' :
+                     mainTab==='pending'  ? tr.status==='pending' :
+                     mainTab==='approved' ? tr.status==='approved' :
+                     mainTab==='rejected' ? tr.status==='rejected' :
+                     tr.status !== 'draft';
+    const typeOk = typeFilter==='all' ? true : typeFilter==='eq' ? tr.type==='equipment' : tr.type==='mold';
+    return statusOk && typeOk;
   });
 }
 
@@ -962,15 +975,30 @@ function buildCard(tr, idx) {
   return div;
 }
 
-/* ===== Filter ===== */
-function setFilter(f) {
-  currentFilter = f;
-  ['all','draft','pending','approved','eq','md'].forEach(k => {
-    const el = document.getElementById('ftab-'+k);
-    if (el) el.classList.toggle('active', k === f);
+/* ===== Tab / Filter ===== */
+function setMainTab(tab) {
+  mainTab = tab;
+  ['draft','pending','all','approved','rejected'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
   });
   renderList();
   document.getElementById('scrollArea').scrollTo(0, 0);
+}
+function setTypeFilter(f) {
+  typeFilter = f;
+  ['all2','eq','md'].forEach(k => document.getElementById('ftab-'+k).classList.toggle('active', k===(f==='all'?'all2':f)));
+  renderList();
+}
+function updateBadges() {
+  const draftCnt = TROUBLES.filter(tr => tr.status==='draft').length;
+  const draftBadge = document.getElementById('tab-badge-draft');
+  if(draftBadge){ draftBadge.textContent=draftCnt; draftBadge.style.display=draftCnt?'inline-flex':'none'; }
+  const pendCnt = TROUBLES.filter(tr => tr.status==='pending').length;
+  const pendBadge = document.getElementById('tab-badge-pending');
+  if(pendBadge){ pendBadge.textContent=pendCnt; pendBadge.style.display=pendCnt?'inline-flex':'none'; }
+  const rejCnt = TROUBLES.filter(tr => tr.status==='rejected').length;
+  const rejBadge = document.getElementById('tab-badge-rejected');
+  if(rejBadge){ rejBadge.textContent=rejCnt; rejBadge.style.display=rejCnt?'inline-flex':'none'; }
 }
 
 /* ===== Detail modal ===== */
@@ -1047,7 +1075,7 @@ async function sendDraft(id) {
     await sbFetch('troubles', 'POST', {
       trouble_type: tr.type, status: 'pending',
       occurred_date: tr.date || null, shift: tr.shift,
-      detail: tr.detail, occurrence: (tr.occurrence==='repeat'?'recurrence':(tr.occurrence||'first')),
+      detail: tr.detail, occurrence: tr.occurrence || 'first',
       stop_minutes: tr.stop_minutes || null, reporter_id: SESSION.userId
     });
     await sbFetch('drafts?id=eq.' + tr._draftId, 'DELETE');
@@ -1244,6 +1272,7 @@ async function loadTroubles() {
       });
     });
   } catch(e) {}
+  updateBadges();
   renderList();
 }
 
