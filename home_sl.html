@@ -119,6 +119,20 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .ca-resubmit{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;border:none;border-top:1px solid var(--border);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;background:rgba(239,159,39,.08);color:var(--orange)}
 .ca-resubmit:hover{background:rgba(239,159,39,.15)}
 .ca-resubmit:active{transform:scale(.97)}
+/* ===== Draft ===== */
+.status-draft{background:rgba(139,144,160,.12);color:var(--text2)}
+.draft-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(239,159,39,.06);border:1px solid rgba(239,159,39,.15);border-radius:var(--radius);margin:0 16px 8px;cursor:pointer;transition:background .15s}
+.draft-banner:hover{background:rgba(239,159,39,.12)}
+.draft-banner-left{display:flex;align-items:center;gap:8px}
+.draft-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:11px;background:var(--orange);color:var(--navy);font-size:12px;font-weight:700;padding:0 6px}
+.draft-banner-label{font-size:13px;font-weight:500;color:var(--text1)}
+.draft-banner-right{font-size:12px;color:var(--orange);font-weight:500}
+.draft-actions{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border)}
+.da-btn{height:44px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.da-btn:active{transform:scale(.97)}
+.da-edit{background:var(--bg3);color:var(--text1);border-right:1px solid var(--border)}
+.da-del{background:rgba(239,68,68,.06);color:var(--danger);border-right:1px solid var(--border)}
+.da-send{background:rgba(239,159,39,.08);color:var(--orange)}
 
 /* Already-actioned card dimming */
 .tcard.actioned{opacity:.55}
@@ -390,6 +404,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <button class="input-bar-btn" onclick="location.href='input_mold.html'">🔧 <span data-i18n="btn_md_short">金型異常</span></button>
     </div>
 
+    <!-- Draft banner -->
+    <div class="draft-banner" id="draftBanner" onclick="setMainTab('draft')" style="display:none">
+      <div class="draft-banner-left">
+        <span class="draft-count" id="draftCount">0</span>
+        <span class="draft-banner-label" data-i18n="draft_label">件の下書きがあります</span>
+      </div>
+      <span class="draft-banner-right" data-i18n="draft_confirm">確認する →</span>
+    </div>
+
     <!-- Tab bar -->
     <div class="tab-bar" id="tabBar">
       <button class="tab-item active" id="tab-pending" onclick="setMainTab('pending')">
@@ -495,6 +518,11 @@ const I18N = {
     logout_done:'ログアウトしました',
     empty_pending:'承認待ちの投稿はありません 👍',
     empty_all:'投稿データがありません',
+    empty_draft:'下書きはありません',
+    draft_label:'件の下書きがあります', draft_confirm:'確認する →',
+    da_edit:'編集', da_del:'削除', da_send:'送信',
+    del_title:'下書き削除', del_msg:'この下書きを削除しますか？', del_cancel:'キャンセル', del_confirm:'削除する', del_done:'削除しました',
+    send_done:'送信しました',
     btn_select:'選択削除', btn_select_done:'完了',
     selected_count:(n)=>`${n}件選択中`,
     delete_confirm_title:'トラブル削除',
@@ -536,6 +564,11 @@ const I18N = {
     logout_done:'Đã đăng xuất',
     empty_pending:'Không có sự cố nào chờ duyệt 👍',
     empty_all:'Chưa có dữ liệu',
+    empty_draft:'Không có bản nháp',
+    draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
+    da_edit:'Sửa', da_del:'Xoá', da_send:'Gửi',
+    del_title:'Xóa bản nháp', del_msg:'Xóa bản nháp này?', del_cancel:'Hủy', del_confirm:'Xóa', del_done:'Đã xóa',
+    send_done:'Đã gửi',
     btn_select:'Chọn để xoá', btn_select_done:'Xong',
     selected_count:(n)=>`Đã chọn ${n}`,
     delete_confirm_title:'Xoá sự cố',
@@ -577,6 +610,11 @@ const I18N = {
     logout_done:'Logged out',
     empty_pending:'No pending submissions 👍',
     empty_all:'No data yet',
+    empty_draft:'No drafts',
+    draft_label:'draft(s) unsent', draft_confirm:'Review →',
+    da_edit:'Edit', da_del:'Delete', da_send:'Submit',
+    del_title:'Delete draft', del_msg:'Delete this draft?', del_cancel:'Cancel', del_confirm:'Delete', del_done:'Deleted',
+    send_done:'Submitted',
     btn_select:'Select & delete', btn_select_done:'Done',
     selected_count:(n)=>`${n} selected`,
     delete_confirm_title:'Delete troubles',
@@ -756,6 +794,25 @@ async function loadTroubles() {
     showToast('データ読込エラー', 'error');
     TROUBLES = [];
   }
+  // 下書き読み込み
+  try {
+    var drows = await sbFetch('drafts?user_id=eq.' + SESSION.userId + '&order=updated_at.desc');
+    (drows || []).forEach(function(dr){
+      var d = dr.data || {};
+      TROUBLES.push({
+        id: 'draft_' + dr.id, _draftId: dr.id,
+        type: dr.trouble_type || 'equipment', status: 'draft',
+        date: d.occurred_date || '', shift: d.shift ? String(d.shift) : String(SESSION.shift || ''),
+        line: d.line_name || '', machine: d.machine_no || '',
+        product_code: d.product_code || '', product_name: d.product_name || '',
+        category: d.category_name || '', occurrence: d.occurrence || 'first',
+        stop_minutes: d.stop_minutes || null, stop_start: null, stop_end: null,
+        detail: d.detail || '',
+        submitted_by: SESSION.name, submitted_at: utcToJST(dr.updated_at),
+        approved_by: null, approved_at: null, reject_reason: null,
+      });
+    });
+  } catch(e) {}
   renderList();
 }
 
@@ -822,12 +879,24 @@ function updateBadges(){
 /* ===== Render list ===== */
 function renderList(){
   updateBadges();
+  // Draft banner
+  var drafts=TROUBLES.filter(function(tr){return tr.status==='draft';});
+  var dBanner=document.getElementById('draftBanner');
+  if(dBanner){
+    if(drafts.length>0){
+      dBanner.style.display='flex';
+      document.getElementById('draftCount').textContent=drafts.length;
+    } else {
+      dBanner.style.display='none';
+    }
+  }
   const list=getFiltered();
   const container=document.getElementById('troubleList');
 
   if(list.length===0){
-    const msg=mainTab==='pending'?t('empty_pending'):t('empty_all');
-    container.innerHTML=`<div class="empty-state"><div class="empty-icon">${mainTab==='pending'?'✅':'📭'}</div><div class="empty-title">${msg}</div></div>`;
+    const msg=mainTab==='pending'?t('empty_pending'):mainTab==='draft'?t('empty_draft'):t('empty_all');
+    const icon=mainTab==='pending'?'✅':mainTab==='draft'?'📝':'📭';
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${msg}</div></div>`;
     return;
   }
 
@@ -842,7 +911,9 @@ function getFiltered(){
   return TROUBLES.filter(tr=>{
     const statusOk = mainTab==='pending'?tr.status==='pending':
                      mainTab==='approved'?tr.status==='approved':
-                     mainTab==='rejected'?tr.status==='rejected':true;
+                     mainTab==='rejected'?tr.status==='rejected':
+                     mainTab==='draft'?tr.status==='draft':
+                     tr.status!=='draft';
     const typeOk = typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
     return statusOk && typeOk;
   });
@@ -874,6 +945,13 @@ function buildCard(tr,idx){
     actionsHTML=`
       <div>
         <button class="ca-resubmit" onclick="event.stopPropagation();editRejected(${tr.id})" style="width:100%;border-radius:0 0 10px 10px">${t('btn_resubmit')}</button>
+      </div>`;
+  } else if(!selectMode && tr.status==='draft'){
+    actionsHTML=`
+      <div class="draft-actions">
+        <button class="da-btn da-edit" onclick="event.stopPropagation();editDraft('${tr.id}')">${t('da_edit')}</button>
+        <button class="da-btn da-del"  onclick="event.stopPropagation();confirmDeleteDraft('${tr.id}')">${t('da_del')}</button>
+        <button class="da-btn da-send" onclick="event.stopPropagation();sendDraft('${tr.id}')">${t('da_send')}</button>
       </div>`;
   }
 
@@ -920,6 +998,53 @@ function buildCard(tr,idx){
 }
 
 /* ===== Quick approve (from card button) ===== */
+/* ===== Draft actions ===== */
+function editDraft(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
+  if(!tr) return;
+  location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html'+(tr._draftId?'?draft='+tr._draftId:'');
+}
+
+async function sendDraft(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
+  if(!tr||!tr._draftId){showToast('送信できません','error');return;}
+  try{
+    await sbFetch('troubles','POST',{
+      trouble_type:tr.type,status:'pending',
+      occurred_date:tr.date||null,shift:parseInt(tr.shift)||1,
+      detail:tr.detail,occurrence:tr.occurrence==='repeat'?'recurrence':(tr.occurrence||'first'),
+      stop_minutes:tr.stop_minutes||null,reporter_id:SESSION.userId
+    });
+    await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');
+    TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
+    renderList();
+    showToast(t('send_done'),'success');
+  }catch(e){showToast('エラー: '+e.message,'error');}
+}
+
+function confirmDeleteDraft(id){
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${t('del_title')}</div>
+    <p style="font-size:14px;color:var(--text2);margin:8px 0 16px">${t('del_msg')}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn-cancel-reject" onclick="closeModal()">${t('del_cancel')}</button>
+      <button onclick="deleteDraft('${id}')" style="height:44px;border:none;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:var(--danger);color:#fff">${t('del_confirm')}</button>
+    </div>
+  `,true);
+}
+
+async function deleteDraft(id){
+  var tr=TROUBLES.find(function(x){return String(x.id)===String(id);});
+  if(tr&&tr._draftId){
+    try{await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');}catch(e){}
+  }
+  TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
+  closeModal();
+  renderList();
+  showToast(t('del_done'),'success');
+}
+
 function editRejected(id){
   const tr=TROUBLES.find(x=>String(x.id)===String(id));
   if(!tr) return;
