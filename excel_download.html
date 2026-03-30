@@ -423,6 +423,18 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   if(sbti) sbti.textContent=(saved||pref)==='dark'?'🌙':'☀️';
 })();
 
+/* ===== UTC→JST変換 ===== */
+function utcToJST(isoStr){
+  if(!isoStr) return '';
+  var s=isoStr.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s)&&!/[+-]\d{2}/.test(s)) s+='Z';
+  var d=new Date(s);
+  if(isNaN(d.getTime())) return isoStr.slice(0,16).replace('T',' ');
+  var jst=new Date(d.getTime()+9*60*60*1000);
+  var y=jst.getUTCFullYear(),mo=String(jst.getUTCMonth()+1).padStart(2,'0'),dy=String(jst.getUTCDate()).padStart(2,'0'),h=String(jst.getUTCHours()).padStart(2,'0'),mi=String(jst.getUTCMinutes()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy+' '+h+':'+mi;
+}
+
 var SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
 
@@ -881,12 +893,8 @@ function buildSheet(rows) {
 
     var approvedAt = '';
     if (r.approved_at) {
-      var d = new Date(r.approved_at);
-      approvedAt = d.getFullYear() + '/' +
-        String(d.getMonth()+1).padStart(2,'0') + '/' +
-        String(d.getDate()).padStart(2,'0') + ' ' +
-        String(d.getHours()).padStart(2,'0') + ':' +
-        String(d.getMinutes()).padStart(2,'0');
+      var jst = utcToJST(r.approved_at);
+      approvedAt = jst.replace('-', '/').replace('-', '/');
     }
 
     data.push([

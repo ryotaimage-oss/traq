@@ -415,6 +415,25 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 })();
 
 /* ===== Supabase ===== */
+/* ===== UTC→JST変換 ===== */
+function utcToJST(isoStr){
+  if(!isoStr) return '';
+  var s=isoStr.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s)&&!/[+-]\d{2}/.test(s)) s+='Z';
+  var d=new Date(s);
+  if(isNaN(d.getTime())) return isoStr.slice(0,16).replace('T',' ');
+  var jst=new Date(d.getTime()+9*60*60*1000);
+  var y=jst.getUTCFullYear(),mo=String(jst.getUTCMonth()+1).padStart(2,'0'),dy=String(jst.getUTCDate()).padStart(2,'0'),h=String(jst.getUTCHours()).padStart(2,'0'),mi=String(jst.getUTCMinutes()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy+' '+h+':'+mi;
+}
+function utcDateToJSTDate(isoStr){
+  /* occurred_dateはdate型（"YYYY-MM-DD"）。UTC深夜0時として扱い+9hでJST日付を返す */
+  if(!isoStr) return null;
+  var s=isoStr.length===10 ? isoStr+'T00:00:00Z' : isoStr;
+  var d=new Date(s.replace('+00:00','Z'));
+  return new Date(d.getTime()+9*60*60*1000);
+}
+
 const SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
 async function sbFetch(path){
@@ -493,7 +512,7 @@ function getFiltered(){
   return RAW.filter(r=>{
     // 期間フィルター
     if(currentPeriod>0){
-      const d=new Date(r.occurred_date||r.created_at||'');
+      const d=utcDateToJSTDate(r.occurred_date||r.created_at||'');
       const diff=(now-d)/(1000*60*60*24);
       if(diff>currentPeriod) return false;
     }
@@ -553,9 +572,10 @@ function tickColor(){return isDark()?'#8b90a0':'#666666';}
 
 /* last N days array */
 function lastNDays(n){
-  const days=[];const now=new Date();
+  const days=[];
+  const nowJST=new Date(Date.now()+9*60*60*1000);
   for(let i=n-1;i>=0;i--){
-    const d=new Date(now);d.setDate(d.getDate()-i);
+    const d=new Date(nowJST);d.setUTCDate(d.getUTCDate()-i);
     days.push(d.toISOString().slice(0,10));
   }
   return days;
@@ -744,9 +764,9 @@ function pieOpts(){
 function getDayRange(data){
   if(!data.length) return lastNDays(30);
   const dates=data.map(r=>(r.occurred_date||'').slice(0,10)).filter(Boolean).sort();
-  const start=new Date(dates[0]);const end=new Date(dates[dates.length-1]);
+  const start=new Date(dates[0]+'T00:00:00Z');const end=new Date(dates[dates.length-1]+'T00:00:00Z');
   const days=[];const cur=new Date(start);
-  while(cur<=end){days.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1);}
+  while(cur<=end){days.push(cur.toISOString().slice(0,10));cur.setUTCDate(cur.getUTCDate()+1);}
   return days;
 }
 
