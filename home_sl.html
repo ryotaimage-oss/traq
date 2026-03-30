@@ -115,6 +115,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .ca-reject{background:rgba(239,68,68,.08);color:var(--danger)}
 .ca-reject:hover{background:rgba(239,68,68,.18)}
 .ca-btn:active{transform:scale(.97)}
+.ca-resubmit{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;border:none;border-top:1px solid var(--border);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;background:rgba(239,159,39,.08);color:var(--orange)}
+.ca-resubmit:hover{background:rgba(239,159,39,.15)}
+.ca-resubmit:active{transform:scale(.97)}
 
 /* Already-actioned card dimming */
 .tcard.actioned{opacity:.55}
@@ -457,7 +460,7 @@ const I18N = {
     occ_first:'初発', occ_rec:'再発',
     stop_min:(n)=>`${n}分`, stop_none:'不明',
     shift_label:(s)=>`${s}直`,
-    btn_approve:'✓ 承認する', btn_reject:'✕ 差し戻す',
+    btn_approve:'✓ 承認する', btn_reject:'✕ 差し戻す', btn_resubmit:'修正して再送信',
     btn_close:'閉じる',
     approve_confirm:'この内容を承認しますか？',
     approve_done:'承認しました',
@@ -496,7 +499,7 @@ const I18N = {
     occ_first:'Lần đầu', occ_rec:'Tái phát',
     stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
     shift_label:(s)=>`Ca ${s}`,
-    btn_approve:'✓ Duyệt', btn_reject:'✕ Trả lại',
+    btn_approve:'✓ Duyệt', btn_reject:'✕ Trả lại', btn_resubmit:'Sửa và gửi lại',
     btn_close:'Đóng',
     approve_confirm:'Bạn có muốn duyệt nội dung này không?',
     approve_done:'Đã duyệt',
@@ -535,7 +538,7 @@ const I18N = {
     occ_first:'First', occ_rec:'Recurrence',
     stop_min:(n)=>`${n} min`, stop_none:'Unknown',
     shift_label:(s)=>`Shift ${s}`,
-    btn_approve:'✓ Approve', btn_reject:'✕ Reject',
+    btn_approve:'✓ Approve', btn_reject:'✕ Reject', btn_resubmit:'Fix & Resubmit',
     btn_close:'Close',
     approve_confirm:'Approve this submission?',
     approve_done:'Approved',
@@ -831,6 +834,11 @@ function buildCard(tr,idx){
         <button class="ca-btn ca-approve" onclick="event.stopPropagation();quickApprove(${tr.id})">${t('btn_approve')}</button>
         <button class="ca-btn ca-reject"  onclick="event.stopPropagation();openRejectModal(${tr.id})">${t('btn_reject')}</button>
       </div>`;
+  } else if(!selectMode && tr.status==='rejected'){
+    actionsHTML=`
+      <div>
+        <button class="ca-resubmit" onclick="event.stopPropagation();editRejected(${tr.id})" style="width:100%;border-radius:0 0 10px 10px">${t('btn_resubmit')}</button>
+      </div>`;
   }
 
   let rejectHTML='';
@@ -876,6 +884,12 @@ function buildCard(tr,idx){
 }
 
 /* ===== Quick approve (from card button) ===== */
+function editRejected(id){
+  const tr=TROUBLES.find(x=>String(x.id)===String(id));
+  if(!tr) return;
+  location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id;
+}
+
 async function quickApprove(id){
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
@@ -952,6 +966,11 @@ function openDetail(id){
       <div class="modal-actions">
         <button class="btn-approve"      onclick="closeModal();quickApprove(${id})">${t('btn_approve')}</button>
         <button class="btn-reject-modal" onclick="closeModal();openRejectModal(${id})">${t('btn_reject')}</button>
+      </div>`;
+  } else if(tr.status==='rejected'){
+    approveActionsHTML=`
+      <div style="margin-top:12px">
+        <button onclick="closeModal();editRejected(${id})" style="width:100%;height:44px;border:none;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:var(--orange);color:var(--navy);transition:opacity .15s">${t('btn_resubmit')}</button>
       </div>`;
   }
 
