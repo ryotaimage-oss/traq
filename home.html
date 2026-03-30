@@ -1263,6 +1263,14 @@ async function loadTroubles() {
   renderUserInfo();
   await loadTroubles();
 })();
+
+/* ===== ページ復帰時にデータ再読み込み ===== */
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) { loadTroubles(); }
+});
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') { loadTroubles(); }
+});
 </script>
 <script src="./update_banner.js"></script>
 </body>
