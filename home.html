@@ -1064,7 +1064,7 @@ function setTlType(f) {
 async function loadTimeline() {
   document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
   try {
-    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
+    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
     TL_DATA = (rows || []).map(r => ({
       id: r.id, type: r.trouble_type, status: r.status,
       date: (r.occurred_date || '').slice(0,10),
@@ -1072,6 +1072,11 @@ async function loadTimeline() {
       line: r.lines ? r.lines.name : '',
       machine: r.machines ? r.machines.machine_no : '',
       product_code: r.products ? r.products.product_code : '',
+      product_name: r.products ? r.products.product_name : '',
+      category: r.categories ? r.categories.name : '',
+      occurrence: r.occurrence || 'first',
+      stop_minutes: r.stop_minutes,
+      reject_reason: r.reject_reason || null,
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : '',
       submitted_at: utcToJST(r.created_at),
