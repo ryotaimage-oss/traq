@@ -162,7 +162,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .draft-load-btn:hover{background:rgba(239,159,39,.1)}
 
 /* トースト */
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 20px;font-size:13px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.15);white-space:nowrap;font-weight:500}
+.toast{position:fixed;top:80px;left:16px;right:16px;transform:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 20px;font-size:13px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.15);font-weight:500;word-break:break-all}
 .toast.success{border-color:var(--success)}
 .toast.error{border-color:var(--error)}
 .hidden{display:none !important}
@@ -879,7 +879,7 @@ async function doSubmit(){
   if(draftInterval){clearInterval(draftInterval);draftInterval=null;}
   var btn=document.getElementById('submit-btn');btn.disabled=true;showOverlay(t('msg_sending'));
   try{
-    var selectedShift=parseInt(document.getElementById('shift-select').value);
+    var selectedShift=parseInt(document.getElementById('shift-select').value)||parseInt(session.shift)||1;
     var td={
       trouble_type:'mold',status:'pending',
       occurred_date:document.getElementById('occurred-date').value,
@@ -888,13 +888,14 @@ async function doSubmit(){
       machine_id:parseInt(document.getElementById('machine-select').value)||null,
       product_id:parseInt(document.getElementById('product-select').value)||null,
       category_id:parseInt(document.getElementById('category-select').value)||null,
-      occurrence:selectedOccurrence,
+      occurrence:selectedOccurrence||'first',
       stop_start:(function(){var h=drumState.sh,m=drumState.sm*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})(),
       stop_end:endTimeSet&&drumState.eh>=0?(function(){var h=drumState.eh,m=drumState.em*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})():null,
       stop_minutes:(function(){var v=document.getElementById('stop-minutes').value;return v?parseInt(v):null;})(),
       detail:document.getElementById('detail').value.trim()||null,
       reporter_id:session.userId
     };
+    console.log('doSubmit data:', JSON.stringify(td));
     var result, tId;
     if (editTroubleId) {
       td.reject_reason = null;
@@ -930,14 +931,14 @@ async function doSubmit(){
     }
     if(!editTroubleId) await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold','DELETE');
     hideOverlay();showToast(editTroubleId?t('msg_resubmitted'):t('msg_submitted'),'success');setTimeout(function(){goHome();},1200);
-  }catch(e){hideOverlay();btn.disabled=false;showToast(t('msg_submit_fail')(e.message),'error');}
+  }catch(e){hideOverlay();btn.disabled=false;console.error('Submit error:',e.message);try{var em=JSON.parse(e.message);showToast(t('msg_submit_fail')(em.message||e.message),'error');}catch(pe){showToast(t('msg_submit_fail')(e.message),'error');}}
 }
 
 /* ── Util ── */
 function showOverlay(t){document.getElementById('overlay-text').textContent=t;document.getElementById('overlay').classList.remove('hidden');}
 function hideOverlay(){document.getElementById('overlay').classList.add('hidden');}
 var toastTimer=null;
-function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3000);}
+function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},type==='error'?8000:3000);}
 function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';var sti=document.getElementById('sb-theme-icon');if(sti)sti.textContent=next==='dark'?'🌙':'☀️';}
 
 /* ── Edit mode (rejected resubmit) ── */
