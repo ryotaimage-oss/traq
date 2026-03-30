@@ -423,27 +423,6 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       </div>
     </div>
 
-    <!-- Push通知設定（SL・adminのみ表示） -->
-    <div class="section" id="sec-push" style="animation-delay:.12s">
-      <div class="section-label" data-i18n="push_title">Push通知</div>
-      <div class="setting-group" style="padding:16px">
-        <p class="push-desc" data-i18n="push_desc">トラブル報告が提出されたときにプッシュ通知を受け取ります。</p>
-        <div id="push-status" class="push-status">
-          <span id="push-status-icon">⏳</span>
-          <span id="push-status-text" data-i18n="push_checking">確認中...</span>
-        </div>
-        <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
-          <span data-i18n="push_enable">🔔 通知をオンにする</span>
-        </button>
-        <button id="btn-push-off" class="btn-push btn-push-off" onclick="unsubscribePush()" style="display:none">
-          <span data-i18n="push_disable">🔕 通知をオフにする</span>
-        </button>
-        <p id="push-unsupported" class="push-warn" style="display:none" data-i18n="push_unsupported">このブラウザはPush通知に対応していません。</p>
-        <p id="push-ios-hint" class="push-warn" style="display:none" data-i18n="push_ios_hint">iOSでPush通知を受け取るにはホーム画面に追加してください。</p>
-        <p id="push-denied" class="push-warn" style="display:none" data-i18n="push_denied">通知がブロックされています。ブラウザの設定から許可してください。</p>
-      </div>
-    </div>
-
     <!-- PIN変更セクション（非表示→setSection('pin')で表示） -->
     <div id="section-pin" style="display:none">
       <div class="pin-section">
@@ -481,6 +460,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         <div style="text-align:center;margin-top:10px">
           <button onclick="setSection(null)" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit" data-i18n="pin_cancel">キャンセル</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Push通知設定（SL・adminのみ表示） -->
+    <div class="section" id="sec-push" style="animation-delay:.12s">
+      <div class="section-label" data-i18n="push_title">Push通知</div>
+      <div class="setting-group" style="padding:16px">
+        <p class="push-desc" data-i18n="push_desc">トラブル報告が提出されたときにプッシュ通知を受け取ります。</p>
+        <div id="push-status" class="push-status">
+          <span id="push-status-icon">⏳</span>
+          <span id="push-status-text" data-i18n="push_checking">確認中...</span>
+        </div>
+        <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
+          <span data-i18n="push_enable">🔔 通知をオンにする</span>
+        </button>
+        <button id="btn-push-off" class="btn-push btn-push-off" onclick="unsubscribePush()" style="display:none">
+          <span data-i18n="push_disable">🔕 通知をオフにする</span>
+        </button>
+        <p id="push-unsupported" class="push-warn" style="display:none" data-i18n="push_unsupported">このブラウザはPush通知に対応していません。</p>
+        <p id="push-ios-hint" class="push-warn" style="display:none" data-i18n="push_ios_hint">iOSでPush通知を受け取るにはホーム画面に追加してください。</p>
+        <p id="push-denied" class="push-warn" style="display:none" data-i18n="push_denied">通知がブロックされています。ブラウザの設定から許可してください。</p>
       </div>
     </div>
 
