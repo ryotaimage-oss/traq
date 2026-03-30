@@ -660,16 +660,16 @@ html, body {
 
       <!-- Tab bar -->
       <div class="tab-bar">
-        <button class="tab-item active" id="tab-draft"    onclick="setMainTab('draft')">
+        <button class="tab-item active" id="tab-all"      onclick="setMainTab('all')">
+          <span data-i18n="tab_all">全件</span>
+        </button>
+        <button class="tab-item" id="tab-draft"    onclick="setMainTab('draft')">
           <span data-i18n="tab_draft">下書き</span>
           <span class="tab-badge" id="tab-badge-draft" style="display:none">0</span>
         </button>
         <button class="tab-item" id="tab-pending"  onclick="setMainTab('pending')">
           <span data-i18n="tab_pending">承認待ち</span>
           <span class="tab-badge" id="tab-badge-pending" style="display:none">0</span>
-        </button>
-        <button class="tab-item" id="tab-all"      onclick="setMainTab('all')">
-          <span data-i18n="tab_all">全件</span>
         </button>
         <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
           <span data-i18n="tab_approved">承認済み</span>
@@ -680,14 +680,14 @@ html, body {
         </button>
       </div>
       <!-- Type filter (非全件タブ用) -->
-      <div class="filter-row" id="typeFilterRow">
+      <div class="filter-row" id="typeFilterRow" style="display:none">
         <button class="ftab active" id="ftab-all2" onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
         <button class="ftab"        id="ftab-eq"   onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
         <button class="ftab"        id="ftab-md"   onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
       </div>
 
       <!-- 全件タイムラインフィルター -->
-      <div class="tl-filter-area" id="tlFilterArea" style="display:none">
+      <div class="tl-filter-area" id="tlFilterArea">
         <div class="tl-filter-row">
           <span class="tl-flabel" data-i18n="tl_date">日付</span>
           <input type="date" class="tl-datebox" id="tlDateFrom">
@@ -704,12 +704,12 @@ html, body {
           <button class="ftab"        id="tl-ftab-md"  onclick="setTlType('md')"   data-i18n="filter_md">金型</button>
         </div>
       </div>
-      <div class="tl-cnt" id="tlCnt" style="display:none"></div>
+      <div class="tl-cnt" id="tlCnt"></div>
 
       <!-- 通常リスト -->
-      <div class="trouble-list" id="troubleList"></div>
+      <div class="trouble-list" id="troubleList" style="display:none"></div>
       <!-- タイムラインリスト -->
-      <div id="timelineList" style="display:none"></div>
+      <div id="timelineList"></div>
 
     </div><!-- /scroll-area -->
   </div><!-- /main-column -->
@@ -893,7 +893,7 @@ const SESSION = (() => {
 
 /* ===== Data ===== */
 let TROUBLES = [];
-let mainTab = 'draft';
+let mainTab = 'all';
 let typeFilter = 'all';
 
 /* ===== Role helper ===== */
@@ -1463,12 +1463,12 @@ async function loadTroubles() {
   });
   applyI18n();
   renderUserInfo();
-  await loadTroubles();
+  await loadTimeline();
 })();
 
 /* ===== ページ復帰時にデータ再読み込み ===== */
 window.addEventListener('pageshow', function(e) {
-  if (e.persisted) { loadTroubles(); }
+  if (e.persisted) { if (mainTab === 'all') { loadTimeline(); } else { loadTroubles(); } }
 });
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
