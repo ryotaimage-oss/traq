@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ===== CSS Variables ===== */
 :root {
   --orange:      #EF9F27;
   --orange-dark: #c97d10;
@@ -44,8 +43,6 @@
   --border: rgba(0,0,0,0.18);
   --shadow: 0 4px 24px rgba(0,0,0,0.12);
 }
-
-/* ===== Reset ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   height: 100%;
@@ -55,13 +52,9 @@ html, body {
   -webkit-tap-highlight-color: transparent;
   overflow: hidden;
 }
-
-/* ===== Layout ===== */
 .app { height: 100%; display: flex; flex-direction: column; }
 .main-column { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 .sidebar { display: none; }
-
-/* ===== Common Header (topbar) ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
@@ -77,8 +70,6 @@ html, body {
 [data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
 [data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
-
-/* Lang btns */
 .lang-btn {
   background: none; border: 1px solid var(--border);
   border-radius: 5px; padding: 3px 6px;
@@ -86,102 +77,28 @@ html, body {
   color: var(--text2); cursor: pointer; transition: all .15s;
 }
 .lang-btn.active, .lang-btn:hover { border-color: var(--orange); color: var(--orange); }
-
-/* ===== Scroll area ===== */
-.scroll-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 16px 16px;
-}
-
-/* ===== Date/shift bar ===== */
-.date-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-  animation: fadeIn .3s ease both;
-}
+.scroll-area { flex: 1; overflow-y: auto; padding: 16px 16px 16px; }
+.date-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; animation: fadeIn .3s ease both; }
 .date-text { font-size: 13px; color: var(--text2); }
-
-/* ===== Action cards ===== */
-.action-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-  animation: slideUp .3s .05s ease both;
-}
-.action-card {
-  background: var(--bg2);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 14px;
-  cursor: pointer;
-  display: flex; flex-direction: row; align-items: center; gap: 10px;
-  transition: all .15s;
-  position: relative;
-  overflow: hidden;
-}
-.action-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 12px 12px 0 0;
-  background: var(--orange);
-  transform: scaleX(0);
-  transition: transform .2s ease;
-  transform-origin: left;
-}
-.action-card:hover, .action-card:active {
-  border-color: var(--orange);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(239,159,39,.15);
-}
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; animation: slideUp .3s .05s ease both; }
+.action-card { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; cursor: pointer; display: flex; flex-direction: row; align-items: center; gap: 10px; transition: all .15s; position: relative; overflow: hidden; }
+.action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; background: var(--orange); transform: scaleX(0); transition: transform .2s ease; transform-origin: left; }
+.action-card:hover, .action-card:active { border-color: var(--orange); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(239,159,39,.15); }
 .action-card:hover::before, .action-card:active::before { transform: scaleX(1); }
-.action-icon {
-  width: 34px; height: 34px; border-radius: 8px;
-  background: rgba(239,159,39,.12);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; flex-shrink: 0;
-}
-.action-label {
-  font-size: 13px; font-weight: 700; color: var(--text1); line-height: 1.3; white-space: nowrap;
-}
-.action-sub { font-size: 11px; color: var(--text2); }
-.action-arrow {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  font-size: 16px; color: var(--orange); opacity: .6;
-}
-
-/* ===== Draft banner ===== */
-.draft-banner {
-  background: rgba(239,159,39,.08);
-  border: 1px solid rgba(239,159,39,.25);
-  border-radius: 8px;
-  padding: 10px 14px;
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-  cursor: pointer;
-  transition: all .15s;
-  animation: slideUp .3s .1s ease both;
-}
+.action-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(239,159,39,.12); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.action-label { font-size: 13px; font-weight: 700; color: var(--text1); line-height: 1.3; white-space: nowrap; }
+.action-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--orange); opacity: .6; }
+.draft-banner { background: rgba(239,159,39,.08); border: 1px solid rgba(239,159,39,.25); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; cursor: pointer; transition: all .15s; animation: slideUp .3s .1s ease both; }
 .draft-banner:hover { background: rgba(239,159,39,.13); }
 .draft-banner-left { display: flex; align-items: center; gap: 8px; }
-.draft-count {
-  background: var(--orange); color: var(--navy);
-  border-radius: 10px; padding: 2px 8px;
-  font-size: 12px; font-weight: 700;
-}
+.draft-count { background: var(--orange); color: var(--navy); border-radius: 10px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 .draft-label { font-size: 13px; font-weight: 500; }
 .draft-banner-right { font-size: 12px; color: var(--orange); }
-
-
-/* ===== Tab bar ===== */
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
 .tab-bar::-webkit-scrollbar{display:none}
 .tab-item{flex:1;min-width:0;padding:11px 4px;text-align:center;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative}
 .tab-item.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700}
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;vertical-align:middle}
-
-/* ===== Timeline (全件) ===== */
 .tl-filter-area{padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;flex-shrink:0}
 .tl-filter-row{display:flex;gap:7px;align-items:center}
 .tl-flabel{font-size:11px;color:var(--text2);white-space:nowrap;min-width:30px}
@@ -218,172 +135,66 @@ html, body {
 .tl-detail{font-size:12px;color:var(--text1);line-height:1.4;margin-bottom:5px}
 .tl-footer{display:flex;justify-content:space-between;align-items:center;padding-top:5px;border-top:1px solid var(--border)}
 .tl-who{font-size:11px;color:var(--text2)}
-
-/* ===== Filter chips (type) ===== */
 .filter-row{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0}
 .filter-row::-webkit-scrollbar{display:none}
 .ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
-
-/* ===== Trouble cards ===== */
 .trouble-list { display: flex; flex-direction: column; gap: 8px; }
-
-.tcard {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-  cursor: pointer;
-  transition: all .15s;
-  animation: slideUp .25s ease both;
-}
+.tcard { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; cursor: pointer; transition: all .15s; animation: slideUp .25s ease both; }
 .tcard:hover { border-color: rgba(239,159,39,.3); }
-
-.tcard-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 8px;
-}
+.tcard-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
 .tcard-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.tcard-type {
-  font-size: 10px; font-weight: 700;
-  padding: 2px 7px; border-radius: 4px;
-}
+.tcard-type { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 .tcard-type.eq { background: rgba(59,130,246,.15); color: #60a5fa; }
 .tcard-type.md { background: rgba(168,85,247,.15); color: #c084fc; }
-
-.status-badge {
-  font-size: 10px; font-weight: 700;
-  padding: 2px 8px; border-radius: 4px;
-}
+.status-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
 .status-draft    { background: rgba(139,144,160,.12); color: var(--text2); }
 .status-pending  { background: rgba(245,158,11,.15);  color: var(--warning); }
 .status-approved { background: rgba(16,185,129,.12);  color: var(--success); }
 .status-rejected { background: rgba(239,68,68,.12);   color: var(--danger); }
-
 .tcard-date { font-size: 11px; color: var(--text2); }
-
 .tcard-body { margin-bottom: 8px; }
-.tcard-machine {
-  font-size: 15px; font-weight: 700; color: var(--text1);
-  margin-bottom: 2px;
-}
+.tcard-machine { font-size: 15px; font-weight: 700; color: var(--text1); margin-bottom: 2px; }
 .tcard-product { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-.tcard-category {
-  display: inline-block;
-  font-size: 11px; font-weight: 500;
-  background: var(--bg3);
-  border-radius: 4px; padding: 2px 7px;
-  color: var(--text2); margin-bottom: 4px;
-}
-.tcard-detail {
-  font-size: 13px; color: var(--text1);
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-
-.tcard-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 8px; border-top: 1px solid var(--border);
-}
+.tcard-category { display: inline-block; font-size: 11px; font-weight: 500; background: var(--bg3); border-radius: 4px; padding: 2px 7px; color: var(--text2); margin-bottom: 4px; }
+.tcard-detail { font-size: 13px; color: var(--text1); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tcard-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border); }
 .tcard-submitter { font-size: 11px; color: var(--text2); }
 .tcard-stop { font-size: 11px; color: var(--text2); }
-
-/* Draft action buttons (inline) */
-.draft-actions {
-  display: flex; gap: 6px; margin-top: 10px;
-  padding-top: 10px; border-top: 1px solid var(--border);
-}
-.da-btn {
-  flex: 1; height: 36px;
-  border-radius: 8px;
-  font-family: inherit; font-size: 12px; font-weight: 700;
-  cursor: pointer; transition: all .12s; border: none;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-}
+.draft-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.da-btn { flex: 1; height: 36px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .12s; border: none; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .da-edit  { background: var(--bg3); color: var(--text1); border: 1px solid var(--border); }
 .da-del   { background: rgba(239,68,68,.1); color: var(--danger); border: 1px solid rgba(239,68,68,.2); }
 .da-send  { background: var(--orange); color: var(--navy); }
 .da-resubmit { background: var(--orange); color: var(--navy); flex: 1; }
 .da-btn:hover { opacity: .85; transform: scale(.98); }
-
-/* Reject reason */
-.reject-reason {
-  margin-top: 8px;
-  background: rgba(239,68,68,.08);
-  border: 1px solid rgba(239,68,68,.2);
-  border-radius: 6px; padding: 8px 10px;
-  font-size: 12px; color: var(--danger);
-}
+.reject-reason { margin-top: 8px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: 6px; padding: 8px 10px; font-size: 12px; color: var(--danger); }
 .reject-reason strong { display: block; margin-bottom: 2px; font-size: 11px; }
-
-/* ===== Empty state ===== */
-.empty-state {
-  text-align: center; padding: 40px 20px;
-  color: var(--text2); font-size: 13px;
-}
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 13px; }
 .empty-icon { font-size: 36px; margin-bottom: 8px; }
-
-/* ===== Common Bottom Nav ===== */
 .bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
 .nav-item.active{color:var(--orange)}
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
 .nav-label{font-weight:500}
-/* ===== PC sidebar layout ===== */
 @media (min-width: 768px) {
   .bottom-nav { display: none; }
   .app { flex-direction: row; }
-  .sidebar {
-    display: flex;
-    width: 220px; flex-shrink: 0;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    flex-direction: column;
-    padding: 0;
-    overflow-y: auto;
-  }
-  .sidebar-logo {
-    padding: 18px 20px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .sidebar-user {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .sidebar-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    font-size: 15px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
+  .sidebar { display: flex; width: 220px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); flex-direction: column; padding: 0; overflow-y: auto; }
+  .sidebar-logo { padding: 18px 20px 12px; border-bottom: 1px solid var(--border); }
+  .sidebar-user { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .sidebar-name { font-size: 13px; font-weight: 700; }
   .sidebar-role { font-size: 11px; color: var(--text2); }
   .sidebar-nav { flex: 1; padding: 12px 8px; }
-  .snav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px;
-    cursor: pointer; transition: all .15s;
-    font-size: 13px; font-weight: 500; color: var(--text2);
-    border: none; background: none; font-family: inherit;
-    width: 100%; text-align: left;
-  }
+  .snav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: 13px; font-weight: 500; color: var(--text2); border: none; background: none; font-family: inherit; width: 100%; text-align: left; }
   .snav-item:hover { background: var(--bg3); color: var(--text1); }
   .snav-item.active { background: rgba(239,159,39,.12); color: var(--orange); font-weight: 700; }
   .snav-icon { font-size: 18px; width: 24px; text-align: center; }
-  .snav-badge {
-    margin-left: auto;
-    background: var(--danger); color: #fff;
-    border-radius: 10px; padding: 1px 6px;
-    font-size: 9px; font-weight: 700;
-  }
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
-  .sidebar-bottom {
-    padding: 12px 8px;
-    border-top: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 4px;
-  }
+  .sidebar-bottom { padding: 12px 8px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
   .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
   .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
   .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
@@ -391,69 +202,28 @@ html, body {
   [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
   .topbar { display: none; }
-  .main-column {
-    flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  }
+  .main-column { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .scroll-area { padding-bottom: 24px; }
 }
-
 @media (min-width: 1025px) {
   .sidebar { width: 240px; }
   .action-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
-/* ===== Animations ===== */
 @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-
-/* ===== Modal ===== */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.6);
-  display: flex; align-items: flex-end; justify-content: center;
-  z-index: 200;
-  animation: fadeIn .15s ease;
-}
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; z-index: 200; animation: fadeIn .15s ease; }
 .modal-overlay.center { align-items: center; }
-.modal-sheet {
-  background: var(--bg2);
-  border-radius: 16px 16px 0 0;
-  padding: 20px;
-  width: 100%; max-width: 520px;
-  max-height: 85vh;
-  overflow-y: auto;
-  animation: slideUp .2s ease;
-}
-.modal-overlay.center .modal-sheet {
-  border-radius: 12px;
-  margin: 20px;
-  max-height: 80vh;
-}
-.modal-handle {
-  width: 36px; height: 4px; border-radius: 2px;
-  background: var(--border); margin: 0 auto 16px;
-}
+.modal-sheet { background: var(--bg2); border-radius: 16px 16px 0 0; padding: 20px; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; animation: slideUp .2s ease; }
+.modal-overlay.center .modal-sheet { border-radius: 12px; margin: 20px; max-height: 80vh; }
+.modal-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 16px; }
 .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
 .modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
-.modal-close-btn {
-  width: 100%; height: 48px;
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 8px; font-family: inherit;
-  font-size: 14px; font-weight: 500; color: var(--text2);
-  cursor: pointer; margin-top: 12px; transition: all .15s;
-}
+.modal-close-btn { width: 100%; height: 48px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text2); cursor: pointer; margin-top: 12px; transition: all .15s; }
 .modal-close-btn:hover { color: var(--text1); }
-
-/* Detail modal fields */
-.detail-row {
-  display: flex; gap: 8px; margin-bottom: 10px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--border);
-}
+.detail-row { display: flex; gap: 8px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .detail-row:last-child { border-bottom: none; margin-bottom: 0; }
 .detail-key { font-size: 11px; font-weight: 500; color: var(--text2); width: 80px; flex-shrink: 0; padding-top: 2px; }
 .detail-val { font-size: 13px; color: var(--text1); flex: 1; word-break: break-all; }
-
-/* Detail images */
 .detail-images{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .detail-images-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:4px}
 .detail-img-grid{display:flex;flex-wrap:wrap;gap:8px}
@@ -462,51 +232,21 @@ html, body {
 .detail-img-loading{font-size:12px;color:var(--text2)}
 .img-fullscreen{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .img-fullscreen img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:4px}
-
-/* Confirm delete */
 .confirm-msg { font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
 .confirm-btns { display: flex; gap: 8px; }
-.btn-danger {
-  flex: 1; height: 48px;
-  background: var(--danger); border: none;
-  border-radius: 8px; color: #fff;
-  font-family: inherit; font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: all .15s;
-}
-.btn-cancel {
-  flex: 1; height: 48px;
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text1);
-  font-family: inherit; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
-}
-
-/* Toast */
-.toast {
-  position: fixed; top: 64px; left: 50%; transform: translateX(-50%);
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 20px; padding: 8px 18px;
-  font-size: 13px; font-weight: 500;
-  box-shadow: var(--shadow); z-index: 300;
-  animation: fadeIn .2s ease;
-  white-space: nowrap;
-}
+.btn-danger { flex: 1; height: 48px; background: var(--danger); border: none; border-radius: 8px; color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.btn-cancel { flex: 1; height: 48px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text1); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s; }
+.toast { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow); z-index: 300; animation: fadeIn .2s ease; white-space: nowrap; }
 .toast.success { background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.3); color: var(--success); }
 .toast.error   { background: rgba(239,68,68,.12);  border-color: rgba(239,68,68,.3);  color: var(--danger); }
-
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
 </style>
 </head>
 <body>
-
 <div class="app" id="app">
-
-  <!-- ===== Sidebar (PC) ===== -->
-    <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
         <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
@@ -584,10 +324,7 @@ html, body {
     </div>
   </aside>
 
-  <!-- ===== Main column ===== -->
   <div class="main-column">
-
-    <!-- Common Header (mobile) -->
     <div class="topbar">
       <div class="topbar-left">
         <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
@@ -618,15 +355,10 @@ html, body {
       </div>
     </div>
 
-    <!-- Scroll area -->
     <div class="scroll-area" id="scrollArea">
-
-      <!-- Date bar -->
       <div class="date-bar">
         <span class="date-text" id="dateText"></span>
       </div>
-
-      <!-- Action cards -->
       <div class="action-grid">
         <div class="action-card" onclick="goInput('equipment')">
           <div class="action-icon"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect x="11" y="27" width="10" height="3" rx="1" fill="var(--orange)" opacity=".5"/><rect x="13" y="22" width="6" height="6" rx="1.5" fill="var(--orange)" opacity=".75"/><path d="M16 22L16 15" stroke="var(--orange)" stroke-width="3.5" stroke-linecap="round"/><circle cx="16" cy="15" r="2.2" fill="var(--orange)"/><path d="M14.2 14L9 9" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/><circle cx="9" cy="9" r="2" fill="var(--orange)"/><path d="M7.5 7.5L5 5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round"/><rect x="2" y="2.5" width="5" height="3.5" rx="1" fill="var(--orange)"/></svg></div>
@@ -640,7 +372,6 @@ html, body {
         </div>
       </div>
 
-      <!-- Draft banner -->
       <div class="draft-banner" id="draftBanner" onclick="setMainTab('draft')" style="display:none">
         <div class="draft-banner-left">
           <span class="draft-count" id="draftCount">0</span>
@@ -649,35 +380,19 @@ html, body {
         <span class="draft-banner-right" data-i18n="draft_confirm">確認する →</span>
       </div>
 
-      <!-- Tab bar -->
       <div class="tab-bar">
-        <button class="tab-item active" id="tab-all"      onclick="setMainTab('all')">
-          <span data-i18n="tab_all">全件</span>
-        </button>
-        <button class="tab-item" id="tab-draft"    onclick="setMainTab('draft')">
-          <span data-i18n="tab_draft">下書き</span>
-          <span class="tab-badge" id="tab-badge-draft" style="display:none">0</span>
-        </button>
-        <button class="tab-item" id="tab-pending"  onclick="setMainTab('pending')">
-          <span data-i18n="tab_pending">承認待ち</span>
-          <span class="tab-badge" id="tab-badge-pending" style="display:none">0</span>
-        </button>
-        <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')">
-          <span data-i18n="tab_approved">承認済み</span>
-        </button>
-        <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')">
-          <span data-i18n="tab_rejected">差し戻し</span>
-          <span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span>
-        </button>
+        <button class="tab-item active" id="tab-all"      onclick="setMainTab('all')"><span data-i18n="tab_all">全件</span></button>
+        <button class="tab-item" id="tab-draft"    onclick="setMainTab('draft')"><span data-i18n="tab_draft">下書き</span><span class="tab-badge" id="tab-badge-draft" style="display:none">0</span></button>
+        <button class="tab-item" id="tab-pending"  onclick="setMainTab('pending')"><span data-i18n="tab_pending">承認待ち</span><span class="tab-badge" id="tab-badge-pending" style="display:none">0</span></button>
+        <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')"><span data-i18n="tab_approved">承認済み</span></button>
+        <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')"><span data-i18n="tab_rejected">差し戻し</span><span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span></button>
       </div>
-      <!-- Type filter (非全件タブ用) -->
       <div class="filter-row" id="typeFilterRow" style="display:none">
         <button class="ftab active" id="ftab-all2" onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
         <button class="ftab"        id="ftab-eq"   onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
         <button class="ftab"        id="ftab-md"   onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
       </div>
 
-      <!-- 全件タイムラインフィルター -->
       <div class="tl-filter-area" id="tlFilterArea">
         <div class="tl-filter-row">
           <span class="tl-flabel" data-i18n="tl_date">日付</span>
@@ -697,15 +412,11 @@ html, body {
       </div>
       <div class="tl-cnt" id="tlCnt"></div>
 
-      <!-- 通常リスト -->
       <div class="trouble-list" id="troubleList" style="display:none"></div>
-      <!-- タイムラインリスト -->
       <div id="timelineList"></div>
+    </div>
+  </div>
 
-    </div><!-- /scroll-area -->
-  </div><!-- /main-column -->
-
-  <!-- ===== Common Bottom Nav (mobile) — 3 tabs ===== -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="void(0)">
       <span class="nav-icon">📋</span>
@@ -720,12 +431,9 @@ html, body {
       <span class="nav-label" data-i18n="nav_master">マスタ</span>
     </button>
   </nav>
+</div>
 
-</div><!-- /app -->
-
-<!-- Modal placeholder -->
 <div id="modalEl" style="display:none"></div>
-<!-- Toast placeholder -->
 <div id="toastEl" style="display:none"></div>
 
 <script>
@@ -734,9 +442,7 @@ html, body {
   var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
   document.documentElement.setAttribute('data-theme',saved||pref);
 })();
-/* =============================================
-   i18n
-============================================= */
+
 const I18N = {
   ja: {
     nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
@@ -749,27 +455,19 @@ const I18N = {
     filter_all:'すべて', filter_draft:'下書き', filter_pending:'承認待ち',
     filter_approved:'承認済み', filter_eq:'設備', filter_md:'金型',
     type_eq:'設備', type_md:'金型',
-    status_draft:'下書き', status_pending:'承認待ち',
-    status_approved:'承認済み', status_rejected:'差し戻し',
+    status_draft:'下書き', status_pending:'承認待ち', status_approved:'承認済み', status_rejected:'差し戻し',
     occurrence_first:'初発', occurrence_rec:'再発',
-    stop_min:(n)=>`${n}分`,
-    stop_none:'不明',
-    shift_label:(s)=>`${s}直`,
+    stop_min:(n)=>`${n}分`, stop_none:'不明', shift_label:(s)=>`${s}直`,
     da_edit:'編集', da_del:'削除', da_send:'承認待ちへ送信', da_resubmit:'修正して再送信',
     del_title:'下書きを削除', del_msg:'この下書きを削除しますか？\nこの操作は取り消せません。',
     del_confirm:'削除する', del_cancel:'キャンセル',
-    send_done:'承認待ちに送信しました',
-    del_done:'下書きを削除しました',
+    send_done:'承認待ちに送信しました', del_done:'下書きを削除しました',
     empty_draft:'下書きはありません 📝', empty_pending:'承認待ちの投稿はありません 👍', empty_all:'投稿はありません 📭',
     reject_label:'差し戻し理由：',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
-    detail_date:'日付', detail_shift:'直', detail_line:'ライン',
-    detail_machine:'機番', detail_product:'品番/品名',
-    detail_stop:'停止時間', detail_category:'分類',
-    detail_detail:'詳細', detail_occurrence:'初発/再発',
-    detail_submitter:'入力者', detail_status:'ステータス',
-    close:'閉じる',
-    logout_msg:'ログアウトしました',
+    detail_date:'日付', detail_shift:'直', detail_line:'ライン', detail_machine:'機番', detail_product:'品番/品名',
+    detail_stop:'停止時間', detail_category:'分類', detail_detail:'詳細', detail_occurrence:'初発/再発',
+    detail_submitter:'入力者', detail_status:'ステータス', close:'閉じる', logout_msg:'ログアウトしました',
   },
   vi: {
     nav_list:'Danh sách bài', nav_dashboard:'Bảng điều khiển', nav_master:'Quản lý', nav_settings:'Cài đặt',
@@ -782,26 +480,19 @@ const I18N = {
     filter_all:'Tất cả', filter_draft:'Nháp', filter_pending:'Chờ duyệt',
     filter_approved:'Đã duyệt', filter_eq:'Thiết bị', filter_md:'Khuôn',
     type_eq:'Thiết bị', type_md:'Khuôn',
-    status_draft:'Nháp', status_pending:'Chờ duyệt',
-    status_approved:'Đã duyệt', status_rejected:'Trả lại',
+    status_draft:'Nháp', status_pending:'Chờ duyệt', status_approved:'Đã duyệt', status_rejected:'Trả lại',
     occurrence_first:'Lần đầu', occurrence_rec:'Tái phát',
-    stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
-    shift_label:(s)=>`Ca ${s}`,
+    stop_min:(n)=>`${n} phút`, stop_none:'Không rõ', shift_label:(s)=>`Ca ${s}`,
     da_edit:'Sửa', da_del:'Xoá', da_send:'Gửi duyệt', da_resubmit:'Sửa và gửi lại',
     del_title:'Xoá bản nháp', del_msg:'Bạn có chắc muốn xoá bản nháp này?\nKhông thể hoàn tác.',
     del_confirm:'Xoá', del_cancel:'Huỷ',
-    send_done:'Đã gửi chờ duyệt',
-    del_done:'Đã xoá bản nháp',
+    send_done:'Đã gửi chờ duyệt', del_done:'Đã xoá bản nháp',
     empty_draft:'Không có bản nháp 📝', empty_pending:'Không có sự cố chờ duyệt 👍', empty_all:'Không có bản ghi 📭',
     reject_label:'Lý do trả lại:',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
-    detail_date:'Ngày', detail_shift:'Ca', detail_line:'Dây chuyền',
-    detail_machine:'Máy', detail_product:'Mã/Tên SP',
-    detail_stop:'Thời gian dừng', detail_category:'Phân loại',
-    detail_detail:'Chi tiết', detail_occurrence:'Lần đầu/Tái phát',
-    detail_submitter:'Người nhập', detail_status:'Trạng thái',
-    close:'Đóng',
-    logout_msg:'Đã đăng xuất',
+    detail_date:'Ngày', detail_shift:'Ca', detail_line:'Dây chuyền', detail_machine:'Máy', detail_product:'Mã/Tên SP',
+    detail_stop:'Thời gian dừng', detail_category:'Phân loại', detail_detail:'Chi tiết', detail_occurrence:'Lần đầu/Tái phát',
+    detail_submitter:'Người nhập', detail_status:'Trạng thái', close:'Đóng', logout_msg:'Đã đăng xuất',
   },
   en: {
     nav_list:'Post List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
@@ -814,52 +505,35 @@ const I18N = {
     filter_all:'All', filter_draft:'Draft', filter_pending:'Pending',
     filter_approved:'Approved', filter_eq:'Equipment', filter_md:'Mold',
     type_eq:'Equipment', type_md:'Mold',
-    status_draft:'Draft', status_pending:'Pending',
-    status_approved:'Approved', status_rejected:'Rejected',
+    status_draft:'Draft', status_pending:'Pending', status_approved:'Approved', status_rejected:'Rejected',
     occurrence_first:'First', occurrence_rec:'Recurrence',
-    stop_min:(n)=>`${n} min`, stop_none:'Unknown',
-    shift_label:(s)=>`Shift ${s}`,
+    stop_min:(n)=>`${n} min`, stop_none:'Unknown', shift_label:(s)=>`Shift ${s}`,
     da_edit:'Edit', da_del:'Delete', da_send:'Submit', da_resubmit:'Fix & Resubmit',
     del_title:'Delete Draft', del_msg:'Delete this draft?\nThis cannot be undone.',
     del_confirm:'Delete', del_cancel:'Cancel',
-    send_done:'Submitted for approval',
-    del_done:'Draft deleted',
+    send_done:'Submitted for approval', del_done:'Draft deleted',
     empty_draft:'No drafts 📝', empty_pending:'No pending submissions 👍', empty_all:'No records 📭',
     reject_label:'Rejection reason:',
     role_op:'OP', role_sl:'SL', role_adm:'admin',
-    detail_date:'Date', detail_shift:'Shift', detail_line:'Line',
-    detail_machine:'Machine', detail_product:'Code/Name',
-    detail_stop:'Downtime', detail_category:'Category',
-    detail_detail:'Detail', detail_occurrence:'First/Recurrence',
-    detail_submitter:'Submitted by', detail_status:'Status',
-    close:'Close',
-    logout_msg:'Logged out',
+    detail_date:'Date', detail_shift:'Shift', detail_line:'Line', detail_machine:'Machine', detail_product:'Code/Name',
+    detail_stop:'Downtime', detail_category:'Category', detail_detail:'Detail', detail_occurrence:'First/Recurrence',
+    detail_submitter:'Submitted by', detail_status:'Status', close:'Close', logout_msg:'Logged out',
   }
 };
 
 let currentLang = localStorage.getItem('traq_lang') || 'ja';
-function t(k, ...a) {
-  const v = I18N[currentLang][k];
-  return typeof v === 'function' ? v(...a) : (v ?? k);
-}
+function t(k, ...a) { const v = I18N[currentLang][k]; return typeof v === 'function' ? v(...a) : (v ?? k); }
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('traq_lang', lang);
-  ['ja','vi','en'].forEach(l => {
-    const b2 = document.getElementById('sb-lang-'+l);
-    if(b2) b2.classList.toggle('active', l===lang);
-  });
+  ['ja','vi','en'].forEach(l => { const b2 = document.getElementById('sb-lang-'+l); if(b2) b2.classList.toggle('active', l===lang); });
   applyI18n();
   renderList();
 }
 function applyI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.dataset.i18n;
-    el.textContent = t(k);
-  });
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
 }
 
-/* ===== Supabase ===== */
 const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
 async function sbFetch(path, method='GET', body=null) {
@@ -871,7 +545,6 @@ async function sbFetch(path, method='GET', body=null) {
   return text ? JSON.parse(text) : null;
 }
 
-/* ===== Session ===== */
 const SESSION = (() => {
   try {
     const s = localStorage.getItem('traq_session');
@@ -882,12 +555,10 @@ const SESSION = (() => {
   } catch(e) { return null; }
 })();
 
-/* ===== Data ===== */
 let TROUBLES = [];
 let mainTab = 'all';
 let typeFilter = 'all';
 
-/* ===== Role helper ===== */
 function getRoleClass(role) {
   if (role === 'admin') return 'role-admin';
   if (role === 'leader' || role === 'sl') return 'role-sl';
@@ -899,28 +570,21 @@ function getRoleLabel(role) {
   return t('role_op');
 }
 
-/* ===== renderUserInfo ===== */
 function renderUserInfo() {
   const u = SESSION;
   if (!u) return;
   const initial = (u.name || '?')[0];
   const roleLabel = getRoleLabel(u.role);
   const roleClass = getRoleClass(u.role);
-
-  // Mobile header
   var topbar = document.querySelector('.topbar');
   if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(roleClass);}
   var mobAv = document.getElementById('mob-avatar');
   if(mobAv) mobAv.textContent = initial;
-
-  // PC sidebar
   const sbWrap = document.getElementById('sb-user-wrap');
   if (sbWrap) sbWrap.className = 'sidebar-user ' + roleClass;
   document.getElementById('sb-avatar').textContent = initial;
   document.getElementById('sb-name').textContent = u.name;
   document.getElementById('sb-role').textContent = roleLabel + ' / ' + t('shift_label', u.shift);
-
-  // Date bar
   const now = new Date();
   const displayDate = (u.shift === 3 && now.getHours() < 8) ? new Date(now.getTime() - 86400000) : now;
   const ymd = `${displayDate.getFullYear()}/${String(displayDate.getMonth()+1).padStart(2,'0')}/${String(displayDate.getDate()).padStart(2,'0')}`;
@@ -928,7 +592,6 @@ function renderUserInfo() {
   document.getElementById('dateText').textContent = `${ymd}（${days[displayDate.getDay()]}）`;
 }
 
-/* ===== renderList ===== */
 function renderList() {
   const list = getFilteredList();
   const container = document.getElementById('troubleList');
@@ -977,30 +640,26 @@ function buildCard(tr, idx) {
   const dateDisp    = (tr.date || '').replace(/-/g,'/') + ' ' + t('shift_label', tr.shift);
   let draftActionsHTML = '';
   if (tr.status === 'draft') {
-    draftActionsHTML = `
-      <div class="draft-actions">
-        <button class="da-btn da-edit"  onclick="event.stopPropagation();editDraft('${tr.id}')">${t('da_edit')}</button>
-        <button class="da-btn da-del"   onclick="event.stopPropagation();confirmDelete('${tr.id}')">${t('da_del')}</button>
-        <button class="da-btn da-send"  onclick="event.stopPropagation();sendDraft('${tr.id}')">${t('da_send')}</button>
-      </div>`;
+    draftActionsHTML = `<div class="draft-actions">
+      <button class="da-btn da-edit"  onclick="event.stopPropagation();editDraft('${tr.id}')">${t('da_edit')}</button>
+      <button class="da-btn da-del"   onclick="event.stopPropagation();confirmDelete('${tr.id}')">${t('da_del')}</button>
+      <button class="da-btn da-send"  onclick="event.stopPropagation();sendDraft('${tr.id}')">${t('da_send')}</button>
+    </div>`;
   } else if (tr.status === 'rejected') {
-    draftActionsHTML = `
-      <div class="draft-actions">
-        <button class="da-btn da-resubmit" onclick="event.stopPropagation();editRejected('${tr.id}')">${t('da_resubmit')}</button>
-      </div>`;
+    draftActionsHTML = `<div class="draft-actions">
+      <button class="da-btn da-resubmit" onclick="event.stopPropagation();editRejected('${tr.id}')">${t('da_resubmit')}</button>
+    </div>`;
   }
   let rejectHTML = '';
   if (tr.status === 'rejected' && tr.reject_reason) {
     rejectHTML = `<div class="reject-reason"><strong>${t('reject_label')}</strong>${tr.reject_reason}</div>`;
   }
   div.innerHTML = `
-    <div class="tcard-header">
-      <div class="tcard-meta">
-        <span class="tcard-type ${typeClass}">${typeLabel}</span>
-        <span class="status-badge status-${tr.status}">${statusLabel}</span>
-        <span class="tcard-date">${dateDisp}</span>
-      </div>
-    </div>
+    <div class="tcard-header"><div class="tcard-meta">
+      <span class="tcard-type ${typeClass}">${typeLabel}</span>
+      <span class="status-badge status-${tr.status}">${statusLabel}</span>
+      <span class="tcard-date">${dateDisp}</span>
+    </div></div>
     <div class="tcard-body">
       <div class="tcard-machine">${tr.line} – ${tr.machine}号機</div>
       <div class="tcard-product">${tr.product_code} / ${tr.product_name}</div>
@@ -1017,7 +676,6 @@ function buildCard(tr, idx) {
   return div;
 }
 
-/* ===== Tab / Filter ===== */
 let TL_DATA = [];
 let tlTypeFilter = 'all';
 
@@ -1032,11 +690,7 @@ function setMainTab(tab) {
   document.getElementById('tlCnt').style.display          = isAll ? '' : 'none';
   document.getElementById('troubleList').style.display    = isAll ? 'none' : '';
   document.getElementById('timelineList').style.display   = isAll ? '' : 'none';
-  if (isAll) {
-    loadTimeline();
-  } else {
-    renderList();
-  }
+  if (isAll) { loadTimeline(); } else { renderList(); }
   document.getElementById('scrollArea').scrollTo(0, 0);
 }
 function setTypeFilter(f) {
@@ -1044,7 +698,6 @@ function setTypeFilter(f) {
   ['all2','eq','md'].forEach(k => document.getElementById('ftab-'+k).classList.toggle('active', k===(f==='all'?'all2':f)));
   renderList();
 }
-
 function setTlType(f) {
   tlTypeFilter = f;
   ['all','eq','md'].forEach(k => document.getElementById('tl-ftab-'+k).classList.toggle('active', k===f));
@@ -1158,6 +811,7 @@ function renderTimeline() {
   });
   container.appendChild(wrap);
 }
+
 function updateBadges() {
   const draftCnt = TROUBLES.filter(tr => tr.status==='draft').length;
   const draftBadge = document.getElementById('tab-badge-draft');
@@ -1170,7 +824,6 @@ function updateBadges() {
   if(rejBadge){ rejBadge.textContent=rejCnt; rejBadge.style.display=rejCnt?'inline-flex':'none'; }
 }
 
-/* ===== Detail modal ===== */
 function openDetail(tr) {
   const typeLabel   = tr.type === 'equipment' ? t('type_eq') : t('type_md');
   const statusLabel = t('status_'+tr.status);
@@ -1205,7 +858,6 @@ function openDetail(tr) {
   loadTroubleImages(tr.id);
 }
 
-/* ===== Trouble Images ===== */
 async function loadTroubleImages(troubleId) {
   var loadingEl = document.getElementById('detail-img-loading');
   var gridEl = document.getElementById('detail-img-grid');
@@ -1224,7 +876,6 @@ async function loadTroubleImages(troubleId) {
     }).join('');
   } catch(e) {
     if (loadingEl) loadingEl.textContent = '写真の読み込みに失敗';
-    console.warn('trouble_images load error:', e);
   }
 }
 
@@ -1236,7 +887,6 @@ function openFullImage(url) {
   document.body.appendChild(div);
 }
 
-/* ===== Draft actions ===== */
 async function sendDraft(id) {
   const tr = TROUBLES.find(x => String(x.id) === String(id));
   if (!tr || !tr._draftId) { showToast('送信できません', 'error'); return; }
@@ -1289,32 +939,12 @@ async function deleteDraft(id) {
   showToast(t('del_done'), 'success');
 }
 
-/* ===== Nav ===== */
-function goInput(type) {
-  location.href = type === 'equipment' ? 'input_equipment.html' : 'input_mold.html';
-}
-
-function setTab(tab) {
-  if (tab === 'dashboard') { location.href = 'dashboard.html'; return; }
-  document.getElementById('scrollArea').scrollTo(0, 0);
-}
-
-function doLogout() {
-  localStorage.removeItem('traq_session');
-  showToast(t('logout_msg'));
-  setTimeout(() => { location.href = 'index.html'; }, 1000);
-}
-
-/* ===== Force Reload ===== */
+function goInput(type) { location.href = type === 'equipment' ? 'input_equipment.html' : 'input_mold.html'; }
+function doLogout() { localStorage.removeItem('traq_session'); showToast(t('logout_msg')); setTimeout(() => { location.href = 'index.html'; }, 1000); }
 function forceReload(){
-  if('caches' in window){
-    caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){return caches.delete(k);}));
-    }).then(function(){location.reload(true);});
-  } else { location.reload(true); }
+  if('caches' in window){ caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>location.reload(true)); }
+  else { location.reload(true); }
 }
-
-/* ===== Theme ===== */
 function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
@@ -1335,8 +965,6 @@ function initTheme() {
   const sbIcon = document.getElementById('sb-theme-icon');
   if (sbIcon) sbIcon.textContent = icon;
 }
-
-/* ===== Modal ===== */
 function showModal(html, center=false) {
   const el = document.getElementById('modalEl');
   el.innerHTML = `<div class="modal-overlay ${center?'center':''}" onclick="handleOverlayClick(event)"><div class="modal-sheet">${html}</div></div>`;
@@ -1344,14 +972,9 @@ function showModal(html, center=false) {
 }
 function closeModal() { document.getElementById('modalEl').style.display = 'none'; }
 function handleOverlayClick(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
-
-/* ===== Master nav ===== */
 function goMaster() {
   var role = SESSION && SESSION.role;
-  if (role === 'worker' || role === 'op' || !role) {
-    showMasterDenied();
-    return;
-  }
+  if (role === 'worker' || role === 'op' || !role) { showMasterDenied(); return; }
   location.href = 'admin.html';
 }
 function showMasterDenied() {
@@ -1371,8 +994,6 @@ function showMasterDenied() {
   ov.appendChild(box);
   document.body.appendChild(ov);
 }
-
-/* ===== Toast ===== */
 let toastTimer = null;
 function showToast(msg, type='') {
   const el = document.getElementById('toastEl');
@@ -1381,8 +1002,6 @@ function showToast(msg, type='') {
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
-
-/* ===== UTC→JST変換 ===== */
 function utcToJST(isoStr){
   if(!isoStr) return '';
   var s=isoStr.replace('+00:00','Z').replace('+00','Z');
@@ -1394,7 +1013,6 @@ function utcToJST(isoStr){
   return y+'-'+mo+'-'+dy+' '+h+':'+mi;
 }
 
-/* ===== Load from Supabase ===== */
 async function loadTroubles() {
   TROUBLES = [];
   try {
@@ -1453,16 +1071,13 @@ async function loadTroubles() {
   initTheme();
   const savedLang = localStorage.getItem('traq_lang') || 'ja';
   currentLang = savedLang;
-  ['ja','vi','en'].forEach(l => {
-    const b2 = document.getElementById('sb-lang-'+l);
-    if(b2) b2.classList.toggle('active', l===savedLang);
-  });
+  ['ja','vi','en'].forEach(l => { const b2 = document.getElementById('sb-lang-'+l); if(b2) b2.classList.toggle('active', l===savedLang); });
   applyI18n();
   renderUserInfo();
+  await loadTroubles();  // ← 修正: TROUBLESを先に読み込み、バッジ・各タブを初期化
   await loadTimeline();
 })();
 
-/* ===== ページ復帰時にデータ再読み込み ===== */
 window.addEventListener('pageshow', function(e) {
   if (e.persisted) { if (mainTab === 'all') { loadTimeline(); } else { loadTroubles(); } }
 });
