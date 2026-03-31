@@ -362,13 +362,14 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(min-width:1025px){.sidebar{width:240px}}
 /* ===== Drum (approve end-time modal) ===== */
-.drum-wrap{display:flex;align-items:flex-start;gap:4px;justify-content:center}
-.drum{width:64px;height:120px;overflow:hidden;position:relative;border-radius:var(--radius);background:var(--bg3)}
-.drum-highlight{position:absolute;top:40px;left:0;right:0;height:40px;border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);pointer-events:none;z-index:1}
-.drum-inner{display:flex;flex-direction:column;align-items:center}
-.drum-cell{height:40px;width:100%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:400;color:var(--text2);cursor:pointer;user-select:none;transition:font-size .15s}
-.drum-cell.active{font-size:21px;font-weight:700;color:var(--text1)}
-.drum-colon{font-size:20px;font-weight:700;color:var(--text2);align-self:center;margin-top:40px}
+.ad-drum-row{display:flex;align-items:flex-start;gap:4px;justify-content:center}
+.ad-drum-box{position:relative;overflow:hidden;height:150px;width:72px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)}
+.ad-drum-selector{position:absolute;top:50%;left:0;right:0;height:36px;margin-top:-18px;border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);pointer-events:none;z-index:2}
+.ad-drum-fade-top{position:absolute;top:0;left:0;right:0;height:57px;background:linear-gradient(to bottom,var(--bg3),transparent);z-index:1;pointer-events:none}
+.ad-drum-fade-bot{position:absolute;bottom:0;left:0;right:0;height:57px;background:linear-gradient(to top,var(--bg3),transparent);z-index:1;pointer-events:none}
+.ad-drum-list{position:absolute;left:0;right:0;top:57px;cursor:grab;user-select:none}
+.ad-drum-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text1)}
+.drum-colon{font-size:20px;font-weight:700;color:var(--text2);align-self:center;padding-top:0}
 .drum-unit{font-size:10px;color:var(--text2);text-align:center;margin-top:3px}
 .approve-start-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:var(--radius);margin-bottom:10px}
 .approve-start-label{font-size:12px;color:var(--text2)}
@@ -1121,32 +1122,18 @@ function renderTimeline() {
       const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
       const typeClass = r.type === 'equipment' ? 'eq' : 'md';
       const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
-      const isSelected = selectMode && selectedIds.has(r.id);
-      const checkboxHTML = selectMode
-        ? '<span class="tcard-checkbox' + (isSelected ? ' checked' : '') + '"></span>'
-        : '';
       const item = document.createElement('div');
-      item.className = 'tl-item' + (selectMode ? ' selectable' : '') + (isSelected ? ' selected' : '');
-      item.setAttribute('data-id', r.id);
+      item.className = 'tl-item';
       item.innerHTML =
         '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
-        '<div class="tl-card' + (isSelected ? ' selected' : '') + '">' +
-          '<div class="tl-card-head">' +
-            '<span class="tl-machine">' + checkboxHTML + r.line + ' — ' + r.machine + '号機</span>' +
-            '<span class="tl-time">' + timeStr + '</span>' +
-          '</div>' +
+        '<div class="tl-card">' +
+          '<div class="tl-card-head"><span class="tl-machine">' + r.line + ' — ' + r.machine + '号機</span><span class="tl-time">' + timeStr + '</span></div>' +
           '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
           (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
           '<div class="tl-detail">' + r.detail + '</div>' +
           '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
         '</div>';
-      if(selectMode) {
-        item.querySelector('.tl-card').addEventListener('click', function(e) {
-          e.stopPropagation(); toggleSelectCard(r.id);
-        });
-      } else {
-        item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
-      }
+      item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
       wrap.appendChild(item);
     });
   });
@@ -1380,10 +1367,10 @@ function openStopTimeModal(id){
         <span class="approve-start-val">${String(_drumState.startH).padStart(2,'0')}:${String(_drumState.startM*5).padStart(2,'0')}</span>
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${t('stop_end_label')}</div>
-      <div class="drum-wrap" style="margin-bottom:10px">
-        <div><div class="drum" id="adH"><div class="drum-highlight"></div><div class="drum-inner" id="adH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-        <span class="drum-colon">:</span>
-        <div><div class="drum" id="adM"><div class="drum-highlight"></div><div class="drum-inner" id="adM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+      <div class="ad-drum-row" style="margin-bottom:10px">
+        <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+        <span class="drum-colon" style="align-self:center">:</span>
+        <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
       </div>
       <div class="approve-calc-row">
         <span class="approve-calc-label">${t('stop_calc_label')}</span>
@@ -1392,7 +1379,7 @@ function openStopTimeModal(id){
       <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
       <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
     `,true);
-    setTimeout(function(){renderApproveDrums();calcApproveTime();},50);
+    setTimeout(function(){initApproveDrums();},50);
   } else {
     // stop_startがない→開始+終了の4ドラムUI
     var now = new Date();
@@ -1409,18 +1396,18 @@ function openStopTimeModal(id){
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
         <div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_start_label')}</div>
-          <div class="drum-wrap">
-            <div><div class="drum" id="adSH"><div class="drum-highlight"></div><div class="drum-inner" id="adSH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-            <span class="drum-colon">:</span>
-            <div><div class="drum" id="adSM"><div class="drum-highlight"></div><div class="drum-inner" id="adSM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+          <div class="ad-drum-row">
+            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adSH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+            <span class="drum-colon" style="align-self:center">:</span>
+            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adSM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
           </div>
         </div>
         <div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_end_label')}</div>
-          <div class="drum-wrap">
-            <div><div class="drum" id="adH"><div class="drum-highlight"></div><div class="drum-inner" id="adH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-            <span class="drum-colon">:</span>
-            <div><div class="drum" id="adM"><div class="drum-highlight"></div><div class="drum-inner" id="adM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+          <div class="ad-drum-row">
+            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+            <span class="drum-colon" style="align-self:center">:</span>
+            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
           </div>
         </div>
       </div>
@@ -1431,54 +1418,82 @@ function openStopTimeModal(id){
       <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
       <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
     `,true);
-    setTimeout(function(){renderApproveDrums();calcApproveTime();},50);
+    setTimeout(function(){initApproveDrums();},50);
   }
 }
 
-function renderApproveDrums(){
-  // 終了時ドラム（常に描画）
-  renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, function(dir){
-    _drumState.eh = (_drumState.eh + dir + 24) % 24;
-    renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, arguments.callee);
-    calcApproveTime();
-  });
-  renderOneDrum('adM', 12, _drumState.em, function(v){return String(v*5).padStart(2,'0');}, function(dir){
-    _drumState.em = (_drumState.em + dir + 12) % 12;
-    renderOneDrum('adM', 12, _drumState.em, function(v){return String(v*5).padStart(2,'0');}, arguments.callee);
-    calcApproveTime();
-  });
-  // 開始時ドラム（stop_startなし時のみ）
-  if(_drumState.noStart){
-    renderOneDrum('adSH', 24, _drumState.startH, function(v){return String(v).padStart(2,'0');}, function(dir){
-      _drumState.startH = (_drumState.startH + dir + 24) % 24;
-      renderOneDrum('adSH', 24, _drumState.startH, function(v){return String(v).padStart(2,'0');}, arguments.callee);
-      calcApproveTime();
-    });
-    renderOneDrum('adSM', 12, _drumState.startM, function(v){return String(v*5).padStart(2,'0');}, function(dir){
-      _drumState.startM = (_drumState.startM + dir + 12) % 12;
-      renderOneDrum('adSM', 12, _drumState.startM, function(v){return String(v*5).padStart(2,'0');}, arguments.callee);
-      calcApproveTime();
-    });
-  }
-}
+/* ---- 承認ドラム (drag/touchスクロール方式) ---- */
+var AD_ITEM_H = 36, AD_DRUM_TOP = 57;
 
-function renderOneDrum(id, total, current, fmt, onTap){
-  var el = document.getElementById(id + '-inner');
+function _adItems(total, fmt){
+  return Array.from({length:total}, function(_,i){ return fmt(i); });
+}
+function _adSetPos(id, idx, animate){
+  var el = document.getElementById(id);
   if(!el) return;
-  var prev = (current - 1 + total) % total;
-  var next = (current + 1) % total;
-  var items = [prev, current, next];
-  el.innerHTML = '';
-  items.forEach(function(v, i){
-    var d = document.createElement('div');
-    d.className = 'drum-cell' + (i === 1 ? ' active' : '');
-    d.textContent = fmt(v);
-    d.style.touchAction = 'manipulation';
-    (function(dir){
-      d.onclick = function(){ if(dir !== 0) onTap(dir); };
-    })(i === 0 ? -1 : i === 2 ? 1 : 0);
-    el.appendChild(d);
+  el.style.transition = animate ? 'top 0.2s ease' : 'none';
+  el.style.top = (AD_DRUM_TOP - idx * AD_ITEM_H) + 'px';
+}
+function _adSnapDrum(d){
+  var el = document.getElementById(d.id);
+  if(!el) return;
+  var top = parseInt(el.style.top) || AD_DRUM_TOP;
+  var maxIdx = d.items.length - 1;
+  var idx = Math.round((AD_DRUM_TOP - top) / AD_ITEM_H);
+  idx = Math.max(0, Math.min(maxIdx, idx));
+  _drumState[d.key] = idx;
+  _adSetPos(d.id, idx, true);
+  calcApproveTime();
+}
+function _adInitDrag(d){
+  var el = document.getElementById(d.id);
+  if(!el) return;
+  var startY = 0, startTop = 0, dragging = false;
+  function onS(e){
+    dragging = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startTop = parseInt(el.style.top) || AD_DRUM_TOP;
+    el.style.transition = 'none';
+    e.preventDefault();
+  }
+  function onM(e){
+    if(!dragging) return;
+    var y = e.touches ? e.touches[0].clientY : e.clientY;
+    var nt = startTop + (y - startY);
+    var mn = AD_DRUM_TOP - (d.items.length - 1) * AD_ITEM_H;
+    nt = Math.max(mn - 20, Math.min(AD_DRUM_TOP + 20, nt));
+    el.style.top = nt + 'px';
+    e.preventDefault();
+  }
+  function onE(){ if(!dragging) return; dragging = false; _adSnapDrum(d); }
+  el.addEventListener('mousedown', onS);
+  el.addEventListener('touchstart', onS, {passive:false});
+  document.addEventListener('mousemove', onM);
+  document.addEventListener('touchmove', onM, {passive:false});
+  document.addEventListener('mouseup', onE);
+  document.addEventListener('touchend', onE);
+}
+function initApproveDrums(){
+  var defs = [
+    {id:'adH',  key:'eh',     items:_adItems(24, function(i){return String(i).padStart(2,'0');})},
+    {id:'adM',  key:'em',     items:_adItems(12, function(i){return String(i*5).padStart(2,'0');})},
+    {id:'adSH', key:'startH', items:_adItems(24, function(i){return String(i).padStart(2,'0');})},
+    {id:'adSM', key:'startM', items:_adItems(12, function(i){return String(i*5).padStart(2,'0');})}
+  ];
+  defs.forEach(function(d){
+    var el = document.getElementById(d.id);
+    if(!el) return;
+    el.innerHTML = '';
+    d.items.forEach(function(label){
+      var div = document.createElement('div');
+      div.className = 'ad-drum-item';
+      div.textContent = label;
+      el.appendChild(div);
+    });
+    _adSetPos(d.id, _drumState[d.key] < 0 ? 0 : _drumState[d.key], false);
+    _adInitDrag(d);
   });
+  calcApproveTime();
 }
 
 function calcApproveTime(){
@@ -1765,7 +1780,7 @@ function enterSelectMode(){
   selectMode = true;
   selectedIds.clear();
   updateSelectButtons(true);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderList();
   updateDeleteBar();
 }
 
@@ -1773,7 +1788,7 @@ function exitSelectMode(){
   selectMode = false;
   selectedIds.clear();
   updateSelectButtons(false);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderList();
   updateDeleteBar();
 }
 
@@ -1858,7 +1873,6 @@ async function deleteSelected(){
 
     // 5) ローカル状態を更新
     TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
-    TL_DATA = TL_DATA.filter(function(tr){ return !selectedIds.has(tr.id); });
     exitSelectMode();
     showToast(t('delete_done', count), 'success');
   } catch(e){
