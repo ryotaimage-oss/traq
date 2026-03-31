@@ -355,7 +355,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
         <label class="form-label"><span data-i18n="lbl_occurrence">初発 / 再発</span><span class="req">*</span></label>
         <div class="occurrence-group">
           <button class="occurrence-btn" id="btn-first" onclick="selectOccurrence('first')" data-i18n="btn_first">初発</button>
-          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('recurrence')" data-i18n="btn_recurrence">再発</button>
+          <button class="occurrence-btn" id="btn-repeat" onclick="selectOccurrence('repeat')" data-i18n="btn_recurrence">再発</button>
         </div>
       </div>
     </div>
@@ -730,10 +730,10 @@ function onMachineChange(){
 /* ── Occurrence ── */
 var selectedOccurrence=null;
 function selectOccurrence(val){
-  if(val==='repeat')val='recurrence';
+  if(val==='recurrence')val='repeat';
   selectedOccurrence=val;
   document.getElementById('btn-first').classList.toggle('selected',val==='first');
-  document.getElementById('btn-repeat').classList.toggle('selected',val==='recurrence');
+  document.getElementById('btn-repeat').classList.toggle('selected',val==='repeat');
   saveDraft();
 }
 
@@ -891,7 +891,7 @@ async function doSubmit(){
       machine_id:parseInt(document.getElementById('machine-select').value)||null,
       product_id:parseInt(document.getElementById('product-select').value)||null,
       category_id:parseInt(document.getElementById('category-select').value)||null,
-      occurrence:(selectedOccurrence==='repeat'?'recurrence':selectedOccurrence)||'first',
+      occurrence:selectedOccurrence||'first',
       stop_start:(function(){var h=drumState.sh,m=drumState.sm*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})(),
       stop_end:endTimeSet&&drumState.eh>=0?(function(){var h=drumState.eh,m=Math.max(0,drumState.em)*5;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00';})():null,
       stop_minutes:(function(){var v=document.getElementById('stop-minutes').value;return v?parseInt(v):null;})(),
