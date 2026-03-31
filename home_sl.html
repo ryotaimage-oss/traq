@@ -1487,7 +1487,17 @@ async function doApprove(id, stopMinutes, stopEnd){
       tr.stop_end = stopEnd;
     }
     tr._actioned = true;
-    if(mainTab === 'all') renderTimeline(); else { setMainTab('approved'); }
+    // TROUBLESの対応レコードも同期（TL_DATA経由で取得した場合に必要）
+    const trInList = TROUBLES.find(x => x.id === id);
+    if(trInList){
+      trInList.status = 'approved';
+      trInList.approved_by = SESSION.name;
+      trInList.approved_at = tr.approved_at;
+      if(stopMinutes !== undefined && stopMinutes !== null) trInList.stop_minutes = stopMinutes;
+      if(stopEnd) trInList.stop_end = stopEnd;
+      trInList._actioned = true;
+    }
+    setMainTab('approved');
     showToast(t('approve_done'), 'success');
   } catch(e) {
     if (card) card.classList.remove('actioned');
@@ -1529,7 +1539,16 @@ async function doReject(id){
     tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
-    if(mainTab === 'all') renderTimeline(); else { setMainTab('rejected'); }
+    // TROUBLESの対応レコードも同期（TL_DATA経由で取得した場合に必要）
+    const trInList = TROUBLES.find(x => x.id === id);
+    if(trInList){
+      trInList.status = 'rejected';
+      trInList.reject_reason = reason || null;
+      trInList.approved_by = SESSION.name;
+      trInList.approved_at = tr.approved_at;
+      trInList._actioned = true;
+    }
+    setMainTab('rejected');
     showToast(t('reject_done'), 'error');
   } catch(e) {
     showToast('エラー: ' + e.message, 'error');
