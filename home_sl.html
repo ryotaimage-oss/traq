@@ -1350,9 +1350,10 @@ function openStopTimeModal(id){
   if(tr.stop_start){
     var sp = tr.stop_start.split(':');
     _drumState.startH = parseInt(sp[0])||0;
-    _drumState.startM = parseInt(sp[1])||0;
+    _drumState.startM = Math.round((parseInt(sp[1])||0) / 5); // インデックス化
+    _drumState.noStart = false;
     // 初期値: 開始+30分
-    var initMin = (_drumState.startH*60 + _drumState.startM) + 30;
+    var initMin = (_drumState.startH*60 + _drumState.startM*5) + 30;
     _drumState.eh = Math.floor(initMin/60) % 24;
     _drumState.em = Math.floor((initMin%60)/5);
 
@@ -1362,7 +1363,7 @@ function openStopTimeModal(id){
       <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
       <div class="approve-start-row">
         <span class="approve-start-label">${t('stop_start_label')}</span>
-        <span class="approve-start-val">${String(_drumState.startH).padStart(2,'0')}:${String(_drumState.startM).padStart(2,'0')}</span>
+        <span class="approve-start-val">${String(_drumState.startH).padStart(2,'0')}:${String(_drumState.startM*5).padStart(2,'0')}</span>
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${t('stop_end_label')}</div>
       <div class="drum-wrap" style="margin-bottom:10px">
@@ -1379,24 +1380,49 @@ function openStopTimeModal(id){
     `,true);
     setTimeout(function(){renderApproveDrums();calcApproveTime();},50);
   } else {
-    // stop_startがない→直接分入力
+    // stop_startがない→開始+終了の4ドラムUI
+    var now = new Date();
+    _drumState.startH = now.getHours();
+    _drumState.startM = Math.floor(now.getMinutes() / 5);
+    var initMin = (_drumState.startH * 60 + _drumState.startM * 5) + 30;
+    _drumState.eh = Math.floor(initMin / 60) % 24;
+    _drumState.em = Math.floor((initMin % 60) / 5);
+    _drumState.noStart = true;
     showModal(`
       <div class="modal-handle"></div>
       <div class="modal-title">${t('stop_input_title')}</div>
       <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
-      <p class="reject-hint">${t('stop_input_hint')}</p>
-      <div style="display:flex;align-items:center;gap:8px;margin:12px 0 16px">
-        <input type="number" id="stopTimeInput" min="0" style="flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:16px;font-weight:600;color:var(--text1);outline:none;text-align:center" placeholder="0" inputmode="numeric">
-        <span style="font-size:14px;color:var(--text2);font-weight:500">${t('stop_unit')}</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_start_label')}</div>
+          <div class="drum-wrap">
+            <div><div class="drum" id="adSH"><div class="drum-highlight"></div><div class="drum-inner" id="adSH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+            <span class="drum-colon">:</span>
+            <div><div class="drum" id="adSM"><div class="drum-highlight"></div><div class="drum-inner" id="adSM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_end_label')}</div>
+          <div class="drum-wrap">
+            <div><div class="drum" id="adH"><div class="drum-highlight"></div><div class="drum-inner" id="adH-inner"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+            <span class="drum-colon">:</span>
+            <div><div class="drum" id="adM"><div class="drum-highlight"></div><div class="drum-inner" id="adM-inner"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+          </div>
+        </div>
       </div>
-      <button onclick="submitMinutesApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+      <div class="approve-calc-row">
+        <span class="approve-calc-label">${t('stop_calc_label')}</span>
+        <span class="approve-calc-val" id="approveCalc">--</span>
+      </div>
+      <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
       <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
     `,true);
-    setTimeout(function(){var el=document.getElementById('stopTimeInput');if(el){el.focus();el.select();}},100);
+    setTimeout(function(){renderApproveDrums();calcApproveTime();},50);
   }
 }
 
 function renderApproveDrums(){
+  // 終了時ドラム（常に描画）
   renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, function(dir){
     _drumState.eh = (_drumState.eh + dir + 24) % 24;
     renderOneDrum('adH', 24, _drumState.eh, function(v){return String(v).padStart(2,'0');}, arguments.callee);
@@ -1407,6 +1433,19 @@ function renderApproveDrums(){
     renderOneDrum('adM', 12, _drumState.em, function(v){return String(v*5).padStart(2,'0');}, arguments.callee);
     calcApproveTime();
   });
+  // 開始時ドラム（stop_startなし時のみ）
+  if(_drumState.noStart){
+    renderOneDrum('adSH', 24, _drumState.startH, function(v){return String(v).padStart(2,'0');}, function(dir){
+      _drumState.startH = (_drumState.startH + dir + 24) % 24;
+      renderOneDrum('adSH', 24, _drumState.startH, function(v){return String(v).padStart(2,'0');}, arguments.callee);
+      calcApproveTime();
+    });
+    renderOneDrum('adSM', 12, _drumState.startM, function(v){return String(v*5).padStart(2,'0');}, function(dir){
+      _drumState.startM = (_drumState.startM + dir + 12) % 12;
+      renderOneDrum('adSM', 12, _drumState.startM, function(v){return String(v*5).padStart(2,'0');}, arguments.callee);
+      calcApproveTime();
+    });
+  }
 }
 
 function renderOneDrum(id, total, current, fmt, onTap){
@@ -1429,7 +1468,7 @@ function renderOneDrum(id, total, current, fmt, onTap){
 }
 
 function calcApproveTime(){
-  var sm = _drumState.startH * 60 + _drumState.startM;
+  var sm = _drumState.startH * 60 + _drumState.startM * 5;
   var em = _drumState.eh * 60 + _drumState.em * 5;
   if(em <= sm) em += 24 * 60;
   var diff = em - sm;
@@ -1438,13 +1477,14 @@ function calcApproveTime(){
 }
 
 function submitDrumApprove(){
-  var sm = _drumState.startH * 60 + _drumState.startM;
+  var sm = _drumState.startH * 60 + _drumState.startM * 5;
   var em = _drumState.eh * 60 + _drumState.em * 5;
   if(em <= sm) em += 24 * 60;
   var stopMinutes = em - sm;
   var endStr = String(_drumState.eh).padStart(2,'0') + ':' + String(_drumState.em * 5).padStart(2,'0') + ':00';
+  var startStr = _drumState.noStart ? String(_drumState.startH).padStart(2,'0') + ':' + String(_drumState.startM * 5).padStart(2,'0') + ':00' : null;
   closeModal();
-  doApprove(_drumState.approveId, stopMinutes, endStr);
+  doApprove(_drumState.approveId, stopMinutes, endStr, startStr);
 }
 
 function submitMinutesApprove(){
@@ -1459,7 +1499,7 @@ function submitMinutesApprove(){
   doApprove(_drumState.approveId, val, null);
 }
 
-async function doApprove(id, stopMinutes, stopEnd){
+async function doApprove(id, stopMinutes, stopEnd, stopStart){
   const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if (!tr) return;
   const card = document.querySelector(`[data-id="${id}"]`);
@@ -1475,6 +1515,9 @@ async function doApprove(id, stopMinutes, stopEnd){
     }
     if(stopEnd){
       patch.stop_end = stopEnd;
+    }
+    if(stopStart){
+      patch.stop_start = stopStart;
     }
     await sbFetch('troubles?id=eq.' + id, 'PATCH', patch);
     tr.status = 'approved';
