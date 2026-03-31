@@ -1323,7 +1323,7 @@ async function deleteDraft(id){
 }
 
 function editRejected(id){
-  const tr=TROUBLES.find(x=>String(x.id)===String(id));
+  const tr=TROUBLES.find(x=>String(x.id)===String(id)) || TL_DATA.find(x=>String(x.id)===String(id));
   if(!tr) return;
   location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id;
 }
@@ -1487,7 +1487,7 @@ async function doApprove(id, stopMinutes, stopEnd){
       tr.stop_end = stopEnd;
     }
     tr._actioned = true;
-    renderList();
+    if(mainTab === 'all') renderTimeline(); else { setMainTab('approved'); }
     showToast(t('approve_done'), 'success');
   } catch(e) {
     if (card) card.classList.remove('actioned');
@@ -1529,7 +1529,7 @@ async function doReject(id){
     tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
-    renderList();
+    if(mainTab === 'all') renderTimeline(); else { setMainTab('rejected'); }
     showToast(t('reject_done'), 'error');
   } catch(e) {
     showToast('エラー: ' + e.message, 'error');
