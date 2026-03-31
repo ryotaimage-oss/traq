@@ -1133,9 +1133,10 @@ function renderTimeline() {
       item.innerHTML =
         '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
         '<div class="tl-card">' +
-          '<div class="tl-card-head" style="' + (selectMode ? 'display:flex;align-items:center' : '') + '">' +
-            cbHTML +
-            '<span class="tl-machine">' + r.line + ' — ' + r.machine + '号機</span><span class="tl-time">' + timeStr + '</span></div>' +
+          '<div class="tl-card-head">' +
+            '<span class="tl-machine" style="display:flex;align-items:center;gap:6px">' + cbHTML + r.line + ' — ' + r.machine + '号機</span>' +
+            '<span class="tl-time">' + timeStr + '</span>' +
+          '</div>' +
           '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
           (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
           '<div class="tl-detail">' + r.detail + '</div>' +
