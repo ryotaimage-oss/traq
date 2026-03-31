@@ -1121,33 +1121,18 @@ function renderTimeline() {
       const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
       const typeClass = r.type === 'equipment' ? 'eq' : 'md';
       const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
-      const isChecked = selectMode && selectedIds.has(r.id);
-      const cbHTML = selectMode
-        ? '<div class="tcard-checkbox' + (isChecked ? ' checked' : '') + '" style="flex-shrink:0;margin-right:6px"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
-        : '';
       const item = document.createElement('div');
       item.className = 'tl-item';
-      item.setAttribute('data-id', r.id);
-      if(selectMode) item.classList.add('selectable');
-      if(isChecked) item.classList.add('selected');
       item.innerHTML =
         '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
         '<div class="tl-card">' +
-          '<div class="tl-card-head">' +
-            '<span class="tl-machine" style="display:flex;align-items:center;gap:6px">' + cbHTML + r.line + ' — ' + r.machine + '号機</span>' +
-            '<span class="tl-time">' + timeStr + '</span>' +
-          '</div>' +
+          '<div class="tl-card-head"><span class="tl-machine">' + r.line + ' — ' + r.machine + '号機</span><span class="tl-time">' + timeStr + '</span></div>' +
           '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
           (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
           '<div class="tl-detail">' + r.detail + '</div>' +
           '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
         '</div>';
-      const tlCard = item.querySelector('.tl-card');
-      if(selectMode){
-        tlCard.addEventListener('click', (e) => { e.stopPropagation(); toggleSelectCard(r.id); });
-      } else {
-        tlCard.addEventListener('click', () => openDetail(r.id));
-      }
+      item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
       wrap.appendChild(item);
     });
   });
@@ -1344,7 +1329,7 @@ function editRejected(id){
 }
 
 async function quickApprove(id){
-  const tr = TROUBLES.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if (!tr) return;
   // 終了時刻が未入力なら入力モーダルを表示
   if(!tr.stop_end){
@@ -1357,7 +1342,7 @@ async function quickApprove(id){
 var _drumState = {eh:0, em:0, startH:0, startM:0, approveId:null};
 
 function openStopTimeModal(id){
-  const tr = TROUBLES.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if(!tr) return;
   _drumState.approveId = id;
 
@@ -1475,7 +1460,7 @@ function submitMinutesApprove(){
 }
 
 async function doApprove(id, stopMinutes, stopEnd){
-  const tr = TROUBLES.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if (!tr) return;
   const card = document.querySelector(`[data-id="${id}"]`);
   if (card) card.classList.add('actioned');
@@ -1512,7 +1497,7 @@ async function doApprove(id, stopMinutes, stopEnd){
 
 /* ===== Reject modal ===== */
 function openRejectModal(id){
-  const tr=TROUBLES.find(x=>x.id===id);
+  const tr=TROUBLES.find(x=>x.id===id) || TL_DATA.find(x=>x.id===id);
   if(!tr) return;
   showModal(`
     <div class="modal-handle"></div>
@@ -1528,7 +1513,7 @@ function openRejectModal(id){
 }
 
 async function doReject(id){
-  const tr = TROUBLES.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if (!tr) return;
   const reason = document.getElementById('rejectReasonInput')?.value.trim() || '';
   closeModal();
@@ -1704,7 +1689,7 @@ function enterSelectMode(){
   selectMode = true;
   selectedIds.clear();
   updateSelectButtons(true);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderList();
   updateDeleteBar();
 }
 
@@ -1712,7 +1697,7 @@ function exitSelectMode(){
   selectMode = false;
   selectedIds.clear();
   updateSelectButtons(false);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderList();
   updateDeleteBar();
 }
 
@@ -1797,7 +1782,6 @@ async function deleteSelected(){
 
     // 5) ローカル状態を更新
     TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
-    TL_DATA  = TL_DATA.filter(function(tr){ return !selectedIds.has(tr.id); });
     exitSelectMode();
     showToast(t('delete_done', count), 'success');
   } catch(e){
