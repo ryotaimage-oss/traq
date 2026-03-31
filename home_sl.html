@@ -1047,6 +1047,8 @@ async function loadTimeline() {
       category: r.categories ? r.categories.name : '',
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
+      stop_start: r.stop_start || null,
+      stop_end: r.stop_end || null,
       reject_reason: r.reject_reason || null,
       detail: r.detail || '',
       submitted_by: r.traq_users ? r.traq_users.name : '',
