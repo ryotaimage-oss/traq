@@ -16,11 +16,9 @@ const STATIC_ASSETS = [
 ];
 
 // インストール：静的リソースをキャッシュ
-// isUpdate フラグ：古いSWが存在していた場合のみ true
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.keys().then(keys => {
-      // traq-push-nav以外の既存キャッシュがあれば「更新」
       self._isUpdate = keys.some(k => k !== 'traq-push-nav' && k !== CACHE_NAME);
     }).then(() =>
       caches.open(CACHE_NAME).then(cache => {
@@ -34,7 +32,6 @@ self.addEventListener('install', event => {
 });
 
 // アクティベート：古いキャッシュを削除
-// 実際に更新があった場合のみクライアントに通知
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -43,7 +40,6 @@ self.addEventListener('activate', event => {
       )
     ).then(() => self.clients.claim())
      .then(() => {
-       // 古いSWからの更新時のみバナーを表示
        if (self._isUpdate) {
          return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
            clients.forEach(client => {
@@ -59,12 +55,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Supabase API はキャッシュしない
   if (url.hostname.includes('supabase.co')) {
     return;
   }
 
-  // Google Fonts はキャッシュ優先
   if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -79,7 +73,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTMLファイルはネットワーク優先（オフライン時はキャッシュ）
   if (event.request.destination === 'document' || url.pathname.endsWith('.html')) {
     event.respondWith(
       fetch(event.request)
@@ -93,7 +86,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // その他（JS・CSS・画像等）はキャッシュ優先
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -112,7 +104,8 @@ self.addEventListener('fetch', event => {
 
 // Push通知を受信
 self.addEventListener('push', event => {
-  var data = { title: 'Traq', body: '新しい通知があります', url: '/home_sl.html' };
+  // フォールバックURLを ./home_sl.html（相対パス）に変更
+  var data = { title: 'Traq', body: '新しい通知があります', url: './home_sl.html' };
   try {
     if (event.data) data = event.data.json();
   } catch (e) {}
@@ -123,7 +116,7 @@ self.addEventListener('push', event => {
     badge: './icons/icon-192.png',
     tag: 'traq-trouble-' + Date.now(),
     renotify: true,
-    data: { url: data.url || '/home_sl.html' },
+    data: { url: data.url || './home_sl.html' },
     vibrate: [200, 100, 200],
     actions: [{ action: 'open', title: '確認する' }]
   };
@@ -137,17 +130,17 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  var targetUrl = (event.notification.data && event.notification.data.url) || '/home_sl.html';
-  var fullUrl = new URL(targetUrl, self.location.origin).href;
+  var targetUrl = (event.notification.data && event.notification.data.url) || './home_sl.html';
+
+  // ★修正: self.location.href（= .../traq/sw.js）を基準にすることで /traq/ が正しく付く
+  var fullUrl = new URL(targetUrl, self.location.href).href;
 
   event.waitUntil(
-    // 1) Cache APIにナビ先URLを保存（ページ側 update_banner.js で読み取る）
     caches.open('traq-push-nav').then(function(cache) {
       return cache.put('/__push_nav__', new Response(fullUrl));
     }).then(function() {
       return clients.matchAll({ type: 'window', includeUncontrolled: true });
     }).then(function(windowClients) {
-      // 2) 既存タブがあれば postMessage + focus
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url.includes('ryotaimage-oss.github.io/traq')) {
@@ -155,7 +148,6 @@ self.addEventListener('notificationclick', event => {
           return client.focus();
         }
       }
-      // 3) なければ新規タブ（iOS PWAでは効かない場合があるがフォールバック）
       return clients.openWindow(fullUrl);
     })
   );
