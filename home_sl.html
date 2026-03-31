@@ -1124,18 +1124,32 @@ function renderTimeline() {
       const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
       const typeClass = r.type === 'equipment' ? 'eq' : 'md';
       const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
+      const isSelected = selectMode && selectedIds.has(r.id);
+      const checkboxHTML = selectMode
+        ? '<span class="tcard-checkbox' + (isSelected ? ' checked' : '') + '"></span>'
+        : '';
       const item = document.createElement('div');
-      item.className = 'tl-item';
+      item.className = 'tl-item' + (selectMode ? ' selectable' : '') + (isSelected ? ' selected' : '');
+      item.setAttribute('data-id', r.id);
       item.innerHTML =
         '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
-        '<div class="tl-card">' +
-          '<div class="tl-card-head"><span class="tl-machine">' + r.line + ' — ' + r.machine + '号機</span><span class="tl-time">' + timeStr + '</span></div>' +
+        '<div class="tl-card' + (isSelected ? ' selected' : '') + '">' +
+          '<div class="tl-card-head">' +
+            '<span class="tl-machine">' + checkboxHTML + r.line + ' — ' + r.machine + '号機</span>' +
+            '<span class="tl-time">' + timeStr + '</span>' +
+          '</div>' +
           '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
           (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
           '<div class="tl-detail">' + r.detail + '</div>' +
           '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
         '</div>';
-      item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
+      if(selectMode) {
+        item.querySelector('.tl-card').addEventListener('click', function(e) {
+          e.stopPropagation(); toggleSelectCard(r.id);
+        });
+      } else {
+        item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
+      }
       wrap.appendChild(item);
     });
   });
@@ -1804,7 +1818,7 @@ function enterSelectMode(){
   selectMode = true;
   selectedIds.clear();
   updateSelectButtons(true);
-  renderList();
+  if(mainTab === 'all') renderTimeline(); else renderList();
   updateDeleteBar();
 }
 
@@ -1812,7 +1826,7 @@ function exitSelectMode(){
   selectMode = false;
   selectedIds.clear();
   updateSelectButtons(false);
-  renderList();
+  if(mainTab === 'all') renderTimeline(); else renderList();
   updateDeleteBar();
 }
 
@@ -1897,6 +1911,7 @@ async function deleteSelected(){
 
     // 5) ローカル状態を更新
     TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
+    TL_DATA = TL_DATA.filter(function(tr){ return !selectedIds.has(tr.id); });
     exitSelectMode();
     showToast(t('delete_done', count), 'success');
   } catch(e){
