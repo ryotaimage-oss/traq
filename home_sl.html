@@ -1346,80 +1346,59 @@ function openStopTimeModal(id){
   const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if(!tr) return;
   _drumState.approveId = id;
+  _drumState.noStart = false;
 
-  // stop_startがある場合はドラムUI、ない場合は直接入力フォールバック
+  // 開始時刻: stop_startがあればそれを使用、なければ投稿時刻(submitted_at)を代替表示
+  var startDispStr = '--:--';
   if(tr.stop_start){
     var sp = tr.stop_start.split(':');
     _drumState.startH = parseInt(sp[0])||0;
-    _drumState.startM = Math.round((parseInt(sp[1])||0) / 5); // インデックス化
-    _drumState.noStart = false;
-    // 初期値: 開始+30分
-    var initMin = (_drumState.startH*60 + _drumState.startM*5) + 30;
-    _drumState.eh = Math.floor(initMin/60) % 24;
-    _drumState.em = Math.floor((initMin%60)/5);
-
-    showModal(`
-      <div class="modal-handle"></div>
-      <div class="modal-title">${t('stop_input_title')}</div>
-      <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
-      <div class="approve-start-row">
-        <span class="approve-start-label">${t('stop_start_label')}</span>
-        <span class="approve-start-val">${String(_drumState.startH).padStart(2,'0')}:${String(_drumState.startM*5).padStart(2,'0')}</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${t('stop_end_label')}</div>
-      <div class="ad-drum-row" style="margin-bottom:10px">
-        <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-        <span class="drum-colon" style="align-self:center">:</span>
-        <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
-      </div>
-      <div class="approve-calc-row">
-        <span class="approve-calc-label">${t('stop_calc_label')}</span>
-        <span class="approve-calc-val" id="approveCalc">--</span>
-      </div>
-      <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
-      <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
-    `,true);
-    setTimeout(function(){initApproveDrums();},50);
-  } else {
-    // stop_startがない→開始+終了の4ドラムUI
-    var now = new Date();
-    _drumState.startH = now.getHours();
-    _drumState.startM = Math.floor(now.getMinutes() / 5);
-    var initMin = (_drumState.startH * 60 + _drumState.startM * 5) + 30;
-    _drumState.eh = Math.floor(initMin / 60) % 24;
-    _drumState.em = Math.floor((initMin % 60) / 5);
-    _drumState.noStart = true;
-    showModal(`
-      <div class="modal-handle"></div>
-      <div class="modal-title">${t('stop_input_title')}</div>
-      <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_start_label')}</div>
-          <div class="ad-drum-row">
-            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adSH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-            <span class="drum-colon" style="align-self:center">:</span>
-            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adSM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:6px;text-align:center">${t('stop_end_label')}</div>
-          <div class="ad-drum-row">
-            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
-            <span class="drum-colon" style="align-self:center">:</span>
-            <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="approve-calc-row">
-        <span class="approve-calc-label">${t('stop_calc_label')}</span>
-        <span class="approve-calc-val" id="approveCalc">--</span>
-      </div>
-      <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
-      <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
-    `,true);
-    setTimeout(function(){initApproveDrums();},50);
+    _drumState.startM = Math.round((parseInt(sp[1])||0) / 5);
+    startDispStr = String(_drumState.startH).padStart(2,'0') + ':' + String(_drumState.startM*5).padStart(2,'0');
+  } else if(tr.submitted_at){
+    // submitted_atから時刻部分だけ表示（参考値、計算には使わない）
+    var timePart = tr.submitted_at.slice(11,16);
+    startDispStr = timePart || '--:--';
+    _drumState.startH = -1; // 不明フラグ
+    _drumState.startM = -1;
   }
+
+  // 終了初期値: stop_startがあれば開始+30分、なければ現在時刻+30分（終了ドラムの初期位置のみ）
+  var baseH, baseM;
+  if(tr.stop_start && _drumState.startH >= 0){
+    baseH = _drumState.startH;
+    baseM = _drumState.startM * 5;
+  } else {
+    var now = new Date();
+    baseH = now.getHours();
+    baseM = Math.floor(now.getMinutes() / 5) * 5;
+  }
+  var initMin = baseH * 60 + baseM + 30;
+  _drumState.eh = Math.floor(initMin / 60) % 24;
+  _drumState.em = Math.floor((initMin % 60) / 5);
+
+  showModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${t('stop_input_title')}</div>
+    <div class="modal-sub">${tr.line} – ${tr.machine}号機 / ${tr.product_code}</div>
+    <div class="approve-start-row">
+      <span class="approve-start-label">${t('stop_start_label')}</span>
+      <span class="approve-start-val">${startDispStr}</span>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${t('stop_end_label')}</div>
+    <div class="ad-drum-row" style="margin-bottom:10px">
+      <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adH"></div></div><div class="drum-unit">${t('hour_unit')}</div></div>
+      <span class="drum-colon" style="align-self:center">:</span>
+      <div><div class="ad-drum-box"><div class="ad-drum-selector"></div><div class="ad-drum-fade-top"></div><div class="ad-drum-fade-bot"></div><div class="ad-drum-list" id="adM"></div></div><div class="drum-unit">${t('min_unit')}</div></div>
+    </div>
+    <div class="approve-calc-row">
+      <span class="approve-calc-label">${t('stop_calc_label')}</span>
+      <span class="approve-calc-val" id="approveCalc">--</span>
+    </div>
+    <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+    <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
+  `,true);
+  setTimeout(function(){initApproveDrums();},50);
 }
 
 /* ---- 承認ドラム (drag/touchスクロール方式) ---- */
@@ -1475,10 +1454,8 @@ function _adInitDrag(d){
 }
 function initApproveDrums(){
   var defs = [
-    {id:'adH',  key:'eh',     items:_adItems(24, function(i){return String(i).padStart(2,'0');})},
-    {id:'adM',  key:'em',     items:_adItems(12, function(i){return String(i*5).padStart(2,'0');})},
-    {id:'adSH', key:'startH', items:_adItems(24, function(i){return String(i).padStart(2,'0');})},
-    {id:'adSM', key:'startM', items:_adItems(12, function(i){return String(i*5).padStart(2,'0');})}
+    {id:'adH', key:'eh', items:_adItems(24, function(i){return String(i).padStart(2,'0');})},
+    {id:'adM', key:'em', items:_adItems(12, function(i){return String(i*5).padStart(2,'0');})}
   ];
   defs.forEach(function(d){
     var el = document.getElementById(d.id);
@@ -1497,23 +1474,32 @@ function initApproveDrums(){
 }
 
 function calcApproveTime(){
+  var el = document.getElementById('approveCalc');
+  if(!el) return;
+  // 開始時刻不明（stop_startなし）の場合は計算不可
+  if(_drumState.startH < 0){
+    el.textContent = '--';
+    return;
+  }
   var sm = _drumState.startH * 60 + _drumState.startM * 5;
   var em = _drumState.eh * 60 + _drumState.em * 5;
   if(em <= sm) em += 24 * 60;
   var diff = em - sm;
-  var el = document.getElementById('approveCalc');
-  if(el) el.textContent = diff + t('stop_unit');
+  el.textContent = diff + t('stop_unit');
 }
 
 function submitDrumApprove(){
-  var sm = _drumState.startH * 60 + _drumState.startM * 5;
-  var em = _drumState.eh * 60 + _drumState.em * 5;
-  if(em <= sm) em += 24 * 60;
-  var stopMinutes = em - sm;
   var endStr = String(_drumState.eh).padStart(2,'0') + ':' + String(_drumState.em * 5).padStart(2,'0') + ':00';
-  var startStr = _drumState.noStart ? String(_drumState.startH).padStart(2,'0') + ':' + String(_drumState.startM * 5).padStart(2,'0') + ':00' : null;
+  var stopMinutes = null;
+  // 開始時刻が判明している場合のみ停止時間を計算
+  if(_drumState.startH >= 0){
+    var sm = _drumState.startH * 60 + _drumState.startM * 5;
+    var em = _drumState.eh * 60 + _drumState.em * 5;
+    if(em <= sm) em += 24 * 60;
+    stopMinutes = em - sm;
+  }
   closeModal();
-  doApprove(_drumState.approveId, stopMinutes, endStr, startStr);
+  doApprove(_drumState.approveId, stopMinutes, endStr, null);
 }
 
 function submitMinutesApprove(){
