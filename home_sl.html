@@ -1209,7 +1209,22 @@ function buildCard(tr,idx){
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
   const statusLabel=t('status_'+tr.status);
-  const stopLabel=tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none');
+  const stopMinutesStr = tr.stop_minutes ? t('stop_min', tr.stop_minutes) : null;
+  const stopStartStr = tr.stop_start ? tr.stop_start.slice(0,5) : null;
+  const stopEndStr   = tr.stop_end   ? tr.stop_end.slice(0,5)   : null;
+  var stopHTML;
+  if(stopStartStr || stopEndStr){
+    var minPart = stopMinutesStr
+      ? '<span style="font-size:13px;font-weight:500;color:var(--text1)">' + stopMinutesStr + '</span><span style="font-size:11px;color:var(--text2);margin:0 4px">|</span>'
+      : '<span style="font-size:13px;color:var(--text2)">未確定</span><span style="font-size:11px;color:var(--text2);margin:0 4px">|</span>';
+    var sPill = '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">' + (stopStartStr || '--:--') + '</span>';
+    var ePill = stopEndStr
+      ? '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">' + stopEndStr + '</span>'
+      : '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);color:var(--text2)">--:--</span>';
+    stopHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + minPart + sPill + '<span style="font-size:12px;color:var(--text2)">→</span>' + ePill + '</div>';
+  } else {
+    stopHTML = '<span>' + (stopMinutesStr || t('stop_none')) + '</span>';
+  }
   const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
 
   let actionsHTML='';
@@ -1625,7 +1640,22 @@ function openDetail(id){
   if(!tr) return;
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
-  const stopLabel=tr.stop_minutes?t('stop_min',tr.stop_minutes):t('stop_none');
+  const stopMinutesStr = tr.stop_minutes ? t('stop_min', tr.stop_minutes) : null;
+  const stopStartStr = tr.stop_start ? tr.stop_start.slice(0,5) : null;
+  const stopEndStr   = tr.stop_end   ? tr.stop_end.slice(0,5)   : null;
+  var stopHTML;
+  if(stopStartStr || stopEndStr){
+    var minPart = stopMinutesStr
+      ? '<span style="font-size:13px;font-weight:500;color:var(--text1)">' + stopMinutesStr + '</span><span style="font-size:11px;color:var(--text2);margin:0 4px">|</span>'
+      : '<span style="font-size:13px;color:var(--text2)">未確定</span><span style="font-size:11px;color:var(--text2);margin:0 4px">|</span>';
+    var sPill = '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">' + (stopStartStr || '--:--') + '</span>';
+    var ePill = stopEndStr
+      ? '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">' + stopEndStr + '</span>'
+      : '<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);color:var(--text2)">--:--</span>';
+    stopHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + minPart + sPill + '<span style="font-size:12px;color:var(--text2)">→</span>' + ePill + '</div>';
+  } else {
+    stopHTML = '<span>' + (stopMinutesStr || t('stop_none')) + '</span>';
+  }
   const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
   const statusLabel=t('status_'+tr.status);
 
@@ -1664,7 +1694,7 @@ function openDetail(id){
     <div class="detail-row"><span class="detail-key">${t('key_line')}</span><span class="detail-val">${tr.line}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_machine')}</span><span class="detail-val">${tr.machine}号機</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_product')}</span><span class="detail-val">${tr.product_code} / ${tr.product_name}</span></div>
-    <div class="detail-row"><span class="detail-key">${t('key_stop')}</span><span class="detail-val">${stopLabel}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_stop')}</span><span class="detail-val">${stopHTML}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_category')}</span><span class="detail-val">${tr.category}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_detail')}</span><span class="detail-val">${tr.detail}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_occurrence')}</span><span class="detail-val">${occLabel}</span></div>
