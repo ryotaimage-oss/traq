@@ -1356,11 +1356,16 @@ function openStopTimeModal(id){
     _drumState.startM = Math.round((parseInt(sp[1])||0) / 5);
     startDispStr = String(_drumState.startH).padStart(2,'0') + ':' + String(_drumState.startM*5).padStart(2,'0');
   } else if(tr.submitted_at){
-    // submitted_atから時刻部分だけ表示（参考値、計算には使わない）
-    var timePart = tr.submitted_at.slice(11,16);
+    // submitted_atの時刻を開始時刻の代替として使用（表示・計算両方に使う）
+    var timePart = tr.submitted_at.slice(11,16); // "HH:MM"
     startDispStr = timePart || '--:--';
-    _drumState.startH = -1; // 不明フラグ
-    _drumState.startM = -1;
+    if(timePart && timePart.length === 5){
+      _drumState.startH = parseInt(timePart.slice(0,2))||0;
+      _drumState.startM = Math.round((parseInt(timePart.slice(3,5))||0) / 5);
+    } else {
+      _drumState.startH = -1;
+      _drumState.startM = -1;
+    }
   }
 
   // 終了初期値: stop_startがあれば開始+30分、なければ現在時刻+30分（終了ドラムの初期位置のみ）
