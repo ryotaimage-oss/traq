@@ -1470,7 +1470,8 @@ function initApproveDrums(){
     _adSetPos(d.id, _drumState[d.key] < 0 ? 0 : _drumState[d.key], false);
     _adInitDrag(d);
   });
-  calcApproveTime();
+  // DOMが確実に描画された後に停止時間を計算・表示
+  setTimeout(calcApproveTime, 0);
 }
 
 function calcApproveTime(){
