@@ -1274,9 +1274,10 @@ function buildCard(tr,idx){
     ? `<div class="tcard-checkbox ${isChecked?'checked':''}"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
     : '';
 
+  const _cardId = String(tr.id);
   const onClickTop = selectMode
-    ? `onclick="event.stopPropagation();toggleSelectCard(${tr.id})"`
-    : `onclick="openDetail(${tr.id})"`;
+    ? `onclick="event.stopPropagation();toggleSelectCard('${_cardId}')"`
+    : `onclick="openDetail('${_cardId}')"`;  // draft_XXX対応で文字列化
 
   div.innerHTML=`
     <div class="tcard-top" ${onClickTop}>
@@ -1298,7 +1299,7 @@ function buildCard(tr,idx){
       </div>
       <div class="tcard-footer">
         <span class="tcard-submitter">👤 ${tr.submitted_by}　${tr.submitted_at||''}</span>
-        <span class="tcard-stop">⏱ ${stopLabel} ${occLabel}</span>
+        <span class="tcard-stop">⏱ ${stopMinutesStr || t('stop_none')} ${occLabel}</span>
       </div>
     </div>
     ${actionsHTML}
