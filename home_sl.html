@@ -1303,6 +1303,12 @@ function buildCard(tr,idx){
     </div>
     ${actionsHTML}
   `;
+  // カード全体のクリック（selectModeは動的判定）
+  div.addEventListener('click', function(e){
+    if(tr.status === 'draft'){ editDraft(String(tr.id)); return; }
+    if(selectMode){ e.stopPropagation(); toggleSelectCard(tr.id); return; }
+    openDetail(tr.id);
+  });
   return div;
 }
 
