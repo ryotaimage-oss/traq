@@ -812,8 +812,12 @@ function saveDraft(){if(draftTimer)clearTimeout(draftTimer);draftTimer=setTimeou
 async function _saveDraft(){
   if(!session||editTroubleId)return;
   try{
-    await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold','DELETE');
-    await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'mold',data:getDraftData()});
+    if(currentDraftId){
+      await sbFetch('drafts?id=eq.'+currentDraftId,'PATCH',{data:getDraftData(),updated_at:new Date().toISOString()});
+    }else{
+      var result=await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'mold',data:getDraftData()});
+      if(result&&result[0]) currentDraftId=result[0].id;
+    }
     document.getElementById('draft-dot').className='draft-dot saved';
     document.getElementById('draft-status-text').textContent=t('draft_saved')(new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}));
   }catch(e){console.warn('下書き保存失敗:',e);}
@@ -835,8 +839,9 @@ function getDraftData(){
 }
 async function loadDraft(){
   try{
-    var rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold&select=data');
+    var rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold&select=id,data&order=updated_at.desc&limit=1');
     if(!rows||!rows.length){showToast(t('draft_none'),'');return;}
+    currentDraftId=rows[0].id;
     var d=rows[0].data;
     if(d.occurred_date) document.getElementById('occurred-date').value=d.occurred_date;
     if(d.shift) document.getElementById('shift-select').value=d.shift;
@@ -931,7 +936,9 @@ async function doSubmit(){
         }
       }
     }
-    if(!editTroubleId) await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.mold','DELETE');
+    if(!editTroubleId && currentDraftId){
+      await sbFetch('drafts?id=eq.'+currentDraftId,'DELETE');
+    }
     hideOverlay();showToast(editTroubleId?t('msg_resubmitted'):t('msg_submitted'),'success');setTimeout(function(){goHome();},1200);
   }catch(e){hideOverlay();btn.disabled=false;console.error('Submit error:',e.message);try{var em=JSON.parse(e.message);showToast(t('msg_submit_fail')(em.message||e.message),'error');}catch(pe){showToast(t('msg_submit_fail')(e.message),'error');}}
 }
@@ -945,9 +952,11 @@ function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('dat
 
 /* ── Edit mode (rejected resubmit) ── */
 var editTroubleId = null;
+var currentDraftId = null;
 (function(){
   var params = new URLSearchParams(location.search);
   if (params.get('edit')) editTroubleId = params.get('edit');
+  if (params.get('draft')) currentDraftId = parseInt(params.get('draft')) || null;
 })();
 
 async function loadEditData() {
