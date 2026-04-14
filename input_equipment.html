@@ -814,7 +814,7 @@ async function _saveDraft(){
   if(!session||editTroubleId)return;
   try{
     if(currentDraftId){
-      await sbFetch('drafts?id=eq.'+currentDraftId,'PATCH',{data:getDraftData(),updated_at:new Date().toISOString()});
+      await sbFetch('drafts?id=eq.'+currentDraftId,'PATCH',{data:getDraftData()});
     }else{
       var result=await sbFetch('drafts','POST',{user_id:session.userId,trouble_type:'equipment',data:getDraftData()});
       if(result&&result[0]) currentDraftId=result[0].id;
