@@ -821,7 +821,7 @@ async function _saveDraft(){
     }
     document.getElementById('draft-dot').className='draft-dot saved';
     document.getElementById('draft-status-text').textContent=t('draft_saved')(new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}));
-  }catch(e){console.warn('下書き保存失敗:',e);}
+  }catch(e){console.warn('下書き保存失敗:',e);showToast('下書き保存失敗: '+e.message,'error');}
 }
 function getDraftData(){
   return {
