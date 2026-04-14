@@ -823,13 +823,22 @@ async function _saveDraft(){
   }catch(e){console.warn('下書き保存失敗:',e);}
 }
 function getDraftData(){
+  var lineEl=document.getElementById('line-select');
+  var machineEl=document.getElementById('machine-select');
+  var productEl=document.getElementById('product-select');
+  var categoryEl=document.getElementById('category-select');
   return {
     occurred_date:document.getElementById('occurred-date').value,
     shift:document.getElementById('shift-select').value,
-    line_id:document.getElementById('line-select').value,
-    machine_id:document.getElementById('machine-select').value,
-    product_id:document.getElementById('product-select').value,
-    category_id:document.getElementById('category-select').value,
+    line_id:lineEl.value,
+    line_name:lineEl.options[lineEl.selectedIndex]?lineEl.options[lineEl.selectedIndex].text:'',
+    machine_id:machineEl.value,
+    machine_no:machineEl.options[machineEl.selectedIndex]?machineEl.options[machineEl.selectedIndex].text:'',
+    product_id:productEl.value,
+    product_code:productEl.options[productEl.selectedIndex]?(productEl.options[productEl.selectedIndex].text.split('(')[0].trim()):'',
+    product_name:productEl.options[productEl.selectedIndex]?(productEl.options[productEl.selectedIndex].text.replace(/^[^(]*/,'').replace(/^\(/,'').replace(/\)$/,'')):'',
+    category_id:categoryEl.value,
+    category_name:categoryEl.options[categoryEl.selectedIndex]?categoryEl.options[categoryEl.selectedIndex].text:'',
     occurrence:selectedOccurrence,
     stop_start_h:drumState.sh,stop_start_m:drumState.sm,
     stop_end_h:drumState.eh,stop_end_m:drumState.em,
