@@ -912,7 +912,8 @@ function utcToJST(isoStr){
 
 async function loadTroubles() {
   try {
-    const q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&order=created_at.desc&limit=100';
+    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&order=created_at.desc&limit=100';
+    if (SESSION.shift) q += '&shift=eq.' + encodeURIComponent(SESSION.shift);
     const rows = await sbFetch(q);
     TROUBLES = (rows || []).map(r => ({
       id: r.id,

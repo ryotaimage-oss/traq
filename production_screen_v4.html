@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生産品番設定</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+[data-theme="dark"]{
+  --bg:#0f1117;--sur:#1a1d27;--sur2:#22263a;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);
+  --tx:#e8eaf0;--tx2:#8b90a0;--tx3:#4a5068;
+  --green:#22c55e;--gdim:rgba(34,197,94,0.13);
+  --red:#ef4444;--rdim:rgba(239,68,68,0.18);
+  --yel:#f59e0b;--ydim:rgba(245,158,11,0.13);
+  --acc:#6366f1;--adim:rgba(99,102,241,0.15);
+  --s1c:#22c55e;--s1d:rgba(34,197,94,0.12);
+  --s2c:#f59e0b;--s2d:rgba(245,158,11,0.12);
+  --s3c:#3b82f6;--s3d:rgba(59,130,246,0.12);
+}
+[data-theme="light"]{
+  --bg:#f0f2f7;--sur:#fff;--sur2:#f6f8fb;--bd:rgba(0,0,0,0.07);--bd2:rgba(0,0,0,0.13);
+  --tx:#1a1f2e;--tx2:#5a6273;--tx3:#9aa0b0;
+  --green:#16a34a;--gdim:rgba(22,163,74,0.1);
+  --red:#dc2626;--rdim:rgba(220,38,38,0.12);
+  --yel:#d97706;--ydim:rgba(217,119,6,0.1);
+  --acc:#4f46e5;--adim:rgba(79,70,229,0.1);
+  --s1c:#15803d;--s1d:rgba(21,128,61,0.1);
+  --s2c:#b45309;--s2d:rgba(180,83,9,0.1);
+  --s3c:#1d4ed8;--s3d:rgba(29,78,216,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.nav{height:46px;background:var(--sur);border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:7px;padding:0 12px;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--acc);letter-spacing:.08em;padding-right:10px;border-right:1px solid var(--bd2)}
+.ntab{padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--tx2);font-family:inherit}
+.ntab.active{background:var(--adim);color:var(--acc);font-weight:700}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green)}
+.nbtn-theme{width:30px;height:30px;border-radius:6px;border:1px solid var(--bd2);background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.toolbar{background:var(--sur);border-bottom:1px solid var(--bd);padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.toolbar-title{font-size:14px;font-weight:700}
+.toolbar-date{font-size:11px;color:var(--tx2)}
+.ltabs{display:flex;gap:3px;background:var(--sur2);border-radius:7px;padding:3px}
+.ltab{padding:4px 14px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--tx2);font-family:inherit;transition:all .15s}
+.ltab.active{background:var(--sur);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ltab.a.active{color:var(--s1c)}.ltab.b.active{color:var(--s2c)}.ltab.c.active{color:var(--s3c)}.ltab.all.active{color:var(--acc)}
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid;font-family:inherit;transition:all .15s}
+.tbtn.save{border-color:var(--acc);background:var(--adim);color:var(--acc)}
+.tbtn.save:hover{background:var(--acc);color:#fff}
+.tbtn.confirm{border-color:var(--green);background:var(--gdim);color:var(--green)}
+.tbtn.confirm:hover{background:var(--green);color:#fff}
+.unset-count{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.unset-count.done{background:var(--green)}
+/* Save reminder banner */
+.save-banner{display:none;background:var(--ydim);border-bottom:2px solid var(--yel);padding:6px 14px;font-size:12px;font-weight:700;color:var(--yel);align-items:center;gap:10px}
+.save-banner.show{display:flex}
+.save-banner-btn{padding:3px 10px;border-radius:4px;background:var(--yel);color:#000;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:auto}
+.main{padding:14px}
+.line-sec{margin-bottom:24px}
+.line-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.line-badge{font-size:12px;font-weight:700;padding:3px 12px;border-radius:5px;font-family:'JetBrains Mono',monospace}
+.line-badge.a{background:var(--s1d);color:var(--s1c)}.line-badge.b{background:var(--s2d);color:var(--s2c)}.line-badge.c{background:var(--s3d);color:var(--s3c)}
+.line-count{font-size:11px;color:var(--tx2)}
+.line-sep2{flex:1;height:1px;background:var(--bd2)}
+.mc-list{display:flex;flex-direction:column;gap:5px}
+.mc-row{background:var(--sur);border:1px solid var(--bd2);border-radius:7px;overflow:hidden;transition:border-color .15s}
+.mc-row.unset{border-color:var(--red)}
+.mc-row.stopped{opacity:.7}
+.mc-row-head{display:flex;align-items:center;gap:10px;padding:7px 12px;background:var(--sur2);border-bottom:1px solid var(--bd)}
+.mc-num-badge{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--tx2);min-width:52px;flex-shrink:0}
+.mc-selected-pn{font-size:12px;font-weight:500;flex:1}
+.mc-selected-pn .pn-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tx2);display:block}
+.mc-selected-pn.unset-label{color:var(--red);font-size:11px}
+.mc-options{padding:7px 12px;display:flex;flex-wrap:wrap;gap:5px}
+.radio-opt{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;border:1.5px solid var(--bd2);background:transparent;cursor:pointer;transition:all .15s;font-family:inherit;font-size:11px;font-weight:500;color:var(--tx2)}
+.radio-opt:hover{border-color:var(--acc);background:var(--adim);color:var(--tx)}
+.radio-opt.selected{border-color:var(--acc);background:var(--adim);color:var(--tx)}
+.radio-opt.selected.stop-opt{border-color:var(--yel);background:var(--ydim);color:var(--yel)}
+.radio-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.radio-opt.selected .radio-dot{border-color:var(--acc)}
+.radio-opt.selected.stop-opt .radio-dot{border-color:var(--yel)}
+.radio-inner{width:6px;height:6px;border-radius:50%;background:var(--acc);display:none}
+.radio-opt.selected .radio-inner{display:block}
+.radio-opt.selected.stop-opt .radio-inner{background:var(--yel)}
+.radio-pn{display:flex;flex-direction:column;gap:1px}
+.radio-pn-code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tx3)}
+.radio-pn-name{font-size:11px;font-weight:500}
+/* Confirm modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--sur);border:1px solid var(--bd2);border-radius:12px;width:380px;overflow:hidden}
+.modal-h{padding:14px 18px;background:var(--sur2);border-bottom:1px solid var(--bd2);font-size:14px;font-weight:700}
+.modal-b{padding:16px 18px;font-size:12px;color:var(--tx2);line-height:1.8}
+.modal-btns{display:flex;gap:8px;padding:12px 18px;background:var(--sur2);border-top:1px solid var(--bd2);justify-content:flex-end}
+.mbtn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--tx);font-family:inherit}
+.mbtn.ok{background:var(--green);color:#fff;border-color:var(--green)}
+.mbtn.save-ok{background:var(--acc);color:#fff;border-color:var(--acc)}
+/* Save modal */
+.save-modal-shifts{display:flex;gap:8px;margin:10px 0}
+.shift-check{flex:1;padding:10px;border-radius:6px;border:1.5px solid var(--bd2);background:var(--sur2);cursor:pointer;text-align:center;font-size:12px;font-weight:700;transition:all .15s}
+.shift-check.sel.s1{border-color:var(--s1c);background:var(--s1d);color:var(--s1c)}
+.shift-check.sel.s2{border-color:var(--s2c);background:var(--s2d);color:var(--s2c)}
+.shift-check.sel.s3{border-color:var(--s3c);background:var(--s3d);color:var(--s3c)}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="nav-logo">INSP·BOARD</span>
+  <div style="display:flex;gap:2px">
+    <button class="ntab">配置ボード</button>
+    <button class="ntab active">生産品番</button>
+    <button class="ntab">ダッシュボード</button>
+    <button class="ntab">履歴</button>
+    <button class="ntab">マスタ</button>
+  </div>
+  <div class="nav-right">
+    <button class="nbtn-theme" onclick="toggleTheme()">🌓</button>
+    <span class="nav-clock" id="clk">——:——</span>
+  </div>
+</div>
+
+<!-- 保存忘れアラートバナー -->
+<div class="save-banner" id="saveBanner">
+  ⚠ 1直の配置がまだ保存されていません。シフト終了前に保存してください。
+  <button class="save-banner-btn" onclick="showSaveModal()">今すぐ保存</button>
+</div>
+
+<div class="toolbar">
+  <div>
+    <div class="toolbar-title">生産品番設定</div>
+    <div class="toolbar-date">2026/04/01（水）— 設定は変更するまで継続されます</div>
+  </div>
+  <div class="ltabs" id="ltabs">
+    <button class="ltab all active" onclick="setLine(this,&#39;all&#39;)">全ライン</button>
+    <button class="ltab a" onclick="setLine(this,&#39;a&#39;)">A ライン</button>
+    <button class="ltab b" onclick="setLine(this,&#39;b&#39;)">B ライン</button>
+    <button class="ltab c" onclick="setLine(this,&#39;c&#39;)">C ライン</button>
+  </div>
+  <div class="toolbar-right">
+    <span class="unset-count" id="unsetCount">未設定 66</span>
+    <button class="tbtn save" onclick="showSaveModal()">💾 配置を保存</button>
+    <button class="tbtn confirm" onclick="showConfirmModal()">✅ 設定確定→配置ボードへ反映</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="line-sec" id="sec-a">
+    <div class="line-head">
+      <span class="line-badge a">A ライン</span>
+      <span class="line-count">21号機</span>
+      <div class="line-sep2"></div>
+    </div>
+    <div class="mc-list">
+      <div class="mc-row unset" id="mca1" data-line="A" data-mc="1">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">1号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca1','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca1','16336-47010','インナーピース','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16336-47010</span><span class="radio-pn-name">インナーピース</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca3" data-line="A" data-mc="3">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">3号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca3','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca3','S550 15 17Z','S5 O/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">S550 15 17Z</span><span class="radio-pn-name">S5 O/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca3','PY8W 10 324','PY8W WJS','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PY8W 10 324</span><span class="radio-pn-name">PY8W WJS</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca4" data-line="A" data-mc="4">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">4号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca4','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca4','11445-25010-A','940','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11445-25010-A</span><span class="radio-pn-name">940</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca4','11445-15010-A','989','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11445-15010-A</span><span class="radio-pn-name">989</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca5" data-line="A" data-mc="5">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">5号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca5','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca5','16305-24010','948','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16305-24010</span><span class="radio-pn-name">948</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca5','16305-25040','001E','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16305-25040</span><span class="radio-pn-name">001E</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca6" data-line="A" data-mc="6">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">6号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca6','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca6','16305-24010','948','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16305-24010</span><span class="radio-pn-name">948</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca6','16304-24010','950','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-24010</span><span class="radio-pn-name">950</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca7" data-line="A" data-mc="7">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">7号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca7','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca7','11445-31050-A','877RH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11445-31050-A</span><span class="radio-pn-name">877RH</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca7','11446-31050-B','877LH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11446-31050-B</span><span class="radio-pn-name">877LH</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca7','11445-25010-A','940','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11445-25010-A</span><span class="radio-pn-name">940</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca8" data-line="A" data-mc="8">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">8号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca8','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca8','11104-RB0-J002','NP1','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11104-RB0-J002</span><span class="radio-pn-name">NP1</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca8','11104-5R0-0000','AP2','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11104-5R0-0000</span><span class="radio-pn-name">AP2</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca9" data-line="A" data-mc="9">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">9号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca9','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca9','11060 3TS0A','TR','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 3TS0A</span><span class="radio-pn-name">TR</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca10" data-line="A" data-mc="10">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">10号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca10','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca10','T303-10324-IN','D2 IN','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">T303-10324-IN</span><span class="radio-pn-name">D2 IN</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca10','T303-10324-EX','D2 EX','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">T303-10324-EX</span><span class="radio-pn-name">D2 EX</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca11" data-line="A" data-mc="11">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">11号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca11','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca11','16304-31140','915','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-31140</span><span class="radio-pn-name">915</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca11','16331-31260','880','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16331-31260</span><span class="radio-pn-name">880</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca11','16304-31121','892','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-31121</span><span class="radio-pn-name">892</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca12" data-line="A" data-mc="12">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">12号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca12','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca12','16304-24010','950','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-24010</span><span class="radio-pn-name">950</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca13" data-line="A" data-mc="13">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">13号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca13','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca13','11104-6A0-A000','AP2T','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11104-6A0-A000</span><span class="radio-pn-name">AP2T</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca13','PE31-10324','PE-FR','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PE31-10324</span><span class="radio-pn-name">PE-FR</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca13','HF01-10324A','G2','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">HF01-10324A</span><span class="radio-pn-name">G2</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca13','PXK7-10324','PY-UL','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PXK7-10324</span><span class="radio-pn-name">PY-UL</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca14" data-line="A" data-mc="14">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">14号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca14','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca14','13049 ET000','ET','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 ET000</span><span class="radio-pn-name">ET</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca14','13049 EN000','EN','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 EN000</span><span class="radio-pn-name">EN</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca14','PY8W 15 172','PY8W サーモ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PY8W 15 172</span><span class="radio-pn-name">PY8W サーモ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca14','13049 5CA0A','FZ5','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 5CA0A</span><span class="radio-pn-name">FZ5</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca14','PE01 15 172','PE01','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PE01 15 172</span><span class="radio-pn-name">PE01</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca15" data-line="A" data-mc="15">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">15号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca15','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca15','16292-25030','コネクタ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16292-25030</span><span class="radio-pn-name">コネクタ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca15','16291-25040','ジョイント','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16291-25040</span><span class="radio-pn-name">ジョイント</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca16" data-line="A" data-mc="16">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">16号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca16','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca16','13049 ET000','ET','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 ET000</span><span class="radio-pn-name">ET</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca16','13049 EN200','EN','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 EN200</span><span class="radio-pn-name">EN</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca17" data-line="A" data-mc="17">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">17号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca17','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca17','16031-25050','114E','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16031-25050</span><span class="radio-pn-name">114E</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca17','16322-70030-A','979 I/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16322-70030-A</span><span class="radio-pn-name">979 I/W</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca18" data-line="A" data-mc="18">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">18号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca18','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca18','11104-5R0-0000','AP2','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11104-5R0-0000</span><span class="radio-pn-name">AP2</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca19" data-line="A" data-mc="19">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">19号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca19','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca19','8096-1214-00E','TK-VST','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">8096-1214-00E</span><span class="radio-pn-name">TK-VST</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca19','8096-1214-30','TK-VST','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">8096-1214-30</span><span class="radio-pn-name">TK-VST</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca19','1319-13CN0-D','A-VST','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">1319-13CN0-D</span><span class="radio-pn-name">A-VST</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca19','S801-10324','S8 WJS','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">S801-10324</span><span class="radio-pn-name">S8 WJS</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca19','S550 10 324','S5 WJS','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">S550 10 324</span><span class="radio-pn-name">S5 WJS</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca22" data-line="A" data-mc="22">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">22号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca22','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca22','11445-25010-A','940','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11445-25010-A</span><span class="radio-pn-name">940</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca23" data-line="A" data-mc="23">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">23号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca23','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca23','BA081 4AA00-P','インバーター','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">BA081 4AA00-P</span><span class="radio-pn-name">インバーター</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca23','16278-25070-A','116E WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-25070-A</span><span class="radio-pn-name">116E WBP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mca26" data-line="A" data-mc="26">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">26号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mca26','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','13048 77DB0A','XH7','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13048 77DB0A</span><span class="radio-pn-name">XH7</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','17D80-77010-A','FC BY PASS','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">17D80-77010-A</span><span class="radio-pn-name">FC BY PASS</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','17B60-77021-B','FC I/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">17B60-77021-B</span><span class="radio-pn-name">FC I/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','17D60-77030','FC O/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">17D60-77030</span><span class="radio-pn-name">FC O/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','23C-14-76010','','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">23C-14-76010</span><span class="radio-pn-name"></span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','13049 AR000','AR','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 AR000</span><span class="radio-pn-name">AR</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mca26','13049 ED02A','ED','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 ED02A</span><span class="radio-pn-name">ED</span></div>
+          </button>
+        </div>
+      </div></div>
+  </div>
+
+  <div class="line-sec" id="sec-b">
+    <div class="line-head">
+      <span class="line-badge b">B ライン</span>
+      <span class="line-count">16号機</span>
+      <div class="line-sep2"></div>
+    </div>
+    <div class="mc-list">
+      <div class="mc-row unset" id="mcb20" data-line="B" data-mc="20">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">20号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb20','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb20','31327 X260D-P','CBOデフ2WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X260D-P</span><span class="radio-pn-name">CBOデフ2WD</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb20','31327 X260D','CBOデフ2WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X260D</span><span class="radio-pn-name">CBOデフ2WD</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb20','31327 X260E-P','CBOデフ4WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X260E-P</span><span class="radio-pn-name">CBOデフ4WD</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb20','31327 X260E','CBOデフ4WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X260E</span><span class="radio-pn-name">CBOデフ4WD</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb24" data-line="B" data-mc="24">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">24号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb24','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb24','11060 5WK0A','XH5','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 5WK0A</span><span class="radio-pn-name">XH5</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb25" data-line="B" data-mc="25">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">25号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb25','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb25','11060 5WK0A','XH5','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 5WK0A</span><span class="radio-pn-name">XH5</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb28" data-line="B" data-mc="28">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">28号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb28','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb28','16335-70020','979LH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16335-70020</span><span class="radio-pn-name">979LH</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb29" data-line="B" data-mc="29">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">29号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb29','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb29','16335-70020','979LH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16335-70020</span><span class="radio-pn-name">979LH</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb29','16332-70010','943RH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16332-70010</span><span class="radio-pn-name">943RH</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb29','16335-70010','943LH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16335-70010</span><span class="radio-pn-name">943LH</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb30" data-line="B" data-mc="30">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">30号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb30','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb30','16031 25060','171E I/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16031 25060</span><span class="radio-pn-name">171E I/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb30','16278-15080','WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-15080</span><span class="radio-pn-name">WBP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb31" data-line="B" data-mc="31">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">31号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb31','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb31','11060 4BB1A','KH 1A','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 4BB1A</span><span class="radio-pn-name">KH 1A</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb31','11060 4BB1B','KH 1B','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 4BB1B</span><span class="radio-pn-name">KH 1B</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb31','11060 4BB1C','KH 1C','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 4BB1C</span><span class="radio-pn-name">KH 1C</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb31','11060 5TA1A','KH 5TA','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">11060 5TA1A</span><span class="radio-pn-name">KH 5TA</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb32" data-line="B" data-mc="32">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">32号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb32','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb32','H301 15 17Z','H3T','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">H301 15 17Z</span><span class="radio-pn-name">H3T</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb32','16304-47032','848','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-47032</span><span class="radio-pn-name">848</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb32','16304-18010-A','090E','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16304-18010-A</span><span class="radio-pn-name">090E</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb33" data-line="B" data-mc="33">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">33号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb33','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb33','156199-0800','090クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0800</span><span class="radio-pn-name">090クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb36" data-line="B" data-mc="36">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">36号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb36','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb36','156199-0790','090カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0790</span><span class="radio-pn-name">090カプラ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb37" data-line="B" data-mc="37">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">37号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb37','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb37','31327 X230B-P','チェーンカバー','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230B-P</span><span class="radio-pn-name">チェーンカバー</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb37','31327 X230B','チェーンカバー','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230B</span><span class="radio-pn-name">チェーンカバー</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb38" data-line="B" data-mc="38">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">38号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb38','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb38','31327 X230C','AXOデフ2WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230C</span><span class="radio-pn-name">AXOデフ2WD</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb38','31327 X230C-P','AXOデフ2WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230C-P</span><span class="radio-pn-name">AXOデフ2WD</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb39" data-line="B" data-mc="39">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">39号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb39','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb39','31327 X230E-P','AXOデフ4WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230E-P</span><span class="radio-pn-name">AXOデフ4WD</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb39','31327 X230E','AXOデフ4WD','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230E</span><span class="radio-pn-name">AXOデフ4WD</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb49" data-line="B" data-mc="49">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">49号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb49','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb49','PX9R-15520','PX9R','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">PX9R-15520</span><span class="radio-pn-name">PX9R</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb49','P5SP-15520','P5SP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">P5SP-15520</span><span class="radio-pn-name">P5SP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb62" data-line="B" data-mc="62">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">62号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb62','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb62','16278-25060','114E WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-25060</span><span class="radio-pn-name">114E WBP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcb63" data-line="B" data-mc="63">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">63号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcb63','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcb63','16278-25060','114E WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-25060</span><span class="radio-pn-name">114E WBP</span></div>
+          </button>
+        </div>
+      </div></div>
+  </div>
+
+  <div class="line-sec" id="sec-c">
+    <div class="line-head">
+      <span class="line-badge c">C ライン</span>
+      <span class="line-count">29号機</span>
+      <div class="line-sep2"></div>
+    </div>
+    <div class="mc-list">
+      <div class="mc-row unset" id="mcc21" data-line="C" data-mc="21">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">21号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc21','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64393_2J-N','パネル(N)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64393_2J-N</span><span class="radio-pn-name">パネル(N)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64393_2J','パネル(D)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64393_2J</span><span class="radio-pn-name">パネル(D)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWF 64392_2J-N','リッドL(N)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWF 64392_2J-N</span><span class="radio-pn-name">リッドL(N)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64392_2J-N','リッドR(N)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64392_2J-N</span><span class="radio-pn-name">リッドR(N)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWF 64392_2J','リッドL(D)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWF 64392_2J</span><span class="radio-pn-name">リッドL(D)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64392_2J','リッドR(D)2次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64392_2J</span><span class="radio-pn-name">リッドR(D)2次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64393_1J-N','パネル(N)1次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64393_1J-N</span><span class="radio-pn-name">パネル(N)1次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWB 64393_1J','パネル(D)1次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWB 64393_1J</span><span class="radio-pn-name">パネル(D)1次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWF 64392_1J-N','リッド(N)1次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWF 64392_1J-N</span><span class="radio-pn-name">リッド(N)1次</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc21','DCWF 64392_1J','リッド(D)1次','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">DCWF 64392_1J</span><span class="radio-pn-name">リッド(D)1次</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc27" data-line="C" data-mc="27">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">27号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc27','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc27','16320-70010','943 I/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16320-70010</span><span class="radio-pn-name">943 I/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc27','16332-70020','979RH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16332-70020</span><span class="radio-pn-name">979RH</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc34" data-line="C" data-mc="34">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">34号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc34','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc34','156199-0800','090クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0800</span><span class="radio-pn-name">090クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc35" data-line="C" data-mc="35">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">35号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc35','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc35','232199-7020','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc35','232199-7020-CKD','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020-CKD</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc40" data-line="C" data-mc="40">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">40号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc40','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc40','31327 X230A','ベースバッフル','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230A</span><span class="radio-pn-name">ベースバッフル</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc41" data-line="C" data-mc="41">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">41号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc41','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc41','31327 X230A','ベースバッフル','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">31327 X230A</span><span class="radio-pn-name">ベースバッフル</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc42" data-line="C" data-mc="42">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">42号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc42','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc42','16332-70020','979RH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16332-70020</span><span class="radio-pn-name">979RH</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc43" data-line="C" data-mc="43">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">43号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc43','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc43','16322-70030','979 I/W','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16322-70030</span><span class="radio-pn-name">979 I/W</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc43','16278-25060','114E WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-25060</span><span class="radio-pn-name">114E WBP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc44" data-line="C" data-mc="44">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">44号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc44','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc44','16278-15080','WBP','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16278-15080</span><span class="radio-pn-name">WBP</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc45" data-line="C" data-mc="45">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">45号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc45','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc45','13049 6RC0A','KH5T','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 6RC0A</span><span class="radio-pn-name">KH5T</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc46" data-line="C" data-mc="46">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">46号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc46','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc46','13049 6RC0A','KH5T','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">13049 6RC0A</span><span class="radio-pn-name">KH5T</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc47" data-line="C" data-mc="47">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">47号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc47','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc47','156199-0800','090クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0800</span><span class="radio-pn-name">090クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc48" data-line="C" data-mc="48">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">48号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc48','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc48','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc48','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc48','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc50" data-line="C" data-mc="50">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">50号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc50','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc50','232199-7010','27PL(ツバ有)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7010</span><span class="radio-pn-name">27PL(ツバ有)</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc51" data-line="C" data-mc="51">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">51号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc51','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc51','156199-0800','090クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0800</span><span class="radio-pn-name">090クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc52" data-line="C" data-mc="52">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">52号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc52','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc52','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc52','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc52','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc53" data-line="C" data-mc="53">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">53号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc53','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc53','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc53','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc53','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc54" data-line="C" data-mc="54">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">54号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc54','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc54','232199-6840-KB03','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-KB03</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc54','232199-6840','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc54','232199-6840-CHN','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-CHN</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc54','232199-7020','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc54','232199-7020-CKD','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020-CKD</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc55" data-line="C" data-mc="55">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">55号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc55','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc55','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc55','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc55','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc56" data-line="C" data-mc="56">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">56号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc56','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc56','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc56','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc56','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc57" data-line="C" data-mc="57">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">57号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc57','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc57','232199-6840-KB03','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-KB03</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc57','232199-6840','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc57','232199-6840-CHN','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-CHN</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc58" data-line="C" data-mc="58">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">58号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc58','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc58','232199-6840-KB03','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-KB03</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc58','232199-6840','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc58','232199-6840-CHN','690カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6840-CHN</span><span class="radio-pn-name">690カプラ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc58','232199-7020','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc58','232199-7020-CKD','27PL(ツバ無)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7020-CKD</span><span class="radio-pn-name">27PL(ツバ無)</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc59" data-line="C" data-mc="59">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">59号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc59','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc59','156199-0790','090カプラ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">156199-0790</span><span class="radio-pn-name">090カプラ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc60" data-line="C" data-mc="60">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">60号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc60','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc60','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc60','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc60','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc61" data-line="C" data-mc="61">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">61号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc61','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc61','232199-6850-KB03','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-KB03</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc61','232199-6850','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc61','232199-6850-CHN','690クランプ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-6850-CHN</span><span class="radio-pn-name">690クランプ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc64" data-line="C" data-mc="64">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">64号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc64','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc64','232199-7500','上サブ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7500</span><span class="radio-pn-name">上サブ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc65" data-line="C" data-mc="65">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">65号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc65','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc65','232199-7510','下サブ','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7510</span><span class="radio-pn-name">下サブ</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc66" data-line="C" data-mc="66">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">66号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc66','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc66','232199-7010','27PL(ツバ有)','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">232199-7010</span><span class="radio-pn-name">27PL(ツバ有)</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="mc-row unset" id="mcc68" data-line="C" data-mc="68">
+        <div class="mc-row-head">
+          <span class="mc-num-badge">68号機</span>
+          <div class="mc-selected-pn unset-label">▼ 品番を選択</div>
+        </div>
+        <div class="mc-options">
+          <button class="radio-opt stop-opt" onclick="selectPn(this,'mcc68','stop','計画停止','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <span>計画停止</span>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc68','16332-70020','979RH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16332-70020</span><span class="radio-pn-name">979RH</span></div>
+          </button>
+          <button class="radio-opt" onclick="selectPn(this,'mcc68','16335-70020','979LH','')">
+            <div class="radio-dot"><div class="radio-inner"></div></div>
+            <div class="radio-pn"><span class="radio-pn-code">16335-70020</span><span class="radio-pn-name">979LH</span></div>
+          </button>
+        </div>
+      </div></div>
+  </div>
+
+</div>
+
+<!-- 確定モーダル -->
+<div class="overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-h">✅ 配置ボードへ反映しますか？</div>
+    <div class="modal-b" id="confirmBody">設定内容を配置ボードに反映します。</div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal(&#39;confirmModal&#39;)">キャンセル</button>
+      <button class="mbtn ok" onclick="confirmSettings()">確定して反映</button>
+    </div>
+  </div>
+</div>
+
+<!-- 配置保存モーダル -->
+<div class="overlay" id="saveModal">
+  <div class="modal">
+    <div class="modal-h">💾 配置をエビデンス保存</div>
+    <div class="modal-b">
+      保存する直を選択してください。<br>選択した直の現在の配置が保存されます。
+      <div class="save-modal-shifts">
+        <div class="shift-check s1" id="sc1" onclick="toggleShift(this,&#39;sc1&#39;,&#39;s1&#39;)">1直（A）</div>
+        <div class="shift-check s2" id="sc2" onclick="toggleShift(this,&#39;sc2&#39;,&#39;s2&#39;)">2直（B）</div>
+        <div class="shift-check s3" id="sc3" onclick="toggleShift(this,&#39;sc3&#39;,&#39;s3&#39;)">3直（C）</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal(&#39;saveModal&#39;)">キャンセル</button>
+      <button class="mbtn save-ok" onclick="doSave()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function tick(){const n=new Date(),p=x=>String(x).padStart(2,&#39;0&#39;);document.getElementById(&#39;clk&#39;).textContent=`${n.getFullYear()}/${p(n.getMonth()+1)}/${p(n.getDate())} ${p(n.getHours())}:${p(n.getMinutes())}`}
+tick();setInterval(tick,10000);
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme===&#39;dark&#39;?&#39;light&#39;:&#39;dark&#39;}
+function setLine(el,line){
+  document.querySelectorAll(&#39;.ltab&#39;).forEach(b=>b.classList.remove(&#39;active&#39;));
+  el.classList.add(&#39;active&#39;);
+  [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;].forEach(l=>{const s=document.getElementById(&#39;sec-&#39;+l);if(s)s.style.display=(line===&#39;all&#39;||line===l)?&#39;&#39;:&#39;none&#39;});
+}
+function selectPn(btn,mcId,code,name,wl){
+  const row=document.getElementById(mcId);
+  row.querySelectorAll(&#39;.radio-opt&#39;).forEach(b=>b.classList.remove(&#39;selected&#39;));
+  btn.classList.add(&#39;selected&#39;);
+  const head=row.querySelector(&#39;.mc-row-head&#39;);
+  const pnDiv=head.querySelector(&#39;.mc-selected-pn&#39;);
+  pnDiv.classList.remove(&#39;unset-label&#39;);
+  const isStop=code===&#39;stop&#39;;
+  if(isStop){
+    pnDiv.innerHTML=&#39;<span class="pn-name" style="color:var(--tx2)">計画停止</span>&#39;;
+    row.classList.add(&#39;stopped&#39;);
+  } else {
+    pnDiv.innerHTML=`<span class="pn-code">${code}</span><span class="pn-name">${name}</span>`;
+    row.classList.remove(&#39;stopped&#39;);
+  }
+  row.classList.remove(&#39;unset&#39;);
+  updateUnsetCount();
+}
+function updateUnsetCount(){
+  const count=document.querySelectorAll(&#39;.mc-row.unset&#39;).length;
+  const el=document.getElementById(&#39;unsetCount&#39;);
+  el.textContent=count>0?&#39;未設定 &#39;+count:&#39;全設定済&#39;;
+  el.classList.toggle(&#39;done&#39;,count===0);
+}
+function showConfirmModal(){
+  const unset=document.querySelectorAll(&#39;.mc-row.unset&#39;).length;
+  const body=document.getElementById(&#39;confirmBody&#39;);
+  if(unset>0){
+    body.innerHTML=`<span style="color:var(--yel)">⚠ ${unset}号機が未設定です。</span><br>未設定の号機は配置ボードに反映されません。このまま確定しますか？`;
+  } else {
+    body.innerHTML=&#39;全号機の設定が完了しています。配置ボードに反映します。&#39;;
+  }
+  document.getElementById(&#39;confirmModal&#39;).classList.add(&#39;show&#39;);
+}
+function confirmSettings(){
+  closeModal(&#39;confirmModal&#39;);
+  document.getElementById(&#39;saveBanner&#39;).classList.add(&#39;show&#39;);
+  alert(&#39;✅ 配置ボードに反映しました！\n\n⚠ 各直の配置を忘れずに保存してください。&#39;);
+}
+function showSaveModal(){document.getElementById(&#39;saveModal&#39;).classList.add(&#39;show&#39;)}
+function closeModal(id){document.getElementById(id).classList.remove(&#39;show&#39;)}
+function toggleShift(el,id,cls){el.classList.toggle(&#39;sel&#39;)}
+function doSave(){
+  const sel=[...document.querySelectorAll(&#39;.shift-check.sel&#39;)].map(e=>e.textContent);
+  if(sel.length===0){alert(&#39;保存する直を選択してください&#39;);return;}
+  closeModal(&#39;saveModal&#39;);
+  document.getElementById(&#39;saveBanner&#39;).classList.remove(&#39;show&#39;);
+  alert(&#39;✅ &#39;+sel.join(&#39;・&#39;)+&#39; の配置を保存しました！&#39;);
+}
+// Show save reminder after 8 hours (demo: 3 seconds)
+setTimeout(()=>{document.getElementById(&#39;saveBanner&#39;).classList.add(&#39;show&#39;)}, 3000);
+</script>
+</body>
+</html>
