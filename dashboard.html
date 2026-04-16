@@ -197,6 +197,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .stop-top-machine{font-size:12px;font-weight:700;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stop-top-sub{font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stop-top-min{font-size:13px;font-weight:700;color:var(--warning);flex-shrink:0}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeUp .15s ease}
+.modal-overlay.center{align-items:center}
+.modal-sheet{background:var(--bg2);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;animation:fadeUp .2s ease}
+.modal-overlay.center .modal-sheet{border-radius:12px;margin:20px;max-height:80vh}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+.detail-row{display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none;margin-bottom:0}
+.detail-key{font-size:11px;font-weight:500;color:var(--text2);width:80px;flex-shrink:0;padding-top:2px}
+.detail-val{font-size:13px;flex:1;word-break:break-all}
+.status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.status-pending{background:rgba(245,158,11,.15);color:var(--warning)}
+.status-approved{background:rgba(16,185,129,.12);color:var(--success)}
+.status-rejected{background:rgba(239,68,68,.12);color:var(--danger)}
+.status-draft{background:rgba(139,144,160,.12);color:var(--text2)}
+.btn-close-modal{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;margin-top:12px;transition:all .15s}
+.btn-close-modal:hover{color:var(--text1)}
+.stop-top-item.clickable{cursor:pointer}
+.stop-top-item.clickable:hover{background:var(--bg2);border:1px solid rgba(239,159,39,.3)}
 /* Loading / empty */
 .loading-overlay{text-align:center;padding:40px;color:var(--text2);font-size:14px}
 .empty-state{text-align:center;padding:30px;color:var(--text2);font-size:13px}
@@ -507,6 +528,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   </nav>
   </div><!-- /.main-column -->
 </div>
+<div id="dashModalEl" style="display:none"></div>
 <div id="toastEl" style="display:none"></div>
 
 <script>
@@ -603,7 +625,7 @@ function cssVar(name){return getComputedStyle(document.documentElement).getPrope
 async function loadData(){
   try{
     const rows=await sbFetch(
-      'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_minutes,occurrence,lines(name),categories(name),machines(machine_no),products(product_code,product_name)'+
+      'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,lines(name),categories(name),machines(machine_no),products(product_code,product_name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)'+
       '&status=neq.draft&order=occurred_date.desc&limit=2000'
     );
     RAW=(rows||[]).filter(r=>r.status!=='draft');
@@ -1260,6 +1282,66 @@ function renderShiftChart(data){
   }
 }
 
+/* ===== Trouble Detail Modal ===== */
+function openTroubleDetail(id){
+  const r=RAW.find(x=>x.id===id);
+  if(!r) return;
+  const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
+  const typeClass=r.trouble_type==='equipment'?'eq':'md';
+  const typeColor=r.trouble_type==='equipment'?'var(--eq)':'var(--md)';
+  const statusMap={pending:'承認待ち',approved:'承認済み',rejected:'差し戻し',draft:'下書き'};
+  const statusLabel=t('status_'+r.status)||(statusMap[r.status]||r.status);
+  const occLabel=r.occurrence==='first'?t('first'):(r.occurrence==='recurrence'||r.occurrence==='repeat')?t('rec'):r.occurrence||'–';
+  const line=r.lines?r.lines.name:'–';
+  const machine=r.machines?r.machines.machine_no+'号機':'–';
+  const pCode=r.products?r.products.product_code:'–';
+  const pName=r.products?r.products.product_name:'';
+  const category=r.categories?r.categories.name:'–';
+  const reporter=r.traq_users?r.traq_users.name:'–';
+  const approver=r.approver?r.approver.name:null;
+  const shift=r.shift?r.shift+'直':'–';
+  const date=(r.occurred_date||'').slice(0,10).replace(/-/g,'/');
+  // 停止時間表示
+  const stopStart=r.stop_start?r.stop_start.slice(0,5):null;
+  const stopEnd=r.stop_end?r.stop_end.slice(0,5):null;
+  let stopHTML;
+  if(stopStart||stopEnd){
+    stopHTML='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+    if(r.stop_minutes) stopHTML+='<span style="font-size:13px;font-weight:500">'+r.stop_minutes+'分</span><span style="font-size:11px;color:var(--text2);margin:0 2px">|</span>';
+    stopHTML+='<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">'+(stopStart||'–')+'</span>';
+    stopHTML+='<span style="font-size:12px;color:var(--text2)">→</span>';
+    stopHTML+='<span style="font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border)">'+(stopEnd||'--:--')+'</span>';
+    stopHTML+='</div>';
+  } else {
+    stopHTML='<span>'+(r.stop_minutes?r.stop_minutes+'分':'–')+'</span>';
+  }
+  const approverRow=approver?'<div class="detail-row"><span class="detail-key">承認者</span><span class="detail-val">'+approver+'</span></div>':'';
+  const html=
+    '<div class="modal-handle"></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+      '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:'+(r.trouble_type==='equipment'?'rgba(59,130,246,.15)':'rgba(168,85,247,.15)')+';color:'+typeColor+'">'+typeLabel+'</span>'+
+      '<span class="modal-title" style="margin:0">トラブル詳細</span>'+
+    '</div>'+
+    '<div class="modal-sub">No.'+r.id+'</div>'+
+    '<div class="detail-row"><span class="detail-key">ステータス</span><span class="detail-val"><span class="status-badge status-'+r.status+'">'+statusLabel+'</span></span></div>'+
+    '<div class="detail-row"><span class="detail-key">日付</span><span class="detail-val">'+date+' '+shift+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">ライン</span><span class="detail-val">'+line+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">機番</span><span class="detail-val">'+machine+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">品番</span><span class="detail-val">'+pCode+(pName?' / '+pName:'')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">停止時間</span><span class="detail-val">'+stopHTML+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">分類</span><span class="detail-val">'+category+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">初発/再発</span><span class="detail-val">'+occLabel+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">詳細</span><span class="detail-val">'+(r.detail||'–')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">入力者</span><span class="detail-val">'+reporter+'</span></div>'+
+    approverRow+
+    '<button class="btn-close-modal" onclick="closeDashModal()">閉じる</button>';
+  const el=document.getElementById('dashModalEl');
+  el.innerHTML='<div class="modal-overlay" onclick="handleDashOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';
+  el.style.display='block';
+}
+function closeDashModal(){document.getElementById('dashModalEl').style.display='none';}
+function handleDashOverlay(e){if(e.target.classList.contains('modal-overlay'))closeDashModal();}
+
 /* ===== Chart 13: 停止時間TOP10 ===== */
 function renderStopTop10(data){
   const el=document.getElementById('stopTop10');
@@ -1268,20 +1350,24 @@ function renderStopTop10(data){
     .sort((a,b)=>b.stop_minutes-a.stop_minutes)
     .slice(0,10);
   if(!valid.length){el.innerHTML='<div class="empty-state">'+t('no_data')+'</div>';return;}
-  el.innerHTML=valid.map((r,i)=>{
+  el.innerHTML='';
+  valid.forEach((r,i)=>{
     const machine=r.machines?r.machines.machine_no+'号機':'–';
     const product=r.products?r.products.product_code:'–';
     const line=r.lines?r.lines.name:'–';
     const date=(r.occurred_date||'').slice(0,10).replace(/-/g,'/');
-    return '<div class="stop-top-item">'+
+    const item=document.createElement('div');
+    item.className='stop-top-item clickable';
+    item.innerHTML=
       '<span class="stop-top-num '+(i<3?'top':'')+'">'+(i+1)+'</span>'+
       '<div class="stop-top-info">'+
         '<div class="stop-top-machine">'+line+' '+machine+'</div>'+
         '<div class="stop-top-sub">'+product+' &nbsp;'+date+'</div>'+
       '</div>'+
-      '<span class="stop-top-min">'+r.stop_minutes+'分</span>'+
-    '</div>';
-  }).join('');
+      '<span class="stop-top-min">'+r.stop_minutes+'分</span>';
+    item.addEventListener('click',function(){openTroubleDetail(r.id);});
+    el.appendChild(item);
+  });
 }
 
 /* ===== Toast ===== */
