@@ -226,7 +226,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .status-approved{background:rgba(16,185,129,.12);color:var(--success)}
 .status-rejected{background:rgba(239,68,68,.12);color:var(--danger)}
 .status-draft{background:rgba(139,144,160,.12);color:var(--text2)}
-.btn-close-modal{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;margin-top:12px;transition:all .15s}
+.btn-back-modal{width:100%;height:40px;background:none;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;font-weight:500;color:var(--orange);cursor:pointer;margin-top:12px;transition:all .15s}
+.btn-back-modal:hover{background:rgba(239,159,39,.08)}
+.btn-close-modal{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;margin-top:6px;transition:all .15s}
 .btn-close-modal:hover{color:var(--text1)}
 .stop-top-item.clickable{cursor:pointer}
 .stop-top-item.clickable:hover{background:var(--bg2);border:1px solid rgba(239,159,39,.3)}
@@ -1346,7 +1348,7 @@ function renderShiftChart(data){
 }
 
 /* ===== 共通 一覧モーダル ===== */
-function buildListItem(r){
+function buildListItem(r, listTitle, listRecords){
   const line=r.lines?r.lines.name:'–';
   const machine=r.machines?r.machines.machine_no+'号機':'–';
   const pCode=r.products?r.products.product_code:'–';
@@ -1354,7 +1356,9 @@ function buildListItem(r){
   const stopStr=r.stop_minutes?r.stop_minutes+'分':'–';
   const typeColor=r.trouble_type==='equipment'?'#3b82f6':'#a855f7';
   const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
-  return '<div class="hm-list-item" onclick="closeDashModal();setTimeout(function(){openTroubleDetail('+r.id+')},50)">'+
+  const item=document.createElement('div');
+  item.className='hm-list-item';
+  item.innerHTML=
     '<div style="flex:1;min-width:0">'+
       '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
         '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:'+(r.trouble_type==='equipment'?'rgba(59,130,246,.15)':'rgba(168,85,247,.15)')+';color:'+typeColor+'">'+typeLabel+'</span>'+
@@ -1362,20 +1366,42 @@ function buildListItem(r){
       '</div>'+
       '<div class="hm-list-sub">'+pCode+' &nbsp;'+date+'</div>'+
     '</div>'+
-    '<span class="hm-list-stop">'+stopStr+'</span>'+
-  '</div>';
+    '<span class="hm-list-stop">'+stopStr+'</span>';
+  item.addEventListener('click',function(){openTroubleDetail(r.id, listTitle, listRecords);});
+  return item;
 }
 function openListModal(title, records){
   const el=document.getElementById('dashModalEl');
   if(!el) return;
   const sorted=[...records].sort((a,b)=>(b.stop_minutes||0)-(a.stop_minutes||0));
-  const html=
-    '<div class="modal-handle"></div>'+
-    '<div class="modal-title">'+title+'<span class="hm-modal-count">'+records.length+'件</span></div>'+
-    '<div class="hm-modal-header">タップで詳細を表示</div>'+
-    '<div style="display:flex;flex-direction:column;gap:6px">'+sorted.map(buildListItem).join('')+'</div>'+
-    '<button class="btn-close-modal" onclick="closeDashModal()">閉じる</button>';
-  el.innerHTML='<div class="modal-overlay" onclick="handleDashOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';
+
+  // DOM生成
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeDashModal();});
+
+  const sheet=document.createElement('div');
+  sheet.className='modal-sheet';
+
+  const handle=document.createElement('div');handle.className='modal-handle';
+  const titleEl=document.createElement('div');titleEl.className='modal-title';
+  titleEl.innerHTML=title+'<span class="hm-modal-count">'+records.length+'件</span>';
+  const subEl=document.createElement('div');subEl.className='hm-modal-header';subEl.textContent='タップで詳細を表示';
+  const listWrap=document.createElement('div');listWrap.style.cssText='display:flex;flex-direction:column;gap:6px';
+  sorted.forEach(r=>listWrap.appendChild(buildListItem(r, title, records)));
+  const closeBtn=document.createElement('button');
+  closeBtn.className='btn-close-modal';
+  closeBtn.textContent='閉じる';
+  closeBtn.addEventListener('click',closeDashModal);
+
+  sheet.appendChild(handle);
+  sheet.appendChild(titleEl);
+  sheet.appendChild(subEl);
+  sheet.appendChild(listWrap);
+  sheet.appendChild(closeBtn);
+  overlay.appendChild(sheet);
+  el.innerHTML='';
+  el.appendChild(overlay);
   el.style.display='block';
 }
 
@@ -1385,7 +1411,7 @@ function openHeatmapDetail(records, slot, dayLabel){
 }
 
 /* ===== Trouble Detail Modal ===== */
-function openTroubleDetail(id){
+function openTroubleDetail(id, backTitle, backRecords){
   const r=RAW.find(x=>x.id===id);
   if(!r) return;
   const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
@@ -1436,13 +1462,18 @@ function openTroubleDetail(id){
     '<div class="detail-row"><span class="detail-key">詳細</span><span class="detail-val">'+(r.detail||'–')+'</span></div>'+
     '<div class="detail-row"><span class="detail-key">入力者</span><span class="detail-val">'+reporter+'</span></div>'+
     approverRow+
+    (backTitle&&backRecords?'<button class="btn-back-modal" onclick="_dashBack()">← 一覧に戻る</button>':'')+
     '<button class="btn-close-modal" onclick="closeDashModal()">閉じる</button>';
+  _dashBackTitle=backTitle||null;
+  _dashBackRecords=backRecords||null;
   const el=document.getElementById('dashModalEl');
   el.innerHTML='<div class="modal-overlay" onclick="handleDashOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';
   el.style.display='block';
 }
-function closeDashModal(){document.getElementById('dashModalEl').style.display='none';}
-function handleDashOverlay(e){if(e.target.classList.contains('modal-overlay'))closeDashModal();}
+function closeDashModal(){document.getElementById('dashModalEl').style.display='none';_dashBackTitle=null;_dashBackRecords=null;}
+function handleDashOverlay(e){if(e.target.classList.contains('modal-overlay')){if(_dashBackTitle&&_dashBackRecords){_dashBack();}else{closeDashModal();}}}
+var _dashBackTitle=null, _dashBackRecords=null;
+function _dashBack(){if(_dashBackTitle&&_dashBackRecords){openListModal(_dashBackTitle,_dashBackRecords);}}
 
 /* ===== Chart 13: 停止時間TOP10 ===== */
 function renderStopTop10(data){
