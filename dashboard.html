@@ -181,6 +181,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .hm-grid{display:grid;gap:3px;align-items:center}
 .hm-cell{height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;transition:opacity .15s}
 .hm-cell:hover{opacity:.8}
+.hm-cell.clickable{cursor:pointer}
+.hm-cell.clickable:hover{opacity:.85;transform:scale(1.04)}
+.hm-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.hm-list-item:hover{border-color:rgba(239,159,39,.3);background:var(--bg2)}
+.hm-list-machine{font-size:14px;font-weight:700;color:var(--text1)}
+.hm-list-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.hm-list-stop{font-size:13px;font-weight:700;color:var(--warning);flex-shrink:0}
+.hm-modal-header{font-size:13px;color:var(--text2);margin-bottom:12px}
+.hm-modal-count{font-size:12px;font-weight:700;color:var(--orange);margin-left:6px}
 .hm-lbl-day{font-size:11px;color:var(--text2);text-align:center}
 .hm-lbl-slot{font-size:10px;color:var(--text2);text-align:right;padding-right:6px;white-space:nowrap}
 .hm-legend{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--text2);flex-wrap:wrap}
@@ -1100,8 +1109,9 @@ function renderHeatmap(data){
   const SLOT_COUNT=9;
   const DAY_COUNT=7;
 
-  // matrix[slot][day] = count
+  // matrix[slot][day] = count、matrixRecords[slot][day] = records[]
   const matrix=Array.from({length:SLOT_COUNT},()=>Array(DAY_COUNT).fill(0));
+  const matrixRecords=Array.from({length:SLOT_COUNT},()=>Array.from({length:DAY_COUNT},()=>([])))
 
   valid.forEach(r=>{
     const h=parseInt((r.stop_start||'').slice(0,2),10);
@@ -1117,6 +1127,7 @@ function renderHeatmap(data){
     const dow=d.getDay(); // 0=日...6=土
     const di=dow===0?6:dow-1; // 月=0...日=6
     matrix[si][di]++;
+    matrixRecords[si][di].push(r);
   });
 
   const max=Math.max(...matrix.flat())||1;
@@ -1157,11 +1168,16 @@ function renderHeatmap(data){
       const v=matrix[si][di];
       const {bg,fg}=hmColor(v);
       const cell=document.createElement('div');
-      cell.className='hm-cell';
+      cell.className='hm-cell'+(v>0?' clickable':'');
       cell.style.background=bg;
       cell.style.color=fg;
       cell.textContent=v>0?v:'';
       cell.title=slot+' '+DAY_LABELS[di]+'曜: '+v+'件';
+      if(v>0){
+        (function(s,d){
+          cell.addEventListener('click',function(){openHeatmapDetail(matrixRecords[s][d],slot,DAY_LABELS[d]);});
+        })(si,di);
+      }
       grid.appendChild(cell);
     });
   });
@@ -1280,6 +1296,45 @@ function renderShiftChart(data){
       options:barOpts()
     });
   }
+}
+
+/* ===== Heatmap Cell Detail Modal ===== */
+function openHeatmapDetail(records, slot, dayLabel){
+  const el=document.getElementById('dashModalEl');
+  if(!el) return;
+
+  // 一覧を停止時間降順でソート
+  const sorted=[...records].sort((a,b)=>(b.stop_minutes||0)-(a.stop_minutes||0));
+
+  const listHTML=sorted.map(r=>{
+    const line=r.lines?r.lines.name:'–';
+    const machine=r.machines?r.machines.machine_no+'号機':'–';
+    const pCode=r.products?r.products.product_code:'–';
+    const date=(r.occurred_date||'').slice(0,10).replace(/-/g,'/');
+    const stopStr=r.stop_minutes?r.stop_minutes+'分':'–';
+    const typeColor=r.trouble_type==='equipment'?'#3b82f6':'#a855f7';
+    const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
+    return '<div class="hm-list-item" onclick="closeDashModal();setTimeout(function(){openTroubleDetail('+r.id+')},50)">'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
+          '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:'+(r.trouble_type==='equipment'?'rgba(59,130,246,.15)':'rgba(168,85,247,.15)')+';color:'+typeColor+'">'+typeLabel+'</span>'+
+          '<span class="hm-list-machine">'+line+' '+machine+'</span>'+
+        '</div>'+
+        '<div class="hm-list-sub">'+pCode+' &nbsp;'+date+'</div>'+
+      '</div>'+
+      '<span class="hm-list-stop">'+stopStr+'</span>'+
+    '</div>';
+  }).join('');
+
+  const html=
+    '<div class="modal-handle"></div>'+
+    '<div class="modal-title">'+slot+' '+dayLabel+'曜日<span class="hm-modal-count">'+records.length+'件</span></div>'+
+    '<div class="hm-modal-header">タップで詳細を表示</div>'+
+    '<div style="display:flex;flex-direction:column;gap:6px">'+listHTML+'</div>'+
+    '<button class="btn-close-modal" onclick="closeDashModal()">閉じる</button>';
+
+  el.innerHTML='<div class="modal-overlay" onclick="handleDashOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';
+  el.style.display='block';
 }
 
 /* ===== Trouble Detail Modal ===== */
