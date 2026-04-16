@@ -182,6 +182,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .hm-cell{height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;transition:opacity .15s}
 .hm-cell:hover{opacity:.8}
 .hm-cell.clickable{cursor:pointer}
+.rank-item.clickable{cursor:pointer;border-radius:6px;transition:background .12s}
+.rank-item.clickable:hover .rank-bar-wrap{opacity:.85}
+.rank-item.clickable:hover{background:var(--bg3)}
 .hm-cell.clickable:hover{opacity:.85;transform:scale(1.04)}
 .hm-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;cursor:pointer;transition:all .15s;border:1px solid transparent}
 .hm-list-item:hover{border-color:rgba(239,159,39,.3);background:var(--bg2)}
@@ -784,10 +787,10 @@ function render(){
   renderChart4(data);
   renderChart5(data);
   renderChart6(data);
-  renderRank('rankMachine', data, r=>r.machines?r.machines.machine_no+'号機':'不明');
-  renderRank('rankProduct', data, r=>r.products?(r.products.product_code+' '+r.products.product_name).trim():'不明');
+  renderRank('rankMachine', data, r=>r.machines?r.machines.machine_no+'号機':'不明', name=>name);
+  renderRank('rankProduct', data, r=>r.products?(r.products.product_code+' '+r.products.product_name).trim():'不明', name=>name);
   renderHeatmap(data);
-  renderRank('rankLine', data, r=>r.lines?r.lines.name:'未設定');
+  renderRank('rankLine', data, r=>r.lines?r.lines.name:'未設定', name=>name);
   renderLineAvgStop(data);
   renderShiftChart(data);
   renderStopTop10(data);
@@ -840,7 +843,21 @@ function renderChart1(data){
     datasets.push({label:t('t_md'),data:days.map(d=>mdMap[d]),backgroundColor:'rgba(168,85,247,.7)',borderRadius:3});
   }
   const ctx=document.getElementById('chart1').getContext('2d');
-  chartInstances['c1']=new Chart(ctx,{type:'bar',data:{labels,datasets},options:barOpts()});
+  const chart1opts=Object.assign({},barOpts());
+  chart1opts.onClick=function(e){
+    const chart=chartInstances['c1'];
+    if(!chart) return;
+    const els=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+    if(!els.length) return;
+    const idx=els[0].index;
+    const dateStr=days[idx];
+    if(!dateStr) return;
+    const records=data.filter(r=>(r.occurred_date||'').slice(0,10)===dateStr);
+    if(!records.length) return;
+    openListModal(dateStr.replace(/-/g,'/'), records);
+  };
+  chart1opts.plugins=Object.assign({},chart1opts.plugins,{tooltip:{mode:'index',intersect:false}});
+  chartInstances['c1']=new Chart(ctx,{type:'bar',data:{labels,datasets},options:chart1opts});
 }
 
 /* ===== Chart 2: 停止時間推移 ===== */
@@ -891,7 +908,7 @@ function renderChart4(data){
   const eq=data.filter(r=>r.trouble_type==='equipment');
   const map={};
   eq.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
-  renderPieChart('chart4','legend4',map);
+  renderPieChart('chart4','legend4',map,eq,function(r,key){return (r.categories?r.categories.name:'その他')===key;});
 }
 
 /* ===== Chart 5: 金型分類別 ===== */
@@ -903,30 +920,47 @@ function renderChart5(data){
   const md=data.filter(r=>r.trouble_type==='mold');
   const map={};
   md.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
-  renderPieChart('chart5','legend5',map);
+  renderPieChart('chart5','legend5',map,md,function(r,key){return (r.categories?r.categories.name:'その他')===key;});
 }
 
-function renderPieChart(canvasId,legendId,map){
+function renderPieChart(canvasId,legendId,map,srcData,filterFn){
   const keys=Object.keys(map);const vals=keys.map(k=>map[k]);
   const colors=keys.map((_,i)=>PIE_COLORS[i%PIE_COLORS.length]);
   destroyChart(canvasId);
   const ctx=document.getElementById(canvasId).getContext('2d');
+  const opts=Object.assign({},pieOpts());
+  if(srcData&&filterFn){
+    opts.onClick=function(e){
+      const chart=chartInstances[canvasId];
+      if(!chart) return;
+      const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},true);
+      if(!els.length) return;
+      const idx=els[0].index;
+      const key=keys[idx];
+      if(!key) return;
+      const records=srcData.filter(r=>filterFn(r,key));
+      openListModal(key, records);
+    };
+    opts.plugins=Object.assign({},opts.plugins,{
+      tooltip:opts.plugins.tooltip
+    });
+  }
   chartInstances[canvasId]=new Chart(ctx,{
     type:'doughnut',
     data:{labels:keys,datasets:[{data:vals,backgroundColor:colors,borderWidth:0}]},
-    options:pieOpts()
+    options:opts
   });
-  renderPieLegend(legendId,keys,vals,colors);
+  renderPieLegend(legendId,keys,vals,colors,srcData&&filterFn);
 }
 
-function renderPieLegend(id,keys,vals,colors){
+function renderPieLegend(id,keys,vals,colors,clickable){
   const el=document.getElementById(id);if(!el)return;
   const total=vals.reduce((s,v)=>s+v,0)||1;
   el.innerHTML=keys.map((k,i)=>
-    `<div class="pie-legend-item">
-      <div class="pie-legend-dot" style="background:${colors[i]}"></div>
-      <span>${k} ${Math.round(vals[i]/total*100)}%</span>
-    </div>`
+    '<div class="pie-legend-item'+(clickable?' clickable':'')+'" style="'+(clickable?'cursor:pointer':'')+'">'+
+      '<div class="pie-legend-dot" style="background:'+colors[i]+'"></div>'+
+      '<span>'+k+' '+Math.round(vals[i]/total*100)+'%</span>'+
+    '</div>'
   ).join('');
 }
 
@@ -954,22 +988,35 @@ function renderChart6(data){
 }
 
 /* ===== Ranking ===== */
-function renderRank(containerId,data,keyFn){
+function renderRank(containerId,data,keyFn,titleFn){
   const el=document.getElementById(containerId);if(!el)return;
   const map={};
-  data.forEach(r=>{const k=keyFn(r);map[k]=(map[k]||0)+1;});
+  const recordMap={};
+  data.forEach(r=>{
+    const k=keyFn(r);
+    map[k]=(map[k]||0)+1;
+    if(!recordMap[k]) recordMap[k]=[];
+    recordMap[k].push(r);
+  });
   const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  if(!sorted.length){el.innerHTML=`<div class="empty-state">${t('no_data')}</div>`;return;}
+  if(!sorted.length){el.innerHTML='<div class="empty-state">'+t('no_data')+'</div>';return;}
   const max=sorted[0][1]||1;
-  el.innerHTML=sorted.map(([name,cnt],i)=>`
-    <div class="rank-item">
-      <span class="rank-num ${i<3?'top':''}">${i+1}</span>
-      <div class="rank-bar-wrap">
-        <div class="rank-bar" style="width:${Math.round(cnt/max*100)}%;background:${i===0?'#EF9F27':i===1?'#8b90a0':i===2?'#c97d10':'var(--bg3)'}"></div>
-        <span class="rank-label" style="color:${isDark()?'#e8eaf0':'#1a1f2e'}">${name}</span>
-      </div>
-      <span class="rank-count">${cnt}</span>
-    </div>`).join('');
+  el.innerHTML='';
+  sorted.forEach(([name,cnt],i)=>{
+    const item=document.createElement('div');
+    item.className='rank-item clickable';
+    item.innerHTML=
+      '<span class="rank-num '+(i<3?'top':'')+'">'+(i+1)+'</span>'+
+      '<div class="rank-bar-wrap">'+
+        '<div class="rank-bar" style="width:'+Math.round(cnt/max*100)+'%;background:'+(i===0?'#EF9F27':i===1?'#8b90a0':i===2?'#c97d10':'var(--bg3)')+'"></div>'+
+        '<span class="rank-label" style="color:'+(isDark()?'#e8eaf0':'#1a1f2e')+'">'+name+'</span>'+
+      '</div>'+
+      '<span class="rank-count">'+cnt+'</span>';
+    const records=recordMap[name]||[];
+    const modalTitle=(titleFn?titleFn(name):name);
+    item.addEventListener('click',function(){openListModal(modalTitle,records);});
+    el.appendChild(item);
+  });
 }
 
 /* ===== Chart option presets ===== */
@@ -1298,43 +1345,43 @@ function renderShiftChart(data){
   }
 }
 
-/* ===== Heatmap Cell Detail Modal ===== */
-function openHeatmapDetail(records, slot, dayLabel){
+/* ===== 共通 一覧モーダル ===== */
+function buildListItem(r){
+  const line=r.lines?r.lines.name:'–';
+  const machine=r.machines?r.machines.machine_no+'号機':'–';
+  const pCode=r.products?r.products.product_code:'–';
+  const date=(r.occurred_date||'').slice(0,10).replace(/-/g,'/');
+  const stopStr=r.stop_minutes?r.stop_minutes+'分':'–';
+  const typeColor=r.trouble_type==='equipment'?'#3b82f6':'#a855f7';
+  const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
+  return '<div class="hm-list-item" onclick="closeDashModal();setTimeout(function(){openTroubleDetail('+r.id+')},50)">'+
+    '<div style="flex:1;min-width:0">'+
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
+        '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:'+(r.trouble_type==='equipment'?'rgba(59,130,246,.15)':'rgba(168,85,247,.15)')+';color:'+typeColor+'">'+typeLabel+'</span>'+
+        '<span class="hm-list-machine">'+line+' '+machine+'</span>'+
+      '</div>'+
+      '<div class="hm-list-sub">'+pCode+' &nbsp;'+date+'</div>'+
+    '</div>'+
+    '<span class="hm-list-stop">'+stopStr+'</span>'+
+  '</div>';
+}
+function openListModal(title, records){
   const el=document.getElementById('dashModalEl');
   if(!el) return;
-
-  // 一覧を停止時間降順でソート
   const sorted=[...records].sort((a,b)=>(b.stop_minutes||0)-(a.stop_minutes||0));
-
-  const listHTML=sorted.map(r=>{
-    const line=r.lines?r.lines.name:'–';
-    const machine=r.machines?r.machines.machine_no+'号機':'–';
-    const pCode=r.products?r.products.product_code:'–';
-    const date=(r.occurred_date||'').slice(0,10).replace(/-/g,'/');
-    const stopStr=r.stop_minutes?r.stop_minutes+'分':'–';
-    const typeColor=r.trouble_type==='equipment'?'#3b82f6':'#a855f7';
-    const typeLabel=r.trouble_type==='equipment'?t('t_eq'):t('t_md');
-    return '<div class="hm-list-item" onclick="closeDashModal();setTimeout(function(){openTroubleDetail('+r.id+')},50)">'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
-          '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:'+(r.trouble_type==='equipment'?'rgba(59,130,246,.15)':'rgba(168,85,247,.15)')+';color:'+typeColor+'">'+typeLabel+'</span>'+
-          '<span class="hm-list-machine">'+line+' '+machine+'</span>'+
-        '</div>'+
-        '<div class="hm-list-sub">'+pCode+' &nbsp;'+date+'</div>'+
-      '</div>'+
-      '<span class="hm-list-stop">'+stopStr+'</span>'+
-    '</div>';
-  }).join('');
-
   const html=
     '<div class="modal-handle"></div>'+
-    '<div class="modal-title">'+slot+' '+dayLabel+'曜日<span class="hm-modal-count">'+records.length+'件</span></div>'+
+    '<div class="modal-title">'+title+'<span class="hm-modal-count">'+records.length+'件</span></div>'+
     '<div class="hm-modal-header">タップで詳細を表示</div>'+
-    '<div style="display:flex;flex-direction:column;gap:6px">'+listHTML+'</div>'+
+    '<div style="display:flex;flex-direction:column;gap:6px">'+sorted.map(buildListItem).join('')+'</div>'+
     '<button class="btn-close-modal" onclick="closeDashModal()">閉じる</button>';
-
   el.innerHTML='<div class="modal-overlay" onclick="handleDashOverlay(event)"><div class="modal-sheet">'+html+'</div></div>';
   el.style.display='block';
+}
+
+/* ===== Heatmap Cell Detail Modal ===== */
+function openHeatmapDetail(records, slot, dayLabel){
+  openListModal(slot+' '+dayLabel+'曜日', records);
 }
 
 /* ===== Trouble Detail Modal ===== */
