@@ -1153,9 +1153,9 @@ function renderHeatmap(data){
   // 曜日(月〜日)×時間帯スロット の2次元集計
   // 曜日: 0=月...6=日
   const DAY_LABELS=['月','火','水','木','金','土','日'];
-  // 時間帯スロット: 8時スタート2時間刻み、0-8時は末尾
-  const SLOTS=['8-10時','10-12時','12-14時','14-16時','16-18時','18-20時','20-22時','22-24時','0-8時'];
-  const SLOT_COUNT=9;
+  // 時間帯スロット: 8時スタート2時間刻み、24時間分（8→10→...→24→2→4→6→8）
+  const SLOTS=['8-10時','10-12時','12-14時','14-16時','16-18時','18-20時','20-22時','22-24時','0-2時','2-4時','4-6時','6-8時'];
+  const SLOT_COUNT=12;
   const DAY_COUNT=7;
 
   // matrix[slot][day] = count、matrixRecords[slot][day] = records[]
@@ -1165,10 +1165,11 @@ function renderHeatmap(data){
   valid.forEach(r=>{
     const h=parseInt((r.stop_start||'').slice(0,2),10);
     if(isNaN(h)) return;
-    // スロット判定
+    // スロット判定: 8時スタート2時間刻み12スロット
+    // 8→0, 10→1, 12→2, 14→3, 16→4, 18→5, 20→6, 22→7, 0→8, 2→9, 4→10, 6→11
     let si;
-    if(h<8) si=8; // 0-8時は末尾スロット
-    else si=Math.floor((h-8)/2); // 8→0, 10→1, ...22→7
+    if(h>=8) si=Math.floor((h-8)/2);
+    else si=8+Math.floor(h/2); // 0→8, 1→8, 2→9, 3→9, 4→10, 5→10, 6→11, 7→11
     if(si<0||si>=SLOT_COUNT) return;
     // 曜日: occurred_date の曜日（ローカルではなくUTC基準で+9h）
     const d=utcDateToJSTDate(r.occurred_date);
