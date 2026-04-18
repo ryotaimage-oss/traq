@@ -296,6 +296,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* Detail rows */
 .detail-row{display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .detail-row:last-child{border-bottom:none;margin-bottom:0}
+.translate-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;flex-shrink:0;transition:all .15s;text-decoration:none}
+.translate-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 .detail-key{font-size:11px;font-weight:500;color:var(--text2);width:80px;flex-shrink:0;padding-top:2px}
 .detail-val{font-size:13px;flex:1;word-break:break-all}
 
@@ -1727,7 +1729,7 @@ function openDetail(id){
     <div class="detail-row"><span class="detail-key">${t('key_product')}</span><span class="detail-val">${tr.product_code} / ${tr.product_name}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_stop')}</span><span class="detail-val">${stopHTML}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_category')}</span><span class="detail-val">${catName(tr)}</span></div>
-    <div class="detail-row"><span class="detail-key">${t('key_detail')}</span><span class="detail-val">${tr.detail}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_detail')}</span><span class="detail-val" style="display:flex;align-items:flex-start;gap:6px"><span style="flex:1;word-break:break-all">${tr.detail||'–'}</span>${(function(){var tlLang=currentLang==='vi'?'vi':currentLang==='en'?'en':'';if(!tlLang||!tr.detail)return '';var url='https://translate.google.com/?sl=ja&tl='+tlLang+'&text='+encodeURIComponent(tr.detail)+'&op=translate';return '<a href="'+url+'" target="_blank" rel="noopener" class="translate-icon-btn" title="Google翻訳で開く"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></a>';})()} </span></div>
     <div class="detail-row"><span class="detail-key">${t('key_occurrence')}</span><span class="detail-val">${occLabel}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_submitter')}</span><span class="detail-val">${tr.submitted_by} ${tr.submitted_at||''}</span></div>
     ${approvedRowHTML}

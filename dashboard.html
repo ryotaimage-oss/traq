@@ -228,6 +228,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .status-draft{background:rgba(139,144,160,.12);color:var(--text2)}
 .btn-back-modal{width:100%;height:40px;background:none;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;font-weight:500;color:var(--orange);cursor:pointer;margin-top:12px;transition:all .15s}
 .btn-back-modal:hover{background:rgba(239,159,39,.08)}
+.translate-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;border:0.5px solid var(--border);background:none;color:var(--text2);cursor:pointer;flex-shrink:0;vertical-align:middle;transition:all .15s;text-decoration:none}
+.translate-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
 .btn-close-modal{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;margin-top:6px;transition:all .15s}
 .btn-close-modal:hover{color:var(--text1)}
 .stop-top-item.clickable{cursor:pointer}
@@ -1466,7 +1468,19 @@ function openTroubleDetail(id, backTitle, backRecords){
     '<div class="detail-row"><span class="detail-key">停止時間</span><span class="detail-val">'+stopHTML+'</span></div>'+
     '<div class="detail-row"><span class="detail-key">分類</span><span class="detail-val">'+category+'</span></div>'+
     '<div class="detail-row"><span class="detail-key">初発/再発</span><span class="detail-val">'+occLabel+'</span></div>'+
-    '<div class="detail-row"><span class="detail-key">詳細</span><span class="detail-val">'+(r.detail||'–')+'</span></div>'+
+    (function(){
+      var detailText=r.detail||'–';
+      var tlLang=currentLang==='vi'?'vi':currentLang==='en'?'en':'';
+      var translateBtn='';
+      if(tlLang&&r.detail){
+        var encoded=encodeURIComponent(r.detail);
+        var url='https://translate.google.com/?sl=ja&tl='+tlLang+'&text='+encoded+'&op=translate';
+        translateBtn='<a href="'+url+'" target="_blank" rel="noopener" class="translate-icon-btn" title="Google翻訳で開く">'+
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>'+
+          '</a>';
+      }
+      return '<div class="detail-row"><span class="detail-key">詳細</span><span class="detail-val" style="display:flex;align-items:flex-start;gap:6px"><span style="flex:1;word-break:break-all">'+detailText+'</span>'+translateBtn+'</span></div>';
+    })()+
     '<div class="detail-row"><span class="detail-key">入力者</span><span class="detail-val">'+reporter+'</span></div>'+
     approverRow+
     (backTitle&&backRecords?'<button class="btn-back-modal" onclick="_dashBack()">← 一覧に戻る</button>':'')+
