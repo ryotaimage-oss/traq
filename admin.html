@@ -436,7 +436,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_equipment">⚙️ 設備分類</span></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th class="sortable" onclick="sortTable('catEq','name')" data-i18n="th_cat_name">分類名</th><th class="sortable" onclick="sortTable('catEq','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
+              <thead><tr><th class="sortable" onclick="sortTable('catEq','name')" data-i18n="th_cat_name">分類名</th><th data-i18n="th_cat_name_vi">VI</th><th data-i18n="th_cat_name_en">EN</th><th class="sortable" onclick="sortTable('catEq','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
               <tbody id="catEqTable"><tr class="loading-row"><td colspan="3" data-i18n="loading">読み込み中...</td></tr></tbody>
             </table>
           </div>
@@ -445,7 +445,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_mold">🔧 金型分類</span></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th class="sortable" onclick="sortTable('catMd','name')" data-i18n="th_cat_name">分類名</th><th class="sortable" onclick="sortTable('catMd','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
+              <thead><tr><th class="sortable" onclick="sortTable('catMd','name')" data-i18n="th_cat_name">分類名</th><th data-i18n="th_cat_name_vi">VI</th><th data-i18n="th_cat_name_en">EN</th><th class="sortable" onclick="sortTable('catMd','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
               <tbody id="catMdTable"><tr class="loading-row"><td colspan="3" data-i18n="loading">読み込み中...</td></tr></tbody>
             </table>
           </div>
@@ -665,10 +665,10 @@ label_product_code:'品番',label_product_name:'品名',
 err_product_required:'品番・品名を入力してください',
 sec_categories:'🏷️ 分類マスタ',ph_cat_search:'分類名で検索...',
 cat_equipment:'⚙️ 設備分類',cat_mold:'🔧 金型分類',
-th_cat_name:'分類名',th_sort_order:'順序',cat_none:'なし',
+th_cat_name:'分類名',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'順序',cat_none:'なし',
 modal_cat_edit:'分類編集',modal_cat_add:'分類追加',
 label_type:'種別',type_equipment:'設備',type_mold:'金型',
-label_cat_name:'分類名',label_sort_order:'表示順',
+label_cat_name:'分類名',label_cat_name_vi:'ベトナム語名（VI）',label_cat_name_en:'英語名（EN）',label_sort_order:'表示順',
 err_cat_name:'分類名を入力してください',
 storage_warning_title:'⚠️ ストレージ使用量が80%を超えています',
 storage_warning_msg:'Excelバックアップ → データ削除 を推奨します。',
@@ -790,10 +790,10 @@ label_product_code:'Mã sản phẩm',label_product_name:'Tên sản phẩm',
 err_product_required:'Vui lòng nhập mã và tên sản phẩm',
 sec_categories:'🏷️ Master phân loại',ph_cat_search:'Tìm theo tên phân loại...',
 cat_equipment:'⚙️ Phân loại thiết bị',cat_mold:'🔧 Phân loại khuôn',
-th_cat_name:'Tên phân loại',th_sort_order:'Thứ tự',cat_none:'Không có',
+th_cat_name:'Tên phân loại',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'Thứ tự',cat_none:'Không có',
 modal_cat_edit:'Sửa phân loại',modal_cat_add:'Thêm phân loại',
 label_type:'Loại',type_equipment:'Thiết bị',type_mold:'Khuôn',
-label_cat_name:'Tên phân loại',label_sort_order:'Thứ tự hiển thị',
+label_cat_name:'Tên phân loại',label_cat_name_vi:'Tên tiếng Việt (VI)',label_cat_name_en:'Tên tiếng Anh (EN)',label_sort_order:'Thứ tự hiển thị',
 err_cat_name:'Vui lòng nhập tên phân loại',
 storage_warning_title:'⚠️ Dung lượng lưu trữ đã vượt 80%',
 storage_warning_msg:'Khuyến nghị sao lưu Excel → Xóa dữ liệu.',
@@ -915,10 +915,10 @@ label_product_code:'Product Code',label_product_name:'Product Name',
 err_product_required:'Please enter code and name',
 sec_categories:'🏷️ Category Master',ph_cat_search:'Search by category...',
 cat_equipment:'⚙️ Equipment Categories',cat_mold:'🔧 Mold Categories',
-th_cat_name:'Category',th_sort_order:'Order',cat_none:'None',
+th_cat_name:'Category',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'Order',cat_none:'None',
 modal_cat_edit:'Edit Category',modal_cat_add:'Add Category',
 label_type:'Type',type_equipment:'Equipment',type_mold:'Mold',
-label_cat_name:'Category Name',label_sort_order:'Display Order',
+label_cat_name:'Category Name',label_cat_name_vi:'Vietnamese Name (VI)',label_cat_name_en:'English Name (EN)',label_sort_order:'Display Order',
 err_cat_name:'Please enter a category name',
 storage_warning_title:'⚠️ Storage usage exceeds 80%',
 storage_warning_msg:'Recommend: Excel backup → Delete data.',
@@ -1342,6 +1342,8 @@ function renderCatTable(tbodyId,list){
   tbody.innerHTML=list.map(c=>{
     return`<tr>
       <td style="font-weight:600">${esc(c.name)}</td>
+      <td style="font-size:12px;color:var(--text2)">${esc(c.name_vi||'')}</td>
+      <td style="font-size:12px;color:var(--text2)">${esc(c.name_en||'')}</td>
       <td style="color:var(--text2)">${c.sort_order}</td>
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openCategoryModal('${c.id}')">${t('btn_edit')}</button>
@@ -1360,6 +1362,8 @@ function openCategoryModal(id){
         <option value="mold" ${c&&c.type==='mold'?'selected':''}>${t('type_mold')}</option>
       </select></div>
     <div class="form-group"><label class="form-label">${t('label_cat_name')}</label><input class="form-input" id="m-cname" value="${c?esc(c.name):''}"></div>
+    <div class="form-group"><label class="form-label">${t('label_cat_name_vi')}</label><input class="form-input" id="m-cname-vi" value="${c?esc(c.name_vi||''):''}"></div>
+    <div class="form-group"><label class="form-label">${t('label_cat_name_en')}</label><input class="form-input" id="m-cname-en" value="${c?esc(c.name_en||''):''}"></div>
     <div class="form-group"><label class="form-label">${t('label_sort_order')}</label><input class="form-input" id="m-csort" type="number" value="${c?c.sort_order:99}"></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
@@ -1369,15 +1373,17 @@ function openCategoryModal(id){
 async function saveCategory(id){
   const type=document.getElementById('m-ctype').value;
   const name=document.getElementById('m-cname').value.trim();
+  const nameVi=document.getElementById('m-cname-vi')?.value.trim()||null;
+  const nameEn=document.getElementById('m-cname-en')?.value.trim()||null;
   const sort=parseInt(document.getElementById('m-csort').value)||99;
   if(!name){showToast(t('err_cat_name'),'error');return;}
   try{
     if(id){
-      const updated=await sbFetch('categories?id=eq.'+id,'PATCH',{name,sort_order:sort});
+      const updated=await sbFetch('categories?id=eq.'+id,'PATCH',{name,name_vi:nameVi,name_en:nameEn,sort_order:sort});
       const idx=CATEGORIES.findIndex(c=>String(c.id)===String(id));
       if(idx>=0&&updated&&updated[0])CATEGORIES[idx]={...CATEGORIES[idx],...updated[0]};
     }else{
-      const created=await sbFetch('categories','POST',{type,name,sort_order:sort,is_active:true});
+      const created=await sbFetch('categories','POST',{type,name,name_vi:nameVi,name_en:nameEn,sort_order:sort,is_active:true});
       if(created&&created[0])CATEGORIES.push(created[0]);
     }
     closeModal();renderCategories();showToast(t('toast_saved'),'success');
