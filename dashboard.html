@@ -617,6 +617,12 @@ const PIE_COLORS=['#EF9F27','#3b82f6','#10b981','#a855f7','#ef4444','#f59e0b','#
 
 /* ===== CSS var helper ===== */
 function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
+function catName(r){
+  if(!r||!r.categories) return '–';
+  if(currentLang==='vi'&&r.categories.name_vi) return r.categories.name_vi;
+  if(currentLang==='en'&&r.categories.name_en) return r.categories.name_en;
+  return r.categories.name||'–';
+}
 
 /* ===== Init ===== */
 (async function init(){
@@ -639,7 +645,7 @@ function cssVar(name){return getComputedStyle(document.documentElement).getPrope
 async function loadData(){
   try{
     const rows=await sbFetch(
-      'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,lines(name),categories(name),machines(machine_no),products(product_code,product_name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)'+
+      'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,lines(name),categories(name,name_vi,name_en),machines(machine_no),products(product_code,product_name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)'+
       '&status=neq.draft&order=occurred_date.desc&limit=2000'
     );
     RAW=(rows||[]).filter(r=>r.status!=='draft');
@@ -909,8 +915,8 @@ function renderChart4(data){
   if(el)el.style.display='';
   const eq=data.filter(r=>r.trouble_type==='equipment');
   const map={};
-  eq.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
-  renderPieChart('chart4','legend4',map,eq,function(r,key){return (r.categories?r.categories.name:'その他')===key;});
+  eq.forEach(r=>{const k=catName(r)||'その他';map[k]=(map[k]||0)+1;});
+  renderPieChart('chart4','legend4',map,eq,function(r,key){return (catName(r)||'その他')===key;});
 }
 
 /* ===== Chart 5: 金型分類別 ===== */
@@ -921,8 +927,8 @@ function renderChart5(data){
   if(el)el.style.display='';
   const md=data.filter(r=>r.trouble_type==='mold');
   const map={};
-  md.forEach(r=>{const k=r.categories?r.categories.name:'その他';map[k]=(map[k]||0)+1;});
-  renderPieChart('chart5','legend5',map,md,function(r,key){return (r.categories?r.categories.name:'その他')===key;});
+  md.forEach(r=>{const k=catName(r)||'その他';map[k]=(map[k]||0)+1;});
+  renderPieChart('chart5','legend5',map,md,function(r,key){return (catName(r)||'その他')===key;});
 }
 
 function renderPieChart(canvasId,legendId,map,srcData,filterFn){
@@ -1425,7 +1431,7 @@ function openTroubleDetail(id, backTitle, backRecords){
   const machine=r.machines?r.machines.machine_no+'号機':'–';
   const pCode=r.products?r.products.product_code:'–';
   const pName=r.products?r.products.product_name:'';
-  const category=r.categories?r.categories.name:'–';
+  const category=catName(r);
   const reporter=r.traq_users?r.traq_users.name:'–';
   const approver=r.approver?r.approver.name:null;
   const shift=r.shift?r.shift+'直':'–';

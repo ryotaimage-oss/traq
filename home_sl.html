@@ -764,6 +764,12 @@ const I18N = {
 };
 let currentLang = localStorage.getItem('traq_lang')||'ja';
 function t(k,...a){const v=I18N[currentLang][k];return typeof v==='function'?v(...a):(v??k)}
+function catName(tr){
+  if(!tr||!tr._categoriesObj) return tr&&tr.category||'–';
+  if(currentLang==='vi'&&tr._categoriesObj.name_vi) return tr._categoriesObj.name_vi;
+  if(currentLang==='en'&&tr._categoriesObj.name_en) return tr._categoriesObj.name_en;
+  return tr._categoriesObj.name||tr.category||'–';
+}
 function setLang(lang){
   currentLang=lang; localStorage.setItem('traq_lang',lang);
   ['ja','vi','en'].forEach(l=>{
@@ -912,7 +918,7 @@ function utcToJST(isoStr){
 
 async function loadTroubles() {
   try {
-    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&order=created_at.desc&limit=100';
+    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&order=created_at.desc&limit=100';
     if (SESSION.shift) q += '&shift=eq.' + encodeURIComponent(SESSION.shift);
     const rows = await sbFetch(q);
     TROUBLES = (rows || []).map(r => ({
@@ -926,6 +932,7 @@ async function loadTroubles() {
       product_code: r.products ? r.products.product_code : '',
       product_name: r.products ? r.products.product_name : '',
       category: r.categories ? r.categories.name : '',
+      _categoriesObj: r.categories || null,
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
       stop_start: r.stop_start || null,
@@ -1035,7 +1042,7 @@ function setTlType(f) {
 async function loadTimeline() {
   document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
   try {
-    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
+    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
     TL_DATA = (rows || []).map(r => ({
       id: r.id, type: r.trouble_type, status: r.status,
       date: (r.occurred_date || '').slice(0,10),
@@ -1045,6 +1052,7 @@ async function loadTimeline() {
       product_code: r.products ? r.products.product_code : '',
       product_name: r.products ? r.products.product_name : '',
       category: r.categories ? r.categories.name : '',
+      _categoriesObj: r.categories || null,
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
       stop_start: r.stop_start || null,
@@ -1293,7 +1301,7 @@ function buildCard(tr,idx){
       <div class="tcard-body">
         <div class="tcard-machine">${tr.line} – ${tr.machine}号機</div>
         <div class="tcard-product">${tr.product_code} / ${tr.product_name}</div>
-        <span class="tcard-category">${tr.category}</span>
+        <span class="tcard-category">${catName(tr)}</span>
         <div class="tcard-detail">${tr.detail}</div>
         ${rejectHTML}
       </div>
@@ -1718,7 +1726,7 @@ function openDetail(id){
     <div class="detail-row"><span class="detail-key">${t('key_machine')}</span><span class="detail-val">${tr.machine}号機</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_product')}</span><span class="detail-val">${tr.product_code} / ${tr.product_name}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_stop')}</span><span class="detail-val">${stopHTML}</span></div>
-    <div class="detail-row"><span class="detail-key">${t('key_category')}</span><span class="detail-val">${tr.category}</span></div>
+    <div class="detail-row"><span class="detail-key">${t('key_category')}</span><span class="detail-val">${catName(tr)}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_detail')}</span><span class="detail-val">${tr.detail}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_occurrence')}</span><span class="detail-val">${occLabel}</span></div>
     <div class="detail-row"><span class="detail-key">${t('key_submitter')}</span><span class="detail-val">${tr.submitted_by} ${tr.submitted_at||''}</span></div>
