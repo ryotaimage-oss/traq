@@ -583,26 +583,10 @@ function t(k) {
   if (v === undefined) v = I18N.ja[k];
   return v !== undefined ? v : k;
 }
-function catDisplayName(cat){
-  if(!cat) return '';
-  if(currentLang==='vi'&&cat.name_vi) return cat.name_vi;
-  if(currentLang==='en'&&cat.name_en) return cat.name_en;
-  return cat.name||'';
-}
-function rebuildCategorySelect(){
-  var sel=document.getElementById('category-select');
-  if(!sel||!allCategories.length) return;
-  var cur=sel.value;
-  sel.innerHTML='<option value="">'+t('ph_select')+'</option>'+
-    allCategories.map(function(c){
-      return '<option value="'+c.id+'"'+(String(c.id)===String(cur)?' selected':'')+'>'+catDisplayName(c)+'</option>';
-    }).join('');
-}
 function setLang(l){
   currentLang=l;localStorage.setItem('traq_lang',l);
   ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});
   applyI18n();
-  rebuildCategorySelect();
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -718,7 +702,7 @@ async function loadMasters(){
     ]);
     allLines=r[0]||[];allMachines=r[1]||[];allProducts=r[2]||[];allCategories=r[3]||[];machineProducts=r[4]||[];
     document.getElementById('line-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
-    document.getElementById('category-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+catDisplayName(c)+'</option>';}).join('');
+    document.getElementById('category-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
   }catch(e){showToast(t('master_load_fail')(e.message),'error');}
 }
 
@@ -865,7 +849,12 @@ function getDraftData(){
 }
 async function loadDraft(){
   try{
-    var rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment&select=id,data&order=updated_at.desc&limit=1');
+    var rows;
+    if(currentDraftId){
+      rows=await sbFetch('drafts?id=eq.'+currentDraftId+'&user_id=eq.'+session.userId+'&select=id,data');
+    }else{
+      rows=await sbFetch('drafts?user_id=eq.'+session.userId+'&trouble_type=eq.equipment&select=id,data&order=updated_at.desc&limit=1');
+    }
     if(!rows||!rows.length){showToast(t('draft_none'),'');return;}
     currentDraftId=rows[0].id;
     var d=rows[0].data;
