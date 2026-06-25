@@ -1382,7 +1382,23 @@ function buildListItem(r, listTitle, listRecords){
 function openListModal(title, records){
   const el=document.getElementById('dashModalEl');
   if(!el) return;
-  const sorted=[...records].sort((a,b)=>(b.stop_minutes||0)-(a.stop_minutes||0));
+
+  // 日付(occurred_date)降順で並べる。同日は停止時間降順で安定化。
+  function sortByDate(arr){
+    return [...arr].sort(function(a,b){
+      const da=(a.occurred_date||''), db=(b.occurred_date||'');
+      if(da<db) return 1;
+      if(da>db) return -1;
+      return (b.stop_minutes||0)-(a.stop_minutes||0);
+    });
+  }
+
+  let curTab='all'; // 'all' | 'equipment' | 'mold'
+  function filterByTab(tab){
+    if(tab==='equipment') return records.filter(r=>r.trouble_type==='equipment');
+    if(tab==='mold')      return records.filter(r=>r.trouble_type==='mold');
+    return records.slice();
+  }
 
   // DOM生成
   const overlay=document.createElement('div');
@@ -1394,10 +1410,47 @@ function openListModal(title, records){
 
   const handle=document.createElement('div');handle.className='modal-handle';
   const titleEl=document.createElement('div');titleEl.className='modal-title';
-  titleEl.innerHTML=title+'<span class="hm-modal-count">'+records.length+'件</span>';
   const subEl=document.createElement('div');subEl.className='hm-modal-header';subEl.textContent='タップで詳細を表示';
+
+  // タブ(すべて / 設備 / 金型)
+  const tabsWrap=document.createElement('div');
+  tabsWrap.className='type-tabs';
+  tabsWrap.style.cssText='margin:6px 0 14px';
+  const tabDefs=[
+    {key:'all',      cls:'all', label:t('t_all')},
+    {key:'equipment',cls:'eq',  label:t('t_eq')},
+    {key:'mold',     cls:'md',  label:t('t_md')}
+  ];
+  const tabBtns={};
+  tabDefs.forEach(function(d){
+    const b=document.createElement('button');
+    b.className='ttab '+d.cls;
+    b.textContent=d.label;
+    b.addEventListener('click',function(){ if(curTab!==d.key){ curTab=d.key; renderList(); } });
+    tabBtns[d.key]=b;
+    tabsWrap.appendChild(b);
+  });
+
   const listWrap=document.createElement('div');listWrap.style.cssText='display:flex;flex-direction:column;gap:6px';
-  sorted.forEach(r=>listWrap.appendChild(buildListItem(r, title, records)));
+
+  function renderList(){
+    const filtered=sortByDate(filterByTab(curTab));
+    // ヘッダー件数(タブ連動)
+    titleEl.innerHTML=title+'<span class="hm-modal-count">'+filtered.length+'件</span>';
+    // タブのactive表示
+    tabDefs.forEach(function(d){ tabBtns[d.key].classList.toggle('active', d.key===curTab); });
+    // リスト描画
+    listWrap.innerHTML='';
+    if(filtered.length===0){
+      const empty=document.createElement('div');
+      empty.style.cssText='text-align:center;color:var(--text2);font-size:13px;padding:28px 0';
+      empty.textContent=t('no_data');
+      listWrap.appendChild(empty);
+    }else{
+      filtered.forEach(r=>listWrap.appendChild(buildListItem(r, title, records)));
+    }
+  }
+
   const closeBtn=document.createElement('button');
   closeBtn.className='btn-close-modal';
   closeBtn.textContent='閉じる';
@@ -1406,12 +1459,15 @@ function openListModal(title, records){
   sheet.appendChild(handle);
   sheet.appendChild(titleEl);
   sheet.appendChild(subEl);
+  sheet.appendChild(tabsWrap);
   sheet.appendChild(listWrap);
   sheet.appendChild(closeBtn);
   overlay.appendChild(sheet);
   el.innerHTML='';
   el.appendChild(overlay);
   el.style.display='block';
+
+  renderList(); // 初期描画(デフォルト=すべて)
 }
 
 /* ===== Heatmap Cell Detail Modal ===== */
