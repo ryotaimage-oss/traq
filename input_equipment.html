@@ -702,7 +702,7 @@ async function loadMasters(){
     ]);
     allLines=r[0]||[];allMachines=r[1]||[];allProducts=r[2]||[];allCategories=r[3]||[];machineProducts=r[4]||[];
     document.getElementById('line-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allLines.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('');
-    document.getElementById('category-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allCategories.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+    document.getElementById('category-select').innerHTML='<option value="">'+t('ph_select')+'</option>'+allCategories.map(function(c){var cn=(currentLang==='vi'&&c.name_vi)?c.name_vi:(currentLang==='en'&&c.name_en)?c.name_en:c.name;return '<option value="'+c.id+'">'+cn+'</option>';}).join('');
   }catch(e){showToast(t('master_load_fail')(e.message),'error');}
 }
 
@@ -839,7 +839,7 @@ function getDraftData(){
     product_code:productEl.options[productEl.selectedIndex]?(productEl.options[productEl.selectedIndex].text.split('(')[0].trim()):'',
     product_name:productEl.options[productEl.selectedIndex]?(productEl.options[productEl.selectedIndex].text.replace(/^[^(]*\(?/,'').replace(/\)$/,'')):'',
     category_id:categoryEl.value,
-    category_name:categoryEl.options[categoryEl.selectedIndex]?categoryEl.options[categoryEl.selectedIndex].text:'',
+    category_name:(function(){var c=allCategories.filter(function(x){return String(x.id)===String(categoryEl.value);})[0];return c?c.name:'';})(),
     occurrence:selectedOccurrence,
     stop_start_h:drumState.sh,stop_start_m:drumState.sm,
     stop_end_h:drumState.eh,stop_end_m:drumState.em,

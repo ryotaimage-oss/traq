@@ -523,6 +523,7 @@ const I18N = {
 
 let currentLang = localStorage.getItem('traq_lang') || 'ja';
 function t(k, ...a) { const v = I18N[currentLang][k]; return typeof v === 'function' ? v(...a) : (v ?? k); }
+function catNm(cats) { if(!cats) return ''; if(currentLang==='vi'&&cats.name_vi) return cats.name_vi; if(currentLang==='en'&&cats.name_en) return cats.name_en; return cats.name||''; }
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('traq_lang', lang);
@@ -707,7 +708,7 @@ function setTlType(f) {
 async function loadTimeline() {
   document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
   try {
-    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
+    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
     TL_DATA = (rows || []).map(r => ({
       id: r.id, type: r.trouble_type, status: r.status,
       date: (r.occurred_date || '').slice(0,10),
@@ -716,7 +717,7 @@ async function loadTimeline() {
       machine: r.machines ? r.machines.machine_no : '',
       product_code: r.products ? r.products.product_code : '',
       product_name: r.products ? r.products.product_name : '',
-      category: r.categories ? r.categories.name : '',
+      category: catNm(r.categories),
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
       reject_reason: r.reject_reason || null,
@@ -1017,7 +1018,7 @@ async function loadTroubles() {
   TROUBLES = [];
   try {
     const rows = await sbFetch(
-      'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)' +
+      'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name),approver:traq_users!approver_id(name)' +
       '&reporter_id=eq.' + SESSION.userId + '&status=neq.draft&order=created_at.desc&limit=50'
     );
     TROUBLES = (rows || []).map(r => ({
@@ -1028,7 +1029,7 @@ async function loadTroubles() {
       machine: r.machines ? r.machines.machine_no : '',
       product_code: r.products ? r.products.product_code : '',
       product_name: r.products ? r.products.product_name : '',
-      category: r.categories ? r.categories.name : '',
+      category: catNm(r.categories),
       occurrence: r.occurrence || 'first',
       stop_minutes: r.stop_minutes,
       detail: r.detail || '',
