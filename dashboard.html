@@ -619,11 +619,27 @@ function utcDateToJSTDate(isoStr){
 
 const SB_URL='https://svnqlwfcnoqwdwfbbaqb.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
-async function sbFetch(path){
-  const res=await fetch(SB_URL+'/rest/v1/'+path,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+async function sbFetch(path,extraHeaders){
+  const h={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+  if(extraHeaders) Object.assign(h,extraHeaders);
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{headers:h});
   if(!res.ok) throw new Error(await res.text());
   const text=await res.text();
   return text?JSON.parse(text):[];
+}
+
+/* Supabaseのmax-rows(既定1000)を回避するページング取得 */
+async function sbFetchAll(path,pageSize){
+  const size=pageSize||1000;
+  let all=[],offset=0;
+  for(let guard=0;guard<100;guard++){
+    const chunk=await sbFetch(path,{'Range-Unit':'items','Range':offset+'-'+(offset+size-1)});
+    if(!Array.isArray(chunk)||chunk.length===0) break;
+    all=all.concat(chunk);
+    if(chunk.length<size) break;
+    offset+=size;
+  }
+  return all;
 }
 
 /* ===== i18n ===== */
@@ -687,9 +703,9 @@ function catName(r){
 /* ===== Load ===== */
 async function loadData(){
   try{
-    const rows=await sbFetch(
+    const rows=await sbFetchAll(
       'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,lines(name),categories(name,name_vi,name_en),machines(machine_no),products(product_code,product_name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)'+
-      '&status=neq.draft&order=occurred_date.desc&limit=2000'
+      '&status=neq.draft&order=occurred_date.desc,id.desc'
     );
     RAW=(rows||[]).filter(r=>r.status!=='draft');
     buildLineOptions();
