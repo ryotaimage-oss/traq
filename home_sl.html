@@ -635,7 +635,7 @@ const I18N = {
     occ_first:'初発', occ_rec:'再発',
     stop_min:(n)=>`${n}分`, stop_none:'不明',
     shift_label:(s)=>`${s}直`,
-    btn_approve:'✓ 承認する', btn_reject:'✕ 差し戻す', btn_resubmit:'修正して再送信',
+    btn_approve:'✓ 承認する', btn_reject:'✕ 差し戻す', btn_resubmit:'修正して再送信', btn_edit_approved:'✎ 修正する', edit_denied:'修正はSL・管理者のみ可能です',
     btn_close:'閉じる',
     approve_confirm:'この内容を承認しますか？',
     approve_done:'承認しました',
@@ -682,7 +682,7 @@ const I18N = {
     occ_first:'Lần đầu', occ_rec:'Tái phát',
     stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
     shift_label:(s)=>`Ca ${s}`,
-    btn_approve:'✓ Duyệt', btn_reject:'✕ Trả lại', btn_resubmit:'Sửa và gửi lại',
+    btn_approve:'✓ Duyệt', btn_reject:'✕ Trả lại', btn_resubmit:'Sửa và gửi lại', btn_edit_approved:'✎ Chỉnh sửa', edit_denied:'Chỉ SL và Admin mới được chỉnh sửa',
     btn_close:'Đóng',
     approve_confirm:'Bạn có muốn duyệt nội dung này không?',
     approve_done:'Đã duyệt',
@@ -729,7 +729,7 @@ const I18N = {
     occ_first:'First', occ_rec:'Recurrence',
     stop_min:(n)=>`${n} min`, stop_none:'Unknown',
     shift_label:(s)=>`Shift ${s}`,
-    btn_approve:'✓ Approve', btn_reject:'✕ Reject', btn_resubmit:'Fix & Resubmit',
+    btn_approve:'✓ Approve', btn_reject:'✕ Reject', btn_resubmit:'Fix & Resubmit', btn_edit_approved:'✎ Edit', edit_denied:'Only SL and Admin can edit',
     btn_close:'Close',
     approve_confirm:'Approve this submission?',
     approve_done:'Approved',
@@ -1368,6 +1368,17 @@ function editRejected(id){
   location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id;
 }
 
+/* 承認済み投稿の修正（SL・adminのみ / 承認状態を維持） */
+function editApproved(id){
+  if(!(SESSION.role==='admin'||SESSION.role==='leader'||SESSION.role==='sl')){
+    showToast(t('edit_denied'),'error');
+    return;
+  }
+  const tr=TROUBLES.find(x=>String(x.id)===String(id)) || TL_DATA.find(x=>String(x.id)===String(id));
+  if(!tr) return;
+  location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id+'&keepapproved=1';
+}
+
 async function quickApprove(id){
   const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
   if (!tr) return;
@@ -1694,6 +1705,11 @@ function openDetail(id){
     approveActionsHTML=`
       <div style="margin-top:12px">
         <button onclick="closeModal();editRejected(${id})" style="width:100%;height:44px;border:none;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:var(--orange);color:var(--navy);transition:opacity .15s">${t('btn_resubmit')}</button>
+      </div>`;
+  } else if(tr.status==='approved' && (SESSION.role==='admin'||SESSION.role==='leader'||SESSION.role==='sl')){
+    approveActionsHTML=`
+      <div style="margin-top:12px">
+        <button onclick="closeModal();editApproved(${id})" style="width:100%;height:44px;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:var(--bg3);color:var(--text1);transition:opacity .15s">${t('btn_edit_approved')}</button>
       </div>`;
   }
 

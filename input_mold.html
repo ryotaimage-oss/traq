@@ -468,6 +468,9 @@ var I18N = {
     v_category:'分類を選択してください',
     v_occurrence:'初発/再発を選択してください',
     v_detail:'詳細内容を入力してください',
+    v_end_required:'承認済み投稿の修正では終了時刻の入力が必要です',
+    btn_edit_save:'修正を保存する',
+    edit_approved_label:'承認済み投稿を修正しています（承認状態は維持されます）',
     msg_sending:'送信中...',
     msg_uploading:'画像をアップロード中...',
     msg_submitted:'送信しました',
@@ -517,6 +520,9 @@ var I18N = {
     v_category:'Hãy chọn phân loại',
     v_occurrence:'Hãy chọn lần đầu / tái phát',
     v_detail:'Hãy nhập chi tiết',
+    v_end_required:'Khi sửa bài đã duyệt, cần nhập thời gian kết thúc',
+    btn_edit_save:'Lưu chỉnh sửa',
+    edit_approved_label:'Đang sửa bài đã duyệt (trạng thái duyệt được giữ nguyên)',
     msg_sending:'Đang gửi...',
     msg_uploading:'Đang tải ảnh lên...',
     msg_submitted:'Đã gửi',
@@ -566,6 +572,9 @@ var I18N = {
     v_category:'Please select a category',
     v_occurrence:'Please select first/recurrence',
     v_detail:'Please enter details',
+    v_end_required:'End time is required when editing an approved post',
+    btn_edit_save:'Save changes',
+    edit_approved_label:'Editing an approved post (approval status will be kept)',
     msg_sending:'Submitting...',
     msg_uploading:'Uploading images...',
     msg_submitted:'Submitted',
@@ -889,6 +898,8 @@ function validate(){
   if(!document.getElementById('category-select').value){showToast(t('v_category'),'error');return false;}
   if(!selectedOccurrence){showToast(t('v_occurrence'),'error');return false;}
   if(!document.getElementById('detail').value.trim()){showToast(t('v_detail'),'error');return false;}
+  // 承認済み投稿の修正では停止時間が確定している必要がある
+  if(keepApproved && !endTimeSet){showToast(t('v_end_required'),'error');return false;}
   return true;
 }
 
@@ -919,9 +930,16 @@ async function doSubmit(){
     console.log('doSubmit data:', JSON.stringify(td));
     var result, tId;
     if (editTroubleId) {
-      td.reject_reason = null;
-      td.approver_id = null;
-      td.approved_at = null;
+      if (keepApproved) {
+        // 承認済み投稿の修正: 承認状態・承認者・元の投稿者を維持する
+        delete td.status;
+        delete td.reporter_id;
+      } else {
+        td.status = 'pending';
+        td.reject_reason = null;
+        td.approver_id = null;
+        td.approved_at = null;
+      }
       await sbFetch('troubles?id=eq.' + editTroubleId, 'PATCH', td);
       tId = editTroubleId;
     } else {
@@ -964,12 +982,14 @@ var toastTimer=null;
 function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},type==='error'?8000:3000);}
 function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';var sti=document.getElementById('sb-theme-icon');if(sti)sti.textContent=next==='dark'?'🌙':'☀️';}
 
-/* ── Edit mode (rejected resubmit) ── */
+/* ── Edit mode (rejected resubmit / approved edit) ── */
 var editTroubleId = null;
+var keepApproved = false;
 var currentDraftId = null;
 (function(){
   var params = new URLSearchParams(location.search);
   if (params.get('edit')) editTroubleId = params.get('edit');
+  if (params.get('keepapproved') === '1') keepApproved = true;
   if (params.get('draft')) currentDraftId = parseInt(params.get('draft')) || null;
 })();
 
@@ -1007,7 +1027,15 @@ async function loadEditData() {
     updateStopResult();
     if (r.detail) document.getElementById('detail').value = r.detail;
     var btn = document.getElementById('submit-btn');
-    if (btn) btn.textContent = t('btn_resubmit');
+    if (btn) btn.textContent = keepApproved ? t('btn_edit_save') : t('btn_resubmit');
+    // 承認済み修正モードの明示バナー
+    if (keepApproved) {
+      var abn = document.createElement('div');
+      abn.style.cssText = 'background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#b07a10;';
+      abn.textContent = t('edit_approved_label');
+      var af = document.querySelector('.form-body');
+      if (af) af.insertBefore(abn, af.firstChild);
+    }
     if (r.reject_reason) {
       var banner = document.createElement('div');
       banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#ef4444;';
