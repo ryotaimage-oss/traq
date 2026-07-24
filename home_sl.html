@@ -77,11 +77,55 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* Scroll area */
 .scroll-area{flex:1;overflow-y:auto;padding:16px 16px 16px}
 
-/* Filter row */
-.filter-row{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0}
-.filter-row::-webkit-scrollbar{display:none}
-.ftab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
-.ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
+/* ===== 検索・絞り込み（全タブ共通） ===== */
+.flt-area{background:var(--bg2);border:1px solid var(--border);border-radius:12px;flex-shrink:0;padding:10px 12px;margin:10px 0 12px}
+.flt-main{display:flex;gap:8px;align-items:stretch}
+.flt-search-wrap{flex:1;position:relative;display:flex;align-items:center;min-width:0}
+.flt-search-icon{position:absolute;left:10px;font-size:13px;opacity:.55;pointer-events:none;z-index:1}
+.flt-search{width:100%;height:40px;padding:0 32px 0 32px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:16px;color:var(--text1);outline:none;-webkit-appearance:none;transition:border-color .15s}
+.flt-search:focus{border-color:var(--orange)}
+.flt-search::placeholder{color:var(--text2);font-size:13px}
+.flt-search::-webkit-search-cancel-button{display:none}
+.flt-kw-clear{position:absolute;right:7px;width:22px;height:22px;border:none;border-radius:50%;background:var(--bg2);color:var(--text2);font-size:10px;cursor:pointer;align-items:center;justify-content:center;padding:0;font-family:inherit}
+.flt-toggle{display:flex;align-items:center;gap:5px;height:40px;padding:0 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation;transition:all .15s}
+.flt-toggle.on{border-color:var(--orange);color:var(--orange)}
+.flt-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--orange);color:var(--navy);font-size:10px;font-weight:700}
+.flt-caret{font-size:9px;transition:transform .15s}
+.flt-toggle.open .flt-caret{transform:rotate(180deg)}
+.flt-panel{display:none;flex-direction:column;gap:8px;padding-top:8px}
+.flt-panel.open{display:flex}
+.flt-seg{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--bg3)}
+.fseg{flex:1;height:40px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap}
+.fseg + .fseg{border-left:1px solid var(--border)}
+.fseg.active{background:var(--orange);color:var(--navy);font-weight:700}
+.flt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.flt-input{height:40px;padding:0 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);-webkit-appearance:none;outline:none;min-width:0;width:100%;transition:border-color .15s}
+.flt-input:focus{border-color:var(--orange)}
+.flt-row3{display:flex;gap:8px;align-items:center}
+.flt-row3 .flt-input{flex:1}
+.flt-clear{height:40px;padding:0 14px;background:none;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;touch-action:manipulation;flex-shrink:0}
+.flt-clear:hover{color:var(--danger);border-color:var(--danger)}
+.flt-cnt-pc{display:none;font-size:11px;color:var(--text2);white-space:nowrap;margin-left:auto}
+.flt-cnt-sp{font-size:11px;color:var(--text2);text-align:right;padding-top:7px}
+.flt-tags{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px}
+.flt-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 6px 4px 10px;background:rgba(239,159,39,.1);border:1px solid rgba(239,159,39,.35);border-radius:14px;font-size:11px;font-weight:500;color:var(--orange);max-width:100%}
+.flt-tag > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flt-tag-x{width:16px;height:16px;border:none;border-radius:50%;background:rgba(239,159,39,.25);color:var(--orange);font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;font-family:inherit}
+.flt-typeseg-pc{display:none}
+@media(min-width:768px){
+  .flt-typeseg-pc{display:flex;flex:0 0 auto}
+  .flt-typeseg-pc .fseg{padding:0 16px}
+  .flt-typeseg-sp{display:none}
+  .flt-toggle{display:none}
+  .flt-panel{display:flex}
+  .flt-grid{grid-template-columns:repeat(4,1fr)}
+  .flt-cnt-pc{display:inline-block}
+  .flt-cnt-sp{display:none}
+  .flt-search{height:36px;font-size:13px}
+  .fseg{height:36px}
+  .flt-input{height:36px}
+  .flt-clear{height:36px}
+}
 
 /* Trouble cards */
 .trouble-list{display:flex;flex-direction:column;gap:10px}
@@ -206,14 +250,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 }
 
 /* Timeline (全件) */
-.tl-filter-area{padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;flex-shrink:0}
-.tl-filter-row{display:flex;gap:7px;align-items:center}
-.tl-flabel{font-size:11px;color:var(--text2);white-space:nowrap;min-width:30px}
-.tl-datebox{flex:1;padding:5px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text1);font-family:inherit}
-.tl-datesep{font-size:11px;color:var(--text2)}
-.tl-linesel{flex:1;padding:5px 7px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text1);font-family:inherit;-webkit-appearance:none}
-.tl-cnt{text-align:right;font-size:11px;color:var(--text2);padding:5px 14px 2px;flex-shrink:0}
-.tl-list{display:flex;flex-direction:column;padding:10px 14px}
+.tl-list{display:flex;flex-direction:column;padding:2px 0}
 .tl-sep{display:flex;align-items:center;gap:8px;margin:8px 0 7px}
 .tl-sep-line{flex:1;height:1px;background:var(--border)}
 .tl-sep-label{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:500}
@@ -546,32 +583,46 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </button>
       </div>
 
-      <!-- Type filter (非全件タブ用) -->
-      <div class="filter-row" id="typeFilterRow">
-        <button class="ftab active" id="ftab-all2"  onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
-        <button class="ftab"        id="ftab-eq"    onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
-        <button class="ftab"        id="ftab-md"    onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
-      </div>
-
-      <!-- 全件タイムラインフィルター -->
-      <div class="tl-filter-area" id="tlFilterArea" style="display:none">
-        <div class="tl-filter-row">
-          <span class="tl-flabel" data-i18n="tl_date">日付</span>
-          <input type="date" class="tl-datebox" id="tlDateFrom">
-          <span class="tl-datesep">〜</span>
-          <input type="date" class="tl-datebox" id="tlDateTo">
+      <!-- 検索・絞り込み（全タブ共通） -->
+      <div class="flt-area" id="fltArea">
+        <div class="flt-main">
+          <div class="flt-search-wrap">
+            <span class="flt-search-icon">🔍</span>
+            <input type="search" class="flt-search" id="fltKeyword" data-i18n-ph="flt_kw_ph" placeholder="品番・品名・機番・内容で検索" autocomplete="off" enterkeyhint="search">
+            <button type="button" class="flt-kw-clear" id="fltKwClear" onclick="clearKeyword()" style="display:none" tabindex="-1">✕</button>
+          </div>
+          <div class="flt-seg flt-typeseg-pc">
+            <button type="button" class="fseg active" data-ft="all" onclick="setFltType('all')" data-i18n="filter_all">すべて</button>
+            <button type="button" class="fseg" data-ft="eq" onclick="setFltType('eq')" data-i18n="filter_eq">設備</button>
+            <button type="button" class="fseg" data-ft="md" onclick="setFltType('md')" data-i18n="filter_md">金型</button>
+          </div>
+          <button type="button" class="flt-toggle" id="fltToggle" onclick="toggleFilterPanel()">
+            <span data-i18n="flt_toggle">絞り込み</span>
+            <span class="flt-badge" id="fltBadge" style="display:none">0</span>
+            <span class="flt-caret" id="fltCaret">▾</span>
+          </button>
         </div>
-        <div class="tl-filter-row">
-          <span class="tl-flabel" data-i18n="tl_line">ライン</span>
-          <select class="tl-linesel" id="tlLineSelect" onchange="renderTimeline()">
-            <option value="" data-i18n="tl_all_lines">すべてのライン</option>
-          </select>
-          <button class="ftab active" id="tl-ftab-all" onclick="setTlType('all')"  data-i18n="filter_all">すべて</button>
-          <button class="ftab"        id="tl-ftab-eq"  onclick="setTlType('eq')"   data-i18n="filter_eq">設備</button>
-          <button class="ftab"        id="tl-ftab-md"  onclick="setTlType('md')"   data-i18n="filter_md">金型</button>
+        <div class="flt-panel" id="fltPanel">
+          <div class="flt-seg flt-typeseg-sp">
+            <button type="button" class="fseg active" data-ft="all" onclick="setFltType('all')" data-i18n="filter_all">すべて</button>
+            <button type="button" class="fseg" data-ft="eq" onclick="setFltType('eq')" data-i18n="filter_eq">設備</button>
+            <button type="button" class="fseg" data-ft="md" onclick="setFltType('md')" data-i18n="filter_md">金型</button>
+          </div>
+          <div class="flt-grid">
+            <input type="date" class="flt-input" id="fltDateFrom">
+            <input type="date" class="flt-input" id="fltDateTo">
+            <select class="flt-input" id="fltLine"></select>
+            <select class="flt-input" id="fltCategory"></select>
+          </div>
+          <div class="flt-row3">
+            <select class="flt-input" id="fltReporter"></select>
+            <button type="button" class="flt-clear" onclick="clearAllFilters()" data-i18n="flt_clear">すべてクリア</button>
+            <span class="flt-cnt-pc" id="fltCntPC"></span>
+          </div>
         </div>
+        <div class="flt-tags" id="fltTags" style="display:none"></div>
+        <div class="flt-cnt-sp" id="fltCntSP"></div>
       </div>
-      <div class="tl-cnt" id="tlCnt" style="display:none"></div>
 
       <!-- 通常リスト -->
       <div class="trouble-list" id="troubleList"></div>
@@ -629,7 +680,15 @@ const I18N = {
     btn_eq_short:'設備異常', btn_md_short:'金型異常',
     tab_pending:'承認待ち', tab_all:'全件', tab_draft:'下書き', tab_approved:'承認済み', tab_rejected:'差し戻し',
     filter_all:'すべて', filter_eq:'設備', filter_md:'金型',
-    tl_date:'日付', tl_line:'ライン', tl_all_lines:'すべてのライン',
+    flt_kw_ph:'品番・品名・機番・内容で検索',
+    flt_toggle:'絞り込み',
+    flt_all_lines:'すべてのライン', flt_all_cats:'すべての分類', flt_all_reporters:'すべての投稿者',
+    flt_clear:'すべてクリア',
+    flt_count:(total,hit)=>`${total}件中 ${hit}件`,
+    flt_capped:'※先頭200件のみ表示',
+    flt_empty:'条件に一致する投稿はありません',
+    flt_loading:'読み込み中...',
+    flt_load_err:'読み込みエラー',
     type_eq:'設備', type_md:'金型',
     status_pending:'承認待ち', status_approved:'承認済み', status_rejected:'差し戻し', status_draft:'下書き',
     occ_first:'初発', occ_rec:'再発',
@@ -676,7 +735,15 @@ const I18N = {
     btn_eq_short:'Thiết bị', btn_md_short:'Khuôn',
     tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_draft:'Nháp', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
     filter_all:'Tất cả', filter_eq:'Thiết bị', filter_md:'Khuôn',
-    tl_date:'Ngày', tl_line:'Dây', tl_all_lines:'Tất cả dây chuyền',
+    flt_kw_ph:'Tìm mã SP・tên SP・máy・nội dung',
+    flt_toggle:'Lọc',
+    flt_all_lines:'Tất cả dây chuyền', flt_all_cats:'Tất cả phân loại', flt_all_reporters:'Tất cả người đăng',
+    flt_clear:'Xóa tất cả',
+    flt_count:(total,hit)=>`${hit} / ${total} mục`,
+    flt_capped:'※Chỉ hiển thị 200 mục đầu',
+    flt_empty:'Không có bài viết phù hợp',
+    flt_loading:'Đang tải...',
+    flt_load_err:'Lỗi tải dữ liệu',
     type_eq:'Thiết bị', type_md:'Khuôn',
     status_pending:'Chờ duyệt', status_approved:'Đã duyệt', status_rejected:'Trả lại', status_draft:'Nháp',
     occ_first:'Lần đầu', occ_rec:'Tái phát',
@@ -723,7 +790,15 @@ const I18N = {
     btn_eq_short:'Equipment', btn_md_short:'Mold',
     tab_pending:'Pending', tab_all:'All', tab_draft:'Draft', tab_approved:'Approved', tab_rejected:'Rejected',
     filter_all:'All', filter_eq:'Equipment', filter_md:'Mold',
-    tl_date:'Date', tl_line:'Line', tl_all_lines:'All lines',
+    flt_kw_ph:'Search product / machine / detail',
+    flt_toggle:'Filter',
+    flt_all_lines:'All lines', flt_all_cats:'All categories', flt_all_reporters:'All reporters',
+    flt_clear:'Clear all',
+    flt_count:(total,hit)=>`${hit} of ${total}`,
+    flt_capped:'※First 200 shown',
+    flt_empty:'No matching posts',
+    flt_loading:'Loading...',
+    flt_load_err:'Load error',
     type_eq:'Equipment', type_md:'Mold',
     status_pending:'Pending', status_approved:'Approved', status_rejected:'Rejected', status_draft:'Draft',
     occ_first:'First', occ_rec:'Recurrence',
@@ -771,11 +846,17 @@ function setLang(lang){
     const b2=document.getElementById('sb-lang-'+l);
     if(b2) b2.classList.toggle('active',l===lang);
   });
-  applyI18n(); renderList();
+  applyI18n();
+  TROUBLES.forEach(function(x){ if(x._cats) x.category = catNm(x._cats); });
+  rebuildFilterOptions();
+  renderFilterTags();
+  updateFilterCount();
+  renderCurrent();
   updateSelectButtons(selectMode);
 }
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh)});
   updateBadges();
 }
 
@@ -803,13 +884,21 @@ const SESSION = (() => {
 })();
 
 /* ===== State ===== */
-let TROUBLES = [];
-let TL_DATA = [];
+let TROUBLES = [];      // 現在タブの表示データ（サーバー側フィルタ適用済み。下書きタブはローカルフィルタ済み）
+let DRAFTS = [];        // 自分の下書き
 let mainTab = 'pending';
-let typeFilter = 'all';
-let tlTypeFilter = 'all';
 let selectMode = false;
 let selectedIds = new Set();
+
+/* ===== 検索・絞り込み状態（全タブ共通） ===== */
+const FILTER = { keyword:'', type:'all', dateFrom:'', dateTo:'', lineId:'', categoryId:'', reporterId:'' };
+const MASTERS = { lines:[], categories:[], machines:[], products:[], reporters:[] };
+const BADGE = { pending:0, rejected:0 };
+let TAB_TOTAL = 0;       // 現在タブの総件数（フィルタなし）
+let FILTERED_TOTAL = 0;  // フィルタ適用後の総件数（Content-Rangeより）
+let filterTimer = null;  // 300msデバウンス用
+let filterPanelOpen = false;
+let _loadSeq = 0;        // 応答の追い越し破棄用
 
 /* ===== Init ===== */
 (async function init(){
@@ -857,17 +946,28 @@ let selectedIds = new Set();
   // SL/adminは選択削除ボタンを表示
   var selBtn = document.getElementById('selectToggleBtn');
   if (selBtn) selBtn.style.display = 'inline-block';
-  await loadTroubles();
 
-  // Push通知タップ時: ?detail={troubleId} で詳細モーダルを自動表示
+  initFilterEvents();
+  await Promise.all([loadFilterMasters(), loadDrafts()]);
+  await reloadData();
+
+  // Push通知タップ時: ?detail={troubleId} で該当タブに切り替えて詳細モーダルを自動表示
   var params = new URLSearchParams(location.search);
   var detailId = params.get('detail');
   if (detailId) {
     history.replaceState(null, '', location.pathname);
-    var found = TROUBLES.find(function(tr) { return String(tr.id) === String(detailId); });
-    if (found) {
-      setTimeout(function() { openDetail(found.id); }, 300);
-    }
+    try {
+      var dRows = await sbFetch('troubles?select=id,status,shift&id=eq.' + encodeURIComponent(detailId));
+      if (dRows && dRows.length) {
+        var dSt = dRows[0].status;
+        var dTgt = dSt === 'pending' ? 'pending' : dSt === 'approved' ? 'approved' : dSt === 'rejected' ? 'rejected' : 'all';
+        // 自直以外の投稿はステータス別タブに表示されないため全件タブで開く
+        if (dTgt !== 'all' && SESSION.shift && String(dRows[0].shift) !== String(SESSION.shift)) dTgt = 'all';
+        await setMainTab(dTgt);
+        var found = TROUBLES.find(function(tr) { return String(tr.id) === String(detailId); });
+        if (found) setTimeout(function() { openDetail(found.id); }, 300);
+      }
+    } catch(e) { console.error('detail deep-link failed:', e); }
   }
 
   // SW からの通知ナビゲーション（postMessage）
@@ -911,44 +1011,178 @@ function utcToJST(isoStr){
   return y+'-'+mo+'-'+dy+' '+h+':'+mi;
 }
 
-async function loadTroubles() {
-  try {
-    let q = 'troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name),approver:traq_users!approver_id(name)&status=neq.draft&order=created_at.desc&limit=100';
-    if (SESSION.shift) q += '&shift=eq.' + encodeURIComponent(SESSION.shift);
-    const rows = await sbFetch(q);
-    TROUBLES = (rows || []).map(r => ({
-      id: r.id,
-      type: r.trouble_type,
-      status: r.status,
-      date: (r.occurred_date || '').slice(0,10),
-      shift: r.shift ? String(r.shift) : '',
-      line: r.lines ? r.lines.name : '',
-      machine: r.machines ? r.machines.machine_no : '',
-      product_code: r.products ? r.products.product_code : '',
-      product_name: r.products ? r.products.product_name : '',
-      category: catNm(r.categories),
-      occurrence: r.occurrence || 'first',
-      stop_minutes: r.stop_minutes,
-      stop_start: r.stop_start || null,
-      stop_end: r.stop_end || null,
-      detail: r.detail || '',
-      submitted_by: r.traq_users ? r.traq_users.name : '',
-      submitted_at: utcToJST(r.created_at),
-      approved_by: r.approver ? r.approver.name : null,
-      approved_at: utcToJST(r.approved_at) || null,
-      reject_reason: r.reject_reason || null,
-    }));
-  } catch(e) {
-    console.error(e);
-    showToast('データ読込エラー', 'error');
-    TROUBLES = [];
+/* ===== 共通マッピング ===== */
+function mapTrouble(r){
+  return {
+    id: r.id,
+    type: r.trouble_type,
+    status: r.status,
+    date: (r.occurred_date || '').slice(0,10),
+    shift: r.shift ? String(r.shift) : '',
+    line: r.lines ? r.lines.name : '',
+    machine: r.machines ? r.machines.machine_no : '',
+    product_code: r.products ? r.products.product_code : '',
+    product_name: r.products ? r.products.product_name : '',
+    _cats: r.categories || null,
+    category: catNm(r.categories),
+    occurrence: r.occurrence || 'first',
+    stop_minutes: r.stop_minutes,
+    stop_start: r.stop_start || null,
+    stop_end: r.stop_end || null,
+    detail: r.detail || '',
+    submitted_by: r.traq_users ? r.traq_users.name : '',
+    submitted_at: utcToJST(r.created_at),
+    approved_by: r.approver ? r.approver.name : null,
+    approved_at: utcToJST(r.approved_at) || null,
+    reject_reason: r.reject_reason || null,
+  };
+}
+
+const TROUBLE_SELECT = 'select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name),approver:traq_users!approver_id(name)';
+
+/* ===== 件数付きfetch（Content-Rangeヘッダから総数取得） ===== */
+async function sbFetchWithCount(path){
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    method: 'GET',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact' }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const rows = await res.json();
+  let total = rows.length;
+  const cr = res.headers.get('content-range');
+  if (cr && cr.indexOf('/') !== -1) {
+    const n = parseInt(cr.split('/')[1], 10);
+    if (!isNaN(n)) total = n;
   }
-  // 下書き読み込み
+  return { rows: rows, total: total };
+}
+
+/* ===== フィルタ用マスタ読み込み ===== */
+async function loadFilterMasters(){
+  try {
+    const results = await Promise.all([
+      sbFetch('lines?select=id,name&is_active=eq.true&order=name.asc'),
+      sbFetch('categories?select=id,name,name_vi,name_en,type&is_active=eq.true&order=sort_order.asc'),
+      sbFetch('machines?select=id,machine_no&is_active=eq.true&order=machine_no.asc'),
+      sbFetch('products?select=id,product_code,product_name&is_active=eq.true&order=product_code.asc'),
+      sbFetch('traq_users?select=id,name&order=name.asc'),
+      sbFetch('troubles?select=reporter_id&status=neq.draft&order=created_at.desc&limit=1000'),
+    ]);
+    MASTERS.lines    = results[0] || [];
+    MASTERS.categories = results[1] || [];
+    MASTERS.machines = results[2] || [];
+    MASTERS.products = results[3] || [];
+    // 投稿実績のあるユーザーのみ（直近1000件の投稿から抽出）
+    const usedIds = new Set((results[5] || []).map(function(x){ return String(x.reporter_id); }));
+    MASTERS.reporters = (results[4] || []).filter(function(u){ return usedIds.has(String(u.id)); });
+  } catch(e) {
+    console.error('フィルタマスタ読込エラー:', e);
+  }
+  rebuildFilterOptions();
+}
+
+/* ===== フィルタ選択肢の構築（言語切替時にも呼ぶ） ===== */
+function rebuildFilterOptions(){
+  const lineSel = document.getElementById('fltLine');
+  if (lineSel) {
+    lineSel.innerHTML = '';
+    lineSel.appendChild(new Option(t('flt_all_lines'), ''));
+    MASTERS.lines.forEach(function(l){ lineSel.appendChild(new Option(l.name, String(l.id))); });
+    lineSel.value = FILTER.lineId || '';
+  }
+  rebuildCategoryOptions();
+  const repSel = document.getElementById('fltReporter');
+  if (repSel) {
+    repSel.innerHTML = '';
+    repSel.appendChild(new Option(t('flt_all_reporters'), ''));
+    MASTERS.reporters.forEach(function(u){ repSel.appendChild(new Option(u.name, String(u.id))); });
+    repSel.value = FILTER.reporterId || '';
+  }
+}
+
+/* 分類は種別選択に連動して絞る（categories.type で判定） */
+function rebuildCategoryOptions(){
+  const catSel = document.getElementById('fltCategory');
+  if (!catSel) return;
+  const typeMap = { eq: 'equipment', md: 'mold' };
+  const list = MASTERS.categories.filter(function(c){
+    if (FILTER.type === 'all') return true;
+    return c.type === typeMap[FILTER.type];
+  });
+  catSel.innerHTML = '';
+  catSel.appendChild(new Option(t('flt_all_cats'), ''));
+  list.forEach(function(c){
+    var label = catNm(c);
+    if (FILTER.type === 'all') label += '（' + t(c.type === 'mold' ? 'filter_md' : 'filter_eq') + '）';
+    catSel.appendChild(new Option(label, String(c.id)));
+  });
+  // 選択中の分類が種別変更で対象外になった場合はリセット
+  if (FILTER.categoryId && !list.some(function(c){ return String(c.id) === String(FILTER.categoryId); })) {
+    FILTER.categoryId = '';
+  }
+  catSel.value = FILTER.categoryId || '';
+}
+
+/* ===== キーワード→機番/品番のID解決（PostgRESTの.or()はJOIN列に使えないため） ===== */
+function resolveKeywordIds(kw){
+  const k = kw.toLowerCase();
+  const machineIds = MASTERS.machines
+    .filter(function(m){ return String(m.machine_no || '').toLowerCase().indexOf(k) !== -1; })
+    .map(function(m){ return m.id; }).slice(0, 100);
+  const productIds = MASTERS.products
+    .filter(function(p){
+      return String(p.product_code || '').toLowerCase().indexOf(k) !== -1 ||
+             String(p.product_name || '').toLowerCase().indexOf(k) !== -1;
+    })
+    .map(function(p){ return p.id; }).slice(0, 100);
+  return { machineIds: machineIds, productIds: productIds };
+}
+
+/* ===== タブスコープ条件（ステータス＋直） ===== */
+function tabScopeParts(){
+  var parts = [];
+  if (mainTab === 'pending')       parts.push('status=eq.pending');
+  else if (mainTab === 'approved') parts.push('status=eq.approved');
+  else if (mainTab === 'rejected') parts.push('status=eq.rejected');
+  else                             parts.push('status=neq.draft');   // 全件
+  // 直: 全件タブ以外は自分の直のみ（現状仕様を維持）
+  if (mainTab !== 'all' && SESSION.shift) parts.push('shift=eq.' + encodeURIComponent(SESSION.shift));
+  return parts;
+}
+
+/* ===== PostgRESTクエリ構築 ===== */
+function buildTroubleQuery(){
+  const parts = tabScopeParts();
+  // 種別
+  if (FILTER.type === 'eq') parts.push('trouble_type=eq.equipment');
+  if (FILTER.type === 'md') parts.push('trouble_type=eq.mold');
+  // 期間（"YYYY-MM-DD"文字列で扱いtimezone問題を回避）
+  if (FILTER.dateFrom) parts.push('occurred_date=gte.' + FILTER.dateFrom);
+  if (FILTER.dateTo)   parts.push('occurred_date=lte.' + FILTER.dateTo);
+  // ライン・分類・投稿者
+  if (FILTER.lineId)     parts.push('line_id=eq.' + encodeURIComponent(FILTER.lineId));
+  if (FILTER.categoryId) parts.push('category_id=eq.' + encodeURIComponent(FILTER.categoryId));
+  if (FILTER.reporterId) parts.push('reporter_id=eq.' + encodeURIComponent(FILTER.reporterId));
+  // キーワード（詳細内容はilike、機番・品番はID解決してin条件）
+  const kw = FILTER.keyword.trim().replace(/[,()]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (kw) {
+    const ids = resolveKeywordIds(kw);
+    const ors = ['detail.ilike.' + encodeURIComponent('*' + kw + '*')];
+    if (ids.machineIds.length) ors.push('machine_id.in.(' + ids.machineIds.join(',') + ')');
+    if (ids.productIds.length) ors.push('product_id.in.(' + ids.productIds.join(',') + ')');
+    parts.push('or=(' + ors.join(',') + ')');
+  }
+  return parts.join('&');
+}
+
+/* ===== 下書き読み込み ===== */
+async function loadDrafts(){
+  DRAFTS = [];
   try {
     var drows = await sbFetch('drafts?user_id=eq.' + SESSION.userId + '&order=updated_at.desc');
     (drows || []).forEach(function(dr){
       var d = dr.data || {};
-      TROUBLES.push({
+      DRAFTS.push({
         id: 'draft_' + dr.id, _draftId: dr.id,
         type: dr.trouble_type || 'equipment', status: 'draft',
         date: d.occurred_date || '', shift: d.shift ? String(d.shift) : String(SESSION.shift || ''),
@@ -961,8 +1195,258 @@ async function loadTroubles() {
         approved_by: null, approved_at: null, reject_reason: null,
       });
     });
-  } catch(e) {}
-  renderList();
+  } catch(e) { console.error('下書き読込エラー:', e); }
+  updateDraftBanner();
+  updateBadges();
+}
+
+function updateDraftBanner(){
+  var dBanner = document.getElementById('draftBanner');
+  if (!dBanner) return;
+  if (DRAFTS.length > 0) {
+    dBanner.style.display = 'flex';
+    document.getElementById('draftCount').textContent = DRAFTS.length;
+  } else {
+    dBanner.style.display = 'none';
+  }
+}
+
+/* 下書きタブはローカルでフィルタ（drafts.dataは名称保存のため名称照合） */
+function filterDrafts(){
+  var kw = FILTER.keyword.trim().toLowerCase();
+  var lineName = '';
+  if (FILTER.lineId) {
+    var fl = MASTERS.lines.find(function(x){ return String(x.id) === String(FILTER.lineId); });
+    lineName = fl ? fl.name : '__none__';
+  }
+  var catName = '';
+  if (FILTER.categoryId) {
+    var fc = MASTERS.categories.find(function(x){ return String(x.id) === String(FILTER.categoryId); });
+    catName = fc ? (fc.name || '') : '__none__';   // 下書きのcategory_nameは日本語マスターname
+  }
+  return DRAFTS.filter(function(d){
+    if (FILTER.type === 'eq' && d.type !== 'equipment') return false;
+    if (FILTER.type === 'md' && d.type !== 'mold') return false;
+    if (FILTER.dateFrom && (!d.date || d.date < FILTER.dateFrom)) return false;
+    if (FILTER.dateTo && (!d.date || d.date > FILTER.dateTo)) return false;
+    if (lineName && d.line !== lineName) return false;
+    if (catName && d.category !== catName) return false;
+    if (FILTER.reporterId && String(FILTER.reporterId) !== String(SESSION.userId)) return false;
+    if (kw) {
+      var hay = [d.machine, d.product_code, d.product_name, d.detail].join(' ').toLowerCase();
+      if (hay.indexOf(kw) === -1) return false;
+    }
+    return true;
+  });
+}
+
+/* ===== メインローダー（検索のたびにDBへ問い合わせ / limit=200） ===== */
+async function loadFiltered(){
+  var seq = ++_loadSeq;
+  if (mainTab === 'draft') {
+    TROUBLES = filterDrafts();
+    FILTERED_TOTAL = TROUBLES.length;
+    TAB_TOTAL = DRAFTS.length;
+    renderCurrent();
+    updateFilterCount();
+    return;
+  }
+  var listEl = document.getElementById(mainTab === 'all' ? 'timelineList' : 'troubleList');
+  if (listEl && TROUBLES.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">' + t('flt_loading') + '</div></div>';
+  }
+  try {
+    var q = 'troubles?' + TROUBLE_SELECT + '&' + buildTroubleQuery() + '&order=occurred_date.desc,id.desc&limit=200';
+    var r = await sbFetchWithCount(q);
+    if (seq !== _loadSeq) return;   // 追い越された古い応答は破棄
+    TROUBLES = r.rows.map(mapTrouble);
+    FILTERED_TOTAL = r.total;
+    renderCurrent();
+    updateFilterCount();
+  } catch(e) {
+    if (seq !== _loadSeq) return;
+    console.error('データ読込エラー:', e);
+    showToast(t('flt_load_err'), 'error');
+    if (listEl) listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">' + t('flt_load_err') + '</div></div>';
+  }
+}
+
+/* 現在タブの総件数（フィルタなし） */
+async function loadTabTotal(){
+  if (mainTab === 'draft') { TAB_TOTAL = DRAFTS.length; updateFilterCount(); return; }
+  try {
+    var r = await sbFetchWithCount('troubles?select=id&' + tabScopeParts().join('&') + '&limit=1');
+    TAB_TOTAL = r.total;
+    updateFilterCount();
+  } catch(e) { console.error('総件数取得エラー:', e); }
+}
+
+/* バッジ件数（承認待ち・差し戻し / 自直・フィルタ非依存） */
+async function loadBadgeCounts(){
+  try {
+    var scope = SESSION.shift ? '&shift=eq.' + encodeURIComponent(SESSION.shift) : '';
+    var results = await Promise.all([
+      sbFetchWithCount('troubles?select=id&status=eq.pending' + scope + '&limit=1'),
+      sbFetchWithCount('troubles?select=id&status=eq.rejected' + scope + '&limit=1'),
+    ]);
+    BADGE.pending  = results[0].total;
+    BADGE.rejected = results[1].total;
+  } catch(e) { console.error('バッジ件数取得エラー:', e); }
+  updateBadges();
+}
+
+/* タブ切替・操作後のデータ一括更新 */
+async function reloadData(){
+  loadBadgeCounts();
+  loadTabTotal();
+  await loadFiltered();
+}
+
+/* ===== フィルタUIイベント ===== */
+function initFilterEvents(){
+  var kwEl = document.getElementById('fltKeyword');
+  kwEl.addEventListener('input', function(){
+    FILTER.keyword = kwEl.value;
+    document.getElementById('fltKwClear').style.display = kwEl.value ? 'flex' : 'none';
+    onFilterChanged();
+  });
+  document.getElementById('fltDateFrom').addEventListener('change', function(e){ FILTER.dateFrom = e.target.value; onFilterChanged(); });
+  document.getElementById('fltDateTo').addEventListener('change',   function(e){ FILTER.dateTo   = e.target.value; onFilterChanged(); });
+  document.getElementById('fltLine').addEventListener('change',     function(e){ FILTER.lineId   = e.target.value; onFilterChanged(); });
+  document.getElementById('fltCategory').addEventListener('change', function(e){ FILTER.categoryId = e.target.value; onFilterChanged(); });
+  document.getElementById('fltReporter').addEventListener('change', function(e){ FILTER.reporterId = e.target.value; onFilterChanged(); });
+}
+
+/* 入力停止後300msのデバウンスで発火 */
+function onFilterChanged(){
+  renderFilterTags();
+  updateFilterBadge();
+  clearTimeout(filterTimer);
+  filterTimer = setTimeout(function(){ loadFiltered(); }, 300);
+}
+
+function setFltType(f){
+  FILTER.type = f;
+  document.querySelectorAll('.fseg').forEach(function(b){ b.classList.toggle('active', b.dataset.ft === f); });
+  rebuildCategoryOptions();
+  onFilterChanged();
+}
+
+function clearKeyword(){
+  FILTER.keyword = '';
+  var kwEl = document.getElementById('fltKeyword');
+  kwEl.value = '';
+  document.getElementById('fltKwClear').style.display = 'none';
+  onFilterChanged();
+}
+
+function clearAllFilters(){
+  FILTER.keyword = ''; FILTER.type = 'all';
+  FILTER.dateFrom = ''; FILTER.dateTo = '';
+  FILTER.lineId = ''; FILTER.categoryId = ''; FILTER.reporterId = '';
+  document.getElementById('fltKeyword').value = '';
+  document.getElementById('fltKwClear').style.display = 'none';
+  document.getElementById('fltDateFrom').value = '';
+  document.getElementById('fltDateTo').value = '';
+  document.querySelectorAll('.fseg').forEach(function(b){ b.classList.toggle('active', b.dataset.ft === 'all'); });
+  rebuildFilterOptions();
+  renderFilterTags();
+  updateFilterBadge();
+  clearTimeout(filterTimer);
+  loadFiltered();
+}
+
+function filterActiveCount(){
+  var n = 0;
+  if (FILTER.keyword.trim()) n++;
+  if (FILTER.type !== 'all') n++;
+  if (FILTER.dateFrom || FILTER.dateTo) n++;
+  if (FILTER.lineId) n++;
+  if (FILTER.categoryId) n++;
+  if (FILTER.reporterId) n++;
+  return n;
+}
+
+/* スマホ折りたたみボタンのバッジ（閉じていても適用中か分かる） */
+function updateFilterBadge(){
+  var n = filterActiveCount();
+  var badge = document.getElementById('fltBadge');
+  var toggle = document.getElementById('fltToggle');
+  if (badge) { badge.textContent = n; badge.style.display = n > 0 ? 'inline-flex' : 'none'; }
+  if (toggle) toggle.classList.toggle('on', n > 0);
+}
+
+function toggleFilterPanel(){
+  filterPanelOpen = !filterPanelOpen;
+  document.getElementById('fltPanel').classList.toggle('open', filterPanelOpen);
+  document.getElementById('fltToggle').classList.toggle('open', filterPanelOpen);
+}
+
+/* 適用中の条件タグ（個別×で解除可能） */
+function renderFilterTags(){
+  var wrap = document.getElementById('fltTags');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  var tags = [];
+  var kw = FILTER.keyword.trim();
+  if (kw) tags.push({ key: 'keyword', label: '🔍 ' + kw });
+  if (FILTER.type !== 'all') tags.push({ key: 'type', label: t(FILTER.type === 'eq' ? 'filter_eq' : 'filter_md') });
+  if (FILTER.dateFrom || FILTER.dateTo) {
+    var fmtD = function(s){ return s ? s.slice(5).replace('-', '/') : ''; };
+    tags.push({ key: 'period', label: '📅 ' + fmtD(FILTER.dateFrom) + '〜' + fmtD(FILTER.dateTo) });
+  }
+  if (FILTER.lineId) {
+    var tl = MASTERS.lines.find(function(x){ return String(x.id) === String(FILTER.lineId); });
+    if (tl) tags.push({ key: 'line', label: tl.name });
+  }
+  if (FILTER.categoryId) {
+    var tc = MASTERS.categories.find(function(x){ return String(x.id) === String(FILTER.categoryId); });
+    if (tc) tags.push({ key: 'category', label: catNm(tc) });
+  }
+  if (FILTER.reporterId) {
+    var tu = MASTERS.reporters.find(function(x){ return String(x.id) === String(FILTER.reporterId); });
+    if (tu) tags.push({ key: 'reporter', label: '👤 ' + tu.name });
+  }
+  if (tags.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  tags.forEach(function(tg){
+    var span = document.createElement('span');
+    span.className = 'flt-tag';
+    var txt = document.createElement('span');
+    txt.textContent = tg.label;
+    var x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'flt-tag-x';
+    x.textContent = '✕';
+    x.onclick = function(){ removeFilter(tg.key); };
+    span.appendChild(txt);
+    span.appendChild(x);
+    wrap.appendChild(span);
+  });
+}
+
+function removeFilter(key){
+  if (key === 'keyword') { clearKeyword(); return; }
+  if (key === 'type') { setFltType('all'); return; }
+  if (key === 'period') {
+    FILTER.dateFrom = ''; FILTER.dateTo = '';
+    document.getElementById('fltDateFrom').value = '';
+    document.getElementById('fltDateTo').value = '';
+  }
+  if (key === 'line')     { FILTER.lineId = '';     document.getElementById('fltLine').value = ''; }
+  if (key === 'category') { FILTER.categoryId = ''; document.getElementById('fltCategory').value = ''; }
+  if (key === 'reporter') { FILTER.reporterId = ''; document.getElementById('fltReporter').value = ''; }
+  onFilterChanged();
+}
+
+/* 件数表示（○件中 ○件） */
+function updateFilterCount(){
+  var txt = t('flt_count', TAB_TOTAL, FILTERED_TOTAL);
+  if (mainTab !== 'draft' && FILTERED_TOTAL > 200) txt += ' ' + t('flt_capped');
+  var cp = document.getElementById('fltCntPC');
+  if (cp) cp.textContent = txt;
+  var cs = document.getElementById('fltCntSP');
+  if (cs) cs.textContent = txt;
 }
 
 /* ===== Force Reload ===== */
@@ -1000,117 +1484,36 @@ function initTheme(){
 function setMainTab(tab){
   mainTab=tab;
   if(selectMode) exitSelectMode();
-  ['pending','all','draft','approved','rejected'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  ['pending','all','draft','approved','rejected'].forEach(tb=>{
+    document.getElementById('tab-'+tb).classList.toggle('active',tb===tab);
   });
   const isAll = tab === 'all';
-  document.getElementById('typeFilterRow').style.display  = isAll ? 'none' : '';
-  document.getElementById('tlFilterArea').style.display   = isAll ? '' : 'none';
-  document.getElementById('tlCnt').style.display          = isAll ? '' : 'none';
   document.getElementById('troubleList').style.display    = isAll ? 'none' : '';
   document.getElementById('timelineList').style.display   = isAll ? '' : 'none';
-  if (isAll) {
-    loadTimeline();
-  } else {
-    renderList();
-  }
   document.getElementById('scrollArea').scrollTo(0,0);
+  return reloadData();
 }
 function setTab(tab){
   if(tab==='dashboard'){ location.href='dashboard.html'; return; }
   if(tab==='excel')    { location.href='excel_download.html'; return; }
   setMainTab(tab==='pending'?'pending':'all');
 }
-function setTypeFilter(f){
-  typeFilter=f;
-  ['all2','eq','md'].forEach(k=>document.getElementById('ftab-'+k).classList.toggle('active',k===(f==='all'?'all2':f)));
-  renderList();
+
+/* 現在タブに応じた描画 */
+function renderCurrent(){
+  if (mainTab === 'all') renderTimeline(); else renderList();
 }
 
-function setTlType(f) {
-  tlTypeFilter = f;
-  ['all','eq','md'].forEach(k => document.getElementById('tl-ftab-'+k).classList.toggle('active', k===f));
-  renderTimeline();
-}
-
-async function loadTimeline() {
-  document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
-  try {
-    const rows = await sbFetch('troubles?select=*,lines(name),machines(machine_no),products(product_code,product_name),categories(name,name_vi,name_en),traq_users!reporter_id(name)&order=created_at.desc&limit=100');
-    TL_DATA = (rows || []).map(r => ({
-      id: r.id, type: r.trouble_type, status: r.status,
-      date: (r.occurred_date || '').slice(0,10),
-      shift: r.shift ? String(r.shift) : '',
-      line: r.lines ? r.lines.name : '',
-      machine: r.machines ? r.machines.machine_no : '',
-      product_code: r.products ? r.products.product_code : '',
-      product_name: r.products ? r.products.product_name : '',
-      category: catNm(r.categories),
-      occurrence: r.occurrence || 'first',
-      stop_minutes: r.stop_minutes,
-      stop_start: r.stop_start || null,
-      stop_end: r.stop_end || null,
-      reject_reason: r.reject_reason || null,
-      detail: r.detail || '',
-      submitted_by: r.traq_users ? r.traq_users.name : '',
-      submitted_at: utcToJST(r.created_at),
-    }));
-    buildLineOptions();
-    setDefaultDates();
-    renderTimeline();
-  } catch(e) {
-    document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div>読み込みエラー</div></div>';
-  }
-}
-
-function buildLineOptions() {
-  const sel = document.getElementById('tlLineSelect');
-  const current = sel.value;
-  const lines = [...new Set(TL_DATA.filter(r=>r.line).map(r=>r.line))].sort();
-  sel.innerHTML = '<option value="">すべてのライン</option>';
-  lines.forEach(ln => {
-    const opt = document.createElement('option');
-    opt.value = ln; opt.textContent = ln;
-    if(ln === current) opt.selected = true;
-    sel.appendChild(opt);
-  });
-}
-
-function setDefaultDates() {
-  const now = new Date();
-  const day = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  const fmt = d => d.toISOString().slice(0,10);
-  const fromEl = document.getElementById('tlDateFrom');
-  const toEl = document.getElementById('tlDateTo');
-  if(!fromEl.value) fromEl.value = fmt(monday);
-  if(!toEl.value) toEl.value = fmt(now);
-  fromEl.onchange = renderTimeline;
-  toEl.onchange = renderTimeline;
-}
-
+/* ===== タイムライン描画（全件タブ / データはTROUBLES） ===== */
 function renderTimeline() {
-  const from = document.getElementById('tlDateFrom').value;
-  const to   = document.getElementById('tlDateTo').value;
-  const line = document.getElementById('tlLineSelect').value;
-  const filtered = TL_DATA.filter(r => {
-    if(r.status === 'draft') return false;
-    if(from && r.date < from) return false;
-    if(to   && r.date > to)   return false;
-    if(line && r.line !== line) return false;
-    if(tlTypeFilter === 'eq' && r.type !== 'equipment') return false;
-    if(tlTypeFilter === 'md' && r.type !== 'mold') return false;
-    return true;
-  });
-  document.getElementById('tlCnt').textContent = TL_DATA.filter(r=>r.status!=='draft').length + '件中 ' + filtered.length + '件表示';
-  if(filtered.length === 0) {
-    document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div>該当する投稿はありません</div></div>';
+  const container = document.getElementById('timelineList');
+  if(TROUBLES.length === 0) {
+    const msg = filterActiveCount() > 0 ? t('flt_empty') : t('empty_all');
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">' + msg + '</div></div>';
     return;
   }
   const groups = {};
-  filtered.forEach(r => { if(!groups[r.date]) groups[r.date]=[]; groups[r.date].push(r); });
-  const container = document.getElementById('timelineList');
+  TROUBLES.forEach(r => { if(!groups[r.date]) groups[r.date]=[]; groups[r.date].push(r); });
   container.innerHTML = '';
   const wrap = document.createElement('div');
   wrap.className = 'tl-list';
@@ -1159,58 +1562,36 @@ function renderTimeline() {
 
 /* ===== Badges ===== */
 function updateBadges(){
-  const cnt=TROUBLES.filter(tr=>tr.status==='pending').length;
-  document.getElementById('tab-badge-pending').textContent=cnt;
+  const pendEl=document.getElementById('tab-badge-pending');
+  if(pendEl) pendEl.textContent=BADGE.pending;
   const sbBadge=document.getElementById('sb-badge');
-  if(sbBadge) sbBadge.textContent=cnt;
-  const rejCnt=TROUBLES.filter(tr=>tr.status==='rejected').length;
+  if(sbBadge) sbBadge.textContent=BADGE.pending;
   const rejBadge=document.getElementById('tab-badge-rejected');
-  if(rejBadge){rejBadge.textContent=rejCnt;rejBadge.style.display=rejCnt>0?'inline-flex':'none';}
-  const draftCnt=TROUBLES.filter(tr=>tr.status==='draft').length;
+  if(rejBadge){rejBadge.textContent=BADGE.rejected;rejBadge.style.display=BADGE.rejected>0?'inline-flex':'none';}
   const draftBadge=document.getElementById('tab-badge-draft');
-  if(draftBadge){draftBadge.textContent=draftCnt;draftBadge.style.display=draftCnt>0?'inline-flex':'none';}
+  if(draftBadge){draftBadge.textContent=DRAFTS.length;draftBadge.style.display=DRAFTS.length>0?'inline-flex':'none';}
 }
 
 /* ===== Render list ===== */
 function renderList(){
-  updateBadges();
-  // Draft banner
-  var drafts=TROUBLES.filter(function(tr){return tr.status==='draft';});
-  var dBanner=document.getElementById('draftBanner');
-  if(dBanner){
-    if(drafts.length>0){
-      dBanner.style.display='flex';
-      document.getElementById('draftCount').textContent=drafts.length;
-    } else {
-      dBanner.style.display='none';
-    }
-  }
-  const list=getFiltered();
   const container=document.getElementById('troubleList');
 
-  if(list.length===0){
-    const msg=mainTab==='pending'?t('empty_pending'):mainTab==='draft'?t('empty_draft'):t('empty_all');
-    const icon=mainTab==='pending'?'✅':mainTab==='draft'?'📝':'📭';
+  if(TROUBLES.length===0){
+    let msg, icon;
+    if(filterActiveCount()>0){
+      msg=t('flt_empty'); icon='📭';
+    } else {
+      msg=mainTab==='pending'?t('empty_pending'):mainTab==='draft'?t('empty_draft'):t('empty_all');
+      icon=mainTab==='pending'?'✅':mainTab==='draft'?'📝':'📭';
+    }
     container.innerHTML=`<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${msg}</div></div>`;
     return;
   }
 
   container.innerHTML='';
-  list.forEach((tr,idx)=>{
+  TROUBLES.forEach((tr,idx)=>{
     const card=buildCard(tr,idx);
     container.appendChild(card);
-  });
-}
-
-function getFiltered(){
-  return TROUBLES.filter(tr=>{
-    const statusOk = mainTab==='pending'?tr.status==='pending':
-                     mainTab==='approved'?tr.status==='approved':
-                     mainTab==='rejected'?tr.status==='rejected':
-                     mainTab==='draft'?tr.status==='draft':
-                     tr.status!=='draft';
-    const typeOk = typeFilter==='all'?true:typeFilter==='eq'?tr.type==='equipment':tr.type==='mold';
-    return statusOk && typeOk;
   });
 }
 
@@ -1333,8 +1714,8 @@ async function sendDraft(id){
       stop_minutes:tr.stop_minutes||null,reporter_id:SESSION.userId
     });
     await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');
-    TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
-    renderList();
+    await loadDrafts();
+    reloadData();
     showToast(t('send_done'),'success');
   }catch(e){showToast('エラー: '+e.message,'error');}
 }
@@ -1356,14 +1737,14 @@ async function deleteDraft(id){
   if(tr&&tr._draftId){
     try{await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');}catch(e){}
   }
-  TROUBLES=TROUBLES.filter(function(x){return String(x.id)!==String(id);});
   closeModal();
-  renderList();
+  await loadDrafts();
+  reloadData();
   showToast(t('del_done'),'success');
 }
 
 function editRejected(id){
-  const tr=TROUBLES.find(x=>String(x.id)===String(id)) || TL_DATA.find(x=>String(x.id)===String(id));
+  const tr=TROUBLES.find(x=>String(x.id)===String(id));
   if(!tr) return;
   location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id;
 }
@@ -1374,13 +1755,13 @@ function editApproved(id){
     showToast(t('edit_denied'),'error');
     return;
   }
-  const tr=TROUBLES.find(x=>String(x.id)===String(id)) || TL_DATA.find(x=>String(x.id)===String(id));
+  const tr=TROUBLES.find(x=>String(x.id)===String(id));
   if(!tr) return;
   location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id+'&keepapproved=1';
 }
 
 async function quickApprove(id){
-  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
   // 終了時刻が未入力なら入力モーダルを表示
   if(!tr.stop_end){
@@ -1393,7 +1774,7 @@ async function quickApprove(id){
 var _drumState = {eh:0, em:0, startH:0, startM:0, approveId:null};
 
 function openStopTimeModal(id){
-  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id);
   if(!tr) return;
   _drumState.approveId = id;
   _drumState.noStart = false;
@@ -1571,7 +1952,7 @@ function submitMinutesApprove(){
 }
 
 async function doApprove(id, stopMinutes, stopEnd, stopStart){
-  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
   const card = document.querySelector(`[data-id="${id}"]`);
   if (card) card.classList.add('actioned');
@@ -1601,16 +1982,6 @@ async function doApprove(id, stopMinutes, stopEnd, stopStart){
       tr.stop_end = stopEnd;
     }
     tr._actioned = true;
-    // TROUBLESの対応レコードも同期（TL_DATA経由で取得した場合に必要）
-    const trInList = TROUBLES.find(x => x.id === id);
-    if(trInList){
-      trInList.status = 'approved';
-      trInList.approved_by = SESSION.name;
-      trInList.approved_at = tr.approved_at;
-      if(stopMinutes !== undefined && stopMinutes !== null) trInList.stop_minutes = stopMinutes;
-      if(stopEnd) trInList.stop_end = stopEnd;
-      trInList._actioned = true;
-    }
     setMainTab('approved');
     showToast(t('approve_done'), 'success');
   } catch(e) {
@@ -1621,7 +1992,7 @@ async function doApprove(id, stopMinutes, stopEnd, stopStart){
 
 /* ===== Reject modal ===== */
 function openRejectModal(id){
-  const tr=TROUBLES.find(x=>x.id===id) || TL_DATA.find(x=>x.id===id);
+  const tr=TROUBLES.find(x=>x.id===id);
   if(!tr) return;
   showModal(`
     <div class="modal-handle"></div>
@@ -1637,7 +2008,7 @@ function openRejectModal(id){
 }
 
 async function doReject(id){
-  const tr = TROUBLES.find(x => x.id === id) || TL_DATA.find(x => x.id === id);
+  const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
   const reason = document.getElementById('rejectReasonInput')?.value.trim() || '';
   closeModal();
@@ -1653,15 +2024,6 @@ async function doReject(id){
     tr.approved_by = SESSION.name;
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
-    // TROUBLESの対応レコードも同期（TL_DATA経由で取得した場合に必要）
-    const trInList = TROUBLES.find(x => x.id === id);
-    if(trInList){
-      trInList.status = 'rejected';
-      trInList.reject_reason = reason || null;
-      trInList.approved_by = SESSION.name;
-      trInList.approved_at = tr.approved_at;
-      trInList._actioned = true;
-    }
     setMainTab('rejected');
     showToast(t('reject_done'), 'error');
   } catch(e) {
@@ -1671,7 +2033,7 @@ async function doReject(id){
 
 /* ===== Detail modal ===== */
 function openDetail(id){
-  const tr=TROUBLES.find(x=>x.id===id) || TL_DATA.find(x=>x.id===id);
+  const tr=TROUBLES.find(x=>x.id===id);
   if(!tr) return;
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
@@ -1842,7 +2204,7 @@ function enterSelectMode(){
   selectMode = true;
   selectedIds.clear();
   updateSelectButtons(true);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderCurrent();
   updateDeleteBar();
 }
 
@@ -1850,7 +2212,7 @@ function exitSelectMode(){
   selectMode = false;
   selectedIds.clear();
   updateSelectButtons(false);
-  if(mainTab === 'all') renderTimeline(); else renderList();
+  renderCurrent();
   updateDeleteBar();
 }
 
@@ -1935,8 +2297,8 @@ async function deleteSelected(){
 
     // 5) ローカル状態を更新
     TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
-    TL_DATA = TL_DATA.filter(function(tr){ return !selectedIds.has(tr.id); });
     exitSelectMode();
+    reloadData();
     showToast(t('delete_done', count), 'success');
   } catch(e){
     console.error('削除エラー:', e);
@@ -1957,7 +2319,8 @@ function _scheduleReload() {
   if (_reloadTimer) clearTimeout(_reloadTimer);
   _reloadTimer = setTimeout(function() {
     _reloadTimer = null;
-    if (mainTab === 'all') { loadTimeline(); } else { loadTroubles(); }
+    loadDrafts();
+    reloadData();
   }, 300);
 }
 window.addEventListener('pageshow', function(e) {
