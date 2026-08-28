@@ -183,6 +183,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
 /* Empty state */
 .empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
+.more-wrap{display:flex;justify-content:center;padding:12px 0 20px}
+.more-btn{min-height:44px;padding:0 28px;font-size:14px;font-weight:600;color:var(--text1);background:var(--bg2);border:1px solid var(--border);border-radius:22px;cursor:pointer}
+.more-btn:disabled{opacity:.6}
 .empty-icon{font-size:40px;margin-bottom:10px}
 .empty-title{font-size:15px;font-weight:700;margin-bottom:4px}
 .empty-sub{font-size:12px}
@@ -685,7 +688,7 @@ const I18N = {
     flt_all_lines:'すべてのライン', flt_all_cats:'すべての分類', flt_all_reporters:'すべての投稿者',
     flt_clear:'すべてクリア',
     flt_count:(total,hit)=>`${total}件中 ${hit}件`,
-    flt_capped:'※先頭200件のみ表示',
+    flt_more:(rest)=>`もっと見る（残り${rest}件）`,
     flt_empty:'条件に一致する投稿はありません',
     flt_loading:'読み込み中...',
     flt_load_err:'読み込みエラー',
@@ -740,7 +743,7 @@ const I18N = {
     flt_all_lines:'Tất cả dây chuyền', flt_all_cats:'Tất cả phân loại', flt_all_reporters:'Tất cả người đăng',
     flt_clear:'Xóa tất cả',
     flt_count:(total,hit)=>`${hit} / ${total} mục`,
-    flt_capped:'※Chỉ hiển thị 200 mục đầu',
+    flt_more:(rest)=>`Xem thêm (còn ${rest})`,
     flt_empty:'Không có bài viết phù hợp',
     flt_loading:'Đang tải...',
     flt_load_err:'Lỗi tải dữ liệu',
@@ -795,7 +798,7 @@ const I18N = {
     flt_all_lines:'All lines', flt_all_cats:'All categories', flt_all_reporters:'All reporters',
     flt_clear:'Clear all',
     flt_count:(total,hit)=>`${hit} of ${total}`,
-    flt_capped:'※First 200 shown',
+    flt_more:(rest)=>`Show more (${rest} left)`,
     flt_empty:'No matching posts',
     flt_loading:'Loading...',
     flt_load_err:'Load error',
@@ -896,6 +899,9 @@ const MASTERS = { lines:[], categories:[], machines:[], products:[], reporters:[
 const BADGE = { pending:0, rejected:0 };
 let TAB_TOTAL = 0;       // 現在タブの総件数（フィルタなし）
 let FILTERED_TOTAL = 0;  // フィルタ適用後の総件数（Content-Rangeより）
+const PAGE_SIZE = 30;    // 1回に読む件数（大量描画でタップが効かなくなるのを防ぐ）
+let PAGE_LOADED = 0;     // 読み込み済み件数
+let loadingMore = false; // 追加読み込み中フラグ（多重発火防止）
 let filterTimer = null;  // 300msデバウンス用
 let filterPanelOpen = false;
 let _loadSeq = 0;        // 応答の追い越し破棄用
@@ -966,6 +972,14 @@ let _loadSeq = 0;        // 応答の追い越し破棄用
         if (dTgt !== 'all' && SESSION.shift && String(dRows[0].shift) !== String(SESSION.shift)) dTgt = 'all';
         await setMainTab(dTgt);
         var found = TROUBLES.find(function(tr) { return String(tr.id) === String(detailId); });
+        if (!found) {
+          // ページング範囲外の古い投稿でも開けるよう、対象1件だけ直接取得
+          var one = await sbFetch('troubles?' + TROUBLE_SELECT + '&id=eq.' + encodeURIComponent(detailId));
+          if (one && one.length) {
+            found = mapTrouble(one[0]);
+            TROUBLES.push(found);
+          }
+        }
         if (found) setTimeout(function() { openDetail(found.id); }, 300);
       }
     } catch(e) { console.error('detail deep-link failed:', e); }
@@ -1241,13 +1255,16 @@ function filterDrafts(){
   });
 }
 
-/* ===== メインローダー（検索のたびにDBへ問い合わせ / limit=200） ===== */
+/* ===== メインローダー（検索のたびにDBへ問い合わせ / 1ページ30件） ===== */
 async function loadFiltered(){
   var seq = ++_loadSeq;
+  PAGE_LOADED = 0;
+  loadingMore = false;
   if (mainTab === 'draft') {
     TROUBLES = filterDrafts();
     FILTERED_TOTAL = TROUBLES.length;
     TAB_TOTAL = DRAFTS.length;
+    PAGE_LOADED = TROUBLES.length;
     renderCurrent();
     updateFilterCount();
     return;
@@ -1257,11 +1274,12 @@ async function loadFiltered(){
     listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">' + t('flt_loading') + '</div></div>';
   }
   try {
-    var q = 'troubles?' + TROUBLE_SELECT + '&' + buildTroubleQuery() + '&order=occurred_date.desc,id.desc&limit=200';
+    var q = 'troubles?' + TROUBLE_SELECT + '&' + buildTroubleQuery() + '&order=occurred_date.desc,id.desc&limit=' + PAGE_SIZE + '&offset=0';
     var r = await sbFetchWithCount(q);
     if (seq !== _loadSeq) return;   // 追い越された古い応答は破棄
     TROUBLES = r.rows.map(mapTrouble);
     FILTERED_TOTAL = r.total;
+    PAGE_LOADED = TROUBLES.length;
     if (filterActiveCount() === 0) {
       TAB_TOTAL = r.total;   // フィルタなし＝タブ総数と同値。追加クエリ不要
     } else {
@@ -1274,6 +1292,35 @@ async function loadFiltered(){
     console.error('データ読込エラー:', e);
     showToast(t('flt_load_err'), 'error');
     if (listEl) listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">' + t('flt_load_err') + '</div></div>';
+  }
+}
+
+/* 続きを読む（30件ずつ追記。既存カードは作り直さない） */
+async function loadMore(){
+  if (loadingMore || mainTab === 'draft') return;
+  if (PAGE_LOADED >= FILTERED_TOTAL) return;
+  loadingMore = true;
+  var seq = _loadSeq;
+  var btn = document.getElementById('moreBtn');
+  if (btn) { btn.disabled = true; btn.textContent = t('flt_loading'); }
+  try {
+    var q = 'troubles?' + TROUBLE_SELECT + '&' + buildTroubleQuery() + '&order=occurred_date.desc,id.desc&limit=' + PAGE_SIZE + '&offset=' + PAGE_LOADED;
+    var r = await sbFetchWithCount(q);
+    if (seq !== _loadSeq) return;   // タブ/条件が切り替わっていたら破棄
+    var added = r.rows.map(mapTrouble);
+    var startIdx = TROUBLES.length;
+    TROUBLES = TROUBLES.concat(added);
+    PAGE_LOADED = TROUBLES.length;
+    FILTERED_TOTAL = r.total;
+    appendCurrent(startIdx);
+    updateFilterCount();
+  } catch(e) {
+    if (seq !== _loadSeq) return;
+    console.error('追加読込エラー:', e);
+    showToast(t('flt_load_err'), 'error');
+  } finally {
+    if (seq === _loadSeq) loadingMore = false;
+    updateMoreButton();
   }
 }
 
@@ -1456,7 +1503,6 @@ function removeFilter(key){
 /* 件数表示（○件中 ○件） */
 function updateFilterCount(){
   var txt = t('flt_count', TAB_TOTAL, FILTERED_TOTAL);
-  if (mainTab !== 'draft' && FILTERED_TOTAL > 200) txt += ' ' + t('flt_capped');
   var cp = document.getElementById('fltCntPC');
   if (cp) cp.textContent = txt;
   var cs = document.getElementById('fltCntSP');
@@ -1526,6 +1572,62 @@ function renderCurrent(){
 }
 
 /* ===== タイムライン描画（全件タブ / データはTROUBLES） ===== */
+function buildTimelineItem(r) {
+  const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
+  const typeClass = r.type === 'equipment' ? 'eq' : 'md';
+  const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
+  const isSelected = selectMode && selectedIds.has(r.id);
+  const checkboxHTML = selectMode
+    ? '<span class="tcard-checkbox' + (isSelected ? ' checked' : '') + '"></span>'
+    : '';
+  const item = document.createElement('div');
+  item.className = 'tl-item' + (selectMode ? ' selectable' : '') + (isSelected ? ' selected' : '');
+  item.setAttribute('data-id', r.id);
+  item.innerHTML =
+    '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
+    '<div class="tl-card' + (isSelected ? ' selected' : '') + '">' +
+      '<div class="tl-card-head">' +
+        '<span class="tl-machine">' + checkboxHTML + r.line + ' — ' + r.machine + '号機</span>' +
+        '<span class="tl-time">' + timeStr + '</span>' +
+      '</div>' +
+      '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
+      (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
+      '<div class="tl-detail">' + r.detail + '</div>' +
+      '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
+    '</div>';
+  if(selectMode) {
+    item.querySelector('.tl-card').addEventListener('click', function(e) {
+      e.stopPropagation(); toggleSelectCard(r.id);
+    });
+  } else {
+    item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
+  }
+  return item;
+}
+
+function buildDateSeparator(date) {
+  const dayNames = ['日','月','火','水','木','金','土'];
+  const sep = document.createElement('div');
+  sep.className = 'tl-sep';
+  const d = new Date(date + 'T00:00:00');
+  sep.innerHTML = '<div class="tl-sep-line"></div><span class="tl-sep-label">' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + dayNames[d.getDay()] + '）</span><div class="tl-sep-line"></div>';
+  return sep;
+}
+
+/* 指定範囲のデータをタイムラインwrapに追記（日付が変わる位置で区切りを挿入） */
+function appendTimelineRange(wrap, startIdx) {
+  let lastDate = wrap.getAttribute('data-last-date') || null;
+  for (let i = startIdx; i < TROUBLES.length; i++) {
+    const r = TROUBLES[i];
+    if (r.date !== lastDate) {
+      wrap.appendChild(buildDateSeparator(r.date));
+      lastDate = r.date;
+    }
+    wrap.appendChild(buildTimelineItem(r));
+  }
+  wrap.setAttribute('data-last-date', lastDate || '');
+}
+
 function renderTimeline() {
   const container = document.getElementById('timelineList');
   if(TROUBLES.length === 0) {
@@ -1533,52 +1635,12 @@ function renderTimeline() {
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">' + msg + '</div></div>';
     return;
   }
-  const groups = {};
-  TROUBLES.forEach(r => { if(!groups[r.date]) groups[r.date]=[]; groups[r.date].push(r); });
   container.innerHTML = '';
   const wrap = document.createElement('div');
   wrap.className = 'tl-list';
-  const dayNames = ['日','月','火','水','木','金','土'];
-  Object.keys(groups).sort().reverse().forEach(date => {
-    const sep = document.createElement('div');
-    sep.className = 'tl-sep';
-    const d = new Date(date + 'T00:00:00');
-    sep.innerHTML = '<div class="tl-sep-line"></div><span class="tl-sep-label">' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + dayNames[d.getDay()] + '）</span><div class="tl-sep-line"></div>';
-    wrap.appendChild(sep);
-    groups[date].forEach(r => {
-      const typeLabel = r.type === 'equipment' ? t('type_eq') : t('type_md');
-      const typeClass = r.type === 'equipment' ? 'eq' : 'md';
-      const timeStr = r.submitted_at ? r.submitted_at.slice(11,16) : '';
-      const isSelected = selectMode && selectedIds.has(r.id);
-      const checkboxHTML = selectMode
-        ? '<span class="tcard-checkbox' + (isSelected ? ' checked' : '') + '"></span>'
-        : '';
-      const item = document.createElement('div');
-      item.className = 'tl-item' + (selectMode ? ' selectable' : '') + (isSelected ? ' selected' : '');
-      item.setAttribute('data-id', r.id);
-      item.innerHTML =
-        '<div class="tl-col"><div class="tl-dot ' + r.status + '"></div><div class="tl-vl"></div></div>' +
-        '<div class="tl-card' + (isSelected ? ' selected' : '') + '">' +
-          '<div class="tl-card-head">' +
-            '<span class="tl-machine">' + checkboxHTML + r.line + ' — ' + r.machine + '号機</span>' +
-            '<span class="tl-time">' + timeStr + '</span>' +
-          '</div>' +
-          '<div class="tl-pills"><span class="tl-pill ' + typeClass + '">' + typeLabel + '</span><span class="tl-pill ' + r.status + '">' + t('status_'+r.status) + '</span></div>' +
-          (r.product_code ? '<div class="tl-product">' + r.product_code + (r.product_name ? ' / ' + r.product_name : '') + '</div>' : '') +
-          '<div class="tl-detail">' + r.detail + '</div>' +
-          '<div class="tl-footer"><span class="tl-who">👤 ' + r.submitted_by + '</span></div>' +
-        '</div>';
-      if(selectMode) {
-        item.querySelector('.tl-card').addEventListener('click', function(e) {
-          e.stopPropagation(); toggleSelectCard(r.id);
-        });
-      } else {
-        item.querySelector('.tl-card').addEventListener('click', () => openDetail(r.id));
-      }
-      wrap.appendChild(item);
-    });
-  });
+  appendTimelineRange(wrap, 0);
   container.appendChild(wrap);
+  appendMoreButton(container);
 }
 
 /* ===== Badges ===== */
@@ -1614,6 +1676,49 @@ function renderList(){
     const card=buildCard(tr,idx);
     container.appendChild(card);
   });
+  appendMoreButton(container);
+}
+
+/* 現在タブに追記描画（続きを読む用。既存カードは作り直さない） */
+function appendCurrent(startIdx){
+  if (mainTab === 'all') {
+    const wrap = document.querySelector('#timelineList .tl-list');
+    if (!wrap) { renderTimeline(); return; }
+    appendTimelineRange(wrap, startIdx);
+  } else {
+    const container = document.getElementById('troubleList');
+    const btn = document.getElementById('moreWrap');
+    for (let i = startIdx; i < TROUBLES.length; i++) {
+      container.insertBefore(buildCard(TROUBLES[i], i - startIdx), btn);
+    }
+  }
+  updateMoreButton();
+}
+
+/* 「もっと見る」ボタン */
+function appendMoreButton(container){
+  const wrap = document.createElement('div');
+  wrap.id = 'moreWrap';
+  wrap.className = 'more-wrap';
+  const btn = document.createElement('button');
+  btn.id = 'moreBtn';
+  btn.type = 'button';
+  btn.className = 'more-btn';
+  btn.onclick = loadMore;
+  wrap.appendChild(btn);
+  container.appendChild(wrap);
+  updateMoreButton();
+}
+
+function updateMoreButton(){
+  const wrap = document.getElementById('moreWrap');
+  const btn = document.getElementById('moreBtn');
+  if (!wrap || !btn) return;
+  const rest = FILTERED_TOTAL - PAGE_LOADED;
+  if (mainTab === 'draft' || rest <= 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  btn.disabled = false;
+  btn.textContent = t('flt_more', rest);
 }
 
 function buildCard(tr,idx){
