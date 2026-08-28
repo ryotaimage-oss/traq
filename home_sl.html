@@ -949,6 +949,7 @@ let _loadSeq = 0;        // 応答の追い越し破棄用
 
   initFilterEvents();
   await Promise.all([loadFilterMasters(), loadDrafts()]);
+  loadBadgeCounts();
   await reloadData();
 
   // Push通知タップ時: ?detail={troubleId} で該当タブに切り替えて詳細モーダルを自動表示
@@ -1261,6 +1262,11 @@ async function loadFiltered(){
     if (seq !== _loadSeq) return;   // 追い越された古い応答は破棄
     TROUBLES = r.rows.map(mapTrouble);
     FILTERED_TOTAL = r.total;
+    if (filterActiveCount() === 0) {
+      TAB_TOTAL = r.total;   // フィルタなし＝タブ総数と同値。追加クエリ不要
+    } else {
+      loadTabTotal();        // フィルタ適用時のみ総数を別取得
+    }
     renderCurrent();
     updateFilterCount();
   } catch(e) {
@@ -1274,8 +1280,10 @@ async function loadFiltered(){
 /* 現在タブの総件数（フィルタなし） */
 async function loadTabTotal(){
   if (mainTab === 'draft') { TAB_TOTAL = DRAFTS.length; updateFilterCount(); return; }
+  var seq = _loadSeq;
   try {
     var r = await sbFetchWithCount('troubles?select=id&' + tabScopeParts().join('&') + '&limit=1');
+    if (seq !== _loadSeq) return;   // タブ/条件が切り替わっていたら破棄
     TAB_TOTAL = r.total;
     updateFilterCount();
   } catch(e) { console.error('総件数取得エラー:', e); }
@@ -1296,10 +1304,16 @@ async function loadBadgeCounts(){
 }
 
 /* タブ切替・操作後のデータ一括更新 */
+/* タブ切替・フィルタ変更時: 本体クエリ1本のみ
+   （タブ総数はフィルタ未適用なら本体のcountと同値、バッジはタブ切替で変化しない） */
 async function reloadData(){
-  loadBadgeCounts();
-  loadTabTotal();
   await loadFiltered();
+}
+
+/* 承認・差戻し・削除・下書き送信などアクション後: バッジ含め全更新 */
+function reloadAfterAction(){
+  loadBadgeCounts();
+  return reloadData();
 }
 
 /* ===== フィルタUIイベント ===== */
@@ -1490,6 +1504,13 @@ function setMainTab(tab){
   const isAll = tab === 'all';
   document.getElementById('troubleList').style.display    = isAll ? 'none' : '';
   document.getElementById('timelineList').style.display   = isAll ? '' : 'none';
+  // 前タブの内容を即クリアしてローディング表示（応答待ちで旧内容が残る「無反応」感の対策）
+  clearTimeout(filterTimer);
+  TROUBLES = [];
+  if (tab !== 'draft') {
+    const listEl = document.getElementById(isAll ? 'timelineList' : 'troubleList');
+    if (listEl) listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">' + t('flt_loading') + '</div></div>';
+  }
   document.getElementById('scrollArea').scrollTo(0,0);
   return reloadData();
 }
@@ -1599,7 +1620,7 @@ function buildCard(tr,idx){
   const div=document.createElement('div');
   div.className='tcard';
   div.setAttribute('data-id', tr.id);
-  div.style.animationDelay=`${idx*0.04}s`;
+  div.style.animationDelay=`${Math.min(idx,12)*0.04}s`;
   if(tr._actioned) div.classList.add('actioned');
   if(selectMode) div.classList.add('selectable');
   if(selectMode && selectedIds.has(tr.id)) div.classList.add('selected');
@@ -1715,7 +1736,7 @@ async function sendDraft(id){
     });
     await sbFetch('drafts?id=eq.'+tr._draftId,'DELETE');
     await loadDrafts();
-    reloadData();
+    reloadAfterAction();
     showToast(t('send_done'),'success');
   }catch(e){showToast('エラー: '+e.message,'error');}
 }
@@ -1739,7 +1760,7 @@ async function deleteDraft(id){
   }
   closeModal();
   await loadDrafts();
-  reloadData();
+  reloadAfterAction();
   showToast(t('del_done'),'success');
 }
 
@@ -1983,6 +2004,7 @@ async function doApprove(id, stopMinutes, stopEnd, stopStart){
     }
     tr._actioned = true;
     setMainTab('approved');
+    loadBadgeCounts();
     showToast(t('approve_done'), 'success');
   } catch(e) {
     if (card) card.classList.remove('actioned');
@@ -2025,6 +2047,7 @@ async function doReject(id){
     tr.approved_at = utcToJST(new Date().toISOString());
     tr._actioned = true;
     setMainTab('rejected');
+    loadBadgeCounts();
     showToast(t('reject_done'), 'error');
   } catch(e) {
     showToast('エラー: ' + e.message, 'error');
@@ -2298,7 +2321,7 @@ async function deleteSelected(){
     // 5) ローカル状態を更新
     TROUBLES = TROUBLES.filter(function(tr){ return !selectedIds.has(tr.id); });
     exitSelectMode();
-    reloadData();
+    reloadAfterAction();
     showToast(t('delete_done', count), 'success');
   } catch(e){
     console.error('削除エラー:', e);
@@ -2320,7 +2343,7 @@ function _scheduleReload() {
   _reloadTimer = setTimeout(function() {
     _reloadTimer = null;
     loadDrafts();
-    reloadData();
+    reloadAfterAction();
   }, 300);
 }
 window.addEventListener('pageshow', function(e) {
