@@ -15,15 +15,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
-  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
-  --text1:#e8eaf0;--text2:#8b90a0;
-  --border:rgba(255,255,255,0.08);
-  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
-  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
-  --nav-h:56px;
-  --factory:#2e3a52; --roof:#3d4e6e;
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;--md:#2DD4BF;
+  --bg1:#0B1524;--bg2:#141A24;--bg3:#1D2531;
+  --bg:#0B1524;--surface:#141A24;--surface2:#1D2531;
+  --text1:#E6E9EF;--text2:#838B99;--text:#E6E9EF;--muted:#838B99;
+  --border:rgba(255,255,255,.11);--border2:rgba(255,255,255,.20);--field-border:rgba(255,255,255,.11);
+  --grid:rgba(255,255,255,.07);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--error:#ef4444;
+  --eq:#EF9F27;
+  --radius:2px;--shadow:none;--nav-h:56px;
 }
+html{color-scheme:dark;background:var(--bg1)}
+[data-theme="light"]{
+  --md:#0E8C7F;
+  --bg1:#E3E7EB;--bg2:#FFFFFF;--bg3:#F2F0EC;
+  --bg:#E3E7EB;--surface:#FFFFFF;--surface2:#F2F0EC;
+  --text1:#161B26;--text2:#5F6672;--text:#161B26;--muted:#5F6672;
+  --border:rgba(0,0,0,.16);--border2:rgba(0,0,0,.28);--field-border:rgba(0,0,0,.16);
+  --grid:rgba(0,0,0,.09);--shadow:none;
+  /* 白背景で読めるよう濃色へ */
+  --orange:#B36F0C;--success:#0B7A56;--warning:#A06A08;--danger:#DC2626;--error:#DC2626;--eq:#B36F0C;
+}
+.setting-icon svg.ico,.pin-success-icon svg{margin:0 auto}
+.add-home-device-label{display:flex;align-items:center;gap:7px}
+.add-home-step-num svg.ico{width:13px;height:13px;margin:0 auto}
+.setting-arrow svg.ico{width:14px;height:14px}
+svg.ico{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+svg.ico-lg{width:26px;height:26px;stroke-width:1.3}
+svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
+.snav-icon svg.ico,.nav-icon svg.ico,.hdr-icon-btn svg.ico{margin:0 auto}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
+
 [data-theme="light"]{
   --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
   --text1:#1a1f2e;--text2:#666666;
@@ -31,7 +53,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
-.app{height:100%;display:flex;flex-direction:column}
+.app{height:100%;display:flex;flex-direction:column;background:var(--bg1)}
 .sidebar{display:none}
 
 /* ===== Topbar (F-style) ===== */
@@ -41,9 +63,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
 .topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
 .topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-icon-btn{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
 .hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
-.hdr-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
 .role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
 .role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
 .role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
@@ -63,15 +85,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
   .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
   .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .sidebar-avatar{width:36px;height:36px;border-radius:50%;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-avatar{width:36px;height:36px;border-radius:var(--radius);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .sidebar-name{font-size:13px;font-weight:700}
   .sidebar-role{font-size:11px;color:var(--text2)}
   .sidebar-nav{flex:1;padding:12px 8px}
-  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:var(--radius);padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
@@ -85,20 +107,20 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 }
 
 /* Lang buttons */
-.lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 
 
 /* Scroll */
-.scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px}
+.scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px;background:var(--bg1)}
 .inner{max-width:520px;margin:0 auto}
 
 /* User card */
-.user-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:slideUp .3s ease}
-.user-avatar-lg{width:52px;height:52px;border-radius:50%;background:var(--orange);color:var(--navy);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:slideUp .3s ease}
+.user-avatar-lg{width:52px;height:52px;border-radius:var(--radius);background:var(--orange);color:var(--navy);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .user-info-name{font-size:16px;font-weight:700;margin-bottom:3px}
 .user-info-meta{font-size:12px;color:var(--text2)}
-.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:5px}
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius);margin-right:5px}
 .role-op{background:rgba(96,165,250,.12);color:#60a5fa}
 .role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
 .role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
@@ -108,12 +130,12 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
 
 /* Setting rows */
-.setting-group{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.setting-group{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;gap:12px}
 .setting-row:last-child{border-bottom:none}
 .setting-row:hover{background:rgba(239,159,39,.04)}
 .setting-row-left{display:flex;align-items:center;gap:12px}
-.setting-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.setting-icon{width:32px;height:32px;border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;background:transparent}
 .setting-name{font-size:14px;font-weight:500}
 .setting-desc{font-size:11px;color:var(--text2);margin-top:2px}
 .setting-row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -121,15 +143,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .setting-arrow{font-size:18px;color:var(--text2)}
 
 /* Toggle switch */
-.toggle{width:44px;height:24px;background:var(--bg3);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:var(--radius);position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
 .toggle.on{background:var(--orange);border-color:var(--orange)}
-.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:var(--radius);background:#fff;transition:transform .2s;}
 .toggle.on .toggle-knob{transform:translateX(20px)}
 
 /* PIN section */
-.pin-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.pin-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
 .pin-dots{display:flex;justify-content:center;gap:14px;margin:16px 0}
-.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot{width:16px;height:16px;border-radius:var(--radius);border:2px solid var(--border);background:transparent;transition:all .2s}
 .pin-dot.filled{background:var(--orange);border-color:var(--orange);transform:scale(1.1)}
 .pin-dot.success{background:var(--success);border-color:var(--success)}
 .pin-dot.error{background:var(--danger);border-color:var(--danger);animation:shake .3s ease}
@@ -145,7 +167,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .pin-success-text{font-size:16px;font-weight:700;color:var(--success)}
 
 /* Add to home screen card */
-.add-home-card{background:linear-gradient(135deg,rgba(239,159,39,.12),rgba(239,159,39,.05));border:1px solid rgba(239,159,39,.25);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px}
+.add-home-card{background:var(--bg2);border:1px solid rgba(239,159,39,.25);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px}
 .add-home-icon{font-size:36px;flex-shrink:0}
 .add-home-info{}
 .add-home-title{font-size:14px;font-weight:700;margin-bottom:4px}
@@ -155,9 +177,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .btn-add-home:disabled{opacity:.5;cursor:not-allowed}
 
 /* Version card */
-.version-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.version-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .version-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.version-logo{width:40px;height:40px;border-radius:10px;background:var(--orange);display:flex;align-items:center;justify-content:center}
+.version-logo{width:40px;height:40px;border-radius:var(--radius);background:var(--orange);display:flex;align-items:center;justify-content:center}
 .version-name{font-size:15px;font-weight:700}
 .version-num{font-size:12px;color:var(--text2)}
 .version-rows{}
@@ -165,11 +187,11 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .version-row:last-child{border-bottom:none}
 .version-key{color:var(--text2)}
 .version-val{font-weight:500}
-.update-badge{background:rgba(16,185,129,.12);color:var(--success);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
-.no-update-badge{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
+.update-badge{background:rgba(16,185,129,.12);color:var(--success);font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius)}
+.no-update-badge{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:var(--radius)}
 
 /* Toast */
-.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:400;white-space:nowrap}
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;z-index:400;white-space:nowrap}
 .toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
 .toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
 .toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
@@ -183,24 +205,24 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* ===== Add Home Modal ===== */
 .hidden{display:none!important}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
-.modal-sheet{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:85vh;overflow-y:auto}
+.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:85vh;overflow-y:auto}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .modal-title{font-size:16px;font-weight:700}
-.modal-close{background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit}
+.modal-close{background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:var(--radius);font-family:inherit}
 .modal-close:hover{color:var(--text1)}
 .add-home-device-label{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .add-home-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--text1)}
 .add-home-step-done{margin-top:4px}
-.add-home-step-num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.add-home-step-num{width:24px;height:24px;border-radius:var(--radius);background:var(--orange);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .add-home-step-num-done{background:var(--success);color:#fff}
 .add-home-highlight{color:var(--orange);font-weight:700}
 .add-home-divider{border:none;border-top:1px solid var(--border);margin:18px 0}
 .add-home-url-label{font-size:11px;color:var(--text2);margin-bottom:6px}
 .add-home-url-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
-.add-home-url-text{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4}
-.add-home-copy-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s}
+.add-home-url-text{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4}
+.add-home-copy-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s}
 .add-home-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
-.add-home-close-btn{width:100%;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
+.add-home-close-btn{width:100%;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
 
 /* ===== Push通知 ===== */
 .push-desc{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5}
@@ -223,27 +245,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   <!-- Sidebar (PC) -->
     <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="14" cy="5" r="2.5" fill="var(--orange)" opacity=".6"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="28" cy="9" r="2" fill="var(--orange)" opacity=".5"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-        <circle cx="42" cy="13" r="1.8" fill="var(--orange)" opacity=".45"/>
-        <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
-      </svg>
+      <span class="logo-text">TRAQ</span>
     </div>
     <div class="sidebar-user" id="sb-user-wrap">
       <div class="sidebar-avatar" id="sb-avatar"></div>
@@ -254,39 +256,39 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
         <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item" onclick="location.href='admin.html'">
-        <span class="snav-icon">🔧</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
         <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span class="snav-icon" id="sb-theme-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></span>
         <span data-i18n="nav_theme">テーマ切替</span>
       </button>
       <button class="snav-item" style="gap:6px">
-        <span class="snav-icon">🌐</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
         <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
         <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
         <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
       </button>
       <button class="snav-item active">
-        <span class="snav-icon">⚙️</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
         <span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
-        <span class="snav-icon">🚪</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
@@ -295,30 +297,14 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   <!-- Topbar -->
   <header class="topbar">
     <div class="topbar-left">
-      <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-      </svg>
-      <span class="topbar-logo-text">Traq</span>
+      <span class="topbar-logo-text">TRAQ</span>
       <span class="topbar-sep"></span>
       <span class="topbar-sub">Trouble Tracking System</span>
     </div>
     <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替">🌙</button>
-      <button class="hdr-icon-btn" onclick="void(0)" data-i18n-title="hdr_settings" title="設定" style="color:var(--orange);border-color:var(--orange)">⚙️</button>
+      <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></button>
+      <button class="hdr-icon-btn" onclick="void(0)" data-i18n-title="hdr_settings" title="設定" style="color:var(--orange);border-color:var(--orange)"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
       <div class="hdr-avatar" id="mob-avatar"></div>
     </div>
   </header>
@@ -360,7 +346,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <div class="setting-group">
         <div class="setting-row" onclick="toggleTheme()">
           <div class="setting-row-left">
-            <div class="setting-icon" style="background:rgba(139,144,160,.1)">🌙</div>
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></div>
             <div>
               <div class="setting-name" data-i18n="dark_mode">ダークモード</div>
               <div class="setting-desc" data-i18n="dark_mode_desc">画面の明暗を切り替えます</div>
@@ -374,7 +360,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </div>
         <div class="setting-row">
           <div class="setting-row-left">
-            <div class="setting-icon" style="background:rgba(96,165,250,.1)">🌐</div>
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></div>
             <div>
               <div class="setting-name" data-i18n="lang_label">言語</div>
               <div class="setting-desc" data-i18n="lang_desc">アプリの表示言語</div>
@@ -398,27 +384,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
         <div class="setting-row" onclick="setSection('pin')">
           <div class="setting-row-left">
-            <div class="setting-icon" style="background:rgba(239,68,68,.1)">🔑</div>
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
             <div>
               <div class="setting-name" data-i18n="pin_change">PIN変更</div>
               <div class="setting-desc" data-i18n="pin_change_desc">ログイン用4桁PINを変更します</div>
             </div>
           </div>
           <div class="setting-row-right">
-            <span class="setting-arrow">›</span>
+            <span class="setting-arrow"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
           </div>
         </div>
 
         <div class="setting-row" onclick="openAddHomeModal()">
           <div class="setting-row-left">
-            <div class="setting-icon" style="background:rgba(239,159,39,.12)">📱</div>
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="1"/><path d="M11 18h2"/></svg></div>
             <div>
               <div class="setting-name" data-i18n="add_home">ホーム画面に追加する</div>
               <div class="setting-desc" data-i18n="add_home_desc">アプリとしてショートカット登録</div>
             </div>
           </div>
           <div class="setting-row-right">
-            <span class="setting-arrow">›</span>
+            <span class="setting-arrow"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
           </div>
         </div>
       </div>
@@ -454,7 +440,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
         </div>
         <div id="pinSuccessArea" style="display:none">
           <div class="pin-success-wrap">
-            <div class="pin-success-icon">✅</div>
+            <div class="pin-success-icon"><svg class="ico ico-xl" style="color:var(--success);margin:0 auto" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
             <div class="pin-success-text" data-i18n="pin_done">PINを変更しました</div>
           </div>
         </div>
@@ -474,10 +460,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           <span id="push-status-text" data-i18n="push_checking">確認中...</span>
         </div>
         <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
-          <span data-i18n="push_enable">🔔 通知をオンにする</span>
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 10-12 0v5l-2 3h16z"/><path d="M10 22h4"/></svg><span data-i18n="push_enable">通知をオンにする</span>
         </button>
         <button id="btn-push-off" class="btn-push btn-push-off" onclick="unsubscribePush()" style="display:none">
-          <span data-i18n="push_disable">🔕 通知をオフにする</span>
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 00-9-5.2"/><path d="M6 11v5l-2 3h13"/><path d="M3 3l18 18"/></svg><span data-i18n="push_disable">通知をオフにする</span>
         </button>
         <p id="push-unsupported" class="push-warn" style="display:none" data-i18n="push_unsupported">このブラウザはPush通知に対応していません。</p>
         <p id="push-ios-hint" class="push-warn" style="display:none" data-i18n="push_ios_hint">iOSでPush通知を受け取るにはホーム画面に追加してください。</p>
@@ -492,15 +478,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <div class="version-card">
         <div class="version-header">
           <div class="version-logo">
-            <svg width="28" height="28" viewBox="0 0 56 56" fill="none">
-              <rect x="2" y="32" width="52" height="20" rx="3" fill="rgba(255,255,255,0.15)"/>
-              <rect x="8" y="10" width="10" height="24" rx="2" fill="rgba(255,255,255,0.2)"/>
-              <rect x="24" y="16" width="10" height="18" rx="2" fill="rgba(255,255,255,0.2)"/>
-              <rect x="40" y="20" width="10" height="14" rx="2" fill="rgba(255,255,255,0.2)"/>
-              <circle cx="13" cy="6" r="4" fill="white" opacity=".9"/>
-              <circle cx="29" cy="11" r="3.5" fill="white" opacity=".7"/>
-              <circle cx="45" cy="15" r="3" fill="white" opacity=".6"/>
-            </svg>
+            <span class="logo-text" style="font-size:15px;letter-spacing:1.5px">TRAQ</span>
           </div>
           <div>
             <div class="version-name">Traq – TroubleTrack System</div>
@@ -529,9 +507,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 
     <!-- ログアウト -->
     <div class="section" style="animation-delay:.25s">
-      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s" data-i18n="logout">
-        🚪 ログアウト
-      </button>
+      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s" data-i18n="logout"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg><span data-i18n="logout">ログアウト</span></button>
     </div>
 
   </div>
@@ -540,15 +516,15 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <button class="nav-item" onclick="goHome()">
-      <span class="nav-icon">📋</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
-      <span class="nav-icon">📊</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
     <button class="nav-item" onclick="goMaster()">
-      <span class="nav-icon">🔧</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
       <span class="nav-label" data-i18n="nav_master">マスタ</span>
     </button>
   </nav>
@@ -556,6 +532,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 <div id="toastEl" style="display:none"></div>
 
 <script>
+const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',sun:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M19.1 4.9l-2.1 2.1M7 16.9l-2.1 2.1"/></svg>',check:'<svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',x:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+
 (function(){
   var saved=localStorage.getItem('traq_theme');
   var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
@@ -576,7 +554,7 @@ var I18N = {
     update_banner_title:'新しいバージョンがあります',
     update_now:'今すぐ更新',
     updating:'最新版に更新しています...',
-    logout:'🚪 ログアウト', logout_msg:'ログアウトしました',
+    logout:'ログアウト', logout_msg:'ログアウトしました',
     nav_list:'投稿一覧',nav_excel:'Excelダウンロード', nav_dashboard:'ダッシュボード', nav_master:'マスタ',
     hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
     master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
@@ -589,25 +567,25 @@ var I18N = {
     pin_save_fail:function(m){return '保存エラー: '+m;},
     pin_error:function(m){return 'エラー: '+m;},
     add_home_title:'ホーム画面に追加', add_home_added:'ホーム画面に追加しました！',
-    add_home_ios_label:'📱 iPhoneでのホーム画面追加手順',
+    add_home_ios_label:'iPhoneでのホーム画面追加手順',
     add_home_ios_1:'Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ',
     add_home_ios_2:'メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ',
     add_home_ios_3:'名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ',
     add_home_ios_done:'ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。',
-    add_home_android_label:'🤖 Androidでのホーム画面追加手順',
+    add_home_android_label:'Androidでのホーム画面追加手順',
     add_home_android_1:'Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ',
     add_home_android_2:'<span class="add-home-highlight">「ホーム画面に追加」</span> を選択',
     add_home_android_done:'「追加」をタップすれば完了です！',
-    add_home_pc_label:'💻 PCでのインストール手順',
+    add_home_pc_label:'PCでのインストール手順',
     add_home_pc_1:'Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック',
     add_home_pc_done:'「インストール」をクリックすれば完了です！',
-    add_home_url_label:'URLをコピー', add_home_copy:'コピー', add_home_copied:'コピー済み ✓', add_home_copy_fail:'コピーできませんでした',
+    add_home_url_label:'URLをコピー', add_home_copy:'コピー', add_home_copied:'コピー済み', add_home_copy_fail:'コピーできませんでした',
     add_home_close:'閉じる',
     lang_changed:'日本語に変更しました',
     push_title:'Push通知', push_desc:'トラブル報告が提出されたときにプッシュ通知を受け取ります。',
     push_checking:'確認中...', push_active:'Push通知: オン', push_inactive:'Push通知: オフ',
     push_blocked:'Push通知: ブロック中', push_error:'エラーが発生しました',
-    push_enable:'🔔 通知をオンにする', push_disable:'🔕 通知をオフにする',
+    push_enable:'通知をオンにする', push_disable:'通知をオフにする',
     push_unsupported:'このブラウザはPush通知に対応していません。',
     push_ios_hint:'iOSでPush通知を受け取るにはホーム画面に追加してください。',
     push_denied:'通知がブロックされています。ブラウザの設定から許可してください。',
@@ -627,7 +605,7 @@ var I18N = {
     update_banner_title:'Có phiên bản mới',
     update_now:'Cập nhật ngay',
     updating:'Đang cập nhật...',
-    logout:'🚪 Đăng xuất', logout_msg:'Đã đăng xuất',
+    logout:'Đăng xuất', logout_msg:'Đã đăng xuất',
     nav_list:'Danh sách bài', nav_dashboard:'Bảng điều khiển', nav_master:'Quản lý',
     hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
     master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
@@ -640,25 +618,25 @@ var I18N = {
     pin_save_fail:function(m){return 'Lỗi lưu: '+m;},
     pin_error:function(m){return 'Lỗi: '+m;},
     add_home_title:'Thêm vào màn hình chính', add_home_added:'Đã thêm vào màn hình chính!',
-    add_home_ios_label:'📱 Hướng dẫn thêm trên iPhone',
+    add_home_ios_label:'Hướng dẫn thêm trên iPhone',
     add_home_ios_1:'Nhấn nút <span class="add-home-highlight">Chia sẻ (口↑)</span> ở dưới thanh địa chỉ Safari',
     add_home_ios_2:'Cuộn menu và nhấn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
     add_home_ios_3:'Đặt tên <span class="add-home-highlight">"Traq"</span> rồi nhấn "Thêm"',
     add_home_ios_done:'Biểu tượng sẽ xuất hiện trên màn hình chính!',
-    add_home_android_label:'🤖 Hướng dẫn thêm trên Android',
+    add_home_android_label:'Hướng dẫn thêm trên Android',
     add_home_android_1:'Nhấn menu Chrome <span class="add-home-highlight">(⋮)</span>',
     add_home_android_2:'Chọn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
     add_home_android_done:'Nhấn "Thêm" là xong!',
-    add_home_pc_label:'💻 Hướng dẫn cài trên PC',
+    add_home_pc_label:'Hướng dẫn cài trên PC',
     add_home_pc_1:'Nhấn <span class="add-home-highlight">biểu tượng cài đặt (⊕)</span> ở thanh địa chỉ Chrome',
     add_home_pc_done:'Nhấn "Cài đặt" là xong!',
-    add_home_url_label:'Sao chép URL', add_home_copy:'Sao chép', add_home_copied:'Đã sao chép ✓', add_home_copy_fail:'Không thể sao chép',
+    add_home_url_label:'Sao chép URL', add_home_copy:'Sao chép', add_home_copied:'Đã sao chép', add_home_copy_fail:'Không thể sao chép',
     add_home_close:'Đóng',
     lang_changed:'Đã chuyển sang tiếng Việt',
     push_title:'Thông báo đẩy', push_desc:'Nhận thông báo khi có báo cáo sự cố mới.',
     push_checking:'Đang kiểm tra...', push_active:'Thông báo đẩy: BẬT', push_inactive:'Thông báo đẩy: TẮT',
     push_blocked:'Thông báo đẩy: Bị chặn', push_error:'Đã xảy ra lỗi',
-    push_enable:'🔔 Bật thông báo', push_disable:'🔕 Tắt thông báo',
+    push_enable:'Bật thông báo', push_disable:'Tắt thông báo',
     push_unsupported:'Trình duyệt này không hỗ trợ thông báo đẩy.',
     push_ios_hint:'Để nhận thông báo trên iOS, hãy thêm vào màn hình chính.',
     push_denied:'Thông báo đang bị chặn. Vui lòng cho phép trong cài đặt trình duyệt.',
@@ -678,7 +656,7 @@ var I18N = {
     update_banner_title:'New version available',
     update_now:'Update now',
     updating:'Updating...',
-    logout:'🚪 Logout', logout_msg:'Logged out',
+    logout:'Logout', logout_msg:'Logged out',
     nav_list:'Post List', nav_dashboard:'Dashboard', nav_master:'Master',
     hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
     master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
@@ -691,25 +669,25 @@ var I18N = {
     pin_save_fail:function(m){return 'Save error: '+m;},
     pin_error:function(m){return 'Error: '+m;},
     add_home_title:'Add to Home Screen', add_home_added:'Added to home screen!',
-    add_home_ios_label:'📱 How to add on iPhone',
+    add_home_ios_label:'How to add on iPhone',
     add_home_ios_1:'Tap the <span class="add-home-highlight">Share button (口↑)</span> below the Safari address bar',
     add_home_ios_2:'Scroll and tap <span class="add-home-highlight">"Add to Home Screen"</span>',
     add_home_ios_3:'Name it <span class="add-home-highlight">"Traq"</span> and tap "Add"',
     add_home_ios_done:'The icon will appear on your home screen!',
-    add_home_android_label:'🤖 How to add on Android',
+    add_home_android_label:'How to add on Android',
     add_home_android_1:'Tap Chrome menu <span class="add-home-highlight">(⋮)</span>',
     add_home_android_2:'Select <span class="add-home-highlight">"Add to Home screen"</span>',
     add_home_android_done:'Tap "Add" and you\'re done!',
-    add_home_pc_label:'💻 How to install on PC',
+    add_home_pc_label:'How to install on PC',
     add_home_pc_1:'Click the <span class="add-home-highlight">install icon (⊕)</span> in Chrome\'s address bar',
     add_home_pc_done:'Click "Install" and you\'re done!',
-    add_home_url_label:'Copy URL', add_home_copy:'Copy', add_home_copied:'Copied ✓', add_home_copy_fail:'Copy failed',
+    add_home_url_label:'Copy URL', add_home_copy:'Copy', add_home_copied:'Copied', add_home_copy_fail:'Copy failed',
     add_home_close:'Close',
     lang_changed:'Switched to English',
     push_title:'Push Notifications', push_desc:'Receive notifications when a trouble report is submitted.',
     push_checking:'Checking...', push_active:'Push notifications: ON', push_inactive:'Push notifications: OFF',
     push_blocked:'Push notifications: Blocked', push_error:'An error occurred',
-    push_enable:'🔔 Enable notifications', push_disable:'🔕 Disable notifications',
+    push_enable:'Enable notifications', push_disable:'Disable notifications',
     push_unsupported:'This browser does not support push notifications.',
     push_ios_hint:'To receive push notifications on iOS, add to home screen first.',
     push_denied:'Notifications are blocked. Please allow in browser settings.',
@@ -769,7 +747,7 @@ function toggleTheme(){
   const html=document.documentElement;
   const isDark=html.getAttribute('data-theme')==='dark';
   html.setAttribute('data-theme',isDark?'light':'dark');
-  const icon=isDark?'☀️':'🌙';
+  const icon=isDark?ICONS.sun:ICONS.moon;
   document.getElementById('themeBtn').textContent=icon;
   localStorage.setItem('traq_theme',isDark?'light':'dark');
   updateThemeToggle();
@@ -779,14 +757,14 @@ function initTheme(){
   const pref=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
   const theme=saved||pref;
   document.documentElement.setAttribute('data-theme',theme);
-  document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';
+  document.getElementById('themeBtn').innerHTML=theme==='dark'?ICONS.moon:ICONS.sun;
   updateThemeToggle();
 }
 function updateThemeToggle(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   document.getElementById('themeToggle').classList.toggle('on',isDark);
-  document.getElementById('themeBtn').textContent=isDark?'🌙':'☀️';
-  var sb=document.getElementById('sb-theme-icon');if(sb) sb.textContent=isDark?'🌙':'☀️';
+  document.getElementById('themeBtn').innerHTML=isDark?ICONS.moon:ICONS.sun;
+  var sb=document.getElementById('sb-theme-icon');if(sb) sb.innerHTML=isDark?ICONS.moon:ICONS.sun;
 }
 
 /* ===== Lang ===== */
@@ -1043,7 +1021,7 @@ async function checkPushStatus() {
   var deniedEl = document.getElementById('push-denied');
   if (Notification.permission === 'denied') {
     statusEl.className = 'push-status inactive';
-    statusIcon.textContent = '🚫';
+    statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M5.6 5.6l12.8 12.8"/></svg>';
     statusText.textContent = t('push_blocked'); statusText.setAttribute('data-i18n','push_blocked');
     deniedEl.style.display = 'block';
     btnOn.style.display = 'none';
@@ -1055,13 +1033,13 @@ async function checkPushStatus() {
     var sub = await reg.pushManager.getSubscription();
     if (sub) {
       statusEl.className = 'push-status active';
-      statusIcon.textContent = '✅';
+      statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>';
       statusText.textContent = t('push_active'); statusText.setAttribute('data-i18n','push_active');
       btnOn.style.display = 'none';
       btnOff.style.display = 'block';
     } else {
       statusEl.className = 'push-status inactive';
-      statusIcon.textContent = '🔕';
+      statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 00-9-5.2"/><path d="M6 11v5l-2 3h13"/><path d="M3 3l18 18"/></svg>';
       statusText.textContent = t('push_inactive'); statusText.setAttribute('data-i18n','push_inactive');
       btnOn.style.display = 'block';
       btnOff.style.display = 'none';
@@ -1069,7 +1047,7 @@ async function checkPushStatus() {
   } catch (e) {
     console.error('Push status check failed:', e);
     statusEl.className = 'push-status inactive';
-    statusIcon.textContent = '⚠️';
+    statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>';
     statusText.textContent = t('push_error'); statusText.setAttribute('data-i18n','push_error');
   }
 }
@@ -1253,8 +1231,8 @@ function showMasterDenied(){
   ov.style.cssText='position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
-  box.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  box.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;max-width:280px;width:90%';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:var(--radius);background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;"><svg class="ico ico-lg" style="color:var(--danger);margin:0 auto" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:var(--radius);border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
@@ -1292,12 +1270,12 @@ function showToast(msg,type='info'){
   <div class="modal-sheet" id="addHomeSheet">
     <div class="modal-header">
       <div class="modal-title" data-i18n="add_home_title">ホーム画面に追加</div>
-      <button class="modal-close" onclick="closeAddHomeModalDirect()">✕</button>
+      <button class="modal-close" onclick="closeAddHomeModalDirect()"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
 
     <!-- iOS手順 -->
     <div id="addHomeIos">
-      <div class="add-home-device-label" data-i18n-html="add_home_ios_label">📱 iPhoneでのホーム画面追加手順</div>
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="1"/><path d="M11 18h2"/></svg><span data-i18n-html="add_home_ios_label">iPhoneでのホーム画面追加手順</span></div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
         <div data-i18n-html="add_home_ios_1">Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ</div>
@@ -1311,14 +1289,14 @@ function showToast(msg,type='info'){
         <div data-i18n-html="add_home_ios_3">名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ</div>
       </div>
       <div class="add-home-step add-home-step-done">
-        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
         <div style="color:var(--success)" data-i18n="add_home_ios_done">ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。</div>
       </div>
     </div>
 
     <!-- Android手順 -->
     <div id="addHomeAndroid" class="hidden">
-      <div class="add-home-device-label" data-i18n-html="add_home_android_label">🤖 Androidでのホーム画面追加手順</div>
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12"/><path d="M12 4v4M9 14h.01M15 14h.01M9 17h6"/><circle cx="12" cy="3" r="1"/></svg><span data-i18n-html="add_home_android_label">Androidでのホーム画面追加手順</span></div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
         <div data-i18n-html="add_home_android_1">Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ</div>
@@ -1328,20 +1306,20 @@ function showToast(msg,type='info'){
         <div data-i18n-html="add_home_android_2"><span class="add-home-highlight">「ホーム画面に追加」</span> を選択</div>
       </div>
       <div class="add-home-step add-home-step-done">
-        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
         <div style="color:var(--success)" data-i18n="add_home_android_done">「追加」をタップすれば完了です！</div>
       </div>
     </div>
 
     <!-- PC手順 -->
     <div id="addHomePc" class="hidden">
-      <div class="add-home-device-label" data-i18n-html="add_home_pc_label">💻 PCでのインストール手順</div>
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12"/><path d="M8 20h8M12 16v4"/></svg><span data-i18n-html="add_home_pc_label">PCでのインストール手順</span></div>
       <div class="add-home-step">
         <div class="add-home-step-num">1</div>
         <div data-i18n-html="add_home_pc_1">Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック</div>
       </div>
       <div class="add-home-step add-home-step-done">
-        <div class="add-home-step-num add-home-step-num-done">✓</div>
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
         <div style="color:var(--success)" data-i18n="add_home_pc_done">「インストール」をクリックすれば完了です！</div>
       </div>
     </div>

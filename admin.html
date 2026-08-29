@@ -16,15 +16,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;
-  --bg1:#080d18;--bg2:#111827;--bg3:#1e2d45;
-  --text1:#e8eaf0;--text2:#8b90a0;
-  --border:rgba(255,255,255,0.08);
-  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
-  --radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);
-  --nav-h:56px;
-  --factory:#2e3a52; --roof:#3d4e6e;
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;--md:#2DD4BF;
+  --bg1:#0B1524;--bg2:#141A24;--bg3:#1D2531;
+  --bg:#0B1524;--surface:#141A24;--surface2:#1D2531;
+  --text1:#E6E9EF;--text2:#838B99;--text:#E6E9EF;--muted:#838B99;
+  --border:rgba(255,255,255,.11);--border2:rgba(255,255,255,.20);--field-border:rgba(255,255,255,.11);
+  --grid:rgba(255,255,255,.07);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--error:#ef4444;
+  --eq:#EF9F27;
+  --radius:2px;--shadow:none;--nav-h:56px;
 }
+html{color-scheme:dark;background:var(--bg1)}
+[data-theme="light"]{
+  --md:#0E8C7F;
+  --bg1:#E3E7EB;--bg2:#FFFFFF;--bg3:#F2F0EC;
+  --bg:#E3E7EB;--surface:#FFFFFF;--surface2:#F2F0EC;
+  --text1:#161B26;--text2:#5F6672;--text:#161B26;--muted:#5F6672;
+  --border:rgba(0,0,0,.16);--border2:rgba(0,0,0,.28);--field-border:rgba(0,0,0,.16);
+  --grid:rgba(0,0,0,.09);--shadow:none;
+  /* 白背景で読めるよう濃色へ */
+  --orange:#B36F0C;--success:#0B7A56;--warning:#A06A08;--danger:#DC2626;--error:#DC2626;--eq:#B36F0C;
+}
+svg.ico{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+svg.ico-lg{width:26px;height:26px;stroke-width:1.3}
+svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
+.snav-icon svg.ico,.nav-icon svg.ico,.hdr-icon-btn svg.ico{margin:0 auto}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
+
 [data-theme="light"]{
   --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
   --text1:#1a1f2e;--text2:#666666;
@@ -32,8 +50,8 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
-.app{height:100%;display:flex;flex-direction:column}
-.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.app{height:100%;display:flex;flex-direction:column;background:var(--bg1)}
+.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg1)}
 
 /* ===== Topbar (F-style) ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
@@ -42,9 +60,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
 .topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
 .topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-icon-btn{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
 .hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
-.hdr-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
 .role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
 .role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
 .role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
@@ -72,22 +90,22 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
   }
   .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
   .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .sidebar-avatar{width:36px;height:36px;border-radius:50%;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-avatar{width:36px;height:36px;border-radius:var(--radius);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .sidebar-name{font-size:13px;font-weight:700}
   .sidebar-role{font-size:11px;color:var(--text2)}
   .sidebar-nav{flex:1;padding:12px 8px}
-  .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+  .lang-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
   .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:var(--radius);padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
-  .scroll-area{padding-bottom:24px}
+  .scroll-area{padding-bottom:24px;background:var(--bg1)}
   .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
   .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
   .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
@@ -111,7 +129,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .tab-item:hover:not(.active){color:var(--text1)}
 
 /* Scroll area */
-.scroll-area{flex:1;overflow-y:auto;padding:16px;padding-bottom:8px}
+.scroll-area{flex:1;overflow-y:auto;padding:16px;padding-bottom:8px;background:var(--bg1)}
 .inner{max-width:900px;margin:0 auto}
 
 /* Panel */
@@ -155,8 +173,8 @@ tr:hover td{background:rgba(239,159,39,.04)}
 .td-actions{display:flex;gap:6px;justify-content:flex-end}
 
 /* Badge */
-.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
-.badge-op{background:rgba(59,130,246,.12);color:#60a5fa}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius)}
+.badge-op{background:transparent;border:1px solid var(--text2);color:var(--text2)}
 .badge-sl{background:rgba(245,158,11,.12);color:var(--warning)}
 .badge-admin{background:rgba(239,68,68,.12);color:var(--danger)}
 .badge-active{background:rgba(16,185,129,.12);color:var(--success)}
@@ -171,14 +189,14 @@ tr:hover td{background:rgba(239,159,39,.04)}
 .page-btn.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
 
 /* Storage */
-.storage-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px}
-.storage-bar-wrap{background:var(--bg3);border-radius:6px;height:12px;overflow:hidden;margin:10px 0}
-.storage-bar-fill{height:100%;border-radius:6px;transition:width .5s ease;min-width:0}
+.storage-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px}
+.storage-bar-wrap{background:var(--bg3);border-radius:var(--radius);height:12px;overflow:hidden;margin:10px 0}
+.storage-bar-fill{height:100%;border-radius:var(--radius);transition:width .5s ease;min-width:0}
 
 /* Modal */
 .modal-wrap{position:fixed;inset:0;z-index:100;display:none}
 .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:16px}
-.modal-sheet{background:var(--bg2);border-radius:12px;width:100%;max-width:440px;max-height:85vh;overflow-y:auto;padding:24px}
+.modal-sheet{background:var(--bg2);border-radius:var(--radius);width:100%;max-width:440px;max-height:85vh;overflow-y:auto;padding:24px}
 .modal-title{font-size:16px;font-weight:700;margin-bottom:18px}
 .form-group{margin-bottom:14px}
 .form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;display:block}
@@ -195,7 +213,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
 /* Toast */
 .toast-wrap{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;pointer-events:none}
-.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
+.toast{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;white-space:nowrap;animation:toastIn .2s ease}
 .toast.success{background:#065f46;border-color:#10b981}
 .toast.error{background:#7f1d1d;border-color:#ef4444}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -214,27 +232,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
   <!-- ===== PC/Tablet Sidebar ===== -->
     <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="14" cy="5" r="2.5" fill="var(--orange)" opacity=".6"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="28" cy="9" r="2" fill="var(--orange)" opacity=".5"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-        <circle cx="42" cy="13" r="1.8" fill="var(--orange)" opacity=".45"/>
-        <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
-      </svg>
+      <span class="logo-text">TRAQ</span>
     </div>
     <div class="sidebar-user" id="sb-user-wrap">
       <div class="sidebar-avatar" id="sb-avatar"></div>
@@ -245,39 +243,39 @@ tr:hover td{background:rgba(239,159,39,.04)}
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
         <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon">🔧</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
         <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span class="snav-icon" id="sb-theme-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></span>
         <span data-i18n="nav_theme">テーマ切替</span>
       </button>
       <button class="snav-item" style="gap:6px">
-        <span class="snav-icon">🌐</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
         <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
         <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
         <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon">⚙️</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
         <span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
-        <span class="snav-icon">🚪</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
@@ -288,45 +286,29 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
     <header class="topbar">
     <div class="topbar-left">
-      <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-      </svg>
-      <span class="topbar-logo-text">Traq</span>
+      <span class="topbar-logo-text">TRAQ</span>
       <span class="topbar-sep"></span>
       <span class="topbar-sub">Trouble Tracking System</span>
     </div>
     <div class="topbar-right">
-      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード" data-i18n-title="title_reload">🔄</button>
-      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替" data-i18n-title="title_theme">🌙</button>
-      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定" data-i18n-title="title_settings">⚙️</button>
+      <button class="hdr-icon-btn" onclick="forceReload()" title="リロード" data-i18n-title="title_reload"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替" data-i18n-title="title_theme"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></button>
+      <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定" data-i18n-title="title_settings"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
       <div class="hdr-avatar" id="mob-avatar"></div>
     </div>
   </header>
 
   <div class="tab-bar">
-    <button class="tab-item active" id="tab-users"    onclick="setTab('users')" data-i18n="tab_users">👥 ユーザー</button>
-    <button class="tab-item"        id="tab-machines" onclick="setTab('machines')" data-i18n="tab_machines">⚙️ 機番</button>
-    <button class="tab-item"        id="tab-products" onclick="setTab('products')" data-i18n="tab_products">📦 品番</button>
-    <button class="tab-item"        id="tab-categories" onclick="setTab('categories')" data-i18n="tab_categories">🏷️ 分類</button>
-    <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')" data-i18n="tab_storage">💾 ストレージ</button>
+    <button class="tab-item active" id="tab-users"    onclick="setTab('users')"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-4.5 6-4.5s6 1.5 6 4.5"/><path d="M17 8h4M19 6v4"/></svg><span data-i18n="tab_users">ユーザー</span></button>
+    <button class="tab-item"        id="tab-machines" onclick="setTab('machines')"><svg class="ico" viewBox="0 0 24 24"><path d="M2 20h20"/><rect x="3" y="9" width="9" height="8"/><rect x="14" y="11" width="7" height="4"/><path d="M12 13h2"/></svg><span data-i18n="tab_machines">機番</span></button>
+    <button class="tab-item"        id="tab-products" onclick="setTab('products')"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span data-i18n="tab_products">品番</span></button>
+    <button class="tab-item"        id="tab-categories" onclick="setTab('categories')"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span data-i18n="tab_categories">分類</span></button>
+    <button class="tab-item"        id="tab-storage"  onclick="setTab('storage')"><svg class="ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span data-i18n="tab_storage">ストレージ</span></button>
   </div>
 
   <div class="master-actions-bar">
-    <button class="btn btn-secondary btn-sm" onclick="exportAllMasters()" data-i18n="btn_export_all">📥 マスタExcel出力</button>
-    <button class="btn btn-primary btn-sm" onclick="triggerImport()" data-i18n="btn_import_all">📤 Excelインポート</button>
+    <button class="btn btn-secondary btn-sm" onclick="exportAllMasters()" ><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg><span data-i18n="btn_export_all">マスタExcel出力</span></button>
+    <button class="btn btn-primary btn-sm" onclick="triggerImport()" ><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg><span data-i18n="btn_import_all">Excelインポート</span></button>
     <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none" onchange="processImportFile(this)">
   </div>
 
@@ -336,7 +318,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== USERS ===== -->
     <div class="panel active" id="panel-users">
       <div class="section-header">
-        <span class="section-title" data-i18n="sec_users">👥 ユーザー管理</span>
+        <span class="section-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-4.5 6-4.5s6 1.5 6 4.5"/><path d="M17 8h4M19 6v4"/></svg><span data-i18n="sec_users">ユーザー管理</span></span>
         <div class="header-actions">
           <button class="btn btn-primary btn-sm" onclick="openUserModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
@@ -366,7 +348,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== MACHINES ===== -->
     <div class="panel" id="panel-machines">
       <div class="section-header">
-        <span class="section-title" data-i18n="sec_machines">⚙️ 機番マスタ</span>
+        <span class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M2 20h20"/><rect x="3" y="9" width="9" height="8"/><rect x="14" y="11" width="7" height="4"/><path d="M12 13h2"/></svg><span data-i18n="sec_machines">機番マスタ</span></span>
         <div class="header-actions">
           <button class="btn btn-primary btn-sm" onclick="openMachineModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
@@ -396,7 +378,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== PRODUCTS ===== -->
     <div class="panel" id="panel-products">
       <div class="section-header">
-        <span class="section-title" data-i18n="sec_products">📦 品番マスタ</span>
+        <span class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span data-i18n="sec_products">品番マスタ</span></span>
         <div class="header-actions">
           <button class="btn btn-primary btn-sm" onclick="openProductModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
@@ -423,7 +405,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== CATEGORIES ===== -->
     <div class="panel" id="panel-categories">
       <div class="section-header">
-        <span class="section-title" data-i18n="sec_categories">🏷️ 分類マスタ</span>
+        <span class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span data-i18n="sec_categories">分類マスタ</span></span>
         <div class="header-actions">
           <button class="btn btn-primary btn-sm" onclick="openCategoryModal()" data-i18n="btn_add">＋ 追加</button>
         </div>
@@ -433,7 +415,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_equipment">⚙️ 設備分類</span></div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><svg class="ico" style="color:var(--eq);display:inline-block;vertical-align:-3px" viewBox="0 0 24 24"><path d="M2 20h20"/><rect x="3" y="9" width="9" height="8"/><rect x="14" y="11" width="7" height="4"/><path d="M12 13h2"/></svg><span data-i18n="cat_equipment">設備分類</span></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th class="sortable" onclick="sortTable('catEq','name')" data-i18n="th_cat_name">分類名</th><th data-i18n="th_cat_name_vi">VI</th><th data-i18n="th_cat_name_en">EN</th><th class="sortable" onclick="sortTable('catEq','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
@@ -442,7 +424,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
           </div>
         </div>
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><span data-i18n="cat_mold">🔧 金型分類</span></div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px"><svg class="ico" style="color:var(--md);display:inline-block;vertical-align:-3px" viewBox="0 0 24 24"><path d="M10 4H4v16h6"/><path d="M14 4h6v16h-6"/><path d="M10 9v6M14 9v6"/></svg><span data-i18n="cat_mold">金型分類</span></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th class="sortable" onclick="sortTable('catMd','name')" data-i18n="th_cat_name">分類名</th><th data-i18n="th_cat_name_vi">VI</th><th data-i18n="th_cat_name_en">EN</th><th class="sortable" onclick="sortTable('catMd','sort_order')" data-i18n="th_sort_order">順序</th><th style="text-align:right" data-i18n="th_actions">操作</th></tr></thead>
@@ -456,11 +438,11 @@ tr:hover td{background:rgba(239,159,39,.04)}
     <!-- ===== STORAGE ===== -->
     <div class="panel" id="panel-storage">
       <div id="storageWarningBanner" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.6">
-        <div style="font-weight:700;color:var(--danger);margin-bottom:4px" data-i18n="storage_warning_title">⚠️ ストレージ使用量が80%を超えています</div>
+        <div style="font-weight:700;color:var(--danger);margin-bottom:4px" ><svg class="ico" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><span data-i18n="storage_warning_title">ストレージ使用量が80%を超えています</span></div>
         <div style="color:var(--text2)"><span data-i18n="storage_warning_msg">Excelバックアップ → データ削除 を推奨します。</span><br><a href="excel_download.html" style="color:var(--orange);text-decoration:underline;font-weight:600" data-i18n="storage_warning_link">Excel出力画面へ →</a></div>
       </div>
       <div class="section-header">
-        <span class="section-title" data-i18n="sec_storage">💾 ストレージ管理</span>
+        <span class="section-title"><svg class="ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span data-i18n="sec_storage">ストレージ管理</span></span>
       </div>
       <div class="storage-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -472,12 +454,12 @@ tr:hover td{background:rgba(239,159,39,.04)}
         </div>
         <div style="font-size:12px;color:var(--text2);margin-top:4px" id="storageDetail"></div>
         <div id="orphanCleanup" style="display:none;margin-top:10px">
-          <button class="btn" style="font-size:12px;padding:6px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600" onclick="cleanOrphanFiles()" id="orphanBtn" data-i18n="storage_clean_orphan">🧹 孤立ファイルを削除</button>
+          <button class="btn" style="font-size:12px;padding:6px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:var(--radius);cursor:pointer;font-family:inherit;font-weight:600" onclick="cleanOrphanFiles()" id="orphanBtn" data-i18n="storage_clean_orphan">孤立ファイルを削除</button>
           <span style="font-size:11px;color:var(--text2);margin-left:8px" id="orphanHint" data-i18n="storage_orphan_hint">DBに紐づかないStorageファイルを削除</span>
         </div>
       </div>
       <div class="storage-card">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_estimate_title">📊 容量の目安</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px" ><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="storage_estimate_title">容量の目安</span></div>
         <div style="font-size:13px;color:var(--text2);line-height:2" id="storageEstContent">
           <div>・テキストデータ：約1.2MB / 年</div>
           <div>・画像（200KB×最大12件/日×365日）：最大 <strong style="color:var(--text1)">876MB / 年</strong></div>
@@ -485,7 +467,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
         </div>
       </div>
       <div class="storage-card">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_export_title">🗂️ 画像エクスポート</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px" data-i18n="storage_export_title">画像エクスポート</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
           <span data-i18n="storage_export_desc">指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。</span>
         </div>
@@ -494,7 +476,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
             <option value="2026">2026</option>
             <option value="2025">2025</option>
           </select>
-          <button class="btn btn-primary" id="exportImgBtn" onclick="exportImages()" data-i18n="storage_export_btn">📥 画像をエクスポート</button>
+          <button class="btn btn-primary" id="exportImgBtn" onclick="exportImages()" ><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg><span data-i18n="storage_export_btn">画像をエクスポート</span></button>
         </div>
         <div id="exportProgress" style="display:none;margin-top:12px">
           <div class="storage-bar-wrap"><div class="storage-bar-fill" id="exportProgressFill" style="width:0%;background:var(--orange)"></div></div>
@@ -503,7 +485,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
       </div>
       <!-- データ削除（adminのみ表示） -->
       <div class="storage-card" id="deleteSection" style="display:none;border-color:rgba(239,68,68,.25)">
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--danger)" data-i18n="storage_delete_title">🗑️ データ削除（管理者専用）</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--danger)" data-i18n="storage_delete_title">データ削除（管理者専用）</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
           <span id="delDescText">指定期間のトラブルデータと関連画像を削除します。<strong style="color:var(--danger)">削除は取り消せません</strong>。<br>必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。</span>
         </div>
@@ -521,7 +503,7 @@ tr:hover td{background:rgba(239,159,39,.04)}
         <div id="delPreview" style="display:none;font-size:13px;padding:10px 14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:var(--radius);margin-bottom:12px">
           <span id="delPreviewText"></span>
         </div>
-        <button class="btn btn-danger" id="delExecBtn" onclick="execDelete()" style="display:none" data-i18n="btn_delete_exec">🗑️ 削除を実行</button>
+        <button class="btn btn-danger" id="delExecBtn" onclick="execDelete()" style="display:none" data-i18n="btn_delete_exec">削除を実行</button>
       </div>
     </div>
 
@@ -531,15 +513,15 @@ tr:hover td{background:rgba(239,159,39,.04)}
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <button class="nav-item" onclick="location.href='home_sl.html'">
-      <span class="nav-icon">📋</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
-      <span class="nav-icon">📊</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
     </button>
     <button class="nav-item active" onclick="void(0)">
-      <span class="nav-icon">🔧</span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
       <span class="nav-label" data-i18n="nav_master_short">マスタ</span>
     </button>
   </nav>
@@ -551,12 +533,14 @@ tr:hover td{background:rgba(239,159,39,.04)}
 <div class="toast-wrap" id="toastWrap" style="display:none"></div>
 
 <script>
+const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',sun:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M19.1 4.9l-2.1 2.1M7 16.9l-2.1 2.1"/></svg>',check:'<svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',x:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+
 (function(){
   var saved=localStorage.getItem('traq_theme');
   var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
   document.documentElement.setAttribute('data-theme',saved||pref);
   var btn=document.getElementById('themeBtn');
-  if(btn)btn.textContent=(saved||pref)==='dark'?'🌙':'☀️';
+  if(btn)btn.innerHTML=(saved||pref)==='dark'?ICONS.moon:ICONS.sun;
 })();
 </script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -604,7 +588,7 @@ function initChip(){
   var sbWrap=document.getElementById('sb-user-wrap');
   if(sbWrap){sbWrap.className='sidebar-user '+(classMap[role]||'role-op');}
   var sbThIcon=document.getElementById('sb-theme-icon');
-  if(sbThIcon)sbThIcon.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'🌙':'☀️';
+  if(sbThIcon)sbThIcon.innerHTML=document.documentElement.getAttribute('data-theme')==='dark'?ICONS.moon:ICONS.sun;
   // sidebar lang buttons
   var cl=localStorage.getItem('traq_lang')||'ja';
   ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===cl);});
@@ -637,8 +621,8 @@ ja:{
 nav_list:'投稿一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード',nav_master:'マスタ',nav_master_short:'マスタ',
 nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
 title_reload:'リロード',title_theme:'テーマ切替',title_settings:'設定',
-tab_users:'👥 ユーザー',tab_machines:'⚙️ 機番',tab_products:'📦 品番',tab_categories:'🏷️ 分類',tab_storage:'💾 ストレージ',
-sec_users:'👥 ユーザー管理',btn_excel:'📥 Excel出力',btn_add:'＋ 追加',
+tab_users:'ユーザー',tab_machines:'機番',tab_products:'品番',tab_categories:'分類',tab_storage:'ストレージ',
+sec_users:'ユーザー管理',btn_excel:'Excel出力',btn_add:'＋ 追加',
 ph_user_search:'名前で検索...',filter_all_roles:'全ロール',
 th_name:'名前',th_role:'ロール',th_actions:'操作',
 loading:'読み込み中...',no_match:'該当なし',
@@ -649,7 +633,7 @@ btn_cancel:'キャンセル',btn_save:'保存',
 toast_saved:'保存しました',err_name_required:'名前を入力してください',
 confirm_pin_reset:function(n){return n+' のPINを「0000」に初期化しますか？';},
 toast_pin_reset:'PINを初期化しました',
-sec_machines:'⚙️ 機番マスタ',ph_machine_search:'機番で検索...',
+sec_machines:'機番マスタ',ph_machine_search:'機番で検索...',
 filter_all_lines:'全ライン',filter_all_status:'全状態',filter_active:'有効',filter_inactive:'無効',
 th_machine_no:'機番',th_line:'ライン',th_status:'状態',
 suffix_machine:'号機',badge_active:'有効',badge_inactive:'無効',
@@ -658,46 +642,46 @@ modal_machine_edit:'機番編集',modal_machine_add:'機番追加',
 label_machine_no:'機番',label_line:'ライン',label_linked_products:'対応品番',
 select_placeholder:'選択してください',no_products:'品番が未登録です',
 err_machine_no:'機番を入力してください',err_line_required:'ラインを選択してください',
-sec_products:'📦 品番マスタ',ph_product_search:'品番・品名で検索...',
+sec_products:'品番マスタ',ph_product_search:'品番・品名で検索...',
 th_product_code:'品番',th_product_name:'品名',
 modal_product_edit:'品番編集',modal_product_add:'品番追加',
 label_product_code:'品番',label_product_name:'品名',
 err_product_required:'品番・品名を入力してください',
-sec_categories:'🏷️ 分類マスタ',ph_cat_search:'分類名で検索...',
-cat_equipment:'⚙️ 設備分類',cat_mold:'🔧 金型分類',
+sec_categories:'分類マスタ',ph_cat_search:'分類名で検索...',
+cat_equipment:'設備分類',cat_mold:'金型分類',
 th_cat_name:'分類名',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'順序',cat_none:'なし',
 modal_cat_edit:'分類編集',modal_cat_add:'分類追加',
 label_type:'種別',type_equipment:'設備',type_mold:'金型',
 label_cat_name:'分類名',label_cat_name_vi:'ベトナム語名（VI）',label_cat_name_en:'英語名（EN）',label_sort_order:'表示順',
 err_cat_name:'分類名を入力してください',
-storage_warning_title:'⚠️ ストレージ使用量が80%を超えています',
+storage_warning_title:'ストレージ使用量が80%を超えています',
 storage_warning_msg:'Excelバックアップ → データ削除 を推奨します。',
 storage_warning_link:'Excel出力画面へ →',
-sec_storage:'💾 ストレージ管理',storage_usage:'使用量',storage_calculating:'計算中...',
-storage_estimate_title:'📊 容量の目安',
+sec_storage:'ストレージ管理',storage_usage:'使用量',storage_calculating:'計算中...',
+storage_estimate_title:'容量の目安',
 storage_est_text:'・テキストデータ：約1.2MB / 年',
 storage_est_image:'・画像（200KB×最大12件/日×365日）：最大',
 storage_est_image_val:'876MB / 年',
 storage_est_free:'・Supabase無料枠：',storage_est_free_val:'1GB',
 storage_est_free_note:'（超過前に年次エクスポートを推奨）',
-storage_export_title:'🗂️ 画像エクスポート',
+storage_export_title:'画像エクスポート',
 storage_export_desc:'指定期間の画像をまとめてダウンロードできます。年次バックアップ用途を想定しています。',
-storage_export_btn:'📥 画像をエクスポート',year_suffix:'年',
-storage_delete_title:'🗑️ データ削除（管理者専用）',
+storage_export_btn:'画像をエクスポート',year_suffix:'年',
+storage_delete_title:'データ削除（管理者専用）',
 storage_delete_warn:'削除は取り消せません',
 storage_delete_desc:'必ず先にExcelバックアップ・画像ZIPエクスポートを完了してください。',
 label_date_from:'開始日',label_date_to:'終了日',
-btn_preview_count:'件数確認',btn_delete_exec:'🗑️ 削除を実行',
+btn_preview_count:'件数確認',btn_delete_exec:'削除を実行',
 err_load:function(m){return 'データ読込エラー: '+m;},
 storage_unavailable:'取得できません',
 storage_check_dashboard:'Supabase Storageダッシュボードで確認してください',
-storage_clean_orphan:'🧹 孤立ファイルを削除',
+storage_clean_orphan:'孤立ファイルを削除',
 storage_orphan_hint:'DBに紐づかないStorageファイルを削除',
 storage_orphan_count:function(n){return '孤立ファイル: '+n+'件';},
 storage_orphan_confirm:function(n){return n+'件の孤立ファイルを削除しますか？';},
 storage_orphan_done:function(n){return n+'件の孤立ファイルを削除しました';},
-storage_critical:'🔴 容量が逼迫しています。バックアップ→削除を推奨します。',
-storage_warn70:'⚠️ 70%を超えています。不要な画像の削除を推奨します。',
+storage_critical:'容量が逼迫しています。バックアップ→削除を推奨します。',
+storage_warn70:'70%を超えています。不要な画像の削除を推奨します。',
 storage_remaining:function(mb){return '残り '+mb+'MB 利用可能';},
 storage_image_count:function(n){return '　画像: '+n+'件';},
 toast_export_start:function(y){return y+'年の画像エクスポートを開始します';},
@@ -732,14 +716,14 @@ master_del_confirm:function(n){return '「'+n+'」を削除しますか？\nこ�
 master_del_has_ref:function(n){return n+'件のトラブルが参照中のため削除できません';},
 master_del_done:'削除しました',
 master_del_error:function(m){return '削除エラー: '+m;},
-btn_export_all:'📥 マスタExcel出力',btn_import_all:'📤 Excelインポート',
+btn_export_all:'マスタExcel出力',btn_import_all:'Excelインポート',
 excel_categories_sheet:'分類',excel_links_sheet:'紐づけ',
 excel_cat_type:'種別',excel_cat_name:'分類名',excel_sort_order:'順序',
 excel_shift:'シフト',excel_memo:'メモ',
 imp_no_file:'ファイルを選択してください',
 imp_invalid_format:'Excelファイルの形式が不正です',
 imp_no_changes:'変更はありません',
-imp_preview_title:'📋 インポートプレビュー',
+imp_preview_title:'インポートプレビュー',
 imp_sheet:'シート',imp_new:'新規',imp_update:'更新',imp_skip:'変更なし',imp_error:'エラー',
 imp_deactivate_missing:'Excelに無い既存データを無効化する',
 imp_deactivate_warn:function(n){return n+'件が無効化されます';},
@@ -762,8 +746,8 @@ vi:{
 nav_list:'Danh sách bài',nav_dashboard:'Bảng điều khiển',nav_master:'Quản lý master',nav_master_short:'Master',
 nav_theme:'Đổi giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
 title_reload:'Tải lại',title_theme:'Đổi giao diện',title_settings:'Cài đặt',
-tab_users:'👥 Người dùng',tab_machines:'⚙️ Máy',tab_products:'📦 Sản phẩm',tab_categories:'🏷️ Phân loại',tab_storage:'💾 Lưu trữ',
-sec_users:'👥 Quản lý người dùng',btn_excel:'📥 Xuất Excel',btn_add:'＋ Thêm',
+tab_users:'Người dùng',tab_machines:'Máy',tab_products:'Sản phẩm',tab_categories:'Phân loại',tab_storage:'Lưu trữ',
+sec_users:'Quản lý người dùng',btn_excel:'Xuất Excel',btn_add:'＋ Thêm',
 ph_user_search:'Tìm theo tên...',filter_all_roles:'Tất cả vai trò',
 th_name:'Tên',th_role:'Vai trò',th_actions:'Thao tác',
 loading:'Đang tải...',no_match:'Không có kết quả',
@@ -774,7 +758,7 @@ btn_cancel:'Hủy',btn_save:'Lưu',
 toast_saved:'Đã lưu',err_name_required:'Vui lòng nhập tên',
 confirm_pin_reset:function(n){return 'Đặt lại PIN của '+n+' về "0000"?';},
 toast_pin_reset:'Đã đặt lại PIN',
-sec_machines:'⚙️ Master máy',ph_machine_search:'Tìm theo số máy...',
+sec_machines:'Master máy',ph_machine_search:'Tìm theo số máy...',
 filter_all_lines:'Tất cả line',filter_all_status:'Tất cả trạng thái',filter_active:'Hoạt động',filter_inactive:'Ngừng',
 th_machine_no:'Số máy',th_line:'Line',th_status:'Trạng thái',
 suffix_machine:'',badge_active:'Hoạt động',badge_inactive:'Ngừng',
@@ -783,46 +767,46 @@ modal_machine_edit:'Sửa máy',modal_machine_add:'Thêm máy',
 label_machine_no:'Số máy',label_line:'Line',label_linked_products:'Sản phẩm liên kết',
 select_placeholder:'Vui lòng chọn',no_products:'Chưa có sản phẩm',
 err_machine_no:'Vui lòng nhập số máy',err_line_required:'Vui lòng chọn line',
-sec_products:'📦 Master sản phẩm',ph_product_search:'Tìm theo mã/tên sản phẩm...',
+sec_products:'Master sản phẩm',ph_product_search:'Tìm theo mã/tên sản phẩm...',
 th_product_code:'Mã SP',th_product_name:'Tên SP',
 modal_product_edit:'Sửa sản phẩm',modal_product_add:'Thêm sản phẩm',
 label_product_code:'Mã sản phẩm',label_product_name:'Tên sản phẩm',
 err_product_required:'Vui lòng nhập mã và tên sản phẩm',
-sec_categories:'🏷️ Master phân loại',ph_cat_search:'Tìm theo tên phân loại...',
-cat_equipment:'⚙️ Phân loại thiết bị',cat_mold:'🔧 Phân loại khuôn',
+sec_categories:'Master phân loại',ph_cat_search:'Tìm theo tên phân loại...',
+cat_equipment:'Phân loại thiết bị',cat_mold:'Phân loại khuôn',
 th_cat_name:'Tên phân loại',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'Thứ tự',cat_none:'Không có',
 modal_cat_edit:'Sửa phân loại',modal_cat_add:'Thêm phân loại',
 label_type:'Loại',type_equipment:'Thiết bị',type_mold:'Khuôn',
 label_cat_name:'Tên phân loại',label_cat_name_vi:'Tên tiếng Việt (VI)',label_cat_name_en:'Tên tiếng Anh (EN)',label_sort_order:'Thứ tự hiển thị',
 err_cat_name:'Vui lòng nhập tên phân loại',
-storage_warning_title:'⚠️ Dung lượng lưu trữ đã vượt 80%',
+storage_warning_title:'Dung lượng lưu trữ đã vượt 80%',
 storage_warning_msg:'Khuyến nghị sao lưu Excel → Xóa dữ liệu.',
 storage_warning_link:'Đến trang xuất Excel →',
-sec_storage:'💾 Quản lý lưu trữ',storage_usage:'Dung lượng',storage_calculating:'Đang tính...',
-storage_estimate_title:'📊 Ước tính dung lượng',
+sec_storage:'Quản lý lưu trữ',storage_usage:'Dung lượng',storage_calculating:'Đang tính...',
+storage_estimate_title:'Ước tính dung lượng',
 storage_est_text:'・Dữ liệu văn bản: khoảng 1.2MB / năm',
 storage_est_image:'・Hình ảnh (200KB×tối đa 12/ngày×365 ngày): tối đa',
 storage_est_image_val:'876MB / năm',
 storage_est_free:'・Supabase miễn phí: ',storage_est_free_val:'1GB',
 storage_est_free_note:' (khuyến nghị xuất hàng năm trước khi vượt)',
-storage_export_title:'🗂️ Xuất hình ảnh',
+storage_export_title:'Xuất hình ảnh',
 storage_export_desc:'Tải xuống hình ảnh trong khoảng thời gian chỉ định. Dùng cho sao lưu hàng năm.',
-storage_export_btn:'📥 Xuất hình ảnh',year_suffix:'',
-storage_delete_title:'🗑️ Xóa dữ liệu (chỉ quản trị viên)',
+storage_export_btn:'Xuất hình ảnh',year_suffix:'',
+storage_delete_title:'Xóa dữ liệu (chỉ quản trị viên)',
 storage_delete_warn:'Không thể hoàn tác',
 storage_delete_desc:'Vui lòng hoàn tất sao lưu Excel và xuất ZIP hình ảnh trước.',
 label_date_from:'Từ ngày',label_date_to:'Đến ngày',
-btn_preview_count:'Kiểm tra số lượng',btn_delete_exec:'🗑️ Thực hiện xóa',
+btn_preview_count:'Kiểm tra số lượng',btn_delete_exec:'Thực hiện xóa',
 err_load:function(m){return 'Lỗi tải dữ liệu: '+m;},
 storage_unavailable:'Không thể lấy',
 storage_check_dashboard:'Vui lòng kiểm tra trên Supabase Storage Dashboard',
-storage_clean_orphan:'🧹 Xóa file rác',
+storage_clean_orphan:'Xóa file rác',
 storage_orphan_hint:'Xóa file không liên kết DB',
 storage_orphan_count:function(n){return 'File rác: '+n;},
 storage_orphan_confirm:function(n){return 'Xóa '+n+' file rác?';},
 storage_orphan_done:function(n){return 'Đã xóa '+n+' file rác';},
-storage_critical:'🔴 Dung lượng sắp hết. Khuyến nghị sao lưu → xóa.',
-storage_warn70:'⚠️ Đã vượt 70%. Khuyến nghị xóa hình ảnh không cần thiết.',
+storage_critical:'Dung lượng sắp hết. Khuyến nghị sao lưu → xóa.',
+storage_warn70:'Đã vượt 70%. Khuyến nghị xóa hình ảnh không cần thiết.',
 storage_remaining:function(mb){return 'Còn '+mb+'MB khả dụng';},
 storage_image_count:function(n){return '　Hình ảnh: '+n;},
 toast_export_start:function(y){return 'Bắt đầu xuất hình ảnh năm '+y;},
@@ -857,14 +841,14 @@ master_del_confirm:function(n){return 'Xoá "'+n+'"?\nThao tác này không th�
 master_del_has_ref:function(n){return 'Không thể xoá vì có '+n+' sự cố đang tham chiếu';},
 master_del_done:'Đã xoá',
 master_del_error:function(m){return 'Lỗi xoá: '+m;},
-btn_export_all:'📥 Xuất Excel master',btn_import_all:'📤 Nhập Excel',
+btn_export_all:'Xuất Excel master',btn_import_all:'Nhập Excel',
 excel_categories_sheet:'Phân loại',excel_links_sheet:'Liên kết',
 excel_cat_type:'Loại',excel_cat_name:'Tên phân loại',excel_sort_order:'Thứ tự',
 excel_shift:'Ca',excel_memo:'Ghi chú',
 imp_no_file:'Vui lòng chọn tệp',
 imp_invalid_format:'Định dạng tệp Excel không hợp lệ',
 imp_no_changes:'Không có thay đổi',
-imp_preview_title:'📋 Xem trước nhập liệu',
+imp_preview_title:'Xem trước nhập liệu',
 imp_sheet:'Sheet',imp_new:'Mới',imp_update:'Cập nhật',imp_skip:'Không đổi',imp_error:'Lỗi',
 imp_deactivate_missing:'Ngừng dữ liệu không có trong Excel',
 imp_deactivate_warn:function(n){return n+' mục sẽ bị ngừng';},
@@ -887,8 +871,8 @@ en:{
 nav_list:'Post List',nav_dashboard:'Dashboard',nav_master:'Master Data',nav_master_short:'Master',
 nav_theme:'Toggle Theme',nav_settings:'Settings',nav_logout:'Logout',
 title_reload:'Reload',title_theme:'Toggle Theme',title_settings:'Settings',
-tab_users:'👥 Users',tab_machines:'⚙️ Machines',tab_products:'📦 Products',tab_categories:'🏷️ Categories',tab_storage:'💾 Storage',
-sec_users:'👥 User Management',btn_excel:'📥 Export Excel',btn_add:'＋ Add',
+tab_users:'Users',tab_machines:'Machines',tab_products:'Products',tab_categories:'Categories',tab_storage:'Storage',
+sec_users:'User Management',btn_excel:'Export Excel',btn_add:'＋ Add',
 ph_user_search:'Search by name...',filter_all_roles:'All Roles',
 th_name:'Name',th_role:'Role',th_actions:'Actions',
 loading:'Loading...',no_match:'No results',
@@ -899,7 +883,7 @@ btn_cancel:'Cancel',btn_save:'Save',
 toast_saved:'Saved',err_name_required:'Please enter a name',
 confirm_pin_reset:function(n){return 'Reset PIN for '+n+' to "0000"?';},
 toast_pin_reset:'PIN has been reset',
-sec_machines:'⚙️ Machine Master',ph_machine_search:'Search by machine no...',
+sec_machines:'Machine Master',ph_machine_search:'Search by machine no...',
 filter_all_lines:'All Lines',filter_all_status:'All Status',filter_active:'Active',filter_inactive:'Inactive',
 th_machine_no:'Machine No.',th_line:'Line',th_status:'Status',
 suffix_machine:'',badge_active:'Active',badge_inactive:'Inactive',
@@ -908,46 +892,46 @@ modal_machine_edit:'Edit Machine',modal_machine_add:'Add Machine',
 label_machine_no:'Machine No.',label_line:'Line',label_linked_products:'Linked Products',
 select_placeholder:'Please select',no_products:'No products registered',
 err_machine_no:'Please enter a machine number',err_line_required:'Please select a line',
-sec_products:'📦 Product Master',ph_product_search:'Search by code/name...',
+sec_products:'Product Master',ph_product_search:'Search by code/name...',
 th_product_code:'Code',th_product_name:'Name',
 modal_product_edit:'Edit Product',modal_product_add:'Add Product',
 label_product_code:'Product Code',label_product_name:'Product Name',
 err_product_required:'Please enter code and name',
-sec_categories:'🏷️ Category Master',ph_cat_search:'Search by category...',
-cat_equipment:'⚙️ Equipment Categories',cat_mold:'🔧 Mold Categories',
+sec_categories:'Category Master',ph_cat_search:'Search by category...',
+cat_equipment:'Equipment Categories',cat_mold:'Mold Categories',
 th_cat_name:'Category',th_cat_name_vi:'VI',th_cat_name_en:'EN',th_sort_order:'Order',cat_none:'None',
 modal_cat_edit:'Edit Category',modal_cat_add:'Add Category',
 label_type:'Type',type_equipment:'Equipment',type_mold:'Mold',
 label_cat_name:'Category Name',label_cat_name_vi:'Vietnamese Name (VI)',label_cat_name_en:'English Name (EN)',label_sort_order:'Display Order',
 err_cat_name:'Please enter a category name',
-storage_warning_title:'⚠️ Storage usage exceeds 80%',
+storage_warning_title:'Storage usage exceeds 80%',
 storage_warning_msg:'Recommend: Excel backup → Delete data.',
 storage_warning_link:'Go to Excel Export →',
-sec_storage:'💾 Storage Management',storage_usage:'Usage',storage_calculating:'Calculating...',
-storage_estimate_title:'📊 Capacity Estimate',
+sec_storage:'Storage Management',storage_usage:'Usage',storage_calculating:'Calculating...',
+storage_estimate_title:'Capacity Estimate',
 storage_est_text:'・Text data: approx. 1.2MB / year',
 storage_est_image:'・Images (200KB×max 12/day×365 days): max',
 storage_est_image_val:'876MB / year',
 storage_est_free:'・Supabase free tier: ',storage_est_free_val:'1GB',
 storage_est_free_note:' (annual export recommended before exceeding)',
-storage_export_title:'🗂️ Image Export',
+storage_export_title:'Image Export',
 storage_export_desc:'Download images for a specified period. Intended for annual backup.',
-storage_export_btn:'📥 Export Images',year_suffix:'',
-storage_delete_title:'🗑️ Delete Data (Admin Only)',
+storage_export_btn:'Export Images',year_suffix:'',
+storage_delete_title:'Delete Data (Admin Only)',
 storage_delete_warn:'Cannot be undone',
 storage_delete_desc:'Please complete Excel backup and image ZIP export first.',
 label_date_from:'Start Date',label_date_to:'End Date',
-btn_preview_count:'Check Count',btn_delete_exec:'🗑️ Execute Delete',
+btn_preview_count:'Check Count',btn_delete_exec:'Execute Delete',
 err_load:function(m){return 'Data load error: '+m;},
 storage_unavailable:'Unable to retrieve',
 storage_check_dashboard:'Please check on Supabase Storage Dashboard',
-storage_clean_orphan:'🧹 Clean orphan files',
+storage_clean_orphan:'Clean orphan files',
 storage_orphan_hint:'Delete storage files not linked to DB',
 storage_orphan_count:function(n){return 'Orphan files: '+n;},
 storage_orphan_confirm:function(n){return 'Delete '+n+' orphan files?';},
 storage_orphan_done:function(n){return 'Deleted '+n+' orphan files';},
-storage_critical:'🔴 Storage is nearly full. Recommend backup → delete.',
-storage_warn70:'⚠️ Over 70%. Recommend deleting unnecessary images.',
+storage_critical:'Storage is nearly full. Recommend backup → delete.',
+storage_warn70:'Over 70%. Recommend deleting unnecessary images.',
 storage_remaining:function(mb){return mb+'MB remaining';},
 storage_image_count:function(n){return '  Images: '+n;},
 toast_export_start:function(y){return 'Starting image export for '+y;},
@@ -982,14 +966,14 @@ master_del_confirm:function(n){return 'Delete "'+n+'"?\nThis action cannot be un
 master_del_has_ref:function(n){return 'Cannot delete: '+n+' trouble(s) referencing this item';},
 master_del_done:'Deleted',
 master_del_error:function(m){return 'Delete error: '+m;},
-btn_export_all:'📥 Export Master Excel',btn_import_all:'📤 Import Excel',
+btn_export_all:'Export Master Excel',btn_import_all:'Import Excel',
 excel_categories_sheet:'Categories',excel_links_sheet:'Links',
 excel_cat_type:'Type',excel_cat_name:'Category',excel_sort_order:'Order',
 excel_shift:'Shift',excel_memo:'Memo',
 imp_no_file:'Please select a file',
 imp_invalid_format:'Invalid Excel file format',
 imp_no_changes:'No changes detected',
-imp_preview_title:'📋 Import preview',
+imp_preview_title:'Import preview',
 imp_sheet:'Sheet',imp_new:'New',imp_update:'Update',imp_skip:'No change',imp_error:'Error',
 imp_deactivate_missing:'Deactivate items not in Excel',
 imp_deactivate_warn:function(n){return n+' item(s) will be deactivated';},
@@ -1025,8 +1009,8 @@ let userPage=1,machinePage=1,productPage=1;
 (async function init(){
   const th=localStorage.getItem('traq_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',th);
-  var tbtn=document.getElementById('themeBtn');if(tbtn)tbtn.textContent=th==='dark'?'🌙':'☀️';
-  var sbti=document.getElementById('sb-theme-icon');if(sbti)sbti.textContent=th==='dark'?'🌙':'☀️';
+  var tbtn=document.getElementById('themeBtn');if(tbtn)tbtn.innerHTML=th==='dark'?ICONS.moon:ICONS.sun;
+  var sbti=document.getElementById('sb-theme-icon');if(sbti)sbti.innerHTML=th==='dark'?ICONS.moon:ICONS.sun;
   initChip();
   const l=localStorage.getItem('traq_lang')||'ja';currentLang=l;
   await loadAll();
@@ -2121,7 +2105,7 @@ function showImportPreview(plan){
   modalHtml+='<th style="padding:6px">'+t('imp_skip')+'</th>';
   modalHtml+='<th style="padding:6px">'+t('imp_error')+'</th>';
   modalHtml+='</tr></thead><tbody>'+rows+'</tbody></table>';
-  if(errDetail) modalHtml+='<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,0.08);border-radius:8px">'+errDetail+'</div>';
+  if(errDetail) modalHtml+='<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,0.08);border-radius:var(--radius)">'+errDetail+'</div>';
   modalHtml+=deactHtml;
   modalHtml+='<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">';
   modalHtml+='<button class="btn btn-secondary" onclick="closeModal()">'+t('btn_cancel')+'</button>';
@@ -2274,8 +2258,8 @@ function toggleTheme(){
   const h=document.documentElement;const isDark=h.getAttribute('data-theme')==='dark';
   const next=isDark?'light':'dark';h.setAttribute('data-theme',next);
   localStorage.setItem('traq_theme',next);
-  var tb=document.getElementById('themeBtn');if(tb)tb.textContent=next==='dark'?'🌙':'☀️';
-  var sb=document.getElementById('sb-theme-icon');if(sb)sb.textContent=next==='dark'?'🌙':'☀️';
+  var tb=document.getElementById('themeBtn');if(tb)tb.innerHTML=next==='dark'?ICONS.moon:ICONS.sun;
+  var sb=document.getElementById('sb-theme-icon');if(sb)sb.innerHTML=next==='dark'?ICONS.moon:ICONS.sun;
 }
 
 /* ===== Logout ===== */

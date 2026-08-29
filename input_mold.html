@@ -14,19 +14,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --orange:#EF9F27;--error:#ef4444;--success:#22c55e;--radius:10px;
-  --bg:#080d18;--surface:#111827;--surface2:#16213a;
-  --border:#1e293b;--field-border:rgba(255,255,255,0.06);
-  --text:#f1f5f9;--muted:#64748b;
-  --nav-h:56px;--factory:#2e3a52;--roof:#3d4e6e;
+  --orange:#EF9F27; --orange-dark:#c97d10; --md:#2DD4BF;
+  --bg1:#0B1524; --bg2:#141A24; --bg3:#1D2531;
+  --text1:#E6E9EF; --text2:#838B99;
+  --border:rgba(255,255,255,.11); --border2:rgba(255,255,255,.20);
+  --grid:rgba(255,255,255,.07);
+  --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
+  --radius:2px; --shadow:none; --nav-h:56px;
+  /* 旧変数名との対応（入力画面のCSSはこちらの名前を参照している） */
+  --bg:#0B1524; --surface:#141A24; --surface2:#1D2531;
+  --text:#E6E9EF; --muted:#838B99;
+  --field-border:rgba(255,255,255,.11); --error:#ef4444;
 
-  --bg2:#111827;--bg3:#1e2d45;--text1:#e8eaf0;--text2:#8b90a0;--danger:#ef4444;--warning:#f59e0b;--navy:#080d18;}
+}
 [data-theme="light"]{
-  --bg:#e8e6e2;--surface:#ffffff;--surface2:#f0ede8;
-  --border:rgba(0,0,0,0.12);--field-border:rgba(0,0,0,0.10);
-  --text:#1a1f2e;--muted:#666666;
+  --md:#0E8C7F;
+  --bg1:#E3E7EB; --bg2:#FFFFFF; --bg3:#F2F0EC;
+  --text1:#161B26; --text2:#5F6672;
+  --border:rgba(0,0,0,.16); --border2:rgba(0,0,0,.28);
+  --grid:rgba(0,0,0,.09); --shadow:none;
+  /* 白背景では明るい色が読めないため濃色へ（コントラスト4:1以上） */
+  --orange:#B36F0C; --success:#0B7A56; --warning:#A06A08; --danger:#DC2626;
+  --bg:#E3E7EB; --surface:#FFFFFF; --surface2:#F2F0EC;
+  --text:#161B26; --muted:#5F6672;
+  --field-border:rgba(0,0,0,.16); --error:#DC2626;
 
-  --bg2:#ffffff;--bg3:#f0ede8;--text1:#1a1f2e;--text2:#666666;}
+}
+html{color-scheme:dark;background:var(--bg)}
+[data-theme="light"]{color-scheme:light}
+svg.ico{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+svg.ico-lg{width:26px;height:26px;stroke-width:1.3}
+svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
+.snav-icon svg.ico,.nav-icon svg.ico,.hdr-icon-btn svg.ico{margin:0 auto}
+.section-title,.page-title-text{display:flex;align-items:center;gap:7px}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column}
 
@@ -37,9 +59,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
 .topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
 .topbar-sub{font-size:9px;font-weight:500;color:var(--muted);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-icon-btn{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s;flex-shrink:0;padding:0}
 .hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
-.hdr-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
 .role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
 .role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
 .role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
@@ -49,7 +71,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* ===== Page Title ===== */
 .page-title-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.page-back-btn{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--muted);transition:all .15s}
+.page-back-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--muted);transition:all .15s}
 .page-back-btn:hover{border-color:var(--orange);color:var(--orange)}
 .page-title-text{font-size:15px;font-weight:700}
 
@@ -64,8 +86,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 
 /* ===== App layout ===== */
-.app{height:100%;display:flex;flex-direction:column}
-.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.app{height:100%;display:flex;flex-direction:column;background:var(--bg)}
+.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg)}
 .sidebar{display:none}
 @media(min-width:768px){
   .bottom-nav{display:none}
@@ -73,7 +95,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
   .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
   .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .sidebar-avatar{width:36px;height:36px;border-radius:50%;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-avatar{width:36px;height:36px;border-radius:var(--radius);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .sidebar-name{font-size:13px;font-weight:700}
   .sidebar-role{font-size:11px;color:var(--text2)}
   .sidebar-nav{flex:1;padding:12px 8px}
@@ -83,23 +105,23 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   [data-theme="light"] .role-admin .sidebar-avatar{background:rgba(239,68,68,0.15);color:#c53030}
   [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
-  .lang-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+  .lang-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
   .lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
-  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
   .snav-item:hover{background:var(--bg3);color:var(--text1)}
   .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
   .snav-icon{font-size:18px;width:24px;text-align:center}
-  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:var(--radius);padding:1px 6px;font-size:9px;font-weight:700}
   .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
   .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
   .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
   .topbar{display:none}
-  .main-column .main{max-width:700px}
+  .main-column .main{max-width:700px;background:var(--bg)}
 }
 @media(min-width:1025px){.sidebar{width:240px}}
 
 /* ===== Main ===== */
-.main{flex:1;padding:16px;max-width:600px;margin:0 auto;width:100%}
+.main{flex:1;padding:16px;max-width:600px;margin:0 auto;width:100%;background:var(--bg)}
 
 /* ===== Section ===== */
 .section{background:var(--surface);border-radius:var(--radius);padding:18px 16px;margin-bottom:12px}
@@ -112,7 +134,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .form-label .req{color:var(--error);font-size:10px}
 .form-input,.form-select,.form-textarea{
   width:100%;background:var(--surface2);border:1px solid var(--field-border);
-  border-radius:8px;padding:12px 14px;color:var(--text);
+  border-radius:var(--radius);padding:12px 14px;color:var(--text);
   font-family:inherit;font-size:15px;transition:border-color .15s;
   -webkit-appearance:none;appearance:none;
 }
@@ -130,7 +152,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* 初発/再発 */
 .occurrence-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .occurrence-btn{
-  background:var(--surface2);border:1px solid var(--field-border);border-radius:8px;
+  background:var(--surface2);border:1px solid var(--field-border);border-radius:var(--radius);
   padding:12px;text-align:center;cursor:pointer;font-family:inherit;
   font-size:15px;font-weight:600;color:var(--muted);transition:all .15s;
   -webkit-appearance:none;appearance:none;
@@ -144,8 +166,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .image-area-sub{font-size:11px;color:var(--muted);opacity:.6}
 .image-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .image-preview{position:relative;width:80px;height:80px}
-.image-preview img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.image-preview .del-btn{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:var(--error);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.image-preview img{width:100%;height:100%;object-fit:cover;border-radius:var(--radius)}
+.image-preview .del-btn{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:var(--radius);background:var(--error);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* 送信 */
 .submit-area{padding:8px 0 16px}
@@ -156,20 +178,20 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* 下書き */
 .draft-bar{background:var(--bg2);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);z-index:10;flex-shrink:0}
 .draft-status{display:flex;align-items:center;gap:6px}
-.draft-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.draft-dot{width:6px;height:6px;border-radius:var(--radius);background:var(--muted)}
 .draft-dot.saved{background:var(--success)}
-.draft-load-btn{background:none;border:none;color:var(--orange);font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;padding:4px 8px;border-radius:6px;transition:background .15s}
+.draft-load-btn{background:none;border:none;color:var(--orange);font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;padding:4px 8px;border-radius:var(--radius);transition:background .15s}
 .draft-load-btn:hover{background:rgba(239,159,39,.1)}
 
 /* トースト */
-.toast{position:fixed;top:80px;left:16px;right:16px;transform:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 20px;font-size:13px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.15);font-weight:500;word-break:break-all}
+.toast{position:fixed;top:80px;left:16px;right:16px;transform:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 20px;font-size:13px;z-index:200;font-weight:500;word-break:break-all}
 .toast.success{border-color:var(--success)}
 .toast.error{border-color:var(--error)}
 .hidden{display:none !important}
 
 /* ローディング */
 .overlay{position:fixed;inset:0;background:rgba(8,13,24,.8);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--orange);border-radius:var(--radius);animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .overlay-text{font-size:14px;color:#94a3b8}
 
@@ -179,14 +201,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .drum-pair{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .drum-pair-labels{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .drum-pair-labels span{font-size:10px;color:var(--muted);text-align:center;opacity:.7}
-.drum-wrap{position:relative;overflow:hidden;height:150px;border-radius:8px;background:var(--surface2);border:1px solid var(--field-border)}
-.drum-selector{position:absolute;top:50%;left:0;right:0;height:36px;margin-top:-18px;border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);pointer-events:none;z-index:2}
-.drum-fade-top{position:absolute;top:0;left:0;right:0;height:57px;background:linear-gradient(to bottom,var(--surface2),transparent);z-index:1;pointer-events:none}
-.drum-fade-bot{position:absolute;bottom:0;left:0;right:0;height:57px;background:linear-gradient(to top,var(--surface2),transparent);z-index:1;pointer-events:none}
+.drum-wrap{position:relative;overflow:hidden;height:150px;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--field-border)}
+.drum-selector{position:absolute;top:57px;left:0;right:0;height:46px;border-top:1px solid var(--orange);border-bottom:1px solid var(--orange);background:rgba(239,159,39,.07);pointer-events:none;z-index:2}
+.drum-fade-top{display:none}
+.drum-fade-bot{display:none}
 .drum-list{position:absolute;left:0;right:0;top:57px;cursor:grab;user-select:none}
 .drum-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text)}
-.stop-result{background:var(--surface2);border:1px solid var(--field-border);border-radius:8px;padding:10px 14px;text-align:center;margin-top:10px;font-size:14px;font-weight:500;color:var(--text)}
-.clear-end-btn{width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px;font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
+.stop-result{background:var(--surface2);border:1px solid var(--field-border);border-radius:var(--radius);padding:10px 14px;text-align:center;margin-top:10px;font-size:14px;font-weight:500;color:var(--text)}
+.clear-end-btn{width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);padding:6px;font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
 .clear-end-btn:hover{border-color:var(--orange);color:var(--orange)}
 </style>
 </head>
@@ -194,27 +216,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <svg width="100" height="32" viewBox="0 0 200 56" fill="none">
-        <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-        <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-        <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-        <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-        <rect x="42" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".4"/>
-        <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-        <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-        <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-        <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-        <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-        <circle cx="14" cy="5" r="2.5" fill="var(--orange)" opacity=".6"/>
-        <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-        <circle cx="28" cy="9" r="2" fill="var(--orange)" opacity=".5"/>
-        <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-        <circle cx="42" cy="13" r="1.8" fill="var(--orange)" opacity=".45"/>
-        <text x="60" y="42" font-family="'Noto Sans JP',sans-serif" font-size="26" font-weight="700" fill="var(--orange)">Traq</text>
-      </svg>
+      <span class="logo-text">TRAQ</span>
     </div>
     <div class="sidebar-user" id="sb-user-wrap">
       <div class="sidebar-avatar" id="sb-avatar"></div>
@@ -225,39 +227,39 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     </div>
     <nav class="sidebar-nav">
       <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon">📋</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon">📊</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
       <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon">📥</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
         <span data-i18n="nav_excel">Excelダウンロード</span>
       </button>
       <button class="snav-item" onclick="location.href='admin.html'">
-        <span class="snav-icon">🔧</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
         <span data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
     <div class="sidebar-bottom">
       <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon">🌙</span>
+        <span class="snav-icon" id="sb-theme-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></span>
         <span data-i18n="nav_theme">テーマ切替</span>
       </button>
       <button class="snav-item" style="gap:6px">
-        <span class="snav-icon">🌐</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
         <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
         <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
         <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
       </button>
       <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon">⚙️</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
         <span data-i18n="nav_settings">設定</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
-        <span class="snav-icon">🚪</span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
         <span data-i18n="nav_logout">ログアウト</span>
       </button>
     </div>
@@ -266,42 +268,26 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <header class="topbar">
   <div class="topbar-left">
-    <svg class="mini-logo" width="26" height="26" viewBox="0 0 56 56" fill="none">
-      <rect x="4" y="34" width="48" height="18" rx="2" fill="var(--factory)"/>
-      <rect x="4" y="33" width="48" height="3" rx="1" fill="var(--roof)"/>
-      <rect x="9" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-      <rect x="20" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".5"/>
-      <rect x="31" y="39" width="6" height="7" rx="1" fill="var(--orange)" opacity=".7"/>
-      <rect x="8" y="18" width="8" height="18" rx="1" fill="var(--factory)"/>
-      <rect x="22" y="22" width="8" height="14" rx="1" fill="var(--factory)"/>
-      <rect x="36" y="25" width="8" height="11" rx="1" fill="var(--factory)"/>
-      <rect x="6" y="16" width="12" height="4" rx="1" fill="var(--roof)"/>
-      <rect x="20" y="20" width="12" height="4" rx="1" fill="var(--roof)"/>
-      <rect x="34" y="23" width="12" height="4" rx="1" fill="var(--roof)"/>
-      <circle cx="12" cy="10" r="3.5" fill="var(--orange)" opacity=".9"/>
-      <circle cx="26" cy="14" r="3" fill="var(--orange)" opacity=".8"/>
-      <circle cx="40" cy="17" r="2.5" fill="var(--orange)" opacity=".7"/>
-    </svg>
-    <span class="topbar-logo-text">Traq</span>
+    <span class="topbar-logo-text">TRAQ</span>
     <span class="topbar-sep"></span>
     <span class="topbar-sub">Trouble Tracking System</span>
   </div>
   <div class="topbar-right">
-    <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード">🔄</button>
-    <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替">🌙</button>
-    <button class="hdr-icon-btn" onclick="location.href='settings.html'" data-i18n-title="hdr_settings" title="設定">⚙️</button>
+    <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></button>
+    <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></button>
+    <button class="hdr-icon-btn" onclick="location.href='settings.html'" data-i18n-title="hdr_settings" title="設定"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
     <div class="hdr-avatar" id="mob-avatar"></div>
   </div>
 </header>
 <div class="page-title-bar">
   <button class="page-back-btn" onclick="goBack()">←</button>
-  <span class="page-title-text" data-i18n="page_title_md">🔧 金型トラブル入力</span>
+  <svg class="ico" style="color:var(--md)" viewBox="0 0 24 24"><path d="M10 4H4v16h6"/><path d="M14 4h6v16h-6"/><path d="M10 9v6M14 9v6"/></svg><span class="page-title-text" data-i18n="page_title_md">金型トラブル入力</span>
 </div>
 
 <main class="main">
   <!-- 基本情報 -->
   <div class="section">
-    <div class="section-title" data-i18n="sec_basic">🔧 基本情報</div>
+    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="M7 10h4M7 14h7"/><circle cx="16.5" cy="10" r="1.5"/></svg><span data-i18n="sec_basic">基本情報</span></div>
     <div class="form-row" style="grid-template-columns:1fr 68px 1fr">
       <div class="form-group">
         <label class="form-label"><span data-i18n="lbl_date">発生日</span><span class="req">*</span></label>
@@ -343,7 +329,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
   <!-- トラブル詳細 -->
   <div class="section">
-    <div class="section-title" data-i18n="sec_detail">📋 トラブル詳細</div>
+    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span data-i18n="sec_detail">トラブル詳細</span></div>
     <div class="form-row form-row-2">
       <div class="form-group">
         <label class="form-label"><span data-i18n="lbl_category">分類</span><span class="req">*</span></label>
@@ -391,7 +377,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
   <!-- 画像 -->
   <div class="section">
-    <div class="section-title" data-i18n="sec_photo">📷 写真</div>
+    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg><span data-i18n="sec_photo">写真</span></div>
     <div class="image-area" onclick="document.getElementById('image-input').click()">
       <div class="image-area-text" data-i18n="photo_tap">タップして写真を追加</div>
       <div class="image-area-sub" data-i18n="photo_sub">カメラ撮影 / ギャラリー選択 — 200KB超は自動圧縮</div>
@@ -416,22 +402,24 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <button class="nav-item" onclick="goHome()"><span class="nav-icon">📋</span><span class="nav-label" data-i18n="nav_list">一覧</span></button>
-  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon">📊</span><span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span></button>
-  <button class="nav-item" onclick="goMaster()"><span class="nav-icon">🔧</span><span class="nav-label" data-i18n="nav_master">マスタ</span></button>
+  <button class="nav-item" onclick="goHome()"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="nav-label" data-i18n="nav_list">一覧</span></button>
+  <button class="nav-item" onclick="location.href='dashboard.html'"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span></button>
+  <button class="nav-item" onclick="goMaster()"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span><span class="nav-label" data-i18n="nav_master">マスタ</span></button>
 </nav>
 
 <div class="overlay hidden" id="overlay"><div class="spinner"></div><div class="overlay-text" id="overlay-text">送信中...</div></div>
 <div class="toast hidden" id="toast"></div>
 
 <script>
+const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',sun:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M19.1 4.9l-2.1 2.1M7 16.9l-2.1 2.1"/></svg>',warn:'<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',lock:'<svg class="ico" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>',photo:'<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>'};
+
 (function(){var s=localStorage.getItem('traq_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p)})();
 
 /* ===== i18n ===== */
 var I18N = {
   ja: {
-    page_title_eq:'⚙️ 設備トラブル入力', page_title_md:'🔧 金型トラブル入力',
-    sec_basic:'🔧 基本情報', sec_detail:'📋 トラブル詳細', sec_photo:'📷 写真',
+    page_title_eq:'設備トラブル入力', page_title_md:'金型トラブル入力',
+    sec_basic:'基本情報', sec_detail:'トラブル詳細', sec_photo:'写真',
     lbl_date:'発生日', lbl_shift:'シフト', lbl_line:'ライン',
     lbl_machine:'機番', lbl_product:'品番',
     lbl_reporter:'報告者:',
@@ -482,8 +470,8 @@ var I18N = {
     hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
   },
   vi: {
-    page_title_eq:'⚙️ Nhập sự cố thiết bị', page_title_md:'🔧 Nhập sự cố khuôn',
-    sec_basic:'🔧 Thông tin cơ bản', sec_detail:'📋 Chi tiết sự cố', sec_photo:'📷 Ảnh',
+    page_title_eq:'Nhập sự cố thiết bị', page_title_md:'Nhập sự cố khuôn',
+    sec_basic:'Thông tin cơ bản', sec_detail:'Chi tiết sự cố', sec_photo:'Ảnh',
     lbl_date:'Ngày xảy ra', lbl_shift:'Ca', lbl_line:'Dây chuyền',
     lbl_machine:'Máy', lbl_product:'Mã SP',
     lbl_reporter:'Người báo:',
@@ -534,8 +522,8 @@ var I18N = {
     hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
   },
   en: {
-    page_title_eq:'⚙️ Equipment Trouble', page_title_md:'🔧 Mold Trouble',
-    sec_basic:'🔧 Basic Info', sec_detail:'📋 Trouble Detail', sec_photo:'📷 Photos',
+    page_title_eq:'Equipment Trouble', page_title_md:'Mold Trouble',
+    sec_basic:'Basic Info', sec_detail:'Trouble Detail', sec_photo:'Photos',
     lbl_date:'Date', lbl_shift:'Shift', lbl_line:'Line',
     lbl_machine:'Machine', lbl_product:'Product',
     lbl_reporter:'Reporter:',
@@ -659,7 +647,7 @@ function initChip(){
     sbRl.textContent=(rlbl[role]||'OP')+' / '+(slbl[s.default_shift]||'');
   }
   var sbThIcon=document.getElementById('sb-theme-icon');
-  if(sbThIcon)sbThIcon.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'🌙':'☀️';
+  if(sbThIcon)sbThIcon.innerHTML=document.documentElement.getAttribute('data-theme')==='dark'?ICONS.moon:ICONS.sun;
   // sidebar lang buttons
   var cl=localStorage.getItem('traq_lang')||'ja';
   ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===cl);});
@@ -683,8 +671,8 @@ function showMasterDenied(){
   ov.style.cssText='position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
   ov.onclick=function(){ov.remove();};
   var box=document.createElement('div');
-  box.style.cssText='background:var(--surface,#111827);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;font-size:22px">🔒</div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:8px;border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  box.style.cssText='background:var(--surface,#111827);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;max-width:280px;width:90%';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:var(--radius);background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center"><svg class="ico ico-lg" viewBox="0 0 24 24" style="color:var(--danger);margin:0 auto"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><div style="font-size:15px;font-weight:700;color:var(--text,#e8eaf0);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--muted,#8b90a0);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:var(--radius);border:none;background:var(--surface2,#1e2d45);color:var(--text,#e8eaf0);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
@@ -980,7 +968,7 @@ function showOverlay(t){document.getElementById('overlay-text').textContent=t;do
 function hideOverlay(){document.getElementById('overlay').classList.add('hidden');}
 var toastTimer=null;
 function showToast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='toast '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},type==='error'?8000:3000);}
-function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.textContent=next==='dark'?'🌙':'☀️';var sti=document.getElementById('sb-theme-icon');if(sti)sti.textContent=next==='dark'?'🌙':'☀️';}
+function toggleTheme(){var h=document.documentElement,isDark=h.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';h.setAttribute('data-theme',next);localStorage.setItem('traq_theme',next);var b=document.getElementById('themeBtn');if(b)b.innerHTML=next==='dark'?ICONS.moon:ICONS.sun;var sti=document.getElementById('sb-theme-icon');if(sti)sti.innerHTML=next==='dark'?ICONS.moon:ICONS.sun;}
 
 /* ── Edit mode (rejected resubmit / approved edit) ── */
 var editTroubleId = null;
@@ -1031,14 +1019,14 @@ async function loadEditData() {
     // 承認済み修正モードの明示バナー
     if (keepApproved) {
       var abn = document.createElement('div');
-      abn.style.cssText = 'background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#b07a10;';
+      abn.style.cssText = 'background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius);padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#b07a10;';
       abn.textContent = t('edit_approved_label');
       var af = document.querySelector('.form-body');
       if (af) af.insertBefore(abn, af.firstChild);
     }
     if (r.reject_reason) {
       var banner = document.createElement('div');
-      banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#ef4444;';
+      banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius);padding:10px 14px;margin:0 16px 12px;font-size:13px;color:#ef4444;';
       banner.innerHTML = '<strong style="display:block;font-size:11px;margin-bottom:2px">' + t('reject_label') + '</strong>' + r.reject_reason;
       var form = document.querySelector('.form-body');
       if (form) form.insertBefore(banner, form.firstChild);
