@@ -312,25 +312,21 @@ td.r,th.r{text-align:right}
     </div>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" onclick="void(0)">
-        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg></span>
-        <span class="nav-label" data-i18n="tab_report">日報</span>
-      </button>
-      <button class="nav-item hide" id="navHome" onclick="location.href='home.html'">
-        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></span>
-        <span class="nav-label" data-i18n="nav_home">ホーム</span>
-      </button>
-      <button class="nav-item" id="navList" onclick="location.href='home_sl.html'">
+      <button class="nav-item" onclick="goHome()">
         <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-        <span class="nav-label" data-i18n="nav_list">投稿一覧</span>
+        <span class="nav-label" data-i18n="nav_list">一覧</span>
       </button>
-      <button class="nav-item" id="navDash" onclick="location.href='dashboard.html'">
+      <button class="nav-item active" onclick="void(0)">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="nav-label" data-i18n="nav_report">日報</span>
+      </button>
+      <button class="nav-item" onclick="location.href='dashboard.html'">
         <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
       </button>
-      <button class="nav-item" onclick="location.href='settings.html'">
-        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><rect x="14" y="4" width="4" height="6"/><rect x="8" y="14" width="4" height="6"/></svg></span>
-        <span class="nav-label" data-i18n="nav_settings">設定</span>
+      <button class="nav-item" onclick="goMaster()">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+        <span class="nav-label" data-i18n="nav_master">マスタ</span>
       </button>
     </nav>
 
@@ -352,6 +348,8 @@ const I18N = {
   ja:{
     role_mgr:'管理職', role_admin:'管理者', role_sl:'SL', role_op:'OP',
     tab_confirm:'確認', tab_report:'日報', nav_home:'ホーム',
+    nav_report:'日報', nav_list:'一覧', nav_master:'マスタ', master_denied_title:'アクセス制限',
+    master_denied:'マスタはSL・管理職・管理者のみ利用できます', btn_close:'閉じる',
     conf_summary:(n,t)=>`管理職 ${n}/${t} 名が確認`, conf_none:'管理職はまだ確認していません',
     nav_mgr:'確認', nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_settings:'設定',
     sm_total:'対象件数', sm_mine:'自分の未確認', sm_stop:'停止計（分）', sm_late:'全員未確認',
@@ -397,6 +395,8 @@ const I18N = {
   vi:{
     role_mgr:'Quản lý', role_admin:'Quản trị', role_sl:'SL', role_op:'OP',
     tab_confirm:'Xác nhận', tab_report:'Báo cáo ngày', nav_home:'Trang chủ',
+    nav_report:'Báo cáo ngày', nav_list:'Danh sách', nav_master:'Quản lý', master_denied_title:'Hạn chế truy cập',
+    master_denied:'Chỉ SL, quản lý và quản trị mới dùng được', btn_close:'Đóng',
     conf_summary:(n,t)=>`${n}/${t} quản lý đã xác nhận`, conf_none:'Quản lý chưa xác nhận',
     nav_mgr:'Xác nhận', nav_list:'Danh sách', nav_dashboard:'Bảng điều khiển', nav_settings:'Cài đặt',
     sm_total:'Tổng số', sm_mine:'Tôi chưa xác nhận', sm_stop:'Tổng dừng (phút)', sm_late:'Chưa ai xác nhận',
@@ -442,6 +442,8 @@ const I18N = {
   en:{
     role_mgr:'Manager', role_admin:'Admin', role_sl:'SL', role_op:'OP',
     tab_confirm:'Confirm', tab_report:'Daily report', nav_home:'Home',
+    nav_report:'Daily report', nav_list:'List', nav_master:'Master', master_denied_title:'Access restricted',
+    master_denied:'Master is for SL, managers and admins only', btn_close:'Close',
     conf_summary:(n,t)=>`${n}/${t} managers confirmed`, conf_none:'No manager has confirmed yet',
     nav_mgr:'Confirm', nav_list:'All posts', nav_dashboard:'Dashboard', nav_settings:'Settings',
     sm_total:'Total', sm_mine:'My unconfirmed', sm_stop:'Downtime (min)', sm_late:'None confirmed',
@@ -568,6 +570,42 @@ const SESSION = (() => {
 function doLogout(){
   localStorage.removeItem('traq_session');
   location.href = 'index.html';
+}
+/* 下部メニューの遷移。他画面と同じ挙動にそろえる */
+function goHome(){
+  try{
+    var r = SESSION ? (SESSION.role || '') : '';
+    if(r === 'leader' || r === 'sl' || r === 'admin' || r === 'manager') location.href = 'home_sl.html';
+    else location.href = 'home.html';
+  }catch(e){ location.href = 'home.html'; }
+}
+function goMaster(){
+  var r = SESSION && SESSION.role;
+  if(r === 'worker' || r === 'op' || !r){ showMasterDenied(); return; }
+  location.href = 'admin.html';
+}
+function showMasterDenied(){
+  var ex = document.getElementById('masterDeniedOverlay');
+  if(ex) ex.remove();
+  var ov = document.createElement('div');
+  ov.id = 'masterDeniedOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;max-width:300px;width:82vw;text-align:center';
+  var h = document.createElement('div');
+  h.style.cssText = 'font-size:14px;font-weight:700;margin-bottom:8px';
+  h.textContent = t('master_denied_title');
+  var b = document.createElement('div');
+  b.style.cssText = 'font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px';
+  b.textContent = t('master_denied');
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;min-height:44px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer';
+  btn.textContent = t('btn_close');
+  btn.onclick = function(){ ov.remove(); };
+  box.appendChild(h); box.appendChild(b); box.appendChild(btn);
+  ov.appendChild(box);
+  ov.onclick = function(e){ if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
 }
 
 /* ===== 日時ユーティリティ ===== */
@@ -1172,7 +1210,6 @@ function exportXls(){
 
   if(!SESSION){ location.href = 'index.html'; return; }
   var role = SESSION.role;
-  var isWorker = (role === 'worker' || role === 'op');
 
   document.getElementById('tbUser').textContent = SESSION.name || '';
   document.getElementById('roleTag').textContent = roleLabel();
@@ -1184,13 +1221,6 @@ function exportXls(){
   } else {
     document.getElementById('mtabs').className = 'mtabs hide';
     state.view = 'rep';
-  }
-
-  /* 下部ナビ：作業者はホームへ、それ以外は投稿一覧へ */
-  if(isWorker){
-    document.getElementById('navHome').className = 'nav-item';
-    document.getElementById('navList').className = 'nav-item hide';
-    document.getElementById('navDash').className = 'nav-item hide';
   }
 
   try {

@@ -424,7 +424,7 @@ let ALL_USERS = [];
 
 async function loadUsers() {
   try {
-    const rows = await sbFetch('traq_users?select=id,name,role,is_active&is_active=eq.true&order=name');
+    const rows = await sbFetch('traq_users?select=id,name,role,title,is_active&is_active=eq.true&order=name');
     ALL_USERS = (rows || []).sort((a, b) => {
       const ro = { admin:0, leader:0, sl:1, worker:2, op:2 };
       const rd = (ro[a.role]||2) - (ro[b.role]||2);
@@ -504,9 +504,12 @@ function renderUsers(filter) {
     const isAdmin = role === 'admin';
     btn.className = 'user-btn';
     btn.onclick = () => selectUser(u);
-    const roleLabel = isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
-    const avatarClass = isAdmin ? 'adm' : isSL ? 'sl' : '';
-    const roleClass = isAdmin ? 'adm' : isSL ? 'sl' : '';
+    const isMgr = role === 'manager';
+    /* 肩書き(次長/チーフ/リーダー)があればそれを表示。無ければ従来のOP/SL/Admin */
+    const roleLabel = u.title ? u.title
+                    : isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
+    const avatarClass = isAdmin ? 'adm' : (isSL || isMgr) ? 'sl' : '';
+    const roleClass   = isAdmin ? 'adm' : (isSL || isMgr) ? 'sl' : '';
     btn.innerHTML =
       `<div class="user-avatar ${avatarClass}">${u.name.charAt(0)}</div>` +
       `<div><div class="user-name">${u.name}</div>` +
@@ -526,13 +529,16 @@ function selectUser(u) {
   const role = u.role;
   const isSL = role === 'leader' || role === 'sl';
   const isAdmin = role === 'admin';
+  const isMgr = role === 'manager';
+  const hi = isAdmin ? ' adm' : (isSL || isMgr) ? ' sl' : '';
   const avatarEl = document.getElementById('pinAvatar');
   avatarEl.textContent = u.name.charAt(0);
-  avatarEl.className = 'pin-avatar' + (isAdmin ? ' adm' : isSL ? ' sl' : '');
+  avatarEl.className = 'pin-avatar' + hi;
   document.getElementById('pinName').textContent = u.name;
   const roleEl = document.getElementById('pinRole');
-  roleEl.textContent = isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
-  roleEl.className = 'pin-user-role' + (isAdmin ? ' adm' : isSL ? ' sl' : '');
+  roleEl.textContent = u.title ? u.title
+    : isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
+  roleEl.className = 'pin-user-role' + hi;
   clearError();
   document.getElementById('loginBtn').disabled = true;
   goStep(3);
