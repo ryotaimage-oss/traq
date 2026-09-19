@@ -49,9 +49,9 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 .logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; height: calc(100dvh + min(var(--vp-raw,0px), env(safe-area-inset-top,0px))); }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); height: 100%; height: calc(100dvh + min(var(--vp-raw,0px), env(safe-area-inset-top,0px))); overflow: hidden; }
-.app { height: 100%; height: calc(100dvh + min(var(--vp-raw,0px), env(safe-area-inset-top,0px))); display: flex; flex-direction: column; background:var(--bg);}
+html, body { height: 100%; height: min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px))); }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); height: 100%; height: min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px))); overflow: hidden; }
+.app { height: 100%; height: min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px))); display: flex; flex-direction: column; background:var(--bg);}
 .main-column { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; background:var(--bg);}
 
 /* ===== Sidebar (PC/Tablet) ===== */
@@ -198,31 +198,30 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 html{background:var(--bg2)}
 </style>
 <script>
-/* iOSのスタンドアロンPWAでは、ビューポートが画面より上部セーフエリア分だけ
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
    小さく報告されることがある(実測: 画面932px / ビューポート873px)。
-   その差を --vp-raw に入れ、CSS側で env(safe-area-inset-top) を上限として
-   アプリの高さに加算する。差が無い環境では0pxになり何も起きない。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
 
-   読み込みが重いページでは innerHeight の確定が遅れるため、最初の描画では
-   前回の測定値を使う。これが無いと、確定後に高さが変わって画面が揺れる。 */
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
 (function(){
-  var KEY='traq_vp_raw', el=document.documentElement, last=0;
-  function set(v){ el.style.setProperty('--vp-raw', v+'px'); }
-  try{ var s=localStorage.getItem(KEY); if(s!==null) last=parseFloat(s)||0; }catch(_){}
-  set(last);                                   /* 最初のフレームから前回値を適用 */
+  var el=document.documentElement;
   function fit(){
-    var g=0;
-    try{
-      var sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
-      if(sa&&window.screen&&window.screen.height) g=Math.max(0,window.screen.height-window.innerHeight);
-    }catch(_){}
-    if(g!==last){ last=g; set(g); try{ localStorage.setItem(KEY,String(g)); }catch(_){} }
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
   }
-  document.addEventListener('DOMContentLoaded',fit);
+  fit();
   window.addEventListener('pageshow',fit);
-  window.addEventListener('load',fit);
   window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
-  var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(fit,200);});
 })();
 </script>
 </head>
