@@ -20,7 +20,7 @@
   --border:rgba(255,255,255,.11); --border2:rgba(255,255,255,.20);
   --grid:rgba(255,255,255,.07);
   --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
-  --radius:2px; --shadow:none; --nav-h:60px;
+  --radius:2px; --shadow:none; --nav-h:55px;
   /* 旧変数名との対応（入力画面のCSSはこちらの名前を参照している） */
   --bg:#0B1524; --surface:#141A24; --surface2:#1D2531;
   --text:#E6E9EF; --muted:#8D95A3;
@@ -57,7 +57,7 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column}
 
 /* ===== Header ===== */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,0px) 10px 0;height:calc(44px + env(safe-area-inset-top,0px));background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
