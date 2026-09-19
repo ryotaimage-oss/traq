@@ -236,6 +236,9 @@ html,body{height:100%;height:100dvh;font-family:'Noto Sans JP',sans-serif;backgr
 .btn-push-off:hover{border-color:var(--danger);color:var(--danger)}
 .push-warn{font-size:12px;color:var(--warning);line-height:1.5;margin-top:8px}
 @media(min-width:1025px){.sidebar{width:240px}}
+
+/* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
+html{background:var(--bg2)}
 </style>
 </head>
 <body>
@@ -493,6 +496,10 @@ html,body{height:100%;height:100dvh;font-family:'Noto Sans JP',sans-serif;backgr
             <span class="version-val" id="releaseDate">2026/09/19</span>
           </div>
           <div class="version-row">
+            <span class="version-key">表示領域</span>
+            <span class="version-val" id="vpInfo" style="font-size:10px;letter-spacing:.2px">–</span>
+          </div>
+          <div class="version-row">
             <span class="version-key" data-i18n="update_label">アップデート</span>
             <span class="version-val" id="updateStatus">
               <span class="no-update-badge" id="updateBadge" data-i18n="update_checking">確認中...</span>
@@ -710,7 +717,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.2.1'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.2.2'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -1147,6 +1154,23 @@ function forceReload(){
   },600);
 }
 
+/* ===== 表示領域の実測（端末ごとのセーフエリア挙動を確認する診断／解決後に削除可） ===== */
+function showViewportInfo(){
+  var el=document.getElementById('vpInfo'); if(!el) return;
+  function envPx(side){
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:env(safe-area-inset-'+side+',0px)';
+    document.body.appendChild(d);
+    var v=Math.round(parseFloat(getComputedStyle(d).height))||0;
+    d.parentNode.removeChild(d); return v;
+  }
+  var pwa=((window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true)?'PWA':'BRW';
+  var app=document.querySelector('.app');
+  var appH=app?Math.round(app.getBoundingClientRect().height):0;
+  var scr=(window.screen&&window.screen.height)?window.screen.height:0;
+  el.textContent=pwa+' win'+window.innerHeight+' scr'+scr+' app'+appH+' sa'+envPx('top')+'/'+envPx('bottom');
+}
+
 /* ===== Version check (mock) ===== */
 function checkVersion(){
   // バージョン表示を更新
@@ -1247,6 +1271,7 @@ function showToast(msg,type='info'){
   });
   initUserInfo();
   checkVersion();
+  showViewportInfo();
   applyI18n();
   initPush();
 })();
