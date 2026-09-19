@@ -23,9 +23,13 @@ self.addEventListener('install', event => {
       self._isUpdate = keys.some(k => k !== 'traq-push-nav' && k !== CACHE_NAME);
     }).then(() =>
       caches.open(CACHE_NAME).then(cache => {
-        return cache.addAll(STATIC_ASSETS).catch(err => {
-          console.warn('SW: 一部ファイルのキャッシュに失敗:', err);
-        });
+        // addAll は1件でも失敗すると全件キャッシュされないため、1件ずつ登録する。
+        // 1ファイルが欠けても残りはキャッシュされ、オフライン動作が保たれる。
+        return Promise.all(STATIC_ASSETS.map(url =>
+          cache.add(url).catch(err => {
+            console.warn('SW: キャッシュ失敗 ' + url, err);
+          })
+        ));
       })
     )
   );
@@ -74,15 +78,27 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // 画面(HTML)はキャッシュ優先。まず手元の分を即返し、裏で最新を取って次回に備える。
+  // ネットワーク優先だと、回線が遅いだけで毎回その往復を待つことになり体感が重くなる。
   if (event.request.destination === 'document' || url.pathname.endsWith('.html')) {
     event.respondWith(
-      fetch(event.request)
-        .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          return res;
-        })
-        .catch(() => caches.match(event.request))
+      caches.match(event.request).then(cached => {
+        const fromNet = fetch(event.request)
+          .then(res => {
+            if (res && res.status === 200) {
+              const clone = res.clone();
+              caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        // キャッシュがあれば即返し、裏側の更新はSWが落ちないよう待機対象にする
+        if (cached) {
+          event.waitUntil(fromNet);
+          return cached;
+        }
+        return fromNet;
+      })
     );
     return;
   }
