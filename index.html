@@ -56,9 +56,9 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 .logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;height:calc(100dvh + var(--vp-fix,0px));font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent}
+html,body{height:100%;height:calc(100dvh + min(var(--vp-raw,0px), env(safe-area-inset-top,0px)));font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-.app{min-height:100%;min-height:calc(100dvh + var(--vp-fix,0px));display:flex;flex-direction:column;background:var(--bg1)}
+.app{min-height:100%;min-height:calc(100dvh + min(var(--vp-raw,0px), env(safe-area-inset-top,0px)));display:flex;flex-direction:column;background:var(--bg1)}
 
 /* ===== Progress bar (top 3-segment) ===== */
 .progress-bar{display:flex;height:3px;flex-shrink:0}
@@ -208,40 +208,30 @@ html{background:var(--bg2)}
 </style>
 <script>
 /* iOSのスタンドアロンPWAでは、ビューポートが画面より上部セーフエリア分だけ
-   小さくなることがある(実測: 画面932px / ビューポート873px)。その差を実測して
-   --vp-fix に入れ、アプリの高さに足して画面下端まで届かせる。
-   差が無い環境では0pxになるため何も起きない。
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   その差を --vp-raw に入れ、CSS側で env(safe-area-inset-top) を上限として
+   アプリの高さに加算する。差が無い環境では0pxになり何も起きない。
 
-   欠損は「上部セーフエリアが除かれている」ことが原因なので、
-   補正量はその実測値を超えない。リロード直後は innerHeight が
-   一時的に正しくない値を返すため、読み込み完了後に測り直す。 */
+   読み込みが重いページでは innerHeight の確定が遅れるため、最初の描画では
+   前回の測定値を使う。これが無いと、確定後に高さが変わって画面が揺れる。 */
 (function(){
-  function capPx(){
-    if(!document.body) return 120;           /* body生成前は暫定上限 */
-    var d=document.createElement('div');
-    d.style.cssText='position:absolute;left:-9999px;top:0;width:1px;visibility:hidden;height:env(safe-area-inset-top,0px)';
-    document.body.appendChild(d);
-    var v=parseFloat(window.getComputedStyle(d).height);
-    document.body.removeChild(d);
-    return (v>0?v:0);
-  }
+  var KEY='traq_vp_raw', el=document.documentElement, last=0;
+  function set(v){ el.style.setProperty('--vp-raw', v+'px'); }
+  try{ var s=localStorage.getItem(KEY); if(s!==null) last=parseFloat(s)||0; }catch(_){}
+  set(last);                                   /* 最初のフレームから前回値を適用 */
   function fit(){
-    var e=document.documentElement,g=0;
+    var g=0;
     try{
       var sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
-      if(sa&&window.screen&&window.screen.height){
-        var d=window.screen.height-window.innerHeight;
-        if(d>0) g=Math.min(d,capPx());       /* 上部インセットを超えて足さない */
-      }
+      if(sa&&window.screen&&window.screen.height) g=Math.max(0,window.screen.height-window.innerHeight);
     }catch(_){}
-    e.style.setProperty('--vp-fix',g+'px');
+    if(g!==last){ last=g; set(g); try{ localStorage.setItem(KEY,String(g)); }catch(_){} }
   }
-  fit();
   document.addEventListener('DOMContentLoaded',fit);
   window.addEventListener('pageshow',fit);
-  window.addEventListener('load',function(){fit();setTimeout(fit,300);});
-  window.addEventListener('resize',fit);
+  window.addEventListener('load',fit);
   window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+  var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(fit,200);});
 })();
 </script>
 </head>
