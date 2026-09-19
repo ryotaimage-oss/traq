@@ -244,20 +244,36 @@ html{background:var(--bg2)}
 /* iOSのスタンドアロンPWAでは、ビューポートが画面より上部セーフエリア分だけ
    小さくなることがある(実測: 画面932px / ビューポート873px)。その差を実測して
    --vp-fix に入れ、アプリの高さに足して画面下端まで届かせる。
-   差が無い環境では0pxになるため何も起きない。 */
+   差が無い環境では0pxになるため何も起きない。
+
+   欠損は「上部セーフエリアが除かれている」ことが原因なので、
+   補正量はその実測値を超えない。リロード直後は innerHeight が
+   一時的に正しくない値を返すため、読み込み完了後に測り直す。 */
 (function(){
+  function capPx(){
+    if(!document.body) return 120;           /* body生成前は暫定上限 */
+    var d=document.createElement('div');
+    d.style.cssText='position:absolute;left:-9999px;top:0;width:1px;visibility:hidden;height:env(safe-area-inset-top,0px)';
+    document.body.appendChild(d);
+    var v=parseFloat(window.getComputedStyle(d).height);
+    document.body.removeChild(d);
+    return (v>0?v:0);
+  }
   function fit(){
     var e=document.documentElement,g=0;
     try{
       var sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
       if(sa&&window.screen&&window.screen.height){
         var d=window.screen.height-window.innerHeight;
-        if(d>0&&d<=120) g=d;
+        if(d>0) g=Math.min(d,capPx());       /* 上部インセットを超えて足さない */
       }
     }catch(_){}
     e.style.setProperty('--vp-fix',g+'px');
   }
   fit();
+  document.addEventListener('DOMContentLoaded',fit);
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('load',function(){fit();setTimeout(fit,300);});
   window.addEventListener('resize',fit);
   window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
 })();
@@ -739,7 +755,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.2.3'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.2.4'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
