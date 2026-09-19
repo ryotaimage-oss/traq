@@ -141,10 +141,10 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 .setting-arrow{font-size:18px;color:var(--text2)}
 
 /* Toggle switch */
-.toggle{width:44px;height:24px;background:var(--bg3);border-radius:var(--radius);position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:var(--radius);position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border2);flex-shrink:0}
 .toggle.on{background:var(--orange);border-color:var(--orange)}
-.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:var(--radius);background:#fff;transition:transform .2s;}
-.toggle.on .toggle-knob{transform:translateX(20px)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:var(--radius);background:var(--text2);transition:transform .2s,background .2s;}
+.toggle.on .toggle-knob{transform:translateX(20px);background:#fff}
 
 /* PIN section */
 .pin-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
@@ -475,7 +475,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
       <div class="version-card">
         <div class="version-header">
           <div class="version-logo">
-            <span class="logo-text" style="font-size:15px;letter-spacing:1.5px">TRAQ</span>
+            <span class="logo-text" style="font-size:11px;letter-spacing:.5px;color:var(--navy);padding-left:.5px">TRAQ</span>
           </div>
           <div>
             <div class="version-name">Traq – TroubleTrack System</div>
@@ -489,7 +489,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
           </div>
           <div class="version-row">
             <span class="version-key" data-i18n="release_date">リリース日</span>
-            <span class="version-val">2026/03/26</span>
+            <span class="version-val" id="releaseDate">2026/09/19</span>
           </div>
           <div class="version-row">
             <span class="version-key" data-i18n="update_label">アップデート</span>
@@ -709,7 +709,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.0.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.1.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -736,20 +736,10 @@ const SESSION = (() => {
 })();
 
 /* ===== Theme ===== */
-function forceReload(){
-  if('caches' in window){
-    caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){return caches.delete(k);}));
-    }).then(function(){location.reload(true);});
-  } else { location.reload(true); }
-}
-
 function toggleTheme(){
   const html=document.documentElement;
   const isDark=html.getAttribute('data-theme')==='dark';
   html.setAttribute('data-theme',isDark?'light':'dark');
-  const icon=isDark?ICONS.sun:ICONS.moon;
-  document.getElementById('themeBtn').textContent=icon;
   localStorage.setItem('traq_theme',isDark?'light':'dark');
   updateThemeToggle();
 }
