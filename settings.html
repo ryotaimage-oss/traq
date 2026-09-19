@@ -2,7 +2,7 @@
 <html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,7 +23,7 @@
   --grid:rgba(255,255,255,.07);
   --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--error:#ef4444;
   --eq:#EF9F27;
-  --radius:2px;--shadow:none;--nav-h:56px;
+  --radius:2px;--shadow:none;--nav-h:60px;
 
   --on-success: #0B1524;
 }
@@ -73,8 +73,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* ===== Bottom Nav (2-tab) ===== */
-.bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.bottom-nav{display:flex;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.bottom-nav svg.ico{width:23px;height:23px;stroke-width:1.5}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:11px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
 .nav-item.active{color:var(--orange)}
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
@@ -203,7 +204,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* ===== Add Home Modal ===== */
 .hidden{display:none!important}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
-.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:85vh;overflow-y:auto}
+.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;width:100%;max-width:480px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .modal-title{font-size:16px;font-weight:700}
 .modal-close{background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:var(--radius);font-family:inherit}
@@ -709,7 +710,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.1.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.2.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */

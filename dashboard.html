@@ -2,7 +2,7 @@
 <html lang="ja" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +24,7 @@
   --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
   --eq:#EF9F27;--md:#2DD4BF;
   --radius:2px;--shadow:none;
-  --nav-h:56px;
+  --nav-h:60px;
 
   --on-success: #0B1524;
 }
@@ -72,8 +72,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* ===== Bottom Nav (2-tab) ===== */
-.bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.bottom-nav{display:flex;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.bottom-nav svg.ico{width:23px;height:23px;stroke-width:1.5}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:11px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
 .nav-item.active{color:var(--orange)}
 .nav-item:hover:not(.active){color:var(--text1)}
 .nav-icon{font-size:18px;line-height:1}
@@ -247,7 +248,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeUp .15s ease}
 .modal-overlay.center{align-items:center}
-.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;padding:20px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;animation:fadeUp .2s ease}
+.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;max-height:88vh;overflow-y:auto;animation:fadeUp .2s ease}
 .modal-overlay.center .modal-sheet{border-radius:var(--radius);margin:20px;max-height:80vh}
 .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
