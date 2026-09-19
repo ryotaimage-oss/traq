@@ -61,8 +61,8 @@
 html{color-scheme:dark;background:var(--bg1)}
 [data-theme="light"]{color-scheme:light}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;height:100dvh;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
-.app{height:100%;height:100dvh;display:flex;flex-direction:column;background:var(--bg1)}.sidebar{display:none}
+html,body{height:100%;height:calc(100dvh + var(--vp-fix,0px));font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;height:calc(100dvh + var(--vp-fix,0px));display:flex;flex-direction:column;background:var(--bg1)}.sidebar{display:none}
 .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg1)}
 
 /* Topbar */
@@ -452,6 +452,28 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
+<script>
+/* iOSのスタンドアロンPWAでは、ビューポートが画面より上部セーフエリア分だけ
+   小さくなることがある(実測: 画面932px / ビューポート873px)。その差を実測して
+   --vp-fix に入れ、アプリの高さに足して画面下端まで届かせる。
+   差が無い環境では0pxになるため何も起きない。 */
+(function(){
+  function fit(){
+    var e=document.documentElement,g=0;
+    try{
+      var sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+      if(sa&&window.screen&&window.screen.height){
+        var d=window.screen.height-window.innerHeight;
+        if(d>0&&d<=120) g=d;
+      }
+    }catch(_){}
+    e.style.setProperty('--vp-fix',g+'px');
+  }
+  fit();
+  window.addEventListener('resize',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
 </head>
 <body>
 <div class="app" id="app">
