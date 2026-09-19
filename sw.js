@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v18';
+const CACHE_NAME = 'traq-v20';
 
 const STATIC_ASSETS = [
   './index.html',
@@ -25,11 +25,17 @@ self.addEventListener('install', event => {
       caches.open(CACHE_NAME).then(cache => {
         // addAll は1件でも失敗すると全件キャッシュされないため、1件ずつ登録する。
         // 1ファイルが欠けても残りはキャッシュされ、オフライン動作が保たれる。
-        return Promise.all(STATIC_ASSETS.map(url =>
-          cache.add(url).catch(err => {
-            console.warn('SW: キャッシュ失敗 ' + url, err);
-          })
-        ));
+        // {cache:'reload'} でブラウザのHTTPキャッシュを迂回する。
+        // これが無いと、更新直後でも古いファイルをSWのキャッシュに取り込んでしまう。
+        // 一斉取得は回線を占有し、表示中のページの読み込みを妨げるため1件ずつ順に取る。
+        // 1件失敗しても残りは取得され、オフライン動作が保たれる。
+        return STATIC_ASSETS.reduce(function(chain, url){
+          return chain.then(function(){
+            return cache.add(new Request(url, { cache: 'reload' })).catch(function(err){
+              console.warn('SW: キャッシュ失敗 ' + url, err);
+            });
+          });
+        }, Promise.resolve());
       })
     )
   );

@@ -8,6 +8,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Traq">
+  <script>
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
+
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
+(function(){
+  var el=document.documentElement;
+  function fit(){
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
+  }
+  fit();
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
@@ -107,6 +134,8 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 
 .list{padding:10px}
 .empty{padding:36px 16px;text-align:center;color:var(--text2);font-size:13px;line-height:1.9}
+.pend-note{margin:12px 10px 0;padding:10px 12px;background:rgba(239,159,39,.10);border:1px solid rgba(239,159,39,.35);border-left:3px solid var(--orange);border-radius:var(--radius);font-size:12px;line-height:1.75;color:var(--text1)}
+.pend-note b{color:var(--orange)}
 .loading{padding:36px 16px;text-align:center;color:var(--text2);font-size:13px}
 
 /* ===== Card ===== */
@@ -251,33 +280,6 @@ td.r,th.r{text-align:right}
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
-<script>
-/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
-   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
-   画面の高さ screen.height を --screen-h に入れ、CSS側で
-
-       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
-
-   として高さを決める。2項の小さい方を採るので、
-     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
-     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
-     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
-     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
-   screen.height は読み込み直後から安定して取得できるため、
-   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
-(function(){
-  var el=document.documentElement;
-  function fit(){
-    var sa=false;
-    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
-    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
-    else el.style.removeProperty('--screen-h');
-  }
-  fit();
-  window.addEventListener('pageshow',fit);
-  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
-})();
-</script>
 </head>
 <body>
 
@@ -391,6 +393,7 @@ const I18N = {
     f_new:'自分の未確認', f_done:'確認済み', f_all:'すべて',
     loading:'読み込み中…', empty_new:'未確認の異常はありません', empty_done:'まだ確認した異常はありません',
     empty_all:'該当する異常はありません', empty_day:'この日の異常報告はありません',
+    pend_note:(n)=>`この日は未承認が <b>${n}件</b> あります。承認されるまで日報には反映されません。`,
     b_approved:'承認済み', b_eq:'設備', b_md:'金型',
     k_product:'品番', k_cat:'区分', k_stop:'停止', k_report:'報告', k_line:'ライン',
     sl_approved:'SL承認', conf_status:'確認状況', not_conf:'未確認',
@@ -438,6 +441,7 @@ const I18N = {
     f_new:'Tôi chưa xác nhận', f_done:'Đã xác nhận', f_all:'Tất cả',
     loading:'Đang tải…', empty_new:'Không có sự cố chưa xác nhận', empty_done:'Chưa xác nhận sự cố nào',
     empty_all:'Không có sự cố phù hợp', empty_day:'Không có báo cáo trong ngày này',
+    pend_note:(n)=>`Ngày này có <b>${n} mục</b> chưa duyệt. Chưa duyệt thì không hiện trong báo cáo.`,
     b_approved:'Đã duyệt', b_eq:'Thiết bị', b_md:'Khuôn',
     k_product:'Mã SP', k_cat:'Phân loại', k_stop:'Dừng', k_report:'Người báo', k_line:'Dây chuyền',
     sl_approved:'SL duyệt', conf_status:'Tình trạng xác nhận', not_conf:'Chưa xác nhận',
@@ -485,6 +489,7 @@ const I18N = {
     f_new:'My unconfirmed', f_done:'Confirmed', f_all:'All',
     loading:'Loading…', empty_new:'No unconfirmed troubles', empty_done:'No troubles confirmed yet',
     empty_all:'No matching troubles', empty_day:'No reports on this day',
+    pend_note:(n)=>`<b>${n}</b> unapproved on this day. They are excluded until approved.`,
     b_approved:'Approved', b_eq:'Equipment', b_md:'Mold',
     k_product:'Part no.', k_cat:'Category', k_stop:'Downtime', k_report:'Reported by', k_line:'Line',
     sl_approved:'SL approved', conf_status:'Confirmation', not_conf:'Not confirmed',
@@ -715,7 +720,7 @@ const IC_DOWN  = '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12"/><path
 const PAGE_SIZE = 30;
 const LIST_DAYS = 21;
 /* 運用開始日。これより前の異常は確認対象に含めない（過去分の積み残しを防ぐ） */
-const START_DATE = '2026-09-22';
+const START_DATE = '2026-09-19';
 /* 確認機能を使えるのは 管理職(manager) と アプリ管理者(admin) のみ。
    シフトリーダー(leader/sl)と作業者(worker/op)は日報だけ。 */
 function canConfirm(){ return !!SESSION && (SESSION.role === 'manager' || SESSION.role === 'admin'); }
@@ -730,7 +735,7 @@ function roleLabel(){
 }
 let MGRS = [];
 let TROUBLES = [];
-let REP = { date:'', rows:[], prev:[], loaded:false };
+let REP = { date:'', rows:[], prev:[], loaded:false, pending:0 };
 let state = { view:'list', tab:'new', openCmt:null, shown:PAGE_SIZE, busy:false, repBusy:false };
 
 const TSEL = 'select=id,trouble_type,status,occurred_date,shift,stop_minutes,detail,approved_at,'
@@ -802,13 +807,18 @@ async function loadTroubles(){
   TROUBLES = (rows || []).map(mapTrouble);
 }
 async function loadReport(ymd){
+  var prevYmd = addDays(ymd, -1);
+  /* 承認済みと未承認を1回の問い合わせでまとめて取る。
+     集計に使うのは承認済みのみ。未承認は件数の告知だけに使う。 */
   var rows = await sbFetch('troubles?' + TSEL
-    + '&status=eq.approved&occurred_date=in.(' + ymd + ',' + addDays(ymd, -1) + ')'
+    + '&status=in.(approved,pending)&occurred_date=in.(' + ymd + ',' + prevYmd + ')'
     + '&order=id.asc&limit=400');
-  var all = (rows || []).map(mapTrouble);
+  var raw = rows || [];
+  var approved = raw.filter(function(r){ return r.status === 'approved'; }).map(mapTrouble);
   REP.date = ymd;
-  REP.rows = all.filter(function(r){ return r.date === ymd; });
-  REP.prev = all.filter(function(r){ return r.date === addDays(ymd, -1); });
+  REP.rows = approved.filter(function(r){ return r.date === ymd; });
+  REP.prev = approved.filter(function(r){ return r.date === prevYmd; });
+  REP.pending = raw.filter(function(r){ return r.status === 'pending' && r.occurred_date === ymd; }).length;
   REP.loaded = true;
 }
 
@@ -989,8 +999,10 @@ function renderRep(){
   document.getElementById('dPrev').disabled = state.repBusy;
 
   var rows = REP.rows.slice(), prev = REP.prev;
+  /* 未承認があると日報が空・少なく見えるため、理由を明示する */
+  var note = REP.pending > 0 ? '<div class="pend-note">' + t('pend_note', REP.pending) + '</div>' : '';
   if(!rows.length){
-    document.getElementById('repBody').innerHTML =
+    document.getElementById('repBody').innerHTML = note +
       '<div class="sec"><div class="sec-b"><div class="empty">' + esc(t('empty_day')) + '</div></div></div>';
     return;
   }
@@ -1006,7 +1018,7 @@ function renderRep(){
     return '<span class="met-d ' + (v > 0 ? 'up' : 'down') + '">' + esc(t('d_diff', v, u)) + '</span>';
   }
 
-  var h = '<div class="sec"><div class="sec-h">' + IC_BAR + esc(t(live ? 'sec_sum_live' : 'sec_sum')) + '</div><div class="mets">'
+  var h = note + '<div class="sec"><div class="sec-h">' + IC_BAR + esc(t(live ? 'sec_sum_live' : 'sec_sum')) + '</div><div class="mets">'
     + '<div class="met"><div class="met-n num">' + rows.length + '</div><div class="met-l">' + esc(t('m_count')) + '</div>' + df(rows.length, prev.length, t('u_count')) + '</div>'
     + '<div class="met"><div class="met-n num" style="color:var(--danger)">' + tot + '</div><div class="met-l">' + esc(t('m_stop')) + '</div>' + df(tot, pTot, t('u_min')) + '</div>'
     + '<div class="met"><div class="met-n num">' + Math.round(tot / rows.length) + '</div><div class="met-l">' + esc(t('m_avg')) + '</div></div>'
