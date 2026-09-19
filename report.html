@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Traq">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>Traq – 日報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange:      #EF9F27;
+  --orange-dark: #c97d10;
+  --md:          #2DD4BF;
+  --navy:        #080d18;
+  --bg1:         #0B1524;
+  --bg2:         #141A24;
+  --bg3:         #1D2531;
+  --text1:       #E6E9EF;
+  --text2:       #838B99;
+  --border:      rgba(255,255,255,0.11);
+  --border2:     rgba(255,255,255,0.20);
+  --grid:        rgba(255,255,255,0.07);
+  --success:     #10b981;
+  --danger:      #ef4444;
+  --warning:     #f59e0b;
+  --radius:      2px;
+  --shadow:      none;
+  --nav-h:       56px;
+  /* 入力画面系（--surface 系）との互換。未定義変数を作らないため両系統を定義する */
+  --surface:     #141A24;
+  --surface2:    #1D2531;
+  --text:        #E6E9EF;
+  --muted:       #838B99;
+}
+[data-theme="light"] {
+  --md:      #0E8C7F;
+  --bg1:     #E3E7EB;
+  --bg2:     #FFFFFF;
+  --bg3:     #F2F0EC;
+  --text1:   #161B26;
+  --text2:   #5F6672;
+  --border:  rgba(0,0,0,0.16);
+  --border2: rgba(0,0,0,0.28);
+  --grid:    rgba(0,0,0,0.09);
+  --shadow:  none;
+  --orange:  #B36F0C;
+  --success: #0B7A56;
+  --warning: #A06A08;
+  --danger:  #DC2626;
+  --surface: #FFFFFF;
+  --surface2:#F2F0EC;
+  --text:    #161B26;
+  --muted:   #5F6672;
+}
+html{color-scheme:dark;background:var(--bg1)}
+[data-theme="light"]{color-scheme:light}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column;background:var(--bg1)}
+.main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg1)}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;background:var(--bg1)}
+.num{font-variant-numeric:tabular-nums}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-s{width:11px;height:11px;stroke-width:2.2}
+.ico-lg{width:26px;height:26px}
+.hide{display:none !important}
+
+/* ===== Topbar ===== */
+.topbar{display:flex;align-items:center;gap:6px;padding:0 10px;height:44px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1;font-family:inherit}
+.role-tag{font-size:10px;font-weight:700;padding:2px 6px;border:1px solid var(--border2);color:var(--text2);white-space:nowrap}
+.tb-user{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.tb-btn{min-width:32px;min-height:32px;padding:0 7px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tb-btn.active{background:var(--orange);border-color:var(--orange);color:var(--bg1)}
+
+/* ===== Main tabs ===== */
+.mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
+.mtab{flex:1;min-height:46px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:6px;transition:color .15s,border-color .15s}
+.mtab[aria-selected="true"]{color:var(--orange);border-bottom-color:var(--orange);background:var(--bg2)}
+.mtab-n{font-size:11px;padding:0 4px;border:1px solid var(--warning);color:var(--warning);font-weight:700}
+
+/* ===== Summary ===== */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.sm{padding:9px 4px;text-align:center;border-right:1px solid var(--border)}
+.sm:last-child{border-right:none}
+.sm-n{font-size:20px;font-weight:700;line-height:1.2}
+.sm-l{font-size:10px;color:var(--text2);margin-top:1px}
+
+/* ===== Sub tabs ===== */
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;min-height:44px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;padding:0 2px}
+.tab[aria-selected="true"]{color:var(--orange);border-bottom-color:var(--orange)}
+.tab-n{font-size:11px;margin-left:2px}
+
+.list{padding:10px}
+.empty{padding:36px 16px;text-align:center;color:var(--text2);font-size:13px;line-height:1.9}
+.loading{padding:36px 16px;text-align:center;color:var(--text2);font-size:13px}
+
+/* ===== Card ===== */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--text2);margin-bottom:9px;overflow:hidden}
+.card.is-new{border-left-color:var(--warning)}
+.card.is-done{border-left-color:var(--success)}
+.card.is-late{border-left-color:var(--danger)}
+.c-head{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid var(--border)}
+.bdg{font-size:10px;font-weight:700;padding:2px 6px;border-radius:0;border:1px solid currentColor;white-space:nowrap}
+.b-eq{color:var(--orange);background:rgba(239,159,39,.10)}
+.b-md{color:var(--md);background:rgba(45,212,191,.10)}
+.b-ok{color:var(--success);background:rgba(16,185,129,.10)}
+.b-late{color:var(--danger);background:rgba(239,68,68,.10)}
+.c-time{margin-left:auto;font-size:11px;color:var(--text2)}
+.c-body{padding:9px 10px}
+.c-title{font-size:14px;font-weight:700;line-height:1.45;margin-bottom:5px}
+.c-grid{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:11px;line-height:1.75}
+.c-k{color:var(--text2);white-space:nowrap}
+.c-stop{color:var(--danger);font-weight:700}
+.c-detail{margin-top:5px;padding:6px 8px;background:var(--bg3);border-left:2px solid var(--border2);font-size:11px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.c-flow{display:flex;align-items:center;gap:6px;padding:7px 10px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);background:var(--bg3)}
+.c-flow b{color:var(--text1);font-weight:600}
+
+/* ===== 確認状況 ===== */
+.conf{border-top:1px solid var(--border);padding:8px 10px}
+.conf-h{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:11px;font-weight:700;color:var(--text2)}
+.conf-bar{flex:1;height:4px;background:var(--bg3);border:1px solid var(--border);overflow:hidden}
+.conf-bar i{display:block;height:100%;background:var(--success)}
+.conf-c{color:var(--text1)}
+.conf-c.full{color:var(--success)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:1px 12px}
+.crow{display:flex;align-items:baseline;gap:5px;font-size:11px;line-height:1.85;border-bottom:1px solid var(--border)}
+.crn{color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crn b{color:var(--text1);font-weight:600}
+.crow.yes .crn b{color:var(--success)}
+.crt{margin-left:auto;white-space:nowrap}
+.crow.yes .crt{color:var(--success)}
+.crow.no .crt{color:var(--danger)}
+.crow.self{background:rgba(239,159,39,.07);border-bottom-color:var(--orange)}
+.ccmt{margin-top:7px;font-size:11px;line-height:1.65;color:var(--text1);background:var(--bg3);border-left:2px solid var(--success);padding:6px 8px;white-space:pre-wrap;word-break:break-word}
+.ccmt+.ccmt{margin-top:4px}
+.ccmt-w{display:block;font-size:10px;color:var(--text2);font-weight:700;margin-bottom:2px}
+
+.c-act{display:flex;border-top:1px solid var(--border)}
+.btn{flex:1;min-height:46px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg3);color:var(--text1);transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn+.btn{border-left:1px solid var(--border)}
+.btn-main{background:var(--success);color:#fff}
+.btn-sub{background:transparent;color:var(--text2)}
+.c-mine{display:flex;align-items:center;gap:7px;padding:9px 10px;border-top:1px solid var(--border);background:rgba(16,185,129,.07);font-size:12px;color:var(--success);font-weight:700}
+
+.cmt{padding:9px 10px;border-top:1px solid var(--border);background:var(--bg3)}
+.cmt textarea{width:100%;min-height:62px;padding:7px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:16px;color:var(--text1);outline:none;resize:vertical;-webkit-appearance:none}
+.cmt textarea:focus{border-color:var(--orange)}
+.cmt-r{display:flex;gap:6px;margin-top:7px}
+.cmt-b{flex:1;min-height:44px;border:1px solid var(--border);background:var(--bg2);color:var(--text1);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border-radius:var(--radius)}
+.cmt-b.pri{background:var(--success);border-color:var(--success);color:#fff}
+.cmt-b:disabled{opacity:.5;cursor:default}
+.cmt-err{color:var(--danger);font-size:12px;margin-top:5px;display:none}
+
+.more{width:100%;min-height:46px;margin-top:2px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text1);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+
+/* ===== 日報 ===== */
+.dnav{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.dnav-b{min-width:44px;min-height:44px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text1);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.dnav-b:disabled{opacity:.3;cursor:default}
+.dnav-c{flex:1;text-align:center;min-width:0}
+.dnav-d{font-size:15px;font-weight:700;line-height:1.3}
+.dnav-w{font-size:10px;color:var(--text2);margin-top:2px;line-height:1.5}
+.dnav-s{font-size:10px;font-weight:700;padding:1px 5px;border:1px solid currentColor;margin-left:4px;white-space:nowrap}
+.st-done{color:var(--success)}
+.st-live{color:var(--warning)}
+
+.sec{margin:12px 10px 0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+.sec-h{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px}
+.sec-b{padding:10px}
+.mets{display:grid;grid-template-columns:repeat(4,1fr)}
+.met{padding:10px 4px;text-align:center;border-right:1px solid var(--border)}
+.met:last-child{border-right:none}
+.met-n{font-size:22px;font-weight:700;line-height:1.15}
+.met-l{font-size:10px;color:var(--text2);margin-top:2px}
+.met-d{font-size:10px;margin-top:2px;display:block}
+.up{color:var(--danger)} .down{color:var(--success)}
+
+.fi{display:flex;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border);font-size:12px;line-height:1.7}
+.fi:last-child{border-bottom:none}
+.fi-m{width:3px;flex-shrink:0;background:var(--text2)}
+.fi.warn .fi-m{background:var(--warning)}
+.fi.bad .fi-m{background:var(--danger)}
+.fi.warn .fi-b b{color:var(--warning)}
+.fi.bad .fi-b b{color:var(--danger)}
+.fi-sub{display:block;font-size:11px;color:var(--text2);margin-top:2px}
+
+.bars{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:11px}
+.bl{white-space:nowrap;color:var(--text2)}
+.bt{height:12px;background:var(--bg3);border:1px solid var(--border);overflow:hidden}
+.bt i{display:block;height:100%;background:var(--orange)}
+.bt.md i{background:var(--md)}
+.bt.dn i{background:var(--danger)}
+.bv{white-space:nowrap;text-align:right;min-width:56px}
+
+table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+th,td{padding:5px 6px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;line-height:1.55;overflow-wrap:anywhere}
+th{color:var(--text2);font-weight:700;font-size:10px;white-space:nowrap}
+td.r,th.r{text-align:right}
+.t-stop{color:var(--danger);font-weight:700}
+.t-eq{color:var(--orange)} .t-md{color:var(--md)}
+.t-no{color:var(--danger)} .t-yes{color:var(--success)}
+
+.cf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px 12px;font-size:11px}
+.cfr{display:flex;align-items:baseline;gap:5px;line-height:1.9;border-bottom:1px solid var(--border)}
+.cfr b{font-weight:600}
+.cfr .v{margin-left:auto;white-space:nowrap}
+.cfr.ok .v{color:var(--success)}
+.cfr.ng .v{color:var(--danger)}
+
+.acts{display:flex;gap:6px;margin:12px 10px 0}
+.act{flex:1;min-height:46px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text1);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.act:active{transform:scale(.98)}
+.pad{height:16px}
+
+/* ===== Bottom nav ===== */
+.bottom-nav{display:flex;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:10px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.nav-item.active{color:var(--orange)}
+.nav-icon{display:flex;align-items:center;justify-content:center}
+
+/* ===== Toast ===== */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(var(--nav-h) + 12px);max-width:calc(100vw - 24px);background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--success);border-radius:var(--radius);color:var(--text1);font-size:13px;font-weight:700;padding:11px 14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{border-left-color:var(--danger)}
+
+@media print{
+  .topbar,.mtabs,.bottom-nav,.acts,.dnav-b,.toast,#viewList{display:none !important}
+  html,body,.app,.main-column,.scroll-area{height:auto;overflow:visible;background:#fff;color:#000}
+  .sec{break-inside:avoid;border-color:#999}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="main-column">
+
+    <div class="topbar">
+      <span class="logo-text">TRAQ</span>
+      <span class="role-tag" id="roleTag"></span>
+      <span class="tb-user" id="tbUser"></span>
+      <span class="tb-right">
+        <button class="tb-btn" id="lang-ja" onclick="setLang('ja')">JA</button>
+        <button class="tb-btn" id="lang-vi" onclick="setLang('vi')">VI</button>
+        <button class="tb-btn" id="lang-en" onclick="setLang('en')">EN</button>
+        <button class="tb-btn" id="themeBtn" onclick="toggleTheme()" aria-label="theme"></button>
+        <button class="tb-btn" onclick="doLogout()" aria-label="logout">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M15 17l5-5-5-5"/><path d="M20 12H9"/><path d="M12 3H5v18h7"/></svg>
+        </button>
+      </span>
+    </div>
+
+    <div class="mtabs hide" id="mtabs">
+      <button class="mtab" data-m="list" id="tabList" aria-selected="true">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
+        <span data-i18n="tab_confirm">確認</span><span class="mtab-n num hide" id="mtabN"></span>
+      </button>
+      <button class="mtab" data-m="rep" id="tabRep" aria-selected="false">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>
+        <span data-i18n="tab_report">日報</span>
+      </button>
+    </div>
+
+    <div class="scroll-area" id="scroller">
+
+      <div id="viewList">
+        <div class="summary">
+          <div class="sm"><div class="sm-n num" id="sTotal">–</div><div class="sm-l" data-i18n="sm_total">対象件数</div></div>
+          <div class="sm"><div class="sm-n num" id="sMine" style="color:var(--warning)">–</div><div class="sm-l" data-i18n="sm_mine">自分の未確認</div></div>
+          <div class="sm"><div class="sm-n num" id="sStop" style="color:var(--danger)">–</div><div class="sm-l" data-i18n="sm_stop">停止計（分）</div></div>
+          <div class="sm"><div class="sm-n num" id="sLate" style="color:var(--danger)">–</div><div class="sm-l" data-i18n="sm_late">全員未確認</div></div>
+        </div>
+        <div class="tabs" id="tabs">
+          <button class="tab" data-tab="new" aria-selected="true"><span data-i18n="f_new">自分の未確認</span><span class="tab-n num" id="tnNew"></span></button>
+          <button class="tab" data-tab="done" aria-selected="false"><span data-i18n="f_done">確認済み</span><span class="tab-n num" id="tnDone"></span></button>
+          <button class="tab" data-tab="all" aria-selected="false"><span data-i18n="f_all">すべて</span><span class="tab-n num" id="tnAll"></span></button>
+        </div>
+        <div class="list" id="list"><div class="loading" data-i18n="loading">読み込み中…</div></div>
+      </div>
+
+      <div id="viewRep" class="hide">
+        <div class="dnav">
+          <button class="dnav-b" id="dPrev" aria-label="prev">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="dnav-c">
+            <div class="dnav-d" id="dDate">–</div>
+            <div class="dnav-w" id="dWin"></div>
+          </div>
+          <button class="dnav-b" id="dNext" aria-label="next">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div id="repBody"><div class="loading" data-i18n="loading">読み込み中…</div></div>
+      </div>
+
+      <div class="pad"></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="void(0)">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg></span>
+        <span class="nav-label" data-i18n="tab_report">日報</span>
+      </button>
+      <button class="nav-item hide" id="navHome" onclick="location.href='home.html'">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></span>
+        <span class="nav-label" data-i18n="nav_home">ホーム</span>
+      </button>
+      <button class="nav-item" id="navList" onclick="location.href='home_sl.html'">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <span class="nav-label" data-i18n="nav_list">投稿一覧</span>
+      </button>
+      <button class="nav-item" id="navDash" onclick="location.href='dashboard.html'">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
+        <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
+      </button>
+      <button class="nav-item" onclick="location.href='settings.html'">
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><rect x="14" y="4" width="4" height="6"/><rect x="8" y="14" width="4" height="6"/></svg></span>
+        <span class="nav-label" data-i18n="nav_settings">設定</span>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
+
+/* ===== i18n ===== */
+let currentLang = localStorage.getItem('traq_lang') || 'ja';
+const I18N = {
+  ja:{
+    role_mgr:'管理職', role_admin:'管理者', role_sl:'SL', role_op:'OP',
+    tab_confirm:'確認', tab_report:'日報', nav_home:'ホーム',
+    conf_summary:(n,t)=>`管理職 ${n}/${t} 名が確認`, conf_none:'管理職はまだ確認していません',
+    nav_mgr:'確認', nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_settings:'設定',
+    sm_total:'対象件数', sm_mine:'自分の未確認', sm_stop:'停止計（分）', sm_late:'全員未確認',
+    f_new:'自分の未確認', f_done:'確認済み', f_all:'すべて',
+    loading:'読み込み中…', empty_new:'未確認の異常はありません', empty_done:'まだ確認した異常はありません',
+    empty_all:'該当する異常はありません', empty_day:'この日の異常報告はありません',
+    b_approved:'承認済み', b_eq:'設備', b_md:'金型',
+    k_product:'品番', k_cat:'区分', k_stop:'停止', k_report:'報告', k_line:'ライン',
+    sl_approved:'SL承認', conf_status:'確認状況', not_conf:'未確認',
+    btn_confirm:'確認', btn_comment:'コメント付き', btn_cancel:'キャンセル',
+    btn_save:'コメント付きで確認', ph_comment:'指示や気づいた点を記入（SL・報告者にも表示されます）',
+    err_empty:'コメントを入力してください',
+    mine_done:'自分は確認済み', all_unconf:'全員未確認',
+    more:'もっと見る', shift_n:(n)=>`${n}直`, min_n:(n)=>`${n} 分`,
+    u_count:'件', u_min:'分',
+    win:'集計区間', st_done:'完成', st_live:'進行中',
+    sec_sum:'本日の集計', sec_sum_live:'現在までの集計', sec_find:'要点',
+    sec_machine:'機番別（停止時間）', sec_cat:'区分別・シフト別', sec_rows:'発生一覧', sec_mgr:'管理職の確認状況',
+    m_count:'異常件数', m_stop:'停止計（分）', m_avg:'平均停止（分）', m_unconf:'確認未了',
+    d_same:'前日と同じ', d_none:'前日データなし', d_diff:(v,u)=>`前日比 ${v>0?'+':''}${v}${u}`,
+    th_time:'時刻', th_shift:'直', th_machine:'機番', th_body:'内容', th_stop:'停止', th_conf:'確認',
+    act_print:'印刷・PDF', act_xls:'Excel出力',
+    f_focus:(mc,n,st,pc)=>`<b>${mc}</b> に <b>${n}件</b>（停止計 ${st}分 ／ 全体の ${pc}%）`,
+    f_focus_s:'同一設備での複数回発生。単発の不具合ではない可能性があります。',
+    f_cont:(l)=>`前日に続けて発生: <b>${l}</b>`,
+    f_cont_s:'連日の発生。前日の処置が効いていない可能性があります。',
+    f_rep:(k,n)=>`<b>${k}</b> が <b>${n}回</b>（再発）`,
+    f_rep_s:'同一の機番・区分で複数回発生。恒久対策の検討対象です。',
+    f_shift:(s,n,pc)=>`<b>${s}</b> に <b>${n}件</b>（全体の ${pc}%）`,
+    f_shift_s:'特定シフトへの偏り。人員配置または引き継ぎの確認対象です。',
+    f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} で <b>${st}分</b>停止`,
+    f_long_s:'60分超の長時間停止。個別の原因究明が要ります。',
+    f_zero:(n)=>`管理職が誰も確認していない案件が <b>${n}件</b>`,
+    f_none:'特記事項なし', f_none_s:'集計ルールに該当する事象はありませんでした。',
+    toast_conf:(at)=>`確認を記録しました　${at}`,
+    toast_conf_c:(at)=>`コメント付きで確認を記録しました　${at}`,
+    toast_dup:'この案件は既に確認済みです',
+    err_load:(m)=>`読み込みに失敗しました: ${m}`,
+    err_save:(m)=>`保存に失敗しました: ${m}`,
+    no_mgr_t:'管理職が登録されていません',
+    no_mgr_b:'Supabase で traq_users の role を manager にしてください。移行SQLの STEP 6 です。'
+  },
+  vi:{
+    role_mgr:'Quản lý', role_admin:'Quản trị', role_sl:'SL', role_op:'OP',
+    tab_confirm:'Xác nhận', tab_report:'Báo cáo ngày', nav_home:'Trang chủ',
+    conf_summary:(n,t)=>`${n}/${t} quản lý đã xác nhận`, conf_none:'Quản lý chưa xác nhận',
+    nav_mgr:'Xác nhận', nav_list:'Danh sách', nav_dashboard:'Bảng điều khiển', nav_settings:'Cài đặt',
+    sm_total:'Tổng số', sm_mine:'Tôi chưa xác nhận', sm_stop:'Tổng dừng (phút)', sm_late:'Chưa ai xác nhận',
+    f_new:'Tôi chưa xác nhận', f_done:'Đã xác nhận', f_all:'Tất cả',
+    loading:'Đang tải…', empty_new:'Không có sự cố chưa xác nhận', empty_done:'Chưa xác nhận sự cố nào',
+    empty_all:'Không có sự cố phù hợp', empty_day:'Không có báo cáo trong ngày này',
+    b_approved:'Đã duyệt', b_eq:'Thiết bị', b_md:'Khuôn',
+    k_product:'Mã SP', k_cat:'Phân loại', k_stop:'Dừng', k_report:'Người báo', k_line:'Dây chuyền',
+    sl_approved:'SL duyệt', conf_status:'Tình trạng xác nhận', not_conf:'Chưa xác nhận',
+    btn_confirm:'Xác nhận', btn_comment:'Kèm ghi chú', btn_cancel:'Hủy',
+    btn_save:'Xác nhận kèm ghi chú', ph_comment:'Nhập chỉ thị hoặc ghi chú (SL và người báo cũng thấy)',
+    err_empty:'Vui lòng nhập ghi chú',
+    mine_done:'Bạn đã xác nhận', all_unconf:'Chưa ai xác nhận',
+    more:'Xem thêm', shift_n:(n)=>`Ca ${n}`, min_n:(n)=>`${n} phút`,
+    u_count:'', u_min:'p',
+    win:'Khoảng tổng hợp', st_done:'Hoàn tất', st_live:'Đang diễn ra',
+    sec_sum:'Tổng hợp trong ngày', sec_sum_live:'Tổng hợp đến hiện tại', sec_find:'Điểm chính',
+    sec_machine:'Theo máy (thời gian dừng)', sec_cat:'Theo phân loại · ca', sec_rows:'Danh sách phát sinh', sec_mgr:'Xác nhận của quản lý',
+    m_count:'Số sự cố', m_stop:'Tổng dừng (phút)', m_avg:'Dừng TB (phút)', m_unconf:'Chưa xác nhận',
+    d_same:'Bằng hôm trước', d_none:'Không có dữ liệu hôm trước', d_diff:(v,u)=>`So hôm trước ${v>0?'+':''}${v}${u}`,
+    th_time:'Giờ', th_shift:'Ca', th_machine:'Máy', th_body:'Nội dung', th_stop:'Dừng', th_conf:'XN',
+    act_print:'In · PDF', act_xls:'Xuất Excel',
+    f_focus:(mc,n,st,pc)=>`<b>${mc}</b> có <b>${n}</b> sự cố (dừng ${st} phút ／ ${pc}% tổng)`,
+    f_focus_s:'Phát sinh nhiều lần trên cùng thiết bị. Có thể không phải sự cố đơn lẻ.',
+    f_cont:(l)=>`Tiếp tục từ hôm trước: <b>${l}</b>`,
+    f_cont_s:'Phát sinh liên tiếp. Biện pháp hôm trước có thể chưa hiệu quả.',
+    f_rep:(k,n)=>`<b>${k}</b> phát sinh <b>${n} lần</b> (lặp lại)`,
+    f_rep_s:'Cùng máy và phân loại lặp lại. Cần xem xét biện pháp lâu dài.',
+    f_shift:(s,n,pc)=>`<b>${s}</b> có <b>${n}</b> sự cố (${pc}% tổng)`,
+    f_shift_s:'Lệch về một ca. Cần xem lại bố trí nhân sự hoặc bàn giao.',
+    f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} dừng <b>${st} phút</b>`,
+    f_long_s:'Dừng trên 60 phút. Cần điều tra nguyên nhân riêng.',
+    f_zero:(n)=>`Có <b>${n}</b> sự cố chưa ai trong ban quản lý xác nhận`,
+    f_none:'Không có điểm đặc biệt', f_none_s:'Không có mục nào khớp với quy tắc tổng hợp.',
+    toast_conf:(at)=>`Đã ghi nhận xác nhận　${at}`,
+    toast_conf_c:(at)=>`Đã ghi nhận kèm ghi chú　${at}`,
+    toast_dup:'Sự cố này đã được bạn xác nhận',
+    err_load:(m)=>`Tải thất bại: ${m}`,
+    err_save:(m)=>`Lưu thất bại: ${m}`,
+    no_mgr_t:'Chưa đăng ký quản lý',
+    no_mgr_b:'Hãy đặt role của traq_users thành manager trong Supabase (STEP 6 của SQL).'
+  },
+  en:{
+    role_mgr:'Manager', role_admin:'Admin', role_sl:'SL', role_op:'OP',
+    tab_confirm:'Confirm', tab_report:'Daily report', nav_home:'Home',
+    conf_summary:(n,t)=>`${n}/${t} managers confirmed`, conf_none:'No manager has confirmed yet',
+    nav_mgr:'Confirm', nav_list:'All posts', nav_dashboard:'Dashboard', nav_settings:'Settings',
+    sm_total:'Total', sm_mine:'My unconfirmed', sm_stop:'Downtime (min)', sm_late:'None confirmed',
+    f_new:'My unconfirmed', f_done:'Confirmed', f_all:'All',
+    loading:'Loading…', empty_new:'No unconfirmed troubles', empty_done:'No troubles confirmed yet',
+    empty_all:'No matching troubles', empty_day:'No reports on this day',
+    b_approved:'Approved', b_eq:'Equipment', b_md:'Mold',
+    k_product:'Part no.', k_cat:'Category', k_stop:'Downtime', k_report:'Reported by', k_line:'Line',
+    sl_approved:'SL approved', conf_status:'Confirmation', not_conf:'Not confirmed',
+    btn_confirm:'Confirm', btn_comment:'With comment', btn_cancel:'Cancel',
+    btn_save:'Confirm with comment', ph_comment:'Add instructions or notes (visible to SL and reporter)',
+    err_empty:'Enter a comment first',
+    mine_done:'You confirmed', all_unconf:'Nobody confirmed',
+    more:'Load more', shift_n:(n)=>`Shift ${n}`, min_n:(n)=>`${n} min`,
+    u_count:'', u_min:'m',
+    win:'Period', st_done:'Complete', st_live:'In progress',
+    sec_sum:'Daily totals', sec_sum_live:'Totals so far', sec_find:'Key points',
+    sec_machine:'By machine (downtime)', sec_cat:'By category and shift', sec_rows:'Occurrences', sec_mgr:'Manager confirmations',
+    m_count:'Troubles', m_stop:'Downtime (min)', m_avg:'Avg downtime (min)', m_unconf:'Unconfirmed',
+    d_same:'Same as previous day', d_none:'No previous-day data', d_diff:(v,u)=>`vs prev ${v>0?'+':''}${v}${u}`,
+    th_time:'Time', th_shift:'Sh', th_machine:'Machine', th_body:'Description', th_stop:'Down', th_conf:'Conf',
+    act_print:'Print / PDF', act_xls:'Export Excel',
+    f_focus:(mc,n,st,pc)=>`<b>${mc}</b> had <b>${n}</b> troubles (${st} min downtime ／ ${pc}% of total)`,
+    f_focus_s:'Repeated on the same equipment. May not be a one-off fault.',
+    f_cont:(l)=>`Continued from previous day: <b>${l}</b>`,
+    f_cont_s:'Occurring on consecutive days. The previous fix may not be holding.',
+    f_rep:(k,n)=>`<b>${k}</b> occurred <b>${n} times</b> (repeat)`,
+    f_rep_s:'Same machine and category repeated. Consider a permanent countermeasure.',
+    f_shift:(s,n,pc)=>`<b>${s}</b> had <b>${n}</b> troubles (${pc}% of total)`,
+    f_shift_s:'Skewed to one shift. Check staffing or handover.',
+    f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} stopped for <b>${st} min</b>`,
+    f_long_s:'Over 60 minutes. Needs individual root-cause work.',
+    f_zero:(n)=>`<b>${n}</b> troubles confirmed by nobody in management`,
+    f_none:'Nothing of note', f_none_s:'No items matched the aggregation rules.',
+    toast_conf:(at)=>`Confirmation recorded　${at}`,
+    toast_conf_c:(at)=>`Confirmation with comment recorded　${at}`,
+    toast_dup:'You have already confirmed this',
+    err_load:(m)=>`Failed to load: ${m}`,
+    err_save:(m)=>`Failed to save: ${m}`,
+    no_mgr_t:'No managers registered',
+    no_mgr_b:'Set traq_users.role to manager in Supabase (STEP 6 of the migration SQL).'
+  }
+};
+function t(k){
+  var v = I18N[currentLang] && I18N[currentLang][k];
+  if(v === undefined){ v = I18N.ja[k]; }
+  if(typeof v === 'function'){ return v.apply(null, Array.prototype.slice.call(arguments, 1)); }
+  return v === undefined ? k : v;
+}
+function catNm(c){
+  if(!c) return '';
+  if(currentLang === 'vi' && c.name_vi) return c.name_vi;
+  if(currentLang === 'en' && c.name_en) return c.name_en;
+  return c.name || '';
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder = t(el.dataset.i18nPh); });
+  ['ja','vi','en'].forEach(function(l){
+    var b = document.getElementById('lang-' + l);
+    if(b) b.classList.toggle('active', l === currentLang);
+  });
+}
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('traq_lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  TROUBLES.forEach(function(x){ if(x._cats) x.category = catNm(x._cats); });
+  REP.rows.forEach(function(x){ if(x._cats) x.category = catNm(x._cats); });
+  applyI18n();
+  render();
+}
+
+/* ===== Theme ===== */
+const ICO_MOON = '<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>';
+const ICO_SUN  = '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M19.1 4.9l-2.1 2.1M7 16.9l-2.1 2.1"/></svg>';
+function initTheme(){
+  var saved = localStorage.getItem('traq_theme');
+  var pref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  var theme = saved || pref;
+  document.documentElement.setAttribute('data-theme', theme);
+  var b = document.getElementById('themeBtn');
+  if(b) b.innerHTML = theme === 'dark' ? ICO_MOON : ICO_SUN;
+}
+function toggleTheme(){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('traq_theme', next);
+  var b = document.getElementById('themeBtn');
+  if(b) b.innerHTML = next === 'dark' ? ICO_MOON : ICO_SUN;
+}
+
+/* ===== Supabase ===== */
+const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path, method, body){
+  const opts = { method: method || 'GET', headers: {
+    'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json', 'Prefer': 'return=representation'
+  }};
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if(!res.ok){
+    const txt = await res.text();
+    const err = new Error(txt);
+    err.status = res.status;
+    throw err;
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+/* ===== Session ===== */
+const SESSION = (() => {
+  try {
+    const s = localStorage.getItem('traq_session');
+    if(!s) return null;
+    const o = JSON.parse(s);
+    if(o.expiresAt && Date.now() > o.expiresAt){ localStorage.removeItem('traq_session'); return null; }
+    return o;
+  } catch(e){ return null; }
+})();
+function doLogout(){
+  localStorage.removeItem('traq_session');
+  location.href = 'index.html';
+}
+
+/* ===== 日時ユーティリティ ===== */
+function utcToJST(isoStr){
+  if(!isoStr) return '';
+  var s = isoStr.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s) && !/[+-]\d{2}/.test(s)) s += 'Z';
+  var d = new Date(s);
+  if(isNaN(d.getTime())) return isoStr.slice(0,16).replace('T',' ');
+  var jst = new Date(d.getTime() + 9*60*60*1000);
+  var p = function(n){ return String(n).padStart(2,'0'); };
+  return jst.getUTCFullYear() + '-' + p(jst.getUTCMonth()+1) + '-' + p(jst.getUTCDate())
+       + ' ' + p(jst.getUTCHours()) + ':' + p(jst.getUTCMinutes());
+}
+function shortDT(full){ return full ? full.slice(5).replace('-','/') : ''; }
+function p2(n){ return String(n).padStart(2,'0'); }
+function ymdOf(d){ return d.getFullYear() + '-' + p2(d.getMonth()+1) + '-' + p2(d.getDate()); }
+function addDays(ymd, n){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd);
+  if(!m) return ymd;
+  var d = new Date(+m[1], +m[2]-1, +m[3]);
+  d.setDate(d.getDate() + n);
+  return ymdOf(d);
+}
+/* 8時境界: 8時前は前営業日。入力時の occurred_date と同じ考え方 */
+function businessToday(){
+  var now = new Date();
+  if(now.getHours() < 8) now = new Date(now.getTime() - 86400000);
+  return ymdOf(now);
+}
+const DAYS_JA = ['日','月','火','水','木','金','土'];
+function jpDate(ymd){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd);
+  if(!m) return ymd;
+  var d = new Date(+m[1], +m[2]-1, +m[3]);
+  var label = m[1] + '/' + m[2] + '/' + m[3];
+  return currentLang === 'ja' ? label + '（' + DAYS_JA[d.getDay()] + '）' : label;
+}
+function mdOf(ymd){
+  var m = /^\d{4}-(\d{2})-(\d{2})$/.exec(ymd);
+  return m ? m[1] + '/' + m[2] : ymd;
+}
+function hoursSinceISO(iso){
+  if(!iso) return 0;
+  var s = iso.replace('+00:00','Z').replace('+00','Z');
+  if(!/Z$/i.test(s) && !/[+-]\d{2}/.test(s)) s += 'Z';
+  var d = new Date(s);
+  if(isNaN(d.getTime())) return 0;
+  return Math.max(0, Math.floor((Date.now() - d.getTime()) / 3600000));
+}
+
+/* ===== Escape ===== */
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+  });
+}
+
+/* ===== Icons ===== */
+const IC_CHECK = '<svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>';
+const IC_CK_S  = '<svg class="ico ico-s" viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>';
+const IC_NOTE  = '<svg class="ico" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>';
+const IC_EYE   = '<svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
+const IC_BAR   = '<svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>';
+const IC_WARN  = '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>';
+const IC_GRID  = '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M3 10h18"/><path d="M9 10v10"/></svg>';
+const IC_LINES = '<svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h12"/></svg>';
+const IC_PRINT = '<svg class="ico" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4v-6h16v6h-2"/><path d="M6 14h12v7H6z"/></svg>';
+const IC_DOWN  = '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 21h16"/></svg>';
+
+/* ===== State ===== */
+const PAGE_SIZE = 30;
+const LIST_DAYS = 21;
+/* 運用開始日。これより前の異常は確認対象に含めない（過去分の積み残しを防ぐ） */
+const START_DATE = '2026-09-22';
+/* 確認機能を使えるのは 管理職(manager) と アプリ管理者(admin) のみ。
+   シフトリーダー(leader/sl)と作業者(worker/op)は日報だけ。 */
+function canConfirm(){ return !!SESSION && (SESSION.role === 'manager' || SESSION.role === 'admin'); }
+/* 管理職6人の氏名・時刻の内訳を見せてよいか（SL・作業者には合計のみ） */
+function canSeeDetail(){ return canConfirm(); }
+function roleLabel(){
+  if(!SESSION) return '';
+  if(SESSION.role === 'admin')   return t('role_admin');
+  if(SESSION.role === 'manager') return t('role_mgr');
+  if(SESSION.role === 'leader' || SESSION.role === 'sl') return t('role_sl');
+  return t('role_op');
+}
+let MGRS = [];
+let TROUBLES = [];
+let REP = { date:'', rows:[], prev:[], loaded:false };
+let state = { view:'list', tab:'new', openCmt:null, shown:PAGE_SIZE, busy:false, repBusy:false };
+
+const TSEL = 'select=id,trouble_type,status,occurred_date,shift,stop_minutes,detail,approved_at,'
+  + 'lines(name),machines(machine_no),products(product_code,product_name),'
+  + 'categories(name,name_vi,name_en),traq_users!reporter_id(name),approver:traq_users!approver_id(name),'
+  + 'trouble_confirmations(user_id,confirmed_at,comment)';
+
+function mapTrouble(r){
+  var cf = {};
+  (r.trouble_confirmations || []).forEach(function(c){
+    cf[String(c.user_id)] = { at: utcToJST(c.confirmed_at), c: c.comment || '' };
+  });
+  return {
+    id: r.id,
+    type: r.trouble_type,
+    date: r.occurred_date || '',
+    shift: r.shift,
+    machine: r.machines ? r.machines.machine_no : '',
+    line: r.lines ? r.lines.name : '',
+    product_code: r.products ? r.products.product_code : '',
+    _cats: r.categories || null,
+    category: catNm(r.categories),
+    stop_minutes: r.stop_minutes == null ? 0 : r.stop_minutes,
+    detail: r.detail || '',
+    reporter: r.traq_users ? r.traq_users.name : '',
+    approver: r.approver ? r.approver.name : '',
+    approved_at_raw: r.approved_at || null,
+    approved_at: utcToJST(r.approved_at),
+    cf: cf
+  };
+}
+function isEq(tr){ return tr.type !== 'mold'; }
+function confCount(tr){ return Object.keys(tr.cf).length; }
+function myKey(){ return SESSION ? String(SESSION.userId) : ''; }
+function isMine(tr){ return !!tr.cf[myKey()]; }
+
+/* ===== Toast ===== */
+let toastTimer = null;
+function showToast(msg, type){
+  var el = document.getElementById('toastEl');
+  el.innerHTML = (type === 'error' ? '' : IC_CHECK) + '<span></span>';
+  el.querySelector('span').textContent = msg;
+  el.className = 'toast show' + (type === 'error' ? ' error' : '');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className = 'toast' + (type === 'error' ? ' error' : ''); toastTimer = null; }, 2600);
+}
+
+/* ===== Load ===== */
+async function loadManagers(){
+  /* 管理職グループの判定は title の有無で行う。
+     森元さんのように role='admin'（アプリ管理者）のまま管理職を兼ねる人がいるため、
+     role ではなく title を所属の印として使う。role は権限だけを決める。 */
+  var rows = await sbFetch('traq_users?select=id,name,title,role&title=not.is.null&order=id.asc');
+  var rank = { '次長':1, 'チーフ':2, 'リーダー':3 };
+  MGRS = (rows || []).map(function(u){
+    return { id:String(u.id), name:u.name || '', title:u.title || '' };
+  }).sort(function(a, b){
+    var ra = rank[a.title] || 9, rb = rank[b.title] || 9;
+    if(ra !== rb) return ra - rb;
+    return a.name.localeCompare(b.name, 'ja');
+  });
+}
+async function loadTroubles(){
+  var from = addDays(businessToday(), -(LIST_DAYS - 1));
+  if(from < START_DATE) from = START_DATE;
+  var rows = await sbFetch('troubles?' + TSEL
+    + '&status=eq.approved&occurred_date=gte.' + from
+    + '&order=occurred_date.desc,id.desc&limit=400');
+  TROUBLES = (rows || []).map(mapTrouble);
+}
+async function loadReport(ymd){
+  var rows = await sbFetch('troubles?' + TSEL
+    + '&status=eq.approved&occurred_date=in.(' + ymd + ',' + addDays(ymd, -1) + ')'
+    + '&order=id.asc&limit=400');
+  var all = (rows || []).map(mapTrouble);
+  REP.date = ymd;
+  REP.rows = all.filter(function(r){ return r.date === ymd; });
+  REP.prev = all.filter(function(r){ return r.date === addDays(ymd, -1); });
+  REP.loaded = true;
+}
+
+/* ===== 一覧 ===== */
+function confRowsHTML(tr){
+  return MGRS.map(function(m){
+    var c = tr.cf[m.id];
+    var cls = 'crow ' + (c ? 'yes' : 'no') + (m.id === myKey() ? ' self' : '');
+    return '<div class="' + cls + '"><span class="crn">' + (c ? IC_CK_S : '')
+      + '<b>' + esc(m.name) + '</b> ' + esc(m.title) + '</span>'
+      + '<span class="crt' + (c ? ' num' : '') + '">' + (c ? esc(shortDT(c.at)) : esc(t('not_conf'))) + '</span></div>';
+  }).join('');
+}
+function confCmtsHTML(tr){
+  return MGRS.filter(function(m){ return tr.cf[m.id] && tr.cf[m.id].c; }).map(function(m){
+    var c = tr.cf[m.id];
+    return '<div class="ccmt"><span class="ccmt-w">' + esc(m.name) + esc(m.title)
+      + '　<span class="num">' + esc(shortDT(c.at)) + '</span></span>' + esc(c.c) + '</div>';
+  }).join('');
+}
+function cardHTML(tr){
+  var n = confCount(tr);
+  var total = MGRS.length;
+  var full = total > 0 && n === total;
+  var late = n === 0 && hoursSinceISO(tr.approved_at_raw) >= 12;
+  var cls = full ? 'is-done' : (late ? 'is-late' : (isMine(tr) ? '' : 'is-new'));
+
+  var head = '<span class="bdg b-ok">' + esc(t('b_approved')) + '</span>'
+    + '<span class="bdg ' + (isEq(tr) ? 'b-eq">' + esc(t('b_eq')) : 'b-md">' + esc(t('b_md'))) + '</span>'
+    + (late ? '<span class="bdg b-late">' + esc(t('all_unconf')) + ' ' + hoursSinceISO(tr.approved_at_raw) + 'h</span>' : '')
+    + '<span class="c-time num">' + esc(mdOf(tr.date)) + ' ' + esc(t('shift_n', tr.shift)) + '</span>';
+
+  var title = (tr.machine ? esc(tr.machine) + ' — ' : '') + esc(tr.category || '');
+  var body = '<div class="c-title">' + (title || esc(t('b_approved'))) + '</div><div class="c-grid">'
+    + (tr.line ? '<span class="c-k">' + esc(t('k_line')) + '</span><span>' + esc(tr.line) + '</span>' : '')
+    + '<span class="c-k">' + esc(t('k_product')) + '</span><span class="num">' + esc(tr.product_code) + '</span>'
+    + '<span class="c-k">' + esc(t('k_stop')) + '</span><span class="c-stop num">' + esc(t('min_n', tr.stop_minutes)) + '</span>'
+    + '<span class="c-k">' + esc(t('k_report')) + '</span><span>' + esc(tr.reporter) + '</span>'
+    + '</div>'
+    + (tr.detail ? '<div class="c-detail">' + esc(tr.detail) + '</div>' : '');
+
+  var flow = '<div class="c-flow">' + IC_CHECK + '<span>' + esc(t('sl_approved')) + ' <b>'
+    + esc(tr.approver) + '</b> <span class="num">' + esc(shortDT(tr.approved_at)) + '</span></span></div>';
+
+  var conf = '';
+  if(total > 0){
+    conf = '<div class="conf"><div class="conf-h"><span>' + esc(t('conf_status')) + '</span>'
+      + '<span class="conf-bar"><i style="width:' + Math.round(n / total * 100) + '%"></i></span>'
+      + '<span class="conf-c num' + (full ? ' full' : '') + '">' + n + '/' + total + '</span></div>'
+      + '<div class="cgrid">' + confRowsHTML(tr) + '</div>' + confCmtsHTML(tr) + '</div>';
+  }
+
+  var tail;
+  if(isMine(tr)){
+    tail = '<div class="c-mine">' + IC_CHECK + '<span>' + esc(t('mine_done')) + ' <span class="num">'
+      + esc(shortDT(tr.cf[myKey()].at)) + '</span></span></div>';
+  } else if(state.openCmt === tr.id){
+    tail = '<div class="cmt"><textarea id="ta' + tr.id + '" data-i18n-ph="ph_comment" placeholder="'
+      + esc(t('ph_comment')) + '"></textarea>'
+      + '<div class="cmt-err" id="er' + tr.id + '">' + esc(t('err_empty')) + '</div><div class="cmt-r">'
+      + '<button class="cmt-b" data-act="cancel" data-id="' + tr.id + '">' + esc(t('btn_cancel')) + '</button>'
+      + '<button class="cmt-b pri" data-act="save" data-id="' + tr.id + '">' + esc(t('btn_save')) + '</button></div></div>';
+  } else {
+    tail = '<div class="c-act">'
+      + '<button class="btn btn-main" data-act="confirm" data-id="' + tr.id + '">' + IC_CHECK + esc(t('btn_confirm')) + '</button>'
+      + '<button class="btn btn-sub" data-act="open" data-id="' + tr.id + '">' + IC_NOTE + esc(t('btn_comment')) + '</button></div>';
+  }
+
+  return '<div class="card ' + cls + '" data-card="' + tr.id + '"><div class="c-head">' + head
+    + '</div><div class="c-body">' + body + '</div>' + flow + conf + tail + '</div>';
+}
+
+function filteredList(){
+  if(state.tab === 'new')  return TROUBLES.filter(function(tr){ return !isMine(tr); });
+  if(state.tab === 'done') return TROUBLES.filter(isMine);
+  return TROUBLES.slice();
+}
+function renderList(){
+  var rows = filteredList();
+  var slice = rows.slice(0, state.shown);
+  var html;
+  if(!MGRS.length){
+    html = '<div class="empty"><b>' + esc(t('no_mgr_t')) + '</b><br>' + esc(t('no_mgr_b')) + '</div>';
+  } else if(!rows.length){
+    html = '<div class="empty">' + esc(t(state.tab === 'new' ? 'empty_new' : state.tab === 'done' ? 'empty_done' : 'empty_all')) + '</div>';
+  } else {
+    html = slice.map(cardHTML).join('');
+    if(rows.length > slice.length){
+      html += '<button class="more" id="moreBtn">' + esc(t('more')) + '（' + (rows.length - slice.length) + '）</button>';
+    }
+  }
+  document.getElementById('list').innerHTML = html;
+
+  var nMine = TROUBLES.filter(function(tr){ return !isMine(tr); }).length;
+  var nLate = TROUBLES.filter(function(tr){ return confCount(tr) === 0 && hoursSinceISO(tr.approved_at_raw) >= 12; }).length;
+  document.getElementById('sTotal').textContent = TROUBLES.length;
+  document.getElementById('sMine').textContent  = nMine;
+  document.getElementById('sStop').textContent  = TROUBLES.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+  document.getElementById('sLate').textContent  = nLate;
+  document.getElementById('tnNew').textContent  = '(' + nMine + ')';
+  document.getElementById('tnDone').textContent = '(' + (TROUBLES.length - nMine) + ')';
+  document.getElementById('tnAll').textContent  = '(' + TROUBLES.length + ')';
+  var badge = document.getElementById('mtabN');
+  badge.textContent = nMine;
+  badge.className = 'mtab-n num' + (nMine ? '' : ' hide');
+  document.querySelectorAll('#tabs .tab').forEach(function(x){
+    x.setAttribute('aria-selected', x.getAttribute('data-tab') === state.tab ? 'true' : 'false');
+  });
+}
+
+/* ===== 日報 ===== */
+function groupBy(rows, key){
+  var m = {}, order = [];
+  rows.forEach(function(d){
+    var k = key(d);
+    if(!m[k]){ m[k] = { k:k, n:0, stop:0 }; order.push(k); }
+    m[k].n += 1; m[k].stop += d.stop_minutes;
+  });
+  return order.map(function(k){ return m[k]; });
+}
+function barsHTML(items, unit, cls){
+  if(!items.length) return '';
+  var max = Math.max.apply(null, items.map(function(r){ return r.v; }));
+  return items.map(function(r){
+    return '<span class="bl">' + esc(r.l) + '</span><span class="bt ' + (r.c || cls || '')
+      + '"><i style="width:' + (max > 0 ? Math.round(r.v / max * 100) : 0) + '%"></i></span>'
+      + '<span class="bv num">' + r.v + unit + (r.n ? '<span style="color:var(--text2)"> / ' + r.n + '</span>' : '') + '</span>';
+  }).join('');
+}
+function buildFindings(rows, prev){
+  var out = [], tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+
+  var byMc = groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; });
+  if(byMc.length && byMc[0].n >= 2 && tot > 0){
+    out.push({ lv:'warn', t:t('f_focus', esc(byMc[0].k), byMc[0].n, byMc[0].stop, Math.round(byMc[0].stop / tot * 100)), s:t('f_focus_s') });
+  }
+  if(prev.length){
+    var pm = {};
+    prev.forEach(function(d){ if(d.machine) pm[d.machine] = true; });
+    var cont = byMc.filter(function(g){ return pm[g.k]; }).map(function(g){ return g.k; });
+    if(cont.length) out.push({ lv:'bad', t:t('f_cont', esc(cont.join(' ／ '))), s:t('f_cont_s') });
+  }
+  var rep = {};
+  rows.forEach(function(d){
+    if(!d.machine || !d.category) return;
+    var k = d.machine + ' ' + d.category;
+    rep[k] = (rep[k] || 0) + 1;
+  });
+  Object.keys(rep).filter(function(k){ return rep[k] >= 2; }).forEach(function(k){
+    out.push({ lv:'bad', t:t('f_rep', esc(k), rep[k]), s:t('f_rep_s') });
+  });
+  var bySh = groupBy(rows, function(d){ return d.shift; }).sort(function(a, b){ return b.n - a.n; });
+  if(bySh.length){
+    var second = bySh.length > 1 ? bySh[1].n : 0;
+    if(bySh[0].n > second && bySh[0].n >= rows.length / 3 * 1.5){
+      out.push({ lv:'warn', t:t('f_shift', esc(t('shift_n', bySh[0].k)), bySh[0].n, Math.round(bySh[0].n / rows.length * 100)), s:t('f_shift_s') });
+    }
+  }
+  rows.filter(function(d){ return d.stop_minutes >= 60; }).forEach(function(d){
+    out.push({ lv:'bad', t:t('f_long', esc(d.machine), esc(d.category), d.stop_minutes), s:t('f_long_s') });
+  });
+  var zero = rows.filter(function(d){ return confCount(d) === 0; });
+  if(zero.length){
+    out.push({ lv:'warn', t:t('f_zero', zero.length),
+      s:zero.map(function(d){ return (d.machine || '—') + ' ' + t('shift_n', d.shift); }).join(' ／ ') });
+  }
+  if(!out.length) out.push({ lv:'', t:esc(t('f_none')), s:t('f_none_s') });
+  return out;
+}
+function renderRep(){
+  var bz = REP.date;
+  var live = bz === businessToday();
+  document.getElementById('dDate').textContent = jpDate(bz);
+  document.getElementById('dWin').innerHTML = esc(t('win')) + ' <span class="num">' + esc(mdOf(bz))
+    + ' 8:00</span> → <span class="num">' + esc(mdOf(addDays(bz, 1))) + ' 8:00</span>'
+    + '<span class="dnav-s ' + (live ? 'st-live">' + esc(t('st_live')) : 'st-done">' + esc(t('st_done'))) + '</span>';
+  document.getElementById('dNext').disabled = live || state.repBusy;
+  document.getElementById('dPrev').disabled = state.repBusy;
+
+  var rows = REP.rows.slice(), prev = REP.prev;
+  if(!rows.length){
+    document.getElementById('repBody').innerHTML =
+      '<div class="sec"><div class="sec-b"><div class="empty">' + esc(t('empty_day')) + '</div></div></div>';
+    return;
+  }
+  var total = MGRS.length;
+  var tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+  var pTot = prev.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+  var unconf = rows.filter(function(d){ return total === 0 || confCount(d) < total; }).length;
+
+  function df(now, was, u){
+    if(!prev.length) return '<span class="met-d" style="color:var(--text2)">' + esc(t('d_none')) + '</span>';
+    var v = now - was;
+    if(v === 0) return '<span class="met-d" style="color:var(--text2)">' + esc(t('d_same')) + '</span>';
+    return '<span class="met-d ' + (v > 0 ? 'up' : 'down') + '">' + esc(t('d_diff', v, u)) + '</span>';
+  }
+
+  var h = '<div class="sec"><div class="sec-h">' + IC_BAR + esc(t(live ? 'sec_sum_live' : 'sec_sum')) + '</div><div class="mets">'
+    + '<div class="met"><div class="met-n num">' + rows.length + '</div><div class="met-l">' + esc(t('m_count')) + '</div>' + df(rows.length, prev.length, t('u_count')) + '</div>'
+    + '<div class="met"><div class="met-n num" style="color:var(--danger)">' + tot + '</div><div class="met-l">' + esc(t('m_stop')) + '</div>' + df(tot, pTot, t('u_min')) + '</div>'
+    + '<div class="met"><div class="met-n num">' + Math.round(tot / rows.length) + '</div><div class="met-l">' + esc(t('m_avg')) + '</div></div>'
+    + '<div class="met"><div class="met-n num" style="color:' + (unconf ? 'var(--warning)' : 'var(--success)') + '">'
+    + unconf + '</div><div class="met-l">' + esc(t('m_unconf')) + '</div></div></div></div>';
+
+  h += '<div class="sec"><div class="sec-h">' + IC_WARN + esc(t('sec_find')) + '</div>'
+    + buildFindings(rows, prev).map(function(f){
+        return '<div class="fi ' + f.lv + '"><div class="fi-m"></div><div class="fi-b">' + f.t
+          + '<span class="fi-sub">' + esc(f.s) + '</span></div></div>';
+      }).join('') + '</div>';
+
+  h += '<div class="sec"><div class="sec-h">' + IC_GRID + esc(t('sec_machine')) + '</div><div class="sec-b"><div class="bars">'
+    + barsHTML(groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; })
+        .map(function(g){ return { l:g.k, v:g.stop, n:g.n }; }), t('u_min')) + '</div></div></div>';
+
+  h += '<div class="sec"><div class="sec-h">' + IC_LINES + esc(t('sec_cat')) + '</div><div class="sec-b"><div class="bars">'
+    + barsHTML(groupBy(rows, function(d){ return d.category || '—'; }).sort(function(a, b){ return b.n - a.n; })
+        .map(function(g){ return { l:g.k, v:g.n, c:'' }; }), t('u_count'))
+    + '</div><div style="height:1px;background:var(--border);margin:10px 0"></div><div class="bars">'
+    + barsHTML([1,2,3].map(function(s){
+        return { l:t('shift_n', s), v:rows.filter(function(d){ return Number(d.shift) === s; }).length, c:'dn' };
+      }), t('u_count')) + '</div></div></div>';
+
+  h += '<div class="sec"><div class="sec-h">' + IC_NOTE + esc(t('sec_rows')) + '</div><div class="sec-b" style="padding:0"><table>'
+    + '<colgroup><col style="width:26px"><col style="width:54px"><col><col style="width:42px"><col style="width:40px"></colgroup>'
+    + '<thead><tr><th>' + esc(t('th_shift')) + '</th><th>' + esc(t('th_machine')) + '</th><th>' + esc(t('th_body'))
+    + '</th><th class="r">' + esc(t('th_stop')) + '</th><th class="r">' + esc(t('th_conf')) + '</th></tr></thead><tbody>'
+    + rows.map(function(d){
+        var n = confCount(d);
+        return '<tr><td class="num">' + esc(d.shift) + '</td>'
+          + '<td class="num ' + (isEq(d) ? 't-eq' : 't-md') + '">' + esc(d.machine) + '</td>'
+          + '<td>' + esc(d.category) + '</td><td class="r num t-stop">' + d.stop_minutes + '</td>'
+          + '<td class="r num ' + (total > 0 && n === total ? 't-yes' : 't-no') + '">' + n + '/' + total + '</td></tr>';
+      }).join('') + '</tbody></table></div></div>';
+
+  h += '<div class="sec"><div class="sec-h">' + IC_EYE + esc(t('sec_mgr')) + '</div><div class="sec-b">';
+  if(canSeeDetail() && total > 0){
+    h += '<div class="cf">' + MGRS.map(function(m){
+        var done = rows.filter(function(d){ return d.cf[m.id]; }).length;
+        return '<div class="cfr ' + (done === rows.length ? 'ok' : 'ng') + '"><b>' + esc(m.name) + '</b> '
+          + esc(m.title) + '<span class="v num">' + done + '/' + rows.length + '</span></div>';
+      }).join('') + '</div>';
+  } else {
+    /* SL・作業者には氏名の内訳を出さず、件数とコメントだけを見せる */
+    var fullyDone = rows.filter(function(d){ return total > 0 && confCount(d) === total; }).length;
+    h += '<div style="font-size:12px;line-height:1.9">'
+      + esc(t('conf_summary', fullyDone, rows.length)) + '</div>';
+  }
+  var allCm = [];
+  rows.forEach(function(d){
+    MGRS.forEach(function(m){
+      if(d.cf[m.id] && d.cf[m.id].c){
+        allCm.push({ who: canSeeDetail() ? (m.name + m.title) : t('role_mgr'),
+                     at: d.cf[m.id].at, mc: d.machine, body: d.cf[m.id].c });
+      }
+    });
+  });
+  h += allCm.map(function(x){
+    return '<div class="ccmt"><span class="ccmt-w">' + esc(x.who) + '　<span class="num">'
+      + esc(shortDT(x.at)) + '</span>　' + esc(x.mc) + '</span>' + esc(x.body) + '</div>';
+  }).join('');
+  h += '</div></div>';
+
+  h += '<div class="acts">'
+    + '<button class="act" data-r="print">' + IC_PRINT + esc(t('act_print')) + '</button>'
+    + '<button class="act" data-r="xls">' + IC_DOWN + esc(t('act_xls')) + '</button></div>';
+
+  document.getElementById('repBody').innerHTML = h;
+}
+
+/* ===== Render ===== */
+function render(){
+  document.getElementById('viewList').className = state.view === 'list' ? '' : 'hide';
+  document.getElementById('viewRep').className  = state.view === 'rep'  ? '' : 'hide';
+  document.querySelectorAll('#mtabs .mtab').forEach(function(x){
+    x.setAttribute('aria-selected', x.getAttribute('data-m') === state.view ? 'true' : 'false');
+  });
+  if(canConfirm()) renderList();
+  if(state.view === 'rep' && REP.loaded) renderRep();
+}
+
+/* ===== 確認アクション ===== */
+async function doConfirm(id, comment, btn){
+  if(state.busy) return;
+  var tr = TROUBLES.filter(function(x){ return x.id === id; })[0];
+  if(!tr || isMine(tr)) return;
+  state.busy = true;
+  if(btn) btn.disabled = true;
+  try {
+    var saved = await sbFetch('trouble_confirmations', 'POST', {
+      trouble_id: id,
+      user_id: SESSION.userId,
+      comment: comment || null
+    });
+    var at = (saved && saved[0] && saved[0].confirmed_at) ? utcToJST(saved[0].confirmed_at) : utcToJST(new Date().toISOString());
+    tr.cf[myKey()] = { at: at, c: comment || '' };
+    state.openCmt = null;
+    var repRow = REP.rows.filter(function(x){ return x.id === id; })[0];
+    if(repRow) repRow.cf[myKey()] = { at: at, c: comment || '' };
+    render();
+    showToast(t(comment ? 'toast_conf_c' : 'toast_conf', shortDT(at)));
+  } catch(e){
+    if(e.status === 409){
+      showToast(t('toast_dup'), 'error');
+      await reloadOne(id);
+    } else {
+      showToast(t('err_save', e.message || ''), 'error');
+      if(btn) btn.disabled = false;
+    }
+  } finally {
+    state.busy = false;
+  }
+}
+async function reloadOne(id){
+  try {
+    var rows = await sbFetch('troubles?' + TSEL + '&id=eq.' + id);
+    if(rows && rows[0]){
+      var fresh = mapTrouble(rows[0]);
+      var i = TROUBLES.findIndex(function(x){ return x.id === id; });
+      if(i >= 0) TROUBLES[i] = fresh;
+      var j = REP.rows.findIndex(function(x){ return x.id === id; });
+      if(j >= 0) REP.rows[j] = fresh;
+      state.openCmt = null;
+      render();
+    }
+  } catch(e){ /* 再取得の失敗は致命ではない */ }
+}
+
+/* ===== Events ===== */
+document.getElementById('mtabs').addEventListener('click', function(ev){
+  var b = ev.target.closest('.mtab');
+  if(!b) return;
+  state.view = b.getAttribute('data-m');
+  state.openCmt = null;
+  render();
+  if(state.view === 'rep' && !REP.loaded) gotoDate(addDays(businessToday(), -1));
+});
+document.getElementById('tabs').addEventListener('click', function(ev){
+  var x = ev.target.closest('.tab');
+  if(!x) return;
+  state.tab = x.getAttribute('data-tab');
+  state.openCmt = null;
+  state.shown = PAGE_SIZE;
+  render();
+});
+document.getElementById('list').addEventListener('click', function(ev){
+  if(ev.target.closest('#moreBtn')){ state.shown += PAGE_SIZE; renderList(); return; }
+  var b = ev.target.closest('[data-act]');
+  if(!b) return;
+  var act = b.getAttribute('data-act'), id = Number(b.getAttribute('data-id'));
+  if(act === 'confirm'){ doConfirm(id, '', b); return; }
+  if(act === 'open'){
+    state.openCmt = id; renderList();
+    var ta = document.getElementById('ta' + id);
+    if(ta) ta.focus();
+    return;
+  }
+  if(act === 'cancel'){ state.openCmt = null; renderList(); return; }
+  if(act === 'save'){
+    var box = document.getElementById('ta' + id);
+    var v = box ? box.value.trim() : '';
+    if(!v){
+      var e = document.getElementById('er' + id);
+      if(e) e.style.display = 'block';
+      if(box) box.focus();
+      return;
+    }
+    doConfirm(id, v, b);
+  }
+});
+document.getElementById('list').addEventListener('input', function(ev){
+  if(ev.target.tagName !== 'TEXTAREA') return;
+  var e = document.getElementById('er' + ev.target.id.slice(2));
+  if(e) e.style.display = 'none';
+});
+async function gotoDate(ymd){
+  if(state.repBusy) return;
+  state.repBusy = true;
+  document.getElementById('repBody').innerHTML = '<div class="loading">' + esc(t('loading')) + '</div>';
+  try {
+    await loadReport(ymd);
+    renderRep();
+  } catch(e){
+    document.getElementById('repBody').innerHTML = '<div class="empty">' + esc(t('err_load', e.message || '')) + '</div>';
+  } finally {
+    state.repBusy = false;
+    document.getElementById('dPrev').disabled = false;
+    document.getElementById('dNext').disabled = REP.date === businessToday();
+  }
+}
+document.getElementById('dPrev').onclick = function(){ if(REP.date) gotoDate(addDays(REP.date, -1)); };
+document.getElementById('dNext').onclick = function(){
+  if(!REP.date || REP.date === businessToday()) return;
+  gotoDate(addDays(REP.date, 1));
+};
+document.getElementById('repBody').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-r]');
+  if(!b) return;
+  if(b.getAttribute('data-r') === 'print'){ window.print(); }
+  else { exportXls(); }
+});
+
+/* ===== Excel出力（SheetJS） ===== */
+function exportXls(){
+  var run = function(){
+    var total = MGRS.length;
+    var aoa = [[jpDate(REP.date) + ' ' + t('tab_report')], []];
+    aoa.push([t('th_shift'), t('th_machine'), t('k_product'), t('th_body'), t('th_stop'), t('th_conf')]);
+    REP.rows.forEach(function(d){
+      aoa.push([d.shift, d.machine, d.product_code, d.category, d.stop_minutes, confCount(d) + '/' + total]);
+    });
+    aoa.push([]);
+    aoa.push([t('sec_mgr')]);
+    MGRS.forEach(function(m){
+      var done = REP.rows.filter(function(d){ return d.cf[m.id]; }).length;
+      aoa.push([m.title, m.name, done + '/' + REP.rows.length]);
+    });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'report');
+    XLSX.writeFile(wb, 'traq_report_' + REP.date + '.xlsx');
+  };
+  if(window.XLSX){ run(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+  s.onload = run;
+  s.onerror = function(){ showToast(t('err_save', 'SheetJS'), 'error'); };
+  document.head.appendChild(s);
+}
+
+/* ===== Init ===== */
+(async function init(){
+  initTheme();
+  document.documentElement.setAttribute('lang', currentLang);
+  applyI18n();
+
+  if(!SESSION){ location.href = 'index.html'; return; }
+  var role = SESSION.role;
+  var isWorker = (role === 'worker' || role === 'op');
+
+  document.getElementById('tbUser').textContent = SESSION.name || '';
+  document.getElementById('roleTag').textContent = roleLabel();
+
+  /* 日報は全員。確認タブは管理職とアプリ管理者だけ */
+  if(canConfirm()){
+    document.getElementById('mtabs').className = 'mtabs';
+    state.view = 'list';
+  } else {
+    document.getElementById('mtabs').className = 'mtabs hide';
+    state.view = 'rep';
+  }
+
+  /* 下部ナビ：作業者はホームへ、それ以外は投稿一覧へ */
+  if(isWorker){
+    document.getElementById('navHome').className = 'nav-item';
+    document.getElementById('navList').className = 'nav-item hide';
+    document.getElementById('navDash').className = 'nav-item hide';
+  }
+
+  try {
+    if(canConfirm()){
+      await Promise.all([loadManagers(), loadTroubles()]);
+    } else {
+      await loadManagers();
+    }
+    render();
+    if(state.view === 'rep') await gotoDate(addDays(businessToday(), -1));
+  } catch(e){
+    var box = canConfirm() ? document.getElementById('list') : document.getElementById('repBody');
+    box.innerHTML = '<div class="empty">' + esc(t('err_load', e.message || '')) + '</div>';
+  }
+})();
+
+window.__rep = window.__mgr = {
+  get MGRS(){ return MGRS; }, get TROUBLES(){ return TROUBLES; }, get REP(){ return REP; },
+  get state(){ return state; },
+  addDays: addDays, businessToday: businessToday, mapTrouble: mapTrouble,
+  buildFindings: buildFindings, confCount: confCount, gotoDate: gotoDate, utcToJST: utcToJST,
+  canConfirm: canConfirm, canSeeDetail: canSeeDetail, roleLabel: roleLabel, START_DATE: START_DATE
+};
+</script>
+</body>
+</html>

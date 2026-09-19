@@ -397,6 +397,10 @@ html, body {
       <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
+    <button class="nav-item" onclick="location.href='report.html'">
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="nav-label" data-i18n="nav_report">日報</span>
+    </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
       <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
       <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
@@ -422,7 +426,7 @@ const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.
 
 const I18N = {
   ja: {
-    nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定',
+    nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_master:'マスタ', nav_settings:'設定', nav_report:'日報',
     nav_excel:'Excelダウンロード', btn_select:'選択削除',
     nav_theme:'テーマ切替', nav_logout:'ログアウト', master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
     btn_eq:'設備異常 入力', btn_md:'金型異常 入力',
@@ -447,7 +451,7 @@ const I18N = {
     detail_submitter:'入力者', detail_status:'ステータス', close:'閉じる', logout_msg:'ログアウトしました',
   },
   vi: {
-    nav_list:'Danh sách bài', nav_dashboard:'Bảng điều khiển', nav_master:'Quản lý', nav_settings:'Cài đặt',
+    nav_list:'Danh sách bài', nav_dashboard:'Bảng điều khiển', nav_master:'Quản lý', nav_settings:'Cài đặt', nav_report:'Báo cáo ngày',
     nav_excel:'Tải Excel', btn_select:'Chọn xóa',
     nav_theme:'Đổi giao diện', nav_logout:'Đăng xuất', master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
     btn_eq:'Nhập sự cố\nthiết bị', btn_md:'Nhập sự cố\nkhuôn',
@@ -472,7 +476,7 @@ const I18N = {
     detail_submitter:'Người nhập', detail_status:'Trạng thái', close:'Đóng', logout_msg:'Đã đăng xuất',
   },
   en: {
-    nav_list:'Post List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings',
+    nav_list:'Post List', nav_dashboard:'Dashboard', nav_master:'Master', nav_settings:'Settings', nav_report:'Daily report',
     nav_excel:'Excel Download', btn_select:'Select & Delete',
     nav_theme:'Toggle theme', nav_logout:'Logout', master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
     btn_eq:'Equipment\nTrouble', btn_md:'Mold\nTrouble',
