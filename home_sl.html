@@ -26,7 +26,7 @@
   --factory:     #2e3a52;
   --roof:        #3d4e6e;
   --text1:       #E6E9EF;
-  --text2:       #838B99;
+  --text2:       #8D95A3;
   --border:      rgba(255,255,255,0.11);
   --border2:     rgba(255,255,255,0.20);
   --grid:        rgba(255,255,255,0.07);
@@ -36,6 +36,8 @@
   --radius:      2px;
   --shadow:      none;
   --nav-h:       56px;
+
+  --on-success: #0B1524;
 }
 [data-theme="light"] {
   --md:      #0E8C7F;
@@ -53,6 +55,8 @@
   --success: #0B7A56;
   --warning: #A06A08;
   --danger:  #DC2626;
+
+  --on-success: #FFFFFF;
 }
 html{color-scheme:dark;background:var(--bg1)}
 [data-theme="light"]{color-scheme:light}
@@ -367,7 +371,7 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 
 /* Approve/Reject modal buttons */
 .modal-actions{display:flex;gap:10px;margin-top:16px}
-.btn-approve{flex:1;height:52px;background:var(--success);border:none;border-radius:var(--radius);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-approve{flex:1;height:52px;background:var(--success);border:none;border-radius:var(--radius);color:var(--on-success);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-approve:hover{opacity:.85}
 .btn-reject-modal{flex:1;height:52px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);color:var(--danger);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-reject-modal:hover{background:rgba(239,68,68,.2)}
@@ -1974,7 +1978,7 @@ function openStopTimeModal(id){
       <span class="approve-calc-label">${t('stop_calc_label')}</span>
       <span class="approve-calc-val" id="approveCalc">--</span>
     </div>
-    <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:#fff">${t('btn_approve')}</button>
+    <button onclick="submitDrumApprove()" style="width:100%;height:48px;border:none;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--success);color:var(--on-success)">${t('btn_approve')}</button>
     <button class="btn-cancel-reject" onclick="closeModal()">${t('reject_cancel')}</button>
   `,true);
   setTimeout(function(){initApproveDrums();},50);

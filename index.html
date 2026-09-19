@@ -19,12 +19,17 @@
   --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;--md:#2DD4BF;
   --bg1:#0B1524;--bg2:#141A24;--bg3:#1D2531;
   --bg:#0B1524;--surface:#141A24;--surface2:#1D2531;
-  --text1:#E6E9EF;--text2:#838B99;--text:#E6E9EF;--muted:#838B99;
+  --text1:#E6E9EF;--text2:#8D95A3;--text:#E6E9EF;--muted:#8D95A3;
   --border:rgba(255,255,255,.11);--border2:rgba(255,255,255,.20);--field-border:rgba(255,255,255,.11);
   --grid:rgba(255,255,255,.07);
   --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--error:#ef4444;
   --eq:#EF9F27;
   --radius:2px;--shadow:none;--nav-h:56px;
+
+  --on-success: #0B1524;
+  /* 役職カラー（ダーク用に明度を上げた版） */
+  --c-kacho:#E0737C; --c-chief:#6BA8E8; --c-leader:#EF9F27;
+  --c-op:#8FA6C4; --c-sys:#8D95A3;
 }
 html{color-scheme:dark;background:var(--bg1)}
 [data-theme="light"]{
@@ -36,6 +41,11 @@ html{color-scheme:dark;background:var(--bg1)}
   --grid:rgba(0,0,0,.09);--shadow:none;
   /* 白背景で読めるよう濃色へ */
   --orange:#B36F0C;--success:#0B7A56;--warning:#A06A08;--danger:#DC2626;--error:#DC2626;--eq:#B36F0C;
+
+  --on-success: #FFFFFF;
+  /* 白背景では同じ色味を濃くする */
+  --c-kacho:#9E2A33; --c-chief:#1A5FA8; --c-leader:#8F5708;
+  --c-op:#1F3864; --c-sys:#5F6672;
 }
 .step-dot svg.ico{width:13px;height:13px;margin:0 auto}
 .theme-btn svg.ico{margin:0 auto}
@@ -45,11 +55,6 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 .snav-icon svg.ico,.nav-icon svg.ico,.hdr-icon-btn svg.ico{margin:0 auto}
 .logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
 
-[data-theme="light"]{
-  --bg1:#e8e6e2;--bg2:#ffffff;--bg3:#f0ede8;
-  --text1:#1a1f2e;--text2:#666666;
-  --border:rgba(0,0,0,0.12);--shadow:0 4px 24px rgba(0,0,0,0.1);
-}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
@@ -113,7 +118,27 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .user-search{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;color:var(--text1);outline:none;margin-bottom:10px;transition:border-color .15s}
 .user-search:focus{border-color:var(--orange)}
 .user-search::placeholder{color:var(--text2);opacity:.5}
-.user-grid{display:flex;flex-direction:column;gap:5px;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* 前回のログイン */
+.recent-cap{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:1px;margin:0 0 6px}
+.recent-btn{display:flex;align-items:center;gap:11px;width:100%;min-height:64px;padding:10px 12px;background:var(--bg3);border:1px solid var(--rc);border-left:4px solid var(--rc);border-radius:var(--radius);cursor:pointer;font-family:inherit;text-align:left;margin-bottom:4px}
+.recent-btn:active{transform:scale(.99)}
+.recent-av{width:44px;height:44px;border-radius:var(--radius);border:1px solid var(--rc);color:var(--rc);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
+.recent-n{font-size:17px;font-weight:700;line-height:1.3;color:var(--text1)}
+.recent-r{font-size:11px;margin-top:1px;color:var(--rc);font-weight:700}
+.recent-go{margin-left:auto;color:var(--rc);display:flex}
+/* 種類タブ */
+.utabs{display:flex;border-bottom:1px solid var(--border);margin:14px 0 10px}
+.utab{flex:1;min-height:46px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:color .15s,border-color .15s;padding:0 2px}
+.utab[aria-selected="true"]{color:var(--tc,var(--orange));border-bottom-color:var(--tc,var(--orange))}
+.utab-n{font-size:10px;font-weight:400;opacity:.85}
+/* タイル */
+.user-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.user-tile{min-height:66px;padding:0 4px 7px;background:var(--bg3);border:1px solid var(--tc);border-radius:var(--radius);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;overflow:hidden;position:relative}
+.user-tile::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc)}
+.user-tile:active{transform:scale(.97)}
+.user-tile.me{outline:2px solid var(--tc);outline-offset:-1px}
+.ut-n{font-size:14px;font-weight:700;line-height:1.25;text-align:center;word-break:keep-all;color:var(--text1);margin-top:12px}
+.ut-r{font-size:10px;line-height:1.2;color:var(--tc);font-weight:700}
 .user-grid::-webkit-scrollbar{width:4px}
 .user-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .user-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;background:transparent;border:1px solid transparent;border-radius:var(--radius);cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;width:100%}
@@ -241,9 +266,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
       <div class="card-title" data-i18n="user_title">ユーザーを選択してください</div>
       <div class="card-hint" id="shiftBadge"></div>
-      <input class="user-search" type="text" id="userSearch"
-             placeholder="名前で検索..." data-i18n-ph="search_ph"
-             oninput="filterUsers()">
+      <div id="recentWrap"></div>
+      <div class="utabs" id="userTabs"></div>
       <div class="user-grid" id="userGrid">
         <div class="loading">読み込み中...</div>
       </div>
@@ -328,7 +352,10 @@ const I18N = {
     shift1_name:'1直', shift2_name:'2直', shift3_name:'3直',
     shift_badge: s => `${s}直のユーザー`,
     user_title:'ユーザーを選択してください', search_ph:'名前で検索...',
-    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    role_op:'作業者', role_sl:'シフトリーダー', role_adm:'Admin',
+    role_kacho:'課長', role_chief:'チーフ', role_leader:'リーダー', role_sys:'システム管理者',
+    tab_mgr:'管理職', tab_op:'作業者', recent_cap:'前回のログイン',
+    n_people:(n)=>`${n}人`, no_user:'ユーザーを取得できませんでした',
     pin_clear:'クリア', login_btn:'ログイン',
     back:'もどる',
     pin_error:'PINが違います',
@@ -341,7 +368,10 @@ const I18N = {
     shift1_name:'Ca 1', shift2_name:'Ca 2', shift3_name:'Ca 3',
     shift_badge: s => `Nhân viên ca ${s}`,
     user_title:'Chọn người dùng', search_ph:'Tìm theo tên...',
-    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    role_op:'Công nhân', role_sl:'Trưởng ca', role_adm:'Admin',
+    role_kacho:'Trưởng phòng', role_chief:'Chief', role_leader:'Leader', role_sys:'Quản trị hệ thống',
+    tab_mgr:'Quản lý', tab_op:'Công nhân', recent_cap:'Đăng nhập lần trước',
+    n_people:(n)=>`${n} người`, no_user:'Không lấy được danh sách người dùng',
     pin_clear:'Xóa', login_btn:'Đăng nhập',
     back:'Quay lại',
     pin_error:'PIN không đúng',
@@ -354,7 +384,10 @@ const I18N = {
     shift1_name:'Shift 1', shift2_name:'Shift 2', shift3_name:'Shift 3',
     shift_badge: s => `Shift ${s} users`,
     user_title:'Select user', search_ph:'Search by name...',
-    role_op:'OP', role_sl:'SL', role_adm:'Admin',
+    role_op:'Operator', role_sl:'Shift leader', role_adm:'Admin',
+    role_kacho:'Section chief', role_chief:'Chief', role_leader:'Leader', role_sys:'System admin',
+    tab_mgr:'Managers', tab_op:'Operators', recent_cap:'Last sign-in',
+    n_people:(n)=>`${n}`, no_user:'Could not load users',
     pin_clear:'Clear', login_btn:'Login',
     back:'Back',
     pin_error:'Incorrect PIN',
@@ -374,6 +407,13 @@ function setLang(lang) {
     document.getElementById('lang-'+l)?.classList.toggle('active', l===lang);
   });
   applyI18n();
+  /* タブとタイルは data-i18n ではなくJSで生成しているため、言語切替で作り直す */
+  if (typeof renderUsers === 'function' && ALL_USERS.length) renderUsers();
+  if (state.selectedUser) {
+    const r = userRole(state.selectedUser);
+    const roleEl = document.getElementById('pinRole');
+    if (roleEl) { roleEl.textContent = r.label; roleEl.style.color = 'var(' + r.v + ')'; }
+  }
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
@@ -426,9 +466,8 @@ async function loadUsers() {
   try {
     const rows = await sbFetch('traq_users?select=id,name,role,title,is_active&is_active=eq.true&order=name');
     ALL_USERS = (rows || []).sort((a, b) => {
-      const ro = { admin:0, leader:0, sl:1, worker:2, op:2 };
-      const rd = (ro[a.role]||2) - (ro[b.role]||2);
-      return rd !== 0 ? rd : a.name.localeCompare(b.name, 'ja');
+      const d = userRank(a) - userRank(b);
+      return d !== 0 ? d : a.name.localeCompare(b.name, 'ja');
     });
   } catch(e) {
     console.warn('ユーザー取得エラー:', e.message);
@@ -480,65 +519,138 @@ async function selectShift(s) {
     await loadUsers();
   }
 
-  renderUsers('');
-  document.getElementById('userSearch').value = '';
+  userTabNow = null;
+  renderUsers();
   goStep(2);
 }
 
-/* ===== Step 2: Users ===== */
-function renderUsers(filter) {
-  const filtered = ALL_USERS.filter(u =>
-    !filter || u.name.toLowerCase().includes(filter.toLowerCase())
-  );
-  const grid = document.getElementById('userGrid');
-  if (!grid) return;
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div class="loading">該当なし</div>';
-    return;
-  }
-  grid.innerHTML = '';
-  filtered.forEach(u => {
-    const btn = document.createElement('button');
-    const role = u.role;
-    const isSL = role === 'leader' || role === 'sl';
-    const isAdmin = role === 'admin';
-    btn.className = 'user-btn';
-    btn.onclick = () => selectUser(u);
-    const isMgr = role === 'manager';
-    /* 肩書き(次長/チーフ/リーダー)があればそれを表示。無ければ従来のOP/SL/Admin */
-    const roleLabel = u.title ? u.title
-                    : isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
-    const avatarClass = isAdmin ? 'adm' : (isSL || isMgr) ? 'sl' : '';
-    const roleClass   = isAdmin ? 'adm' : (isSL || isMgr) ? 'sl' : '';
-    btn.innerHTML =
-      `<div class="user-avatar ${avatarClass}">${u.name.charAt(0)}</div>` +
-      `<div><div class="user-name">${u.name}</div>` +
-      `<div class="user-role ${roleClass}">${roleLabel}</div></div>`;
-    grid.appendChild(btn);
+/* ===== Step 2: Users =====
+   タブは「管理職」と「作業者」の2つ。
+   アプリ管理者は別タブを作らず、管理職タブの一番最後に置く。 */
+const LAST_USER_KEY = 'traq_last_user';
+
+function esc(v){
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
   });
 }
-function filterUsers() {
-  renderUsers(document.getElementById('userSearch').value);
+/* 表示タブ。システム管理者も管理職タブに入れる */
+function userTab(u){
+  if (u.role === 'worker' || u.role === 'op') return 'op';
+  return 'mgr';
 }
+/* 管理職タブの並び。システム管理者は必ず最後 */
+function userRank(u){
+  if (u.role === 'admin') return 90;
+  if (u.title === '次長')   return 10;
+  if (u.title === 'チーフ') return 20;
+  if (u.title === 'リーダー') return 30;
+  if (u.role === 'leader' || u.role === 'sl') return 40;
+  return 50;
+}
+/* 役職の表記と色 */
+function userRole(u){
+  if (u.role === 'admin') return { label: t('role_sys'), v: '--c-sys' };
+  if (u.title === '次長')   return { label: t('role_kacho'), v: '--c-kacho' };
+  if (u.title === 'チーフ') return { label: t('role_chief'), v: '--c-chief' };
+  if (u.title === 'リーダー') return { label: t('role_leader'), v: '--c-leader' };
+  if (u.role === 'leader' || u.role === 'sl') return { label: t('role_sl'), v: '--c-leader' };
+  return { label: t('role_op'), v: '--c-op' };
+}
+function getLastUser(){
+  try {
+    const id = localStorage.getItem(LAST_USER_KEY);
+    if (!id) return null;
+    return ALL_USERS.filter(u => String(u.id) === String(id))[0] || null;
+  } catch(e) { return null; }
+}
+function saveLastUser(u){
+  try { localStorage.setItem(LAST_USER_KEY, String(u.id)); } catch(e) {}
+}
+
+let userTabNow = null;
+
+function renderUsers(){
+  const grid = document.getElementById('userGrid');
+  const tabsEl = document.getElementById('userTabs');
+  const recentEl = document.getElementById('recentWrap');
+  if (!grid || !tabsEl || !recentEl) return;
+
+  if (ALL_USERS.length === 0) {
+    recentEl.innerHTML = '';
+    tabsEl.innerHTML = '';
+    grid.innerHTML = '<div class="loading">' + esc(t('no_user')) + '</div>';
+    return;
+  }
+
+  const last = getLastUser();
+  if (!userTabNow) userTabNow = last ? userTab(last) : 'op';
+
+  /* 前回のログイン */
+  if (last) {
+    const r = userRole(last);
+    recentEl.innerHTML =
+      '<div class="recent-cap">' + esc(t('recent_cap')) + '</div>' +
+      '<button class="recent-btn" style="--rc:var(' + r.v + ')" data-uid="' + esc(last.id) + '">' +
+        '<span class="recent-av">' + esc(last.name.charAt(0)) + '</span>' +
+        '<span><span class="recent-n">' + esc(last.name) + '</span><br>' +
+        '<span class="recent-r">' + esc(r.label) + '</span></span>' +
+        '<span class="recent-go"><svg class="ico" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>' +
+      '</button>';
+  } else {
+    recentEl.innerHTML = '';
+  }
+
+  /* タブ */
+  const TABS = [['mgr', t('tab_mgr'), '--c-leader'], ['op', t('tab_op'), '--c-op']];
+  tabsEl.innerHTML = TABS.map(function(tb){
+    const cnt = ALL_USERS.filter(function(u){ return userTab(u) === tb[0]; }).length;
+    return '<button class="utab" style="--tc:var(' + tb[2] + ')" data-tab="' + tb[0] + '"' +
+      ' aria-selected="' + (userTabNow === tb[0]) + '">' +
+      '<span>' + esc(tb[1]) + '</span>' +
+      '<span class="utab-n">' + t('n_people', cnt) + '</span></button>';
+  }).join('');
+
+  /* タイル */
+  const list = ALL_USERS.filter(function(u){ return userTab(u) === userTabNow; });
+  grid.innerHTML = list.map(function(u){
+    const r = userRole(u);
+    const me = last && String(u.id) === String(last.id);
+    return '<button class="user-tile' + (me ? ' me' : '') + '" style="--tc:var(' + r.v + ')"' +
+      ' data-uid="' + esc(u.id) + '">' +
+      '<span class="ut-n">' + esc(u.name) + '</span>' +
+      '<span class="ut-r">' + esc(r.label) + '</span></button>';
+  }).join('');
+}
+
+/* タブとユーザーの選択 */
+document.addEventListener('click', function(ev){
+  const tb = ev.target.closest && ev.target.closest('#userTabs [data-tab]');
+  if (tb) { userTabNow = tb.getAttribute('data-tab'); renderUsers(); return; }
+  const btn = ev.target.closest && ev.target.closest('[data-uid]');
+  if (btn) {
+    const id = btn.getAttribute('data-uid');
+    const u = ALL_USERS.filter(function(x){ return String(x.id) === String(id); })[0];
+    if (u) selectUser(u);
+  }
+});
 
 /* ===== Step 3: PIN ===== */
 function selectUser(u) {
   state.selectedUser = u;
   state.pinInput = '';
   updatePinDots();
-  const role = u.role;
-  const isSL = role === 'leader' || role === 'sl';
-  const isAdmin = role === 'admin';
-  const isMgr = role === 'manager';
-  const hi = isAdmin ? ' adm' : (isSL || isMgr) ? ' sl' : '';
+  /* 一覧と同じ役職カラーをPIN画面にも使う */
+  const r = userRole(u);
   const avatarEl = document.getElementById('pinAvatar');
   avatarEl.textContent = u.name.charAt(0);
-  avatarEl.className = 'pin-avatar' + hi;
+  avatarEl.className = 'pin-avatar';
+  avatarEl.style.cssText = 'border-color:var(' + r.v + ');color:var(' + r.v + ');background:transparent';
   document.getElementById('pinName').textContent = u.name;
   const roleEl = document.getElementById('pinRole');
-  roleEl.textContent = u.title ? u.title
-    : isAdmin ? t('role_adm') : isSL ? t('role_sl') : t('role_op');
-  roleEl.className = 'pin-user-role' + hi;
+  roleEl.textContent = r.label;
+  roleEl.className = 'pin-user-role';
+  roleEl.style.color = 'var(' + r.v + ')';
   clearError();
   document.getElementById('loginBtn').disabled = true;
   goStep(3);
@@ -609,6 +721,8 @@ async function doLogin() {
       shift: state.selectedShift,
       expiresAt: Date.now() + 8 * 60 * 60 * 1000
     }));
+
+    saveLastUser(dbUser);
 
     showToast(t('login_ok', dbUser.name), 'success');
     setTimeout(() => { redirectByRole(role); }, 800);

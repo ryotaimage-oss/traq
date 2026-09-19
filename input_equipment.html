@@ -16,16 +16,18 @@
 :root{
   --orange:#EF9F27; --orange-dark:#c97d10; --md:#2DD4BF;
   --bg1:#0B1524; --bg2:#141A24; --bg3:#1D2531;
-  --text1:#E6E9EF; --text2:#838B99;
+  --text1:#E6E9EF; --text2:#8D95A3;
   --border:rgba(255,255,255,.11); --border2:rgba(255,255,255,.20);
   --grid:rgba(255,255,255,.07);
   --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
   --radius:2px; --shadow:none; --nav-h:56px;
   /* 旧変数名との対応（入力画面のCSSはこちらの名前を参照している） */
   --bg:#0B1524; --surface:#141A24; --surface2:#1D2531;
-  --text:#E6E9EF; --muted:#838B99;
+  --text:#E6E9EF; --muted:#8D95A3;
   --field-border:rgba(255,255,255,.11); --error:#ef4444;
 
+
+  --on-success: #0B1524;
 }
 [data-theme="light"]{
   --md:#0E8C7F;
@@ -39,6 +41,8 @@
   --text:#161B26; --muted:#5F6672;
   --field-border:rgba(0,0,0,.16); --error:#DC2626;
 
+
+  --on-success: #FFFFFF;
 }
 html{color-scheme:dark;background:var(--bg)}
 [data-theme="light"]{color-scheme:light}
