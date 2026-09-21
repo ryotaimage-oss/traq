@@ -8,6 +8,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Traq">
+  <script>
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
+
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
+(function(){
+  var el=document.documentElement;
+  function fit(){
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
+  }
+  fit();
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
@@ -177,6 +204,9 @@ tr:hover td{background:rgba(239,159,39,.04)}
 .badge-op{background:transparent;border:1px solid var(--text2);color:var(--text2)}
 .badge-sl{background:rgba(245,158,11,.12);color:var(--warning)}
 .badge-admin{background:rgba(239,68,68,.12);color:var(--danger)}
+/* 管理職(L=リーダー / C=チーフ / J=次長)。同系色にして英字で区別する */
+.badge-l,.badge-c,.badge-j{background:rgba(45,212,191,.14);color:var(--md)}
+.badge-adm{margin-left:5px;background:rgba(239,68,68,.12);color:var(--danger)}
 .badge-active{background:rgba(16,185,129,.12);color:var(--success)}
 .badge-inactive{background:rgba(100,116,139,.12);color:#94a3b8}
 
@@ -228,33 +258,6 @@ tr:hover td{background:rgba(239,159,39,.04)}
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
-<script>
-/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
-   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
-   画面の高さ screen.height を --screen-h に入れ、CSS側で
-
-       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
-
-   として高さを決める。2項の小さい方を採るので、
-     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
-     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
-     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
-     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
-   screen.height は読み込み直後から安定して取得できるため、
-   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
-(function(){
-  var el=document.documentElement;
-  function fit(){
-    var sa=false;
-    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
-    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
-    else el.style.removeProperty('--screen-h');
-  }
-  fit();
-  window.addEventListener('pageshow',fit);
-  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
-})();
-</script>
 </head>
 <body>
 <div class="app">
@@ -357,8 +360,11 @@ html{background:var(--bg2)}
         <input class="search-input" type="text" id="userSearch" placeholder="名前で検索..." data-i18n-ph="ph_user_search" oninput="renderUsers()">
         <select class="filter-select" id="userRoleFilter" onchange="renderUsers()">
           <option value="" data-i18n="filter_all_roles">全ロール</option>
-          <option value="worker" data-i18n="role_op">OP</option>
-          <option value="leader" data-i18n="role_sl">SL</option>
+          <option value="op">OP</option>
+          <option value="sl">SL</option>
+          <option value="l">L</option>
+          <option value="c">C</option>
+          <option value="j">J</option>
           <option value="admin" data-i18n="role_admin">Admin</option>
         </select>
       </div>
@@ -662,6 +668,7 @@ loading:'読み込み中...',no_match:'該当なし',
 btn_edit:'編集',btn_reset_pin:'PIN初期化',
 modal_user_edit:'ユーザー編集',modal_user_add:'ユーザー追加',
 label_name:'名前',label_role:'ロール',label_init_pin:'初期PIN',
+label_app_admin:'アプリ管理者',hint_app_admin:'マスタの編集や設定変更ができます。役職とは別の権限です。',
 btn_cancel:'キャンセル',btn_save:'保存',
 toast_saved:'保存しました',err_name_required:'名前を入力してください',
 confirm_pin_reset:function(n){return n+' のPINを「0000」に初期化しますか？';},
@@ -787,6 +794,7 @@ loading:'Đang tải...',no_match:'Không có kết quả',
 btn_edit:'Sửa',btn_reset_pin:'Đặt lại PIN',
 modal_user_edit:'Sửa người dùng',modal_user_add:'Thêm người dùng',
 label_name:'Tên',label_role:'Vai trò',label_init_pin:'PIN ban đầu',
+label_app_admin:'Quản trị ứng dụng',hint_app_admin:'Có thể sửa dữ liệu gốc và cài đặt. Khác với chức vụ.',
 btn_cancel:'Hủy',btn_save:'Lưu',
 toast_saved:'Đã lưu',err_name_required:'Vui lòng nhập tên',
 confirm_pin_reset:function(n){return 'Đặt lại PIN của '+n+' về "0000"?';},
@@ -912,6 +920,7 @@ loading:'Loading...',no_match:'No results',
 btn_edit:'Edit',btn_reset_pin:'Reset PIN',
 modal_user_edit:'Edit User',modal_user_add:'Add User',
 label_name:'Name',label_role:'Role',label_init_pin:'Initial PIN',
+label_app_admin:'App administrator',hint_app_admin:'Can edit master data and settings. Separate from job title.',
 btn_cancel:'Cancel',btn_save:'Save',
 toast_saved:'Saved',err_name_required:'Please enter a name',
 confirm_pin_reset:function(n){return 'Reset PIN for '+n+' to "0000"?';},
@@ -1098,10 +1107,39 @@ function getFilteredUsers(){
   const rf=document.getElementById('userRoleFilter').value;
   return USERS.filter(u=>{
     if(q&&!u.name.toLowerCase().includes(q))return false;
-    if(rf&&u.role!==rf)return false;
+    if(rf==='admin'){ if(!isAppAdmin(u))return false; }
+    else if(rf&&levelOf(u)!==rf)return false;
     return true;
   });
 }
+/* ===== 区分(OP/SL/L/C/J) =====
+   L・C・J は役職(title)で、SL・OP はロール(role)で決まる。
+   アプリ管理者は役職とは別で、role==='admin' が目印。 */
+const LEVELS = [
+  { key:'op', label:'OP', role:'worker',  title:null },
+  { key:'sl', label:'SL', role:'leader',  title:null },
+  { key:'l',  label:'L',  role:'manager', title:'リーダー' },
+  { key:'c',  label:'C',  role:'manager', title:'チーフ' },
+  { key:'j',  label:'J',  role:'manager', title:'次長' }
+];
+function levelOf(u){
+  if(!u) return 'op';
+  if(u.title==='次長')     return 'j';
+  if(u.title==='チーフ')   return 'c';
+  if(u.title==='リーダー') return 'l';
+  if(u.role==='leader'||u.role==='sl') return 'sl';
+  return 'op';
+}
+function levelLabel(k){
+  for(var i=0;i<LEVELS.length;i++){ if(LEVELS[i].key===k) return LEVELS[i].label; }
+  return 'OP';
+}
+function levelDef(k){
+  for(var i=0;i<LEVELS.length;i++){ if(LEVELS[i].key===k) return LEVELS[i]; }
+  return LEVELS[0];
+}
+function isAppAdmin(u){ return !!u && u.role==='admin'; }
+
 function renderUsers(){
   var list=getFilteredUsers();
   list=applySortToList(list,'user',function(u,k){
@@ -1115,12 +1153,13 @@ function renderUsers(){
   const tbody=document.getElementById('userTable');
   if(!page.length){tbody.innerHTML='<tr class="loading-row"><td colspan="3">'+t('no_match')+'</td></tr>';renderPagination('userPagination',total,userPage,'user');return;}
   tbody.innerHTML=page.map(u=>{
-    const role=u.role==='admin'?'admin':u.role==='leader'||u.role==='sl'?'sl':'op';
-    const rl=role==='admin'?'Admin':role==='sl'?'SL':'OP';
-    const bc='badge-'+role;
+    const lv=levelOf(u);
+    const rl=levelLabel(lv);
+    const bc='badge-'+lv;
+    const adm=isAppAdmin(u)?'<span class="badge badge-adm">'+t('role_admin')+'</span>':'';
     return`<tr>
       <td style="font-weight:600">${esc(u.name)}</td>
-      <td><span class="badge ${bc}">${rl}</span></td>
+      <td><span class="badge ${bc}">${rl}</span>${adm}</td>
       <td><div class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">${t('btn_edit')}</button>
         <button class="btn btn-secondary btn-sm" onclick="resetPin('${u.id}','${esc(u.name)}')">${t('btn_reset_pin')}</button>
@@ -1136,11 +1175,13 @@ function openUserModal(id){
     <div class="modal-title">${u?t('modal_user_edit'):t('modal_user_add')}</div>
     <div class="form-group"><label class="form-label">${t('label_name')}</label><input class="form-input" id="m-name" value="${u?esc(u.name):''}"></div>
     <div class="form-group"><label class="form-label">${t('label_role')}</label>
-      <select class="form-select" id="m-role">
-        <option value="worker" ${u&&u.role==='worker'?'selected':''}>OP</option>
-        <option value="leader" ${u&&(u.role==='leader'||u.role==='sl')?'selected':''}>SL</option>
-        <option value="admin"  ${u&&u.role==='admin'?'selected':''}>Admin</option>
+      <select class="form-select" id="m-level">
+        ${LEVELS.map(function(v){return '<option value="'+v.key+'"'+(levelOf(u)===v.key?' selected':'')+'>'+v.label+(v.title?'（'+v.title+'）':'')+'</option>';}).join('')}
       </select></div>
+    <div class="form-group"><label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="m-admin" ${isAppAdmin(u)?'checked':''} style="width:16px;height:16px">
+      <span>${t('label_app_admin')}</span></label>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">${t('hint_app_admin')}</div></div>
     ${!u?'<div class="form-group"><label class="form-label">'+t('label_init_pin')+'</label><input class="form-input" id="m-pin" value="0000" maxlength="4" placeholder="4桁"></div>':''}
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">${t('btn_cancel')}</button>
@@ -1149,16 +1190,19 @@ function openUserModal(id){
 }
 async function saveUser(id){
   const name=document.getElementById('m-name').value.trim();
-  const role=document.getElementById('m-role').value;
+  const def=levelDef(document.getElementById('m-level').value);
+  /* アプリ管理者のチェックは役職と独立。チェック時だけ role を admin にする */
+  const role=document.getElementById('m-admin').checked?'admin':def.role;
+  const title=def.title;
   if(!name){showToast(t('err_name_required'),'error');return;}
   try{
     if(id){
-      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role});
+      const updated=await sbFetch('traq_users?id=eq.'+id,'PATCH',{name,role,title});
       const idx=USERS.findIndex(u=>String(u.id)===String(id));
       if(idx>=0&&updated&&updated[0])USERS[idx]={...USERS[idx],...updated[0]};
     }else{
       const pin=document.getElementById('m-pin')?.value||'0000';
-      const created=await sbFetch('traq_users','POST',{name,role,pin,is_active:true,shift:1});
+      const created=await sbFetch('traq_users','POST',{name,role,title,pin,is_active:true,shift:1});
       if(created&&created[0])USERS.push(created[0]);
     }
     closeModal();renderUsers();showToast(t('toast_saved'),'success');
@@ -1761,7 +1805,7 @@ function exportAllMasters(){
 
     /* Sheet 1: Users */
     var uRows=USERS.map(function(u){
-      var rl=u.role==='admin'?'Admin':(u.role==='leader'||u.role==='sl')?'SL':'OP';
+      var rl=levelLabel(levelOf(u))+(isAppAdmin(u)?' / Admin':'');
       var o={};
       o[t('excel_name')]=u.name||'';
       o[t('excel_role')]=rl;
