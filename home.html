@@ -170,6 +170,10 @@ html, body {
 .tl-footer{display:flex;justify-content:space-between;align-items:center;padding-top:5px;border-top:1px solid var(--border)}
 .tl-who{font-size:11px;color:var(--text2)}
 .filter-row{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0}
+/* 絞り込みの検索欄。font-size:16px は iOS で focus 時に拡大されるのを防ぐため（下げないこと） */
+.flt-kw{flex:1;min-width:0;height:34px;padding:0 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:16px;color:var(--text1);outline:none;-webkit-appearance:none}
+.flt-kw::placeholder{color:var(--text2);font-size:13px}
+.flt-kw:focus{border-color:var(--orange)}
 .filter-row::-webkit-scrollbar{display:none}
 .ftab{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .ftab.active{background:var(--orange);border-color:var(--orange);color:var(--navy);font-weight:700}
@@ -429,27 +433,26 @@ html{background:var(--bg2)}
         <button class="tab-item" id="tab-approved" onclick="setMainTab('approved')"><span data-i18n="tab_approved">承認済み</span></button>
         <button class="tab-item" id="tab-rejected" onclick="setMainTab('rejected')"><span data-i18n="tab_rejected">差し戻し</span><span class="tab-badge" id="tab-badge-rejected" style="display:none">0</span></button>
       </div>
-      <div class="filter-row" id="typeFilterRow" style="display:none">
-        <button class="ftab active" id="ftab-all2" onclick="setTypeFilter('all')"  data-i18n="filter_all">すべて</button>
-        <button class="ftab"        id="ftab-eq"   onclick="setTypeFilter('eq')"   data-i18n="filter_eq">設備</button>
-        <button class="ftab"        id="ftab-md"   onclick="setTypeFilter('md')"   data-i18n="filter_md">金型</button>
-      </div>
-
-      <div class="tl-filter-area" id="tlFilterArea">
+      <!-- 絞り込み。全タブ共通で出す（以前は全件タブとそれ以外で別物だった） -->
+      <div class="tl-filter-area" id="filterArea">
+        <div class="tl-filter-row">
+          <input type="search" class="flt-kw" id="fKw" data-i18n-ph="ph_search" placeholder="品番・品名・機番・内容で検索">
+          <button class="ftab" onclick="clearFilters()" data-i18n="flt_clear">クリア</button>
+        </div>
         <div class="tl-filter-row">
           <span class="tl-flabel" data-i18n="tl_date">日付</span>
-          <input type="date" class="tl-datebox" id="tlDateFrom">
+          <input type="date" class="tl-datebox" id="fFrom">
           <span class="tl-datesep">〜</span>
-          <input type="date" class="tl-datebox" id="tlDateTo">
+          <input type="date" class="tl-datebox" id="fTo">
         </div>
         <div class="tl-filter-row">
           <span class="tl-flabel" data-i18n="tl_line">ライン</span>
-          <select class="tl-linesel" id="tlLineSelect" onchange="renderTimeline()">
+          <select class="tl-linesel" id="fLine">
             <option value="" data-i18n="tl_all_lines">すべてのライン</option>
           </select>
-          <button class="ftab active" id="tl-ftab-all" onclick="setTlType('all')"  data-i18n="filter_all">すべて</button>
-          <button class="ftab"        id="tl-ftab-eq"  onclick="setTlType('eq')"   data-i18n="filter_eq">設備</button>
-          <button class="ftab"        id="tl-ftab-md"  onclick="setTlType('md')"   data-i18n="filter_md">金型</button>
+          <button class="ftab active" id="ftab-all" onclick="setType('all')" data-i18n="filter_all">すべて</button>
+          <button class="ftab"        id="ftab-eq"  onclick="setType('eq')"  data-i18n="filter_eq">設備</button>
+          <button class="ftab"        id="ftab-md"  onclick="setType('md')"  data-i18n="filter_md">金型</button>
         </div>
       </div>
       <div class="tl-cnt" id="tlCnt"></div>
@@ -500,6 +503,8 @@ const I18N = {
     draft_label:'件の下書きがあります', draft_confirm:'確認する →',
     tab_draft:'下書き', tab_pending:'承認待ち', tab_all:'全件', tab_approved:'承認済み', tab_rejected:'差し戻し',
     tl_date:'日付', tl_line:'ライン', tl_all_lines:'すべてのライン',
+    ph_search:'品番・品名・機番・内容で検索', flt_clear:'クリア',
+    cnt_shown:(n)=>`表示 ${n}件`, cnt_capped:'（直近100件から）',
     filter_all:'すべて', filter_draft:'下書き', filter_pending:'承認待ち',
     filter_approved:'承認済み', filter_eq:'設備', filter_md:'金型',
     type_eq:'設備', type_md:'金型',
@@ -525,6 +530,8 @@ const I18N = {
     draft_label:'bản nháp chưa gửi', draft_confirm:'Xem →',
     tab_draft:'Nháp', tab_pending:'Chờ duyệt', tab_all:'Tất cả', tab_approved:'Đã duyệt', tab_rejected:'Trả lại',
     tl_date:'Ngày', tl_line:'Dây', tl_all_lines:'Tất cả dây chuyền',
+    ph_search:'Tìm theo mã SP, máy, nội dung', flt_clear:'Xoá lọc',
+    cnt_shown:(n)=>`Hiển thị ${n}`, cnt_capped:' (trong 100 gần nhất)',
     filter_all:'Tất cả', filter_draft:'Nháp', filter_pending:'Chờ duyệt',
     filter_approved:'Đã duyệt', filter_eq:'Thiết bị', filter_md:'Khuôn',
     type_eq:'Thiết bị', type_md:'Khuôn',
@@ -550,6 +557,8 @@ const I18N = {
     draft_label:'draft(s) unsent', draft_confirm:'Review →',
     tab_draft:'Draft', tab_pending:'Pending', tab_all:'All', tab_approved:'Approved', tab_rejected:'Rejected',
     tl_date:'Date', tl_line:'Line', tl_all_lines:'All lines',
+    ph_search:'Search part, machine or text', flt_clear:'Clear',
+    cnt_shown:(n)=>`${n} shown`, cnt_capped:' (of the latest 100)',
     filter_all:'All', filter_draft:'Draft', filter_pending:'Pending',
     filter_approved:'Approved', filter_eq:'Equipment', filter_md:'Mold',
     type_eq:'Equipment', type_md:'Mold',
@@ -581,6 +590,7 @@ function setLang(lang) {
 }
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
 }
 
 const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
@@ -606,7 +616,28 @@ const SESSION = (() => {
 
 let TROUBLES = [];
 let mainTab = 'all';
-let typeFilter = 'all';
+/* 絞り込みの状態。全タブで共通に使う */
+const F = { kw:'', from:'', to:'', line:'', type:'all' };
+
+/* 1件が絞り込みに合うか。日付が空の行（下書きなど）は日付で落とさない。
+   下書きタブは日付で絞らない（やりかけを期間で隠すと気づけなくなるため） */
+function matchF(r){
+  if(mainTab !== 'draft' && r.date){
+    if(F.from && r.date < F.from) return false;
+    if(F.to   && r.date > F.to)   return false;
+  }
+  if(F.line && r.line !== F.line) return false;
+  if(F.type === 'eq' && r.type !== 'equipment') return false;
+  if(F.type === 'md' && r.type !== 'mold')      return false;
+  if(F.kw){
+    const k = F.kw.toLowerCase();
+    const hay = [r.machine, r.product_code, r.product_name, r.category, r.detail, r.line]
+      .map(x => String(x == null ? '' : x).toLowerCase()).join(' ');
+    if(hay.indexOf(k) === -1) return false;
+  }
+  return true;
+}
+function rerender(){ if(mainTab === 'all') renderTimeline(); else renderList(); }
 
 function getRoleClass(role) { return traqRoleClass(SESSION); }
 function getRoleLabel(role) { return traqLevelLabel(SESSION); }
@@ -648,6 +679,7 @@ function renderList() {
   } else {
     draftBanner.style.display = 'none';
   }
+  showCount(list.length, false);
   if (list.length === 0) {
     const emptyMsg = mainTab==='draft'?t('empty_draft'):mainTab==='pending'?t('empty_pending'):t('empty_all');
     container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg></div><div>${emptyMsg}</div></div>`;
@@ -657,6 +689,14 @@ function renderList() {
   list.forEach((tr, idx) => { container.appendChild(buildCard(tr, idx)); });
 }
 
+/* 件数表示。以前は「100件中」と出していたが、その100は取得上限であって総数ではなかった */
+function showCount(n, capped){
+  const el = document.getElementById('tlCnt');
+  if(!el) return;
+  el.style.display = '';
+  el.textContent = t('cnt_shown', n) + (capped ? t('cnt_capped') : '');
+}
+
 function getFilteredList() {
   return TROUBLES.filter(tr => {
     const statusOk = mainTab==='draft'    ? tr.status==='draft' :
@@ -664,8 +704,7 @@ function getFilteredList() {
                      mainTab==='approved' ? tr.status==='approved' :
                      mainTab==='rejected' ? tr.status==='rejected' :
                      tr.status !== 'draft';
-    const typeOk = typeFilter==='all' ? true : typeFilter==='eq' ? tr.type==='equipment' : tr.type==='mold';
-    return statusOk && typeOk;
+    return statusOk && matchF(tr);
   });
 }
 
@@ -718,7 +757,6 @@ function buildCard(tr, idx) {
 }
 
 let TL_DATA = [];
-let tlTypeFilter = 'all';
 
 function setMainTab(tab) {
   mainTab = tab;
@@ -726,23 +764,33 @@ function setMainTab(tab) {
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
   });
   const isAll = tab === 'all';
-  document.getElementById('typeFilterRow').style.display  = isAll ? 'none' : '';
-  document.getElementById('tlFilterArea').style.display   = isAll ? '' : 'none';
-  document.getElementById('tlCnt').style.display          = isAll ? '' : 'none';
-  document.getElementById('troubleList').style.display    = isAll ? 'none' : '';
-  document.getElementById('timelineList').style.display   = isAll ? '' : 'none';
-  if (isAll) { loadTimeline(); } else { renderList(); }
+  /* 絞り込みは全タブで出したままにする */
+  document.getElementById('troubleList').style.display  = isAll ? 'none' : '';
+  document.getElementById('timelineList').style.display = isAll ? '' : 'none';
+  if (isAll) { if(TL_DATA.length) renderTimeline(); else loadTimeline(); }
+  else { renderList(); }
   document.getElementById('scrollArea').scrollTo(0, 0);
 }
-function setTypeFilter(f) {
-  typeFilter = f;
-  ['all2','eq','md'].forEach(k => document.getElementById('ftab-'+k).classList.toggle('active', k===(f==='all'?'all2':f)));
-  renderList();
+function setType(f) {
+  F.type = f;
+  ['all','eq','md'].forEach(k => document.getElementById('ftab-'+k).classList.toggle('active', k===f));
+  rerender();
 }
-function setTlType(f) {
-  tlTypeFilter = f;
-  ['all','eq','md'].forEach(k => document.getElementById('tl-ftab-'+k).classList.toggle('active', k===f));
-  renderTimeline();
+function clearFilters(){
+  F.kw = ''; F.line = ''; F.type = 'all';
+  document.getElementById('fKw').value = '';
+  document.getElementById('fLine').value = '';
+  ['all','eq','md'].forEach(k => document.getElementById('ftab-'+k).classList.toggle('active', k==='all'));
+  setDefaultDates(true);
+  rerender();
+}
+function initFilterEvents(){
+  const kw = document.getElementById('fKw');
+  let tm = null;
+  kw.oninput = function(){ clearTimeout(tm); tm = setTimeout(function(){ F.kw = kw.value.trim(); rerender(); }, 250); };
+  document.getElementById('fFrom').onchange = function(){ F.from = this.value; rerender(); };
+  document.getElementById('fTo').onchange   = function(){ F.to   = this.value; rerender(); };
+  document.getElementById('fLine').onchange = function(){ F.line = this.value; rerender(); };
 }
 
 async function loadTimeline() {
@@ -774,9 +822,10 @@ async function loadTimeline() {
 }
 
 function buildLineOptions() {
-  const sel = document.getElementById('tlLineSelect');
+  const sel = document.getElementById('fLine');
   const current = sel.value;
-  const lines = [...new Set(TL_DATA.filter(r=>r.line).map(r=>r.line))].sort();
+  /* 全件タブ（全員）と自分の投稿、両方からラインを集める */
+  const lines = [...new Set(TL_DATA.concat(TROUBLES).filter(r=>r.line).map(r=>r.line))].sort();
   sel.innerHTML = `<option value="">すべてのライン</option>`;
   lines.forEach(ln => {
     const opt = document.createElement('option');
@@ -786,34 +835,23 @@ function buildLineOptions() {
   });
 }
 
-function setDefaultDates() {
+/* 初期期間は直近30日。
+   以前は「今週の月曜〜今日」だったため、月曜に開くと1日分しか出ず空になっていた。
+   toISOString() はUTCなので日本時間だと1日ずれる。ローカルの年月日で組み立てること。 */
+function setDefaultDates(force) {
   const now = new Date();
-  const day = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  const fmt = d => d.toISOString().slice(0,10);
-  const fromEl = document.getElementById('tlDateFrom');
-  const toEl = document.getElementById('tlDateTo');
-  if(!fromEl.value) fromEl.value = fmt(monday);
-  if(!toEl.value) toEl.value = fmt(now);
-  fromEl.onchange = renderTimeline;
-  toEl.onchange = renderTimeline;
+  const from = new Date(now);
+  from.setDate(now.getDate() - 29);
+  const fmt = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const fromEl = document.getElementById('fFrom');
+  const toEl   = document.getElementById('fTo');
+  if(force || !fromEl.value){ fromEl.value = fmt(from); F.from = fromEl.value; }
+  if(force || !toEl.value){   toEl.value   = fmt(now);  F.to   = toEl.value; }
 }
 
 function renderTimeline() {
-  const from = document.getElementById('tlDateFrom').value;
-  const to   = document.getElementById('tlDateTo').value;
-  const line = document.getElementById('tlLineSelect').value;
-  const filtered = TL_DATA.filter(r => {
-    if(r.status === 'draft') return false;
-    if(from && r.date < from) return false;
-    if(to   && r.date > to)   return false;
-    if(line && r.line !== line) return false;
-    if(tlTypeFilter === 'eq' && r.type !== 'equipment') return false;
-    if(tlTypeFilter === 'md' && r.type !== 'mold') return false;
-    return true;
-  });
-  document.getElementById('tlCnt').textContent = TL_DATA.filter(r=>r.status!=='draft').length + '件中 ' + filtered.length + '件表示';
+  const filtered = TL_DATA.filter(r => r.status !== 'draft' && matchF(r));
+  showCount(filtered.length, TL_DATA.length >= 100);
   if(filtered.length === 0) {
     document.getElementById('timelineList').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg></div><div>該当する投稿はありません</div></div>';
     return;
@@ -1119,6 +1157,7 @@ async function loadTroubles() {
     });
   } catch(e) {}
   updateBadges();
+  buildLineOptions();
   renderList();
 }
 
@@ -1133,7 +1172,9 @@ async function loadTroubles() {
   ['ja','vi','en'].forEach(l => { const b2 = document.getElementById('sb-lang-'+l); if(b2) b2.classList.toggle('active', l===savedLang); });
   applyI18n();
   renderUserInfo();
-  await loadTroubles();  // ← 修正: TROUBLESを先に読み込み、バッジ・各タブを初期化
+  setDefaultDates();     // 絞り込みの初期期間（直近30日）を先に入れておく
+  initFilterEvents();
+  await loadTroubles();  // TROUBLESを先に読み込み、バッジ・各タブを初期化
   await loadTimeline();
 })();
 
