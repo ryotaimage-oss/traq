@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Traq">
+  <script>
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
+
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
+(function(){
+  var el=document.documentElement;
+  function fit(){
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
+  }
+  fit();
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>Traq – 設定</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#EF9F27;--orange-dark:#c97d10;--navy:#080d18;--md:#2DD4BF;
+  --bg1:#0B1524;--bg2:#141A24;--bg3:#1D2531;
+  --bg:#0B1524;--surface:#141A24;--surface2:#1D2531;
+  --text1:#E6E9EF;--text2:#8D95A3;--text:#E6E9EF;--muted:#8D95A3;
+  --border:rgba(255,255,255,.11);--border2:rgba(255,255,255,.20);--field-border:rgba(255,255,255,.11);
+  --grid:rgba(255,255,255,.07);
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--error:#ef4444;
+  --eq:#EF9F27;
+  --radius:2px;--shadow:none;--nav-h:55px;
+
+  --on-success: #0B1524;
+}
+html{color-scheme:dark;background:var(--bg1)}
+[data-theme="light"]{
+  --md:#0E8C7F;
+  --bg1:#E3E7EB;--bg2:#FFFFFF;--bg3:#F2F0EC;
+  --bg:#E3E7EB;--surface:#FFFFFF;--surface2:#F2F0EC;
+  --text1:#161B26;--text2:#5F6672;--text:#161B26;--muted:#5F6672;
+  --border:rgba(0,0,0,.16);--border2:rgba(0,0,0,.28);--field-border:rgba(0,0,0,.16);
+  --grid:rgba(0,0,0,.09);--shadow:none;
+  /* 白背景で読めるよう濃色へ */
+  --orange:#B36F0C;--success:#0B7A56;--warning:#A06A08;--danger:#DC2626;--error:#DC2626;--eq:#B36F0C;
+
+  --on-success: #FFFFFF;
+}
+.setting-icon svg.ico,.pin-success-icon svg{margin:0 auto}
+.add-home-device-label{display:flex;align-items:center;gap:7px}
+.add-home-step-num svg.ico{width:13px;height:13px;margin:0 auto}
+.setting-arrow svg.ico{width:14px;height:14px}
+svg.ico{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+svg.ico-lg{width:26px;height:26px;stroke-width:1.3}
+svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
+.snav-icon svg.ico,.nav-icon svg.ico,.hdr-icon-btn svg.ico{margin:0 auto}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px)));font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
+.app{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px)));display:flex;flex-direction:column;background:var(--bg1)}
+.sidebar{display:none}
+
+/* ===== Topbar (F-style) ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,0px) 10px 0;height:calc(44px + env(safe-area-inset-top,0px));background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
+.topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
+.topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+.role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+.role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+[data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+[data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+[data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+
+/* ===== Bottom Nav (2-tab) ===== */
+.bottom-nav{display:flex;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+.bottom-nav svg.ico{width:23px;height:23px;stroke-width:1.5}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:11px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0}
+.nav-item.active{color:var(--orange)}
+.nav-item:hover:not(.active){color:var(--text1)}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-weight:500}
+@media(min-width:768px){.bottom-nav{display:none}
+  .app{flex-direction:row}
+  .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
+  .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
+  .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .sidebar-avatar{width:36px;height:36px;border-radius:var(--radius);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-name{font-size:13px;font-weight:700}
+  .sidebar-role{font-size:11px;color:var(--text2)}
+  .sidebar-nav{flex:1;padding:12px 8px}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item:hover{background:var(--bg3);color:var(--text1)}
+  .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
+  .snav-icon{font-size:18px;width:24px;text-align:center}
+  .snav-badge{margin-left:auto;background:var(--danger);color:#fff;border-radius:var(--radius);padding:1px 6px;font-size:9px;font-weight:700}
+  .snav-disabled{opacity:.3;pointer-events:none;cursor:not-allowed}
+  .snav-lock{margin-left:auto;font-size:10px;opacity:.6}
+  .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+  .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+  .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+  .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+  [data-theme="light"] .role-admin .sidebar-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+  [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+  [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+  .topbar{display:none}
+}
+
+/* Lang buttons */
+.lang-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;padding:16px 16px 40px;background:var(--bg1)}
+.inner{max-width:520px;margin:0 auto}
+
+/* User card */
+.user-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:slideUp .3s ease}
+.user-avatar-lg{width:52px;height:52px;border-radius:var(--radius);background:var(--orange);color:var(--navy);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-info-name{font-size:16px;font-weight:700;margin-bottom:3px}
+.user-info-meta{font-size:12px;color:var(--text2)}
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius);margin-right:5px}
+/* 役職の色はバッジにだけ効かせる。ヘッダーにも同じクラスを付けるため、
+   要素を限定しないとヘッダー全体が着色されてしまう */
+.role-badge.role-op{background:rgba(96,165,250,.12);color:#60a5fa}
+.role-badge.role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
+.role-badge.role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
+
+/* Section */
+.section{margin-bottom:20px;animation:slideUp .3s ease both}
+.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
+
+/* Setting rows */
+.setting-group{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;gap:12px}
+.setting-row:last-child{border-bottom:none}
+.setting-row:hover{background:rgba(239,159,39,.04)}
+.setting-row-left{display:flex;align-items:center;gap:12px}
+.setting-icon{width:32px;height:32px;border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;background:transparent}
+.setting-name{font-size:14px;font-weight:500}
+.setting-desc{font-size:11px;color:var(--text2);margin-top:2px}
+.setting-row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.setting-value{font-size:13px;color:var(--text2)}
+.setting-arrow{font-size:18px;color:var(--text2)}
+
+/* Toggle switch */
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:var(--radius);position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--border2);flex-shrink:0}
+.toggle.on{background:var(--orange);border-color:var(--orange)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:var(--radius);background:var(--text2);transition:transform .2s,background .2s;}
+.toggle.on .toggle-knob{transform:translateX(20px);background:#fff}
+
+/* PIN section */
+.pin-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:16px 0}
+.pin-dot{width:16px;height:16px;border-radius:var(--radius);border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--orange);border-color:var(--orange);transform:scale(1.1)}
+.pin-dot.success{background:var(--success);border-color:var(--success)}
+.pin-dot.error{background:var(--danger);border-color:var(--danger);animation:shake .3s ease}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.key-btn{height:52px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:20px;font-weight:700;color:var(--text1);cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.key-btn:active{transform:scale(.95);background:var(--bg1)}
+.key-btn:disabled{opacity:.3;pointer-events:none}
+.pin-step-label{text-align:center;font-size:13px;color:var(--text2);margin-bottom:4px}
+.pin-step-title{text-align:center;font-size:15px;font-weight:700;margin-bottom:2px}
+.pin-error{text-align:center;font-size:13px;color:var(--danger);min-height:20px;margin-top:4px}
+.pin-success-wrap{text-align:center;padding:20px 0}
+.pin-success-icon{font-size:48px;margin-bottom:10px;animation:popIn .4s cubic-bezier(.17,.67,.38,1.4)}
+.pin-success-text{font-size:16px;font-weight:700;color:var(--success)}
+
+/* Add to home screen card */
+.add-home-card{background:var(--bg2);border:1px solid rgba(239,159,39,.25);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px}
+.add-home-icon{font-size:36px;flex-shrink:0}
+.add-home-info{}
+.add-home-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.add-home-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.btn-add-home{margin-top:10px;height:40px;background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:13px;font-weight:700;padding:0 16px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-add-home:hover{background:var(--orange-dark)}
+.btn-add-home:disabled{opacity:.5;cursor:not-allowed}
+
+/* Version card */
+.version-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.version-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.version-logo{width:40px;height:40px;border-radius:var(--radius);background:var(--orange);display:flex;align-items:center;justify-content:center}
+.version-name{font-size:15px;font-weight:700}
+.version-num{font-size:12px;color:var(--text2)}
+.version-rows{}
+.version-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.version-row:last-child{border-bottom:none}
+.version-key{color:var(--text2)}
+.version-val{font-weight:500}
+.update-badge{background:rgba(16,185,129,.12);color:var(--success);font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius)}
+.no-update-badge{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:var(--radius)}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;z-index:400;white-space:nowrap}
+.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success)}
+.toast.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.toast.info{background:var(--bg3);border:1px solid var(--border);color:var(--text1)}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ===== Add Home Modal ===== */
+.hidden{display:none!important}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-sheet{background:var(--bg2);border-radius:var(--radius) 16px 0 0;width:100%;max-width:480px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:var(--radius);font-family:inherit}
+.modal-close:hover{color:var(--text1)}
+.add-home-device-label{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.add-home-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--text1)}
+.add-home-step-done{margin-top:4px}
+.add-home-step-num{width:24px;height:24px;border-radius:var(--radius);background:var(--orange);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.add-home-step-num-done{background:var(--success);color:var(--on-success)}
+.add-home-highlight{color:var(--orange);font-weight:700}
+.add-home-divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.add-home-url-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+.add-home-url-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.add-home-url-text{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4}
+.add-home-copy-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s}
+.add-home-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
+.add-home-close-btn{width:100%;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text1);cursor:pointer;font-family:inherit}
+
+/* ===== Push通知 ===== */
+.push-desc{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.push-status{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border-radius:var(--radius);margin-bottom:12px;font-size:13px}
+.push-status.active{background:rgba(16,185,129,0.12);color:var(--success)}
+.push-status.inactive{background:rgba(239,68,68,0.12);color:var(--danger)}
+.btn-push{width:100%;padding:12px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-push:not(.btn-push-off){background:var(--orange);color:#000}
+.btn-push:not(.btn-push-off):hover{background:var(--orange-dark)}
+.btn-push:disabled{opacity:.5;cursor:not-allowed}
+.btn-push-off{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-push-off:hover{border-color:var(--danger);color:var(--danger)}
+.push-warn{font-size:12px;color:var(--warning);line-height:1.5;margin-top:8px}
+@media(min-width:1025px){.sidebar{width:240px}}
+
+/* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
+html{background:var(--bg2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar (PC) -->
+    <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-text">TRAQ</span>
+    </div>
+    <div class="sidebar-user" id="sb-user-wrap">
+      <div class="sidebar-avatar" id="sb-avatar"></div>
+      <div>
+        <div class="sidebar-name" id="sb-name"></div>
+        <div class="sidebar-role" id="sb-role"></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="snav-item" onclick="goHome()">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <span data-i18n="nav_list">一覧</span>
+      </button>
+      <button class="snav-item" onclick="location.href='dashboard.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
+      </button>
+      <button class="snav-item" onclick="location.href='excel_download.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
+      </button>
+      <button class="snav-item" onclick="location.href='admin.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+        <span data-i18n="nav_master">マスタ</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="snav-item" onclick="toggleTheme()">
+        <span class="snav-icon" id="sb-theme-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></span>
+        <span data-i18n="nav_theme">テーマ切替</span>
+      </button>
+      <button class="snav-item" style="gap:6px">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
+        <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
+      </button>
+      <button class="snav-item active">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
+        <span data-i18n="nav_settings">設定</span>
+      </button>
+      <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
+        <span data-i18n="nav_logout">ログアウト</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo-text">TRAQ</span>
+      <span class="topbar-sep"></span>
+      <span class="topbar-sub">Trouble Tracking System</span>
+    </div>
+    <div class="topbar-right">
+      <button class="hdr-icon-btn" onclick="forceReload()" data-i18n-title="hdr_reload" title="リロード"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></button>
+      <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" data-i18n-title="hdr_theme" title="テーマ切替"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></button>
+      <button class="hdr-icon-btn" onclick="void(0)" data-i18n-title="hdr_settings" title="設定" style="color:var(--orange);border-color:var(--orange)"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
+      <div class="hdr-avatar" id="mob-avatar"></div>
+    </div>
+  </header>
+
+  <!-- アップデートバナー（新バージョン検知時に表示） -->
+  <div id="updateBanner" style="display:none;background:rgba(239,159,39,.12);border-bottom:2px solid var(--orange);padding:10px 16px;flex-shrink:0;animation:fadeIn .3s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:520px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🆕</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--orange)" id="updateBannerTitle" data-i18n="update_banner_title">新しいバージョンがあります</div>
+          <div style="font-size:11px;color:var(--text2)" id="updateBannerSub"></div>
+        </div>
+      </div>
+      <button onclick="forceReload()" style="background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;flex-shrink:0;margin-left:10px" data-i18n="update_now">
+        今すぐ更新
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-area" id="scrollArea">
+  <div class="inner">
+
+    <!-- ユーザーカード -->
+    <div class="user-card">
+      <div class="user-avatar-lg" id="userAvatar">高</div>
+      <div>
+        <div class="user-info-name" id="userName">高橋 A</div>
+        <div class="user-info-meta">
+          <span class="role-badge role-op" id="userRoleBadge">OP</span>
+          <span id="userShiftLabel">1直</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表示設定 -->
+    <div class="section" style="animation-delay:.05s">
+      <div class="section-label" data-i18n="sec_display">表示設定</div>
+      <div class="setting-group">
+        <div class="setting-row" onclick="toggleTheme()">
+          <div class="setting-row-left">
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></div>
+            <div>
+              <div class="setting-name" data-i18n="dark_mode">ダークモード</div>
+              <div class="setting-desc" data-i18n="dark_mode_desc">画面の明暗を切り替えます</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <div class="toggle" id="themeToggle" onclick="event.stopPropagation();toggleTheme()">
+              <div class="toggle-knob"></div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-left">
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></div>
+            <div>
+              <div class="setting-name" data-i18n="lang_label">言語</div>
+              <div class="setting-desc" data-i18n="lang_desc">アプリの表示言語</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <div style="display:flex;gap:5px">
+              <button class="lang-btn active" onclick="setLang('ja')" id="s-lang-ja">JP</button>
+              <button class="lang-btn" onclick="setLang('vi')" id="s-lang-vi">VN</button>
+              <button class="lang-btn" onclick="setLang('en')" id="s-lang-en">EN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- アカウント設定 -->
+    <div class="section" style="animation-delay:.1s">
+      <div class="section-label" data-i18n="sec_account">アカウント</div>
+      <div class="setting-group">
+
+        <div class="setting-row" onclick="setSection('pin')">
+          <div class="setting-row-left">
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
+            <div>
+              <div class="setting-name" data-i18n="pin_change">PIN変更</div>
+              <div class="setting-desc" data-i18n="pin_change_desc">ログイン用4桁PINを変更します</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-arrow"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="setting-row" onclick="openAddHomeModal()">
+          <div class="setting-row-left">
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="1"/><path d="M11 18h2"/></svg></div>
+            <div>
+              <div class="setting-name" data-i18n="add_home">ホーム画面に追加する</div>
+              <div class="setting-desc" data-i18n="add_home_desc">アプリとしてショートカット登録</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-arrow"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN変更セクション（非表示→setSection('pin')で表示） -->
+    <div id="section-pin" style="display:none">
+      <div class="pin-section">
+        <div class="pin-step-label" id="pinStepLabel">ステップ 1 / 3</div>
+        <div class="pin-step-title" id="pinTitle">現在のPINを入力してください</div>
+        <div class="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-error" id="pinError"></div>
+        <div id="pinKeypadArea">
+          <div class="pin-keypad">
+            <button class="key-btn" onclick="pinKey('1')">1</button>
+            <button class="key-btn" onclick="pinKey('2')">2</button>
+            <button class="key-btn" onclick="pinKey('3')">3</button>
+            <button class="key-btn" onclick="pinKey('4')">4</button>
+            <button class="key-btn" onclick="pinKey('5')">5</button>
+            <button class="key-btn" onclick="pinKey('6')">6</button>
+            <button class="key-btn" onclick="pinKey('7')">7</button>
+            <button class="key-btn" onclick="pinKey('8')">8</button>
+            <button class="key-btn" onclick="pinKey('9')">9</button>
+            <button class="key-btn" onclick="pinClear()" style="font-size:13px;color:var(--text2)">C</button>
+            <button class="key-btn" onclick="pinKey('0')">0</button>
+            <button class="key-btn" onclick="pinDel()" style="font-size:15px">⌫</button>
+          </div>
+        </div>
+        <div id="pinSuccessArea" style="display:none">
+          <div class="pin-success-wrap">
+            <div class="pin-success-icon"><svg class="ico ico-xl" style="color:var(--success);margin:0 auto" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+            <div class="pin-success-text" data-i18n="pin_done">PINを変更しました</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:10px">
+          <button onclick="setSection(null)" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit" data-i18n="pin_cancel">キャンセル</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Push通知設定（SL・adminのみ表示） -->
+    <div class="section" id="sec-push" style="animation-delay:.12s">
+      <div class="section-label" data-i18n="push_title">Push通知</div>
+      <div class="setting-group" style="padding:16px">
+        <p class="push-desc" data-i18n="push_desc">トラブル報告が提出されたときにプッシュ通知を受け取ります。</p>
+        <div id="push-status" class="push-status">
+          <span id="push-status-icon">⏳</span>
+          <span id="push-status-text" data-i18n="push_checking">確認中...</span>
+        </div>
+        <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 10-12 0v5l-2 3h16z"/><path d="M10 22h4"/></svg><span data-i18n="push_enable">通知をオンにする</span>
+        </button>
+        <button id="btn-push-off" class="btn-push btn-push-off" onclick="unsubscribePush()" style="display:none">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 00-9-5.2"/><path d="M6 11v5l-2 3h13"/><path d="M3 3l18 18"/></svg><span data-i18n="push_disable">通知をオフにする</span>
+        </button>
+        <p id="push-unsupported" class="push-warn" style="display:none" data-i18n="push_unsupported">このブラウザはPush通知に対応していません。</p>
+        <p id="push-ios-hint" class="push-warn" style="display:none" data-i18n="push_ios_hint">iOSでPush通知を受け取るにはホーム画面に追加してください。</p>
+        <p id="push-denied" class="push-warn" style="display:none" data-i18n="push_denied">通知がブロックされています。ブラウザの設定から許可してください。</p>
+      </div>
+    </div>
+
+    <!-- バージョン情報 -->
+    <div class="section" style="animation-delay:.2s">
+      <div class="section-label" data-i18n="sec_version">バージョン情報</div>
+      <div class="version-card">
+        <div class="version-header">
+          <div class="version-logo">
+            <span class="logo-text" style="font-size:11px;letter-spacing:.5px;color:var(--navy);padding-left:.5px">TRAQ</span>
+          </div>
+          <div>
+            <div class="version-name">Traq – TroubleTrack System</div>
+            <div class="version-num" id="versionNum">v1.0.0</div>
+          </div>
+        </div>
+        <div class="version-rows">
+          <div class="version-row">
+            <span class="version-key" data-i18n="version_label">バージョン</span>
+            <span class="version-val" id="versionVal">v1.0.0</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key" data-i18n="release_date">リリース日</span>
+            <span class="version-val" id="releaseDate">2026/09/19</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key">表示領域</span>
+            <span class="version-val" id="vpInfo" style="font-size:10px;letter-spacing:.2px">–</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key" data-i18n="update_label">アップデート</span>
+            <span class="version-val" id="updateStatus">
+              <span class="no-update-badge" id="updateBadge" data-i18n="update_checking">確認中...</span>
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ログアウト -->
+    <div class="section" style="animation-delay:.25s">
+      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s" data-i18n="logout"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg><span data-i18n="logout">ログアウト</span></button>
+    </div>
+
+  </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item" onclick="goHome()">
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+      <span class="nav-label" data-i18n="nav_list">一覧</span>
+    </button>
+        <button class="nav-item" onclick="location.href='report.html'">
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="nav-label" data-i18n="nav_report">日報</span>
+    </button>
+<button class="nav-item" onclick="location.href='dashboard.html'">
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
+      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
+    </button>
+    <button class="nav-item" onclick="goMaster()">
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+      <span class="nav-label" data-i18n="nav_master">マスタ</span>
+    </button>
+  </nav>
+</div>
+<div id="toastEl" style="display:none"></div>
+
+<script>
+const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',sun:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M19.1 4.9l-2.1 2.1M7 16.9l-2.1 2.1"/></svg>',check:'<svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>',x:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+
+(function(){
+  var saved=localStorage.getItem('traq_theme');
+  var pref=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved||pref);
+})();
+/* ===== i18n ===== */
+var I18N = {
+  ja: {
+    nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
+    sec_display:'表示設定', sec_account:'アカウント', sec_version:'バージョン情報',
+    dark_mode:'ダークモード', dark_mode_desc:'画面の明暗を切り替えます',
+    lang_label:'言語', lang_desc:'アプリの表示言語',
+    pin_change:'PIN変更', pin_change_desc:'ログイン用4桁PINを変更します',
+    add_home:'ホーム画面に追加する', add_home_desc:'アプリとしてショートカット登録',
+    version_label:'バージョン', release_date:'リリース日', update_label:'アップデート',
+    update_checking:'確認中...', update_latest:'最新版です',
+    update_available:function(v){return 'v'+v+' に更新可能';},
+    update_banner_title:'新しいバージョンがあります',
+    update_now:'今すぐ更新',
+    updating:'最新版に更新しています...',
+    logout:'ログアウト', logout_msg:'ログアウトしました',
+    nav_list:'投稿一覧',nav_excel:'Excelダウンロード', nav_dashboard:'ダッシュボード', nav_report:'日報', nav_master:'マスタ',
+    hdr_reload:'リロード', hdr_theme:'テーマ切替', hdr_settings:'設定',
+    master_denied_title:'アクセス制限', master_denied:'マスタはSL・管理者のみ利用できます',
+    shift_label:function(s){return s+'直';}, shift_none:'未設定',
+    pin_step:function(n){return 'ステップ '+n+' / 3';},
+    pin_s1:'現在のPINを入力してください', pin_s2:'新しいPINを入力してください（4桁）', pin_s3:'新しいPINをもう一度入力してください',
+    pin_easy:'簡単すぎるPINは使用できません', pin_mismatch:'PINが一致しません。もう一度入力してください',
+    pin_wrong:'PINが違います', pin_done:'PINを変更しました', pin_cancel:'キャンセル',
+    pin_session_err:'セッションエラー', pin_user_not_found:'ユーザーが見つかりません',
+    pin_save_fail:function(m){return '保存エラー: '+m;},
+    pin_error:function(m){return 'エラー: '+m;},
+    add_home_title:'ホーム画面に追加', add_home_added:'ホーム画面に追加しました！',
+    add_home_ios_label:'iPhoneでのホーム画面追加手順',
+    add_home_ios_1:'Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ',
+    add_home_ios_2:'メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ',
+    add_home_ios_3:'名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ',
+    add_home_ios_done:'ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。',
+    add_home_android_label:'Androidでのホーム画面追加手順',
+    add_home_android_1:'Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ',
+    add_home_android_2:'<span class="add-home-highlight">「ホーム画面に追加」</span> を選択',
+    add_home_android_done:'「追加」をタップすれば完了です！',
+    add_home_pc_label:'PCでのインストール手順',
+    add_home_pc_1:'Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック',
+    add_home_pc_done:'「インストール」をクリックすれば完了です！',
+    add_home_url_label:'URLをコピー', add_home_copy:'コピー', add_home_copied:'コピー済み', add_home_copy_fail:'コピーできませんでした',
+    add_home_close:'閉じる',
+    lang_changed:'日本語に変更しました',
+    push_title:'Push通知', push_desc:'トラブル報告が提出されたときにプッシュ通知を受け取ります。',
+    push_checking:'確認中...', push_active:'Push通知: オン', push_inactive:'Push通知: オフ',
+    push_blocked:'Push通知: ブロック中', push_error:'エラーが発生しました',
+    push_enable:'通知をオンにする', push_disable:'通知をオフにする',
+    push_unsupported:'このブラウザはPush通知に対応していません。',
+    push_ios_hint:'iOSでPush通知を受け取るにはホーム画面に追加してください。',
+    push_denied:'通知がブロックされています。ブラウザの設定から許可してください。',
+    push_permission_denied:'通知の許可が拒否されました',
+    push_enabled_toast:'Push通知をオンにしました', push_disabled_toast:'Push通知をオフにしました',
+  },
+  vi: {
+    nav_excel:'Tải Excel',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
+    sec_display:'Cài đặt hiển thị', sec_account:'Tài khoản', sec_version:'Thông tin phiên bản',
+    dark_mode:'Chế độ tối', dark_mode_desc:'Chuyển đổi sáng/tối',
+    lang_label:'Ngôn ngữ', lang_desc:'Ngôn ngữ hiển thị',
+    pin_change:'Đổi PIN', pin_change_desc:'Đổi mã PIN 4 số để đăng nhập',
+    add_home:'Thêm vào màn hình chính', add_home_desc:'Tạo lối tắt ứng dụng',
+    version_label:'Phiên bản', release_date:'Ngày phát hành', update_label:'Cập nhật',
+    update_checking:'Đang kiểm tra...', update_latest:'Đã là phiên bản mới nhất',
+    update_available:function(v){return 'Có thể cập nhật v'+v;},
+    update_banner_title:'Có phiên bản mới',
+    update_now:'Cập nhật ngay',
+    updating:'Đang cập nhật...',
+    logout:'Đăng xuất', logout_msg:'Đã đăng xuất',
+    nav_list:'Danh sách bài', nav_dashboard:'Bảng điều khiển', nav_report:'Báo cáo ngày', nav_master:'Quản lý',
+    hdr_reload:'Tải lại', hdr_theme:'Đổi giao diện', hdr_settings:'Cài đặt',
+    master_denied_title:'Hạn chế truy cập', master_denied:'Chỉ SL và Admin mới dùng được Master',
+    shift_label:function(s){return 'Ca '+s;}, shift_none:'Chưa cài',
+    pin_step:function(n){return 'Bước '+n+' / 3';},
+    pin_s1:'Nhập PIN hiện tại', pin_s2:'Nhập PIN mới (4 số)', pin_s3:'Nhập lại PIN mới',
+    pin_easy:'PIN quá đơn giản', pin_mismatch:'PIN không khớp. Hãy thử lại',
+    pin_wrong:'Sai PIN', pin_done:'Đã đổi PIN', pin_cancel:'Huỷ',
+    pin_session_err:'Lỗi phiên', pin_user_not_found:'Không tìm thấy người dùng',
+    pin_save_fail:function(m){return 'Lỗi lưu: '+m;},
+    pin_error:function(m){return 'Lỗi: '+m;},
+    add_home_title:'Thêm vào màn hình chính', add_home_added:'Đã thêm vào màn hình chính!',
+    add_home_ios_label:'Hướng dẫn thêm trên iPhone',
+    add_home_ios_1:'Nhấn nút <span class="add-home-highlight">Chia sẻ (口↑)</span> ở dưới thanh địa chỉ Safari',
+    add_home_ios_2:'Cuộn menu và nhấn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
+    add_home_ios_3:'Đặt tên <span class="add-home-highlight">"Traq"</span> rồi nhấn "Thêm"',
+    add_home_ios_done:'Biểu tượng sẽ xuất hiện trên màn hình chính!',
+    add_home_android_label:'Hướng dẫn thêm trên Android',
+    add_home_android_1:'Nhấn menu Chrome <span class="add-home-highlight">(⋮)</span>',
+    add_home_android_2:'Chọn <span class="add-home-highlight">"Thêm vào MH chính"</span>',
+    add_home_android_done:'Nhấn "Thêm" là xong!',
+    add_home_pc_label:'Hướng dẫn cài trên PC',
+    add_home_pc_1:'Nhấn <span class="add-home-highlight">biểu tượng cài đặt (⊕)</span> ở thanh địa chỉ Chrome',
+    add_home_pc_done:'Nhấn "Cài đặt" là xong!',
+    add_home_url_label:'Sao chép URL', add_home_copy:'Sao chép', add_home_copied:'Đã sao chép', add_home_copy_fail:'Không thể sao chép',
+    add_home_close:'Đóng',
+    lang_changed:'Đã chuyển sang tiếng Việt',
+    push_title:'Thông báo đẩy', push_desc:'Nhận thông báo khi có báo cáo sự cố mới.',
+    push_checking:'Đang kiểm tra...', push_active:'Thông báo đẩy: BẬT', push_inactive:'Thông báo đẩy: TẮT',
+    push_blocked:'Thông báo đẩy: Bị chặn', push_error:'Đã xảy ra lỗi',
+    push_enable:'Bật thông báo', push_disable:'Tắt thông báo',
+    push_unsupported:'Trình duyệt này không hỗ trợ thông báo đẩy.',
+    push_ios_hint:'Để nhận thông báo trên iOS, hãy thêm vào màn hình chính.',
+    push_denied:'Thông báo đang bị chặn. Vui lòng cho phép trong cài đặt trình duyệt.',
+    push_permission_denied:'Quyền thông báo bị từ chối',
+    push_enabled_toast:'Đã bật thông báo đẩy', push_disabled_toast:'Đã tắt thông báo đẩy',
+  },
+  en: {
+    nav_excel:'Excel Download',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout',
+    sec_display:'Display', sec_account:'Account', sec_version:'Version Info',
+    dark_mode:'Dark Mode', dark_mode_desc:'Toggle light/dark appearance',
+    lang_label:'Language', lang_desc:'App display language',
+    pin_change:'Change PIN', pin_change_desc:'Change your 4-digit login PIN',
+    add_home:'Add to Home Screen', add_home_desc:'Create an app shortcut',
+    version_label:'Version', release_date:'Release Date', update_label:'Update',
+    update_checking:'Checking...', update_latest:'Up to date',
+    update_available:function(v){return 'v'+v+' available';},
+    update_banner_title:'New version available',
+    update_now:'Update now',
+    updating:'Updating...',
+    logout:'Logout', logout_msg:'Logged out',
+    nav_list:'Post List', nav_dashboard:'Dashboard', nav_report:'Daily report', nav_master:'Master',
+    hdr_reload:'Reload', hdr_theme:'Toggle theme', hdr_settings:'Settings',
+    master_denied_title:'Access restricted', master_denied:'Master is for SL and Admin only',
+    shift_label:function(s){return 'Shift '+s;}, shift_none:'Not set',
+    pin_step:function(n){return 'Step '+n+' / 3';},
+    pin_s1:'Enter your current PIN', pin_s2:'Enter new PIN (4 digits)', pin_s3:'Confirm new PIN',
+    pin_easy:'PIN is too simple', pin_mismatch:'PINs do not match. Try again',
+    pin_wrong:'Wrong PIN', pin_done:'PIN changed', pin_cancel:'Cancel',
+    pin_session_err:'Session error', pin_user_not_found:'User not found',
+    pin_save_fail:function(m){return 'Save error: '+m;},
+    pin_error:function(m){return 'Error: '+m;},
+    add_home_title:'Add to Home Screen', add_home_added:'Added to home screen!',
+    add_home_ios_label:'How to add on iPhone',
+    add_home_ios_1:'Tap the <span class="add-home-highlight">Share button (口↑)</span> below the Safari address bar',
+    add_home_ios_2:'Scroll and tap <span class="add-home-highlight">"Add to Home Screen"</span>',
+    add_home_ios_3:'Name it <span class="add-home-highlight">"Traq"</span> and tap "Add"',
+    add_home_ios_done:'The icon will appear on your home screen!',
+    add_home_android_label:'How to add on Android',
+    add_home_android_1:'Tap Chrome menu <span class="add-home-highlight">(⋮)</span>',
+    add_home_android_2:'Select <span class="add-home-highlight">"Add to Home screen"</span>',
+    add_home_android_done:'Tap "Add" and you\'re done!',
+    add_home_pc_label:'How to install on PC',
+    add_home_pc_1:'Click the <span class="add-home-highlight">install icon (⊕)</span> in Chrome\'s address bar',
+    add_home_pc_done:'Click "Install" and you\'re done!',
+    add_home_url_label:'Copy URL', add_home_copy:'Copy', add_home_copied:'Copied', add_home_copy_fail:'Copy failed',
+    add_home_close:'Close',
+    lang_changed:'Switched to English',
+    push_title:'Push Notifications', push_desc:'Receive notifications when a trouble report is submitted.',
+    push_checking:'Checking...', push_active:'Push notifications: ON', push_inactive:'Push notifications: OFF',
+    push_blocked:'Push notifications: Blocked', push_error:'An error occurred',
+    push_enable:'Enable notifications', push_disable:'Disable notifications',
+    push_unsupported:'This browser does not support push notifications.',
+    push_ios_hint:'To receive push notifications on iOS, add to home screen first.',
+    push_denied:'Notifications are blocked. Please allow in browser settings.',
+    push_permission_denied:'Notification permission denied',
+    push_enabled_toast:'Push notifications enabled', push_disabled_toast:'Push notifications disabled',
+  }
+};
+function t(k) {
+  var v = I18N[currentLang] && I18N[currentLang][k];
+  if (v === undefined) v = I18N.ja[k];
+  return v !== undefined ? v : k;
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) { el.title = t(el.dataset.i18nTitle); });
+  document.title = 'Traq – ' + t('hdr_settings');
+}
+
+/* ===== Version ===== */
+const APP_VERSION = '1.5.2'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+
+/* ===== Session ===== */
+/* ===== Supabase ===== */
+const SB_URL = 'https://svnqlwfcnoqwdwfbbaqb.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bnFsd2Zjbm9xd2R3ZmJiYXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzIzNDAsImV4cCI6MjA5MDI0ODM0MH0.wu2BqVk6FemFO-d_UDgNW5XXl6uVqQAKEMmGy7mQFmw';
+async function sbFetch(path, method='GET', body=null) {
+  const opts = { method, headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+/* ===== Session ===== */
+const SESSION = (() => {
+  try {
+    const s = localStorage.getItem('traq_session');
+    if (!s) return null;
+    const o = JSON.parse(s);
+    if (o.expiresAt && Date.now() > o.expiresAt) { localStorage.removeItem('traq_session'); return null; }
+    return o;
+  } catch(e) { return null; }
+})();
+
+/* ===== Theme ===== */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  localStorage.setItem('traq_theme',isDark?'light':'dark');
+  updateThemeToggle();
+}
+function initTheme(){
+  const saved=localStorage.getItem('traq_theme');
+  const pref=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  const theme=saved||pref;
+  document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('themeBtn').innerHTML=theme==='dark'?ICONS.moon:ICONS.sun;
+  updateThemeToggle();
+}
+function updateThemeToggle(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.getElementById('themeToggle').classList.toggle('on',isDark);
+  document.getElementById('themeBtn').innerHTML=isDark?ICONS.moon:ICONS.sun;
+  var sb=document.getElementById('sb-theme-icon');if(sb) sb.innerHTML=isDark?ICONS.moon:ICONS.sun;
+}
+
+/* ===== Lang ===== */
+let currentLang=localStorage.getItem('traq_lang')||'ja';
+function setLang(lang){
+  currentLang=lang;
+  localStorage.setItem('traq_lang',lang);
+  ['ja','vi','en'].forEach(l=>{
+    var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===lang);
+    var sb=document.getElementById('sb-lang-'+l); if(sb) sb.classList.toggle('active',l===lang);
+  });
+  applyI18n();
+  showToast(t('lang_changed'),'success');
+}
+
+/* ===== Header Chip ===== */
+function initChip(){
+  if(!SESSION) return;
+  var name=SESSION.name||'';
+  var role=SESSION.role||'worker';
+  var initial=name?name.charAt(0):'?';
+  var classMap={worker:'role-op',leader:'role-sl',admin:'role-admin'};
+  var topbar=document.querySelector('.topbar');
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(classMap[role]||'role-op');}
+  var av=document.getElementById('mob-avatar');
+  if(av) av.textContent=initial;
+  // PC sidebar
+  var sbAvatar=document.getElementById('sb-avatar');if(sbAvatar) sbAvatar.textContent=initial;
+  var sbName=document.getElementById('sb-name');if(sbName) sbName.textContent=name;
+  var sbRole=document.getElementById('sb-role');
+  if(sbRole){
+    var roleLabel=role==='admin'?'Admin':role==='leader'?'SL':'OP';
+    var shiftLabel=SESSION.shift?SESSION.shift+'S':'';
+    sbRole.textContent=roleLabel+(shiftLabel?' / '+shiftLabel:'');
+  }
+}
+
+/* ===== Init user info ===== */
+function initUserInfo(){
+  const u=SESSION;
+  document.getElementById('userAvatar').textContent=u.name[0];
+  document.getElementById('userName').textContent=u.name;
+  const roleEl=document.getElementById('userRoleBadge');
+  roleEl.textContent=u.role==='admin'?'admin':u.role==='sl'?'SL':'OP';
+  roleEl.className='role-badge role-'+u.role;
+  const shiftLabel=u.shift?t('shift_label')(u.shift):t('shift_none');
+  const shiftEl=document.getElementById('userShiftLabel');
+  if(shiftEl) shiftEl.textContent=shiftLabel;
+}
+
+/* ===== Section toggle ===== */
+let currentSection=null;
+function setSection(name){
+  ['pin'].forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el) el.style.display=s===name?'block':'none';
+  });
+  currentSection=name;
+  if(name==='pin') resetPinFlow();
+}
+
+/* ===== Default shift ===== */
+
+/* ===== PIN change flow ===== */
+// 3ステップ: 現在PIN確認 → 新PIN入力 → 新PIN確認
+let pinStep=1; // 1=現在PIN確認 2=新PIN入力 3=新PIN確認
+let pinInput='';
+let newPin='';
+// PIN照合はSupabase DB（traq_usersテーブルのpinカラム）で行う
+
+function resetPinFlow(){
+  pinStep=1; pinInput=''; newPin='';
+  updatePinUI();
+}
+
+function updatePinUI(){
+  var steps=[t('pin_s1'),t('pin_s2'),t('pin_s3')];
+  document.getElementById('pinTitle').textContent=steps[pinStep-1];
+  document.getElementById('pinStepLabel').textContent=t('pin_step')(pinStep);
+  document.getElementById('pinError').textContent='';
+  document.getElementById('pinSuccessArea').style.display='none';
+  document.getElementById('pinKeypadArea').style.display='block';
+  updatePinDots();
+}
+
+function pinKey(k){
+  if(pinInput.length>=4) return;
+  pinInput+=k;
+  updatePinDots();
+  if(pinInput.length===4) setTimeout(handlePinComplete,150);
+}
+function pinDel(){pinInput=pinInput.slice(0,-1);updatePinDots()}
+function pinClear(){pinInput='';updatePinDots()}
+
+function updatePinDots(state=''){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.className='pin-dot'+(i<pinInput.length?' filled':'');
+    if(state==='error') d.className='pin-dot error';
+    if(state==='success') d.className='pin-dot success';
+  }
+}
+
+function handlePinComplete(){
+  if(pinStep===1){
+    // 現在PIN確認 → Supabase照合
+    verifyCurrentPin(pinInput);
+    return;
+  } else if(pinStep===2){
+    // 新PIN記憶
+    if(pinInput==='0000'||pinInput==='1234'){
+      updatePinDots('error');
+      document.getElementById('pinError').textContent=t('pin_easy');
+      setTimeout(()=>{pinInput='';updatePinDots();},700);
+      return;
+    }
+    newPin=pinInput; pinStep=3; pinInput='';
+    updatePinUI();
+  } else if(pinStep===3){
+    // 新PIN確認
+    if(pinInput===newPin){
+      updatePinDots('success');
+      saveNewPin(newPin);
+    } else {
+      updatePinDots('error');
+      document.getElementById('pinError').textContent=t('pin_mismatch');
+      setTimeout(()=>{pinInput='';pinStep=2;newPin='';updatePinUI();},800);
+    }
+  }
+}
+
+/* ===== Supabase PIN処理 ===== */
+async function verifyCurrentPin(pin) {
+  if (!SESSION) { showToast(t('pin_session_err'),'error'); return; }
+  try {
+    const rows = await sbFetch('traq_users?id=eq.' + SESSION.userId + '&select=pin');
+    if (!rows || rows.length === 0) throw new Error(t('pin_user_not_found'));
+    const dbPin = rows[0].pin;
+    if (pin === dbPin) {
+      pinStep = 2; pinInput = '';
+      updatePinUI();
+    } else {
+      updatePinDots('error');
+      document.getElementById('pinError').textContent = t('pin_wrong');
+      setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
+    }
+  } catch(e) {
+    updatePinDots('error');
+    document.getElementById('pinError').textContent = t('pin_error')(e.message);
+    setTimeout(() => { pinInput = ''; updatePinDots(); }, 700);
+  }
+}
+
+async function saveNewPin(pin) {
+  if (!SESSION) { showToast(t('pin_session_err'),'error'); return; }
+  try {
+    await sbFetch('traq_users?id=eq.' + SESSION.userId, 'PATCH', { pin: pin });
+    document.getElementById('pinKeypadArea').style.display = 'none';
+    document.getElementById('pinSuccessArea').style.display = 'block';
+    showToast(t('pin_done'), 'success');
+    setTimeout(() => setSection(null), 2000);
+  } catch(e) {
+    showToast(t('pin_save_fail')(e.message), 'error');
+    setTimeout(() => { pinInput = ''; pinStep = 1; updatePinUI(); }, 800);
+  }
+}
+
+/* ===== Add to home screen ===== */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+});
+/* ===== Add Home Modal ===== */
+function openAddHomeModal(){
+  // Androidの場合はシステムプロンプトを優先
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(result=>{
+      if(result.outcome==='accepted') showToast(t('add_home_added'),'success');
+      deferredPrompt=null;
+    });
+    return;
+  }
+  const ua=navigator.userAgent.toLowerCase();
+  const isIos=/iphone|ipad|ipod/.test(ua);
+  const isAndroid=/android/.test(ua);
+  document.getElementById('addHomeIos').classList.toggle('hidden', !isIos);
+  document.getElementById('addHomeAndroid').classList.toggle('hidden', !isAndroid);
+  document.getElementById('addHomePc').classList.toggle('hidden', isIos||isAndroid);
+  var baseUrl=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
+  if(!baseUrl.endsWith('/')) baseUrl+='/';
+  document.getElementById('addHomeUrl').textContent=baseUrl;
+  document.getElementById('addHomeCopyBtn').textContent=t('add_home_copy');
+  document.getElementById('addHomeModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeAddHomeModal(e){
+  if(e.target===document.getElementById('addHomeModal')) closeAddHomeModalDirect();
+}
+function closeAddHomeModalDirect(){
+  document.getElementById('addHomeModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function copyUrl(){
+  var url=location.origin+location.pathname.replace(/[^/]+\.html$/, '');
+  if(!url.endsWith('/')) url+='/';
+  navigator.clipboard.writeText(url).then(()=>{
+    document.getElementById('addHomeCopyBtn').textContent=t('add_home_copied');
+    setTimeout(()=>{ document.getElementById('addHomeCopyBtn').textContent=t('add_home_copy'); },2000);
+  }).catch(()=>{
+    showToast(t('add_home_copy_fail'),'error');
+  });
+}
+
+/* ===== Push通知 ===== */
+var VAPID_PUBLIC_KEY = 'BMzCoc6rT3rOEQF4VJtADkz4v7o6SYT7NoMLMoMCOrSmrqcWci90CKzAPWu6MOsmz84XsrEkWa4eMCOd0QNPZCo';
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+function initPush() {
+  var sec = document.getElementById('sec-push');
+  if (!sec) return;
+  var session = JSON.parse(localStorage.getItem('traq_session') || '{}');
+  if (session.role === 'worker') { sec.style.display = 'none'; return; }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    document.getElementById('push-unsupported').style.display = 'block';
+    document.getElementById('push-status').style.display = 'none';
+    return;
+  }
+  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (isIos && !isStandalone) {
+    document.getElementById('push-ios-hint').style.display = 'block';
+  }
+  checkPushStatus();
+}
+
+async function checkPushStatus() {
+  var statusEl = document.getElementById('push-status');
+  var statusIcon = document.getElementById('push-status-icon');
+  var statusText = document.getElementById('push-status-text');
+  var btnOn = document.getElementById('btn-push-on');
+  var btnOff = document.getElementById('btn-push-off');
+  var deniedEl = document.getElementById('push-denied');
+  if (Notification.permission === 'denied') {
+    statusEl.className = 'push-status inactive';
+    statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M5.6 5.6l12.8 12.8"/></svg>';
+    statusText.textContent = t('push_blocked'); statusText.setAttribute('data-i18n','push_blocked');
+    deniedEl.style.display = 'block';
+    btnOn.style.display = 'none';
+    btnOff.style.display = 'none';
+    return;
+  }
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      statusEl.className = 'push-status active';
+      statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+      statusText.textContent = t('push_active'); statusText.setAttribute('data-i18n','push_active');
+      btnOn.style.display = 'none';
+      btnOff.style.display = 'block';
+    } else {
+      statusEl.className = 'push-status inactive';
+      statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M18 16V11a6 6 0 00-9-5.2"/><path d="M6 11v5l-2 3h13"/><path d="M3 3l18 18"/></svg>';
+      statusText.textContent = t('push_inactive'); statusText.setAttribute('data-i18n','push_inactive');
+      btnOn.style.display = 'block';
+      btnOff.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('Push status check failed:', e);
+    statusEl.className = 'push-status inactive';
+    statusIcon.innerHTML = '<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>';
+    statusText.textContent = t('push_error'); statusText.setAttribute('data-i18n','push_error');
+  }
+}
+
+async function subscribePush() {
+  var btnOn = document.getElementById('btn-push-on');
+  btnOn.disabled = true;
+  btnOn.textContent = '⏳ ...';
+  try {
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      showToast(t('push_permission_denied'), 'error');
+      btnOn.disabled = false;
+      btnOn.innerHTML = '<span data-i18n="push_enable">' + t('push_enable') + '</span>';
+      checkPushStatus();
+      return;
+    }
+    var reg = await navigator.serviceWorker.ready;
+    var existing = await reg.pushManager.getSubscription();
+    if (existing) await existing.unsubscribe();
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    var session = JSON.parse(localStorage.getItem('traq_session') || '{}');
+    var subJson = sub.toJSON();
+    var postBody = {
+      user_id: session.userId,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth_key: subJson.keys.auth
+    };
+    // 直接fetchで409を正確にハンドリング
+    var resp = await fetch(SB_URL + '/rest/v1/push_subscriptions', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify(postBody)
+    });
+    if (!resp.ok) {
+      if (resp.status === 409) {
+        // UNIQUE制約違反 → PATCHで更新
+        await fetch(SB_URL + '/rest/v1/push_subscriptions?endpoint=eq.' + encodeURIComponent(subJson.endpoint), {
+          method: 'PATCH',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+          body: JSON.stringify({ user_id: session.userId, p256dh: subJson.keys.p256dh, auth_key: subJson.keys.auth })
+        });
+      } else {
+        throw new Error('Save failed: ' + resp.status);
+      }
+    }
+    showToast(t('push_enabled_toast'), 'success');
+    checkPushStatus();
+  } catch (e) {
+    console.error('Subscribe error:', e);
+    showToast(t('push_error'), 'error');
+  } finally {
+    btnOn.disabled = false;
+    btnOn.innerHTML = '<span data-i18n="push_enable">' + t('push_enable') + '</span>';
+  }
+}
+
+async function unsubscribePush() {
+  var btnOff = document.getElementById('btn-push-off');
+  btnOff.disabled = true;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      var endpoint = sub.endpoint;
+      await sub.unsubscribe();
+      try {
+        await fetch(SB_URL + '/rest/v1/push_subscriptions?endpoint=eq.' + encodeURIComponent(endpoint), {
+          method: 'DELETE',
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+        });
+      } catch(e) { /* ignore */ }
+    }
+    showToast(t('push_disabled_toast'), 'success');
+    checkPushStatus();
+  } catch (e) {
+    console.error('Unsubscribe error:', e);
+    showToast(t('push_error'), 'error');
+  } finally {
+    btnOff.disabled = false;
+  }
+}
+
+/* ===== Force reload ===== */
+function forceReload(){
+  showToast(t('updating'),'info');
+  // 新バージョンとして保存（次回起動で「最新版」と表示される）
+  localStorage.setItem('traq_last_version', APP_VERSION);
+  // Service Worker のキャッシュをクリアして強制リロード
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      regs.forEach(reg=>reg.unregister());
+    });
+  }
+  // キャッシュAPI をクリア
+  if('caches' in window){
+    caches.keys().then(keys=>{
+      keys.forEach(key=>caches.delete(key));
+    });
+  }
+  setTimeout(()=>{
+    location.reload(true);
+  },600);
+}
+
+/* ===== 表示領域の実測（端末ごとのセーフエリア挙動を確認する診断／解決後に削除可） ===== */
+function showViewportInfo(){
+  var el=document.getElementById('vpInfo'); if(!el) return;
+  function envPx(side){
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:env(safe-area-inset-'+side+',0px)';
+    document.body.appendChild(d);
+    var v=Math.round(parseFloat(getComputedStyle(d).height))||0;
+    d.parentNode.removeChild(d); return v;
+  }
+  var pwa=((window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true)?'PWA':'BRW';
+  var app=document.querySelector('.app');
+  var appH=app?Math.round(app.getBoundingClientRect().height):0;
+  var scr=(window.screen&&window.screen.height)?window.screen.height:0;
+  var vf=getComputedStyle(document.documentElement).getPropertyValue('--screen-h').trim()||'未設定';
+  el.textContent=pwa+' win'+window.innerHeight+' scr'+scr+' app'+appH+' sa'+envPx('top')+'/'+envPx('bottom')+' cap'+vf;
+}
+
+/* ===== Version check (mock) ===== */
+function checkVersion(){
+  // バージョン表示を更新
+  const vn=document.getElementById('versionNum');
+  const vv=document.getElementById('versionVal');
+  if(vn) vn.textContent='v'+APP_VERSION;
+  if(vv) vv.textContent='v'+APP_VERSION;
+
+  // 前回起動時のバージョンと比較
+  const lastVersion=localStorage.getItem('traq_last_version');
+
+  if(!lastVersion){
+    // 初回アクセス：バージョンを保存してスキップ
+    localStorage.setItem('traq_last_version', APP_VERSION);
+    setBadgeLatest();
+    return;
+  }
+
+  if(lastVersion !== APP_VERSION){
+    // 新バージョン検知！バナーを表示
+    showUpdateBanner(lastVersion, APP_VERSION);
+  } else {
+    setBadgeLatest();
+  }
+}
+
+function showUpdateBanner(oldVer, newVer){
+  const banner=document.getElementById('updateBanner');
+  const sub=document.getElementById('updateBannerSub');
+  const badge=document.getElementById('updateBadge');
+  if(banner){
+    banner.style.display='block';
+    if(sub) sub.textContent=`v${oldVer} → v${newVer}`;
+  }
+  if(badge){
+    badge.textContent=t('update_available')(newVer);
+    badge.className='update-badge';
+    badge.removeAttribute('data-i18n');
+  }
+}
+
+function setBadgeLatest(){
+  const badge=document.getElementById('updateBadge');
+  if(badge){ badge.textContent=t('update_latest'); badge.className='no-update-badge'; badge.setAttribute('data-i18n','update_latest'); }
+}
+
+/* ===== Logout ===== */
+function doLogout(){
+  localStorage.removeItem('traq_session');
+  showToast(t('logout_msg'),'info');
+  setTimeout(()=>{location.href='index.html'},1000);
+}
+
+/* ===== Navigation ===== */
+function goHome(){
+  try{
+    const r = SESSION ? SESSION.role : '';
+    if(r==='leader'||r==='sl'||r==='admin'||r==='manager') location.href='home_sl.html';
+    else location.href='home.html';
+  }catch(e){location.href='home.html';}
+}
+function goMaster(){
+  var r=SESSION&&SESSION.role;
+  if(r==='worker'||r==='op'||!r){showMasterDenied();return;}
+  location.href='admin.html';
+}
+function showMasterDenied(){
+  var ex=document.getElementById('masterDeniedOverlay');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.id='masterDeniedOverlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45)';
+  ov.onclick=function(){ov.remove();};
+  var box=document.createElement('div');
+  box.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;max-width:280px;width:90%';
+  box.innerHTML='<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:var(--radius);background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;"><svg class="ico ico-lg" style="color:var(--danger);margin:0 auto" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><div style="font-size:15px;font-weight:700;color:var(--text1);margin-bottom:8px">'+t('master_denied_title')+'</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+t('master_denied')+'</div><button onclick="document.getElementById(\'masterDeniedOverlay\').remove()" style="margin-top:18px;padding:9px 28px;border-radius:var(--radius);border:none;background:var(--bg3);color:var(--text1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">OK</button>';
+  ov.appendChild(box);document.body.appendChild(ov);
+}
+
+/* ===== Toast ===== */
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toastEl');
+  el.innerHTML=`<div class="toast ${type}">${msg}</div>`;
+  el.style.display='block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{el.style.display='none'},2500);
+}
+
+/* ===== Init ===== */
+(function init(){
+  if (!SESSION) { location.href = 'index.html'; return; }
+  initTheme();
+  initChip();
+  const sl=localStorage.getItem('traq_lang')||'ja';
+  currentLang=sl;
+  ['ja','vi','en'].forEach(l=>{
+    var el=document.getElementById('s-lang-'+l); if(el) el.classList.toggle('active',l===sl);
+    var sb=document.getElementById('sb-lang-'+l); if(sb) sb.classList.toggle('active',l===sl);
+  });
+  initUserInfo();
+  checkVersion();
+  showViewportInfo();
+  applyI18n();
+  initPush();
+})();
+</script>
+
+<!-- ホーム画面追加モーダル -->
+<div class="modal-overlay hidden" id="addHomeModal" onclick="closeAddHomeModal(event)">
+  <div class="modal-sheet" id="addHomeSheet">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="add_home_title">ホーム画面に追加</div>
+      <button class="modal-close" onclick="closeAddHomeModalDirect()"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <!-- iOS手順 -->
+    <div id="addHomeIos">
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="1"/><path d="M11 18h2"/></svg><span data-i18n-html="add_home_ios_label">iPhoneでのホーム画面追加手順</span></div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div data-i18n-html="add_home_ios_1">Safariのアドレスバー下の <span class="add-home-highlight">共有ボタン（口↑）</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">2</div>
+        <div data-i18n-html="add_home_ios_2">メニューをスクロールして <span class="add-home-highlight">「ホーム画面に追加」</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">3</div>
+        <div data-i18n-html="add_home_ios_3">名前を <span class="add-home-highlight">「Traq」</span> にして右上の「追加」をタップ</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+        <div style="color:var(--success)" data-i18n="add_home_ios_done">ホーム画面にアイコンが追加されます！次回からはアイコンをタップするだけで起動できます。</div>
+      </div>
+    </div>
+
+    <!-- Android手順 -->
+    <div id="addHomeAndroid" class="hidden">
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12"/><path d="M12 4v4M9 14h.01M15 14h.01M9 17h6"/><circle cx="12" cy="3" r="1"/></svg><span data-i18n-html="add_home_android_label">Androidでのホーム画面追加手順</span></div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div data-i18n-html="add_home_android_1">Chromeのメニュー <span class="add-home-highlight">（⋮）</span> をタップ</div>
+      </div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">2</div>
+        <div data-i18n-html="add_home_android_2"><span class="add-home-highlight">「ホーム画面に追加」</span> を選択</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+        <div style="color:var(--success)" data-i18n="add_home_android_done">「追加」をタップすれば完了です！</div>
+      </div>
+    </div>
+
+    <!-- PC手順 -->
+    <div id="addHomePc" class="hidden">
+      <div class="add-home-device-label"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12"/><path d="M8 20h8M12 16v4"/></svg><span data-i18n-html="add_home_pc_label">PCでのインストール手順</span></div>
+      <div class="add-home-step">
+        <div class="add-home-step-num">1</div>
+        <div data-i18n-html="add_home_pc_1">Chromeアドレスバー右端の <span class="add-home-highlight">インストールアイコン（⊕）</span> をクリック</div>
+      </div>
+      <div class="add-home-step add-home-step-done">
+        <div class="add-home-step-num add-home-step-num-done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+        <div style="color:var(--success)" data-i18n="add_home_pc_done">「インストール」をクリックすれば完了です！</div>
+      </div>
+    </div>
+
+    <div class="add-home-divider"></div>
+
+    <div class="add-home-url-label" data-i18n="add_home_url_label">URLをコピー</div>
+    <div class="add-home-url-row">
+      <div class="add-home-url-text" id="addHomeUrl"></div>
+      <button class="add-home-copy-btn" id="addHomeCopyBtn" onclick="copyUrl()" data-i18n="add_home_copy">コピー</button>
+    </div>
+
+    <button class="add-home-close-btn" onclick="closeAddHomeModalDirect()" data-i18n="add_home_close">閉じる</button>
+  </div>
+</div>
+
+<script src="./update_banner.js"></script>
+</body>
+</html>
