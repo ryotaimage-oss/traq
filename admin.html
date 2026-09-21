@@ -54,6 +54,9 @@
   --radius:2px;--shadow:none;--nav-h:55px;
 
   --on-success: #0B1524;
+  /* 役職カラー。index.html（ログイン画面）と同じ値にしてある。片方だけ変えないこと */
+  --c-jicho:#E0737C; --c-chief:#6BA8E8; --c-leader:#EF9F27;
+  --c-op:#8FA6C4; --c-sys:#8D95A3;
 }
 html{color-scheme:dark;background:var(--bg1)}
 [data-theme="light"]{
@@ -67,6 +70,9 @@ html{color-scheme:dark;background:var(--bg1)}
   --orange:#B36F0C;--success:#0B7A56;--warning:#A06A08;--danger:#DC2626;--error:#DC2626;--eq:#B36F0C;
 
   --on-success: #FFFFFF;
+  /* 白背景では同じ色味を濃くする（index.html と同値） */
+  --c-jicho:#9E2A33; --c-chief:#1A5FA8; --c-leader:#8F5708;
+  --c-op:#1F3864; --c-sys:#5F6672;
 }
 svg.ico{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
 svg.ico-lg{width:26px;height:26px;stroke-width:1.3}
@@ -210,12 +216,14 @@ tr:hover td{background:rgba(239,159,39,.04)}
 
 /* Badge */
 .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--radius)}
-.badge-op{background:transparent;border:1px solid var(--text2);color:var(--text2)}
-.badge-sl{background:rgba(245,158,11,.12);color:var(--warning)}
+.badge-op{background:rgba(143,166,196,.14);color:var(--c-op)}
+.badge-sl{background:rgba(239,159,39,.14);color:var(--c-leader)}
 .badge-admin{background:rgba(239,68,68,.12);color:var(--danger)}
 /* 管理職(L=リーダー / C=チーフ / J=次長)。同系色にして英字で区別する */
-.badge-l,.badge-c,.badge-j{background:rgba(45,212,191,.14);color:var(--md)}
-.badge-adm{margin-left:5px;background:rgba(239,68,68,.12);color:var(--danger)}
+.badge-l{background:rgba(239,159,39,.14);color:var(--c-leader)}
+.badge-c{background:rgba(107,168,232,.14);color:var(--c-chief)}
+.badge-j{background:rgba(224,115,124,.14);color:var(--c-jicho)}
+.badge-adm{margin-left:5px;background:rgba(141,149,163,.16);color:var(--c-sys)}
 .badge-active{background:rgba(16,185,129,.12);color:var(--success)}
 .badge-inactive{background:rgba(100,116,139,.12);color:#94a3b8}
 
