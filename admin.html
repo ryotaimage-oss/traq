@@ -306,6 +306,10 @@ tr:hover td{background:rgba(239,159,39,.04)}
   /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
   .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
 }
+/* 確認の未確認件数（v1.9.0） */
+.snav-n{margin-left:auto;font-size:11px;padding:0 5px;border:1px solid var(--warning);color:var(--warning);font-weight:700;line-height:16px}
+.nav-icon{position:relative}
+.bn-n{position:absolute;top:-4px;right:-9px;font-size:10px;padding:0 4px;border:1px solid var(--warning);background:var(--bg1);color:var(--warning);font-weight:700;line-height:14px}
 /* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
@@ -325,32 +329,7 @@ html{background:var(--bg2)}
         <div class="sidebar-role" id="sb-role"></div>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <button class="snav-item" onclick="goHome()">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-        <span data-i18n="nav_list">一覧</span>
-      </button>
-      <button class="snav-item" onclick="location.href='report.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
-        <span data-i18n="nav_report">日報</span>
-      </button>
-      <button class="snav-item" onclick="location.href='dashboard.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
-        <span data-i18n="nav_dashboard">ダッシュボード</span>
-      </button>
-      <button class="snav-item" onclick="location.href='excel_download.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
-        <span data-i18n="nav_excel">Excelダウンロード</span>
-      </button>
-      <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
-        <span data-i18n="nav_master">マスタ</span>
-      </button>
-          <button class="snav-item" onclick="location.href='settings.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
-        <span data-i18n="nav_settings">設定</span>
-      </button>
-    </nav>
+    <nav class="sidebar-nav" id="sbNav"></nav>
     <div class="sidebar-bottom">
       <div class="snav-lang">
         <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
@@ -611,24 +590,7 @@ html{background:var(--bg2)}
   </div>
 
   <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <button class="nav-item" onclick="location.href='home_sl.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-      <span class="nav-label" data-i18n="nav_list">一覧</span>
-    </button>
-        <button class="nav-item" onclick="location.href='report.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
-      <span class="nav-label" data-i18n="nav_report">日報</span>
-    </button>
-<button class="nav-item" onclick="location.href='dashboard.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
-      <span class="nav-label" data-i18n="nav_dashboard">ダッシュボード</span>
-    </button>
-    <button class="nav-item active" onclick="void(0)">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
-      <span class="nav-label" data-i18n="nav_master_short">マスタ</span>
-    </button>
-  </nav>
+  <nav class="bottom-nav" id="btNav"></nav>
   </div><!-- /.main-column -->
 </div>
 
@@ -682,8 +644,9 @@ function initChip(){
   var role=s.role||'worker';
   var initial=name?name.charAt(0):'?';
   var __rc=traqRoleClass(s), __rl=traqLevelLabel(s);
+  traqRenderNav('master', s);
   var topbar=document.querySelector('.topbar');
-  if(topbar){topbar.classList.remove('role-op','role-sl','role-mg','role-admin');topbar.classList.add__rc;}
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-mg','role-admin');topbar.classList.add(__rc);}
   var av=document.getElementById('mob-avatar');
   if(av) av.textContent=initial;
   // PC sidebar
@@ -720,7 +683,7 @@ function setLang(l){
 
 var I18N={
 ja:{
-nav_list:'投稿一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード', nav_report:'日報',nav_master:'マスタ',nav_master_short:'マスタ',
+nav_list:'投稿一覧',nav_excel:'Excelダウンロード',nav_dashboard:'ダッシュボード', nav_mgr:'確認', nav_report:'日報',nav_master:'マスタ',nav_master_short:'マスタ',
 nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
 title_reload:'リロード',title_theme:'テーマ切替',title_settings:'設定',
 tab_users:'ユーザー',tab_machines:'機番',tab_products:'品番',tab_categories:'分類',tab_storage:'ストレージ',
@@ -846,7 +809,7 @@ imp_err_invalid_type:'種別が不正です'
 },
 vi:{
     nav_excel:'Tải Excel',
-nav_list:'Danh sách bài',nav_dashboard:'Bảng điều khiển', nav_report:'Báo cáo ngày',nav_master:'Quản lý master',nav_master_short:'Master',
+nav_list:'Danh sách bài',nav_dashboard:'Bảng điều khiển', nav_mgr:'Xác nhận', nav_report:'Báo cáo ngày',nav_master:'Quản lý master',nav_master_short:'Master',
 nav_theme:'Đổi giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
 title_reload:'Tải lại',title_theme:'Đổi giao diện',title_settings:'Cài đặt',
 tab_users:'Người dùng',tab_machines:'Máy',tab_products:'Sản phẩm',tab_categories:'Phân loại',tab_storage:'Lưu trữ',
@@ -972,7 +935,7 @@ imp_err_invalid_type:'Loại không hợp lệ'
 },
 en:{
     nav_excel:'Excel Download',
-nav_list:'Post List',nav_dashboard:'Dashboard', nav_report:'Daily report',nav_master:'Master Data',nav_master_short:'Master',
+nav_list:'Post List',nav_dashboard:'Dashboard', nav_mgr:'Confirm', nav_report:'Daily report',nav_master:'Master Data',nav_master_short:'Master',
 nav_theme:'Toggle Theme',nav_settings:'Settings',nav_logout:'Logout',
 title_reload:'Reload',title_theme:'Toggle Theme',title_settings:'Settings',
 tab_users:'Users',tab_machines:'Machines',tab_products:'Products',tab_categories:'Categories',tab_storage:'Storage',
@@ -2409,6 +2372,70 @@ function goHome(){
   catch(e){location.href='home.html';}
 }
 /* ロール表示の共通判定（manager は title から L / C / J を出す） */
+/* ===== ナビの出し分け（10ファイル同一）v1.9.0 ここから =====
+   そのロールが使う項目だけ出す。権限の無い画面はナビに出さない。
+   current: list / confirm / report / dashboard / excel / master / settings
+   u: そのファイルのセッションオブジェクト（変数名がファイルごとに違うので引数で受ける） */
+/* 定義は関数にしておく。var だと画面によっては初期化より前に traqRenderNav が走り、
+   巻き上げで undefined になる（実際に6画面でナビが出なかった） */
+function traqNavDef(){ return {
+  list:      { i18n:'nav_list',      go:'traqGoHome()',                        ic:'<rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
+  confirm:   { i18n:'nav_mgr',       go:"location.href='confirm.html'",        ic:'<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>' },
+  report:    { i18n:'nav_report',    go:"location.href='report.html'",         ic:'<rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/>' },
+  dashboard: { i18n:'nav_dashboard', go:"location.href='dashboard.html'",      ic:'<path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/>' },
+  excel:     { i18n:'nav_excel',     go:"location.href='excel_download.html'", ic:'<path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/>' },
+  master:    { i18n:'nav_master',    go:"location.href='admin.html'",          ic:'<rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/>' },
+  settings:  { i18n:'nav_settings',  go:"location.href='settings.html'",       ic:'<path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/>' }
+}; }
+function traqGoHome(){
+  var u = window.__traqNavUser, r = u ? (u.role || '') : '';
+  location.href = (r === 'leader' || r === 'sl' || r === 'admin' || r === 'manager') ? 'home_sl.html' : 'home.html';
+}
+function traqNavKeys(u, forBottom){
+  var r = u ? (u.role || '') : '';
+  var sl = (r === 'leader' || r === 'sl'), mg = (r === 'manager'), ad = (r === 'admin');
+  var k = ['list'];
+  if(mg || ad) k.push('confirm');
+  k.push('report', 'dashboard');
+  if(forBottom){ if(sl || mg || ad) k.push('master'); return k; }
+  if(sl || mg || ad) k.push('excel', 'master');
+  k.push('settings');
+  return k;
+}
+/* 未確認の件数。confirm.html を開いたときに保存した値を読むだけで、問い合わせは増やさない */
+function traqUnconfirmed(){
+  var n = parseInt(localStorage.getItem('traq_unconfirmed') || '0', 10);
+  return (isNaN(n) || n < 0) ? 0 : n;
+}
+function traqNavLabel(d, k){
+  try { var v = t(d.i18n); return (typeof v === 'string') ? v : k; } catch(e){ return k; }
+}
+function traqRenderNav(current, u){
+  window.__traqNavUser = u || null;
+  var DEF = traqNavDef();
+  var n = traqUnconfirmed(), canC = !!u && (u.role === 'manager' || u.role === 'admin');
+  var sb = document.getElementById('sbNav');
+  if(sb){
+    sb.innerHTML = traqNavKeys(u, false).map(function(k){
+      var d = DEF[k];
+      var bd = (k === 'confirm' && canC && n > 0) ? '<span class="snav-n num">' + n + '</span>' : '';
+      return '<button class="snav-item' + (k === current ? ' active' : '') + '" onclick="' + d.go + '">'
+        + '<span class="snav-icon"><svg class="ico" viewBox="0 0 24 24">' + d.ic + '</svg></span>'
+        + '<span data-i18n="' + d.i18n + '">' + traqNavLabel(d, k) + '</span>' + bd + '</button>';
+    }).join('');
+  }
+  var bt = document.getElementById('btNav');
+  if(bt){
+    bt.innerHTML = traqNavKeys(u, true).map(function(k){
+      var d = DEF[k];
+      var bd = (k === 'confirm' && canC && n > 0) ? '<span class="bn-n num">' + n + '</span>' : '';
+      return '<button class="nav-item' + (k === current ? ' active' : '') + '" onclick="' + d.go + '">'
+        + '<span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24">' + d.ic + '</svg>' + bd + '</span>'
+        + '<span class="nav-label" data-i18n="' + d.i18n + '">' + traqNavLabel(d, k) + '</span></button>';
+    }).join('');
+  }
+}
+/* ===== ナビの出し分け ここまで ===== */
 function traqLevelLabel(u){
   if(!u) return 'OP';
   if(u.role==='admin') return 'Admin';

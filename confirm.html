@@ -38,7 +38,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <title>Traq – 日報</title>
+  <title>Traq – 確認</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -454,29 +454,28 @@ html{background:var(--bg2)}
     </div>
 
     <div class="page-header">
-      <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
-      <h1 class="ph-title" data-i18n="nav_report">日報</h1>
+      <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
+      <h1 class="ph-title" data-i18n="nav_mgr">確認</h1>
     </div>
 
 
     <div class="scroll-area" id="scroller">
 
-
-      <div id="viewRep">
-        <div class="dnav">
-          <button class="dnav-b" id="dPrev" aria-label="prev">
-            <svg class="ico" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
-          </button>
-          <div class="dnav-c">
-            <div class="dnav-d" id="dDate">–</div>
-            <div class="dnav-w" id="dWin"></div>
-          </div>
-          <button class="dnav-b" id="dNext" aria-label="next">
-            <svg class="ico" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-          </button>
+      <div id="viewList">
+        <div class="summary">
+          <div class="sm"><div class="sm-n num" id="sTotal">–</div><div class="sm-l" data-i18n="sm_total">対象件数</div></div>
+          <div class="sm"><div class="sm-n num" id="sMine" style="color:var(--warning)">–</div><div class="sm-l" data-i18n="sm_mine">自分の未確認</div></div>
+          <div class="sm"><div class="sm-n num" id="sStop" style="color:var(--danger)">–</div><div class="sm-l" data-i18n="sm_stop">停止計（分）</div></div>
+          <div class="sm"><div class="sm-n num" id="sLate" style="color:var(--danger)">–</div><div class="sm-l" data-i18n="sm_late">全員未確認</div></div>
         </div>
-        <div id="repBody"><div class="loading" data-i18n="loading">読み込み中…</div></div>
+        <div class="tabs" id="tabs">
+          <button class="tab" data-tab="new" aria-selected="true"><span data-i18n="f_new">自分の未確認</span><span class="tab-n num" id="tnNew"></span></button>
+          <button class="tab" data-tab="done" aria-selected="false"><span data-i18n="f_done">確認済み</span><span class="tab-n num" id="tnDone"></span></button>
+          <button class="tab" data-tab="all" aria-selected="false"><span data-i18n="f_all">すべて</span><span class="tab-n num" id="tnAll"></span></button>
+        </div>
+        <div class="list" id="list"><div class="loading" data-i18n="loading">読み込み中…</div></div>
       </div>
+
 
       <div class="pad"></div>
     </div>
@@ -486,7 +485,6 @@ html{background:var(--bg2)}
   </div>
 </div>
 
-<div class="rm-ov hide" id="repModal"></div>
 
 <div class="toast" id="toastEl"></div>
 
@@ -680,7 +678,7 @@ function setLang(lang){
   currentLang = lang;
   localStorage.setItem('traq_lang', lang);
   document.documentElement.setAttribute('lang', lang);
-  REP.rows.forEach(function(x){ if(x._cats) x.category = catNm(x._cats); });
+  TROUBLES.forEach(function(x){ if(x._cats) x.category = catNm(x._cats); });
   applyI18n();
   render();
 }
@@ -957,8 +955,8 @@ function roleLabel(){
   return t('role_op');
 }
 let MGRS = [];
-let REP = { date:'', rows:[], prev:[], loaded:false, pending:0 };
-let state = { openCmt:null, busy:false, repBusy:false };
+let TROUBLES = [];
+let state = { tab:'new', openCmt:null, shown:PAGE_SIZE, busy:false };
 
 const TSEL = 'select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,approved_at,'
   + 'lines(name),machines(machine_no),products(product_code,product_name),'
@@ -1025,22 +1023,14 @@ async function loadManagers(){
     return a.name.localeCompare(b.name, 'ja');
   });
 }
-async function loadReport(ymd){
-  var prevYmd = addDays(ymd, -1);
-  /* 承認済みと未承認を1回の問い合わせでまとめて取る。
-     集計に使うのは承認済みのみ。未承認は件数の告知だけに使う。 */
+async function loadTroubles(){
+  var from = addDays(businessToday(), -(LIST_DAYS - 1));
+  if(from < START_DATE) from = START_DATE;
   var rows = await sbFetch('troubles?' + TSEL
-    + '&status=in.(approved,pending)&occurred_date=in.(' + ymd + ',' + prevYmd + ')'
-    + '&order=id.asc&limit=400');
-  var raw = rows || [];
-  var approved = raw.filter(function(r){ return r.status === 'approved'; }).map(mapTrouble);
-  REP.date = ymd;
-  REP.rows = approved.filter(function(r){ return r.date === ymd; });
-  REP.prev = approved.filter(function(r){ return r.date === prevYmd; });
-  REP.pending = raw.filter(function(r){ return r.status === 'pending' && r.occurred_date === ymd; }).length;
-  REP.loaded = true;
+    + '&status=eq.approved&occurred_date=gte.' + from
+    + '&order=occurred_date.desc,id.desc&limit=400');
+  TROUBLES = (rows || []).map(mapTrouble);
 }
-
 /* ===== 一覧 ===== */
 function confRowsHTML(tr){
   return MGRS.map(function(m){
@@ -1058,360 +1048,183 @@ function confCmtsHTML(tr){
       + '　<span class="num">' + esc(shortDT(c.at)) + '</span></span>' + esc(c.c) + '</div>';
   }).join('');
 }
-/* ===== 日報 ===== */
-function groupBy(rows, key){
-  var m = {}, order = [];
-  rows.forEach(function(d){
-    var k = key(d);
-    if(!m[k]){ m[k] = { k:k, n:0, stop:0 }; order.push(k); }
-    m[k].n += 1; m[k].stop += d.stop_minutes;
-  });
-  return order.map(function(k){ return m[k]; });
-}
-function barsHTML(items, unit, cls){
-  if(!items.length) return '';
-  var max = Math.max.apply(null, items.map(function(r){ return r.v; }));
-  return items.map(function(r){
-    var cells = '<span class="bl">' + esc(r.l) + '</span><span class="bt ' + (r.c || cls || '')
-      + '"><i style="width:' + (max > 0 ? Math.round(r.v / max * 100) : 0) + '%"></i></span>'
-      + '<span class="bv num">' + r.v + unit + (r.n ? '<span style="color:var(--text2)"> / ' + r.n + '</span>' : '') + '</span>';
-    var ids = r.ids || [];
-    if(!ids.length) return cells;
-    /* display:contents なので桁ぞろえは崩れない。クリックは中のセルから拾う */
-    return '<div class="brow" data-ids="' + ids.join(',') + '" data-lt="' + esc(r.lt || r.l) + '">' + cells + '</div>';
-  }).join('');
-}
-function buildFindings(rows, prev){
-  var out = [], tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+function cardHTML(tr){
+  var n = confCount(tr);
+  var total = MGRS.length;
+  var full = total > 0 && n === total;
+  var late = n === 0 && hoursSinceISO(tr.approved_at_raw) >= 12;
+  var cls = full ? 'is-done' : (late ? 'is-late' : (isMine(tr) ? '' : 'is-new'));
 
-  var idsOf = function(fn){ return rows.filter(fn).map(function(d){ return d.id; }); };
+  var head = '<span class="bdg b-ok">' + esc(t('b_approved')) + '</span>'
+    + '<span class="bdg ' + (isEq(tr) ? 'b-eq">' + esc(t('b_eq')) : 'b-md">' + esc(t('b_md'))) + '</span>'
+    + (late ? '<span class="bdg b-late">' + esc(t('all_unconf')) + ' ' + hoursSinceISO(tr.approved_at_raw) + 'h</span>' : '')
+    + '<span class="c-time num">' + esc(mdOf(tr.date)) + ' ' + esc(t('shift_n', tr.shift)) + '</span>';
 
-  var byMc = groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; });
-  if(byMc.length && byMc[0].n >= 2 && tot > 0){
-    out.push({ lv:'warn', t:t('f_focus', esc(byMc[0].k), byMc[0].n, byMc[0].stop, Math.round(byMc[0].stop / tot * 100)), s:t('f_focus_s'),
-      lt:byMc[0].k, ids:idsOf(function(d){ return (d.machine || '—') === byMc[0].k; }) });
+  var title = (tr.machine ? esc(tr.machine) + ' — ' : '') + esc(tr.category || '');
+  var body = '<div class="c-title">' + (title || esc(t('b_approved'))) + '</div><div class="c-grid">'
+    + (tr.line ? '<span class="c-k">' + esc(t('k_line')) + '</span><span>' + esc(tr.line) + '</span>' : '')
+    + '<span class="c-k">' + esc(t('k_product')) + '</span><span class="num">' + esc(tr.product_code) + '</span>'
+    + '<span class="c-k">' + esc(t('k_stop')) + '</span><span class="c-stop num">' + esc(t('min_n', tr.stop_minutes)) + '</span>'
+    + '<span class="c-k">' + esc(t('k_report')) + '</span><span>' + esc(tr.reporter) + '</span>'
+    + '</div>'
+    + (tr.detail ? '<div class="c-detail">' + esc(tr.detail) + '</div>' : '');
+
+  var flow = '<div class="c-flow">' + IC_CHECK + '<span>' + esc(t('sl_approved')) + ' <b>'
+    + esc(tr.approver) + '</b> <span class="num">' + esc(shortDT(tr.approved_at)) + '</span></span></div>';
+
+  var conf = '';
+  if(total > 0){
+    conf = '<div class="conf"><div class="conf-h"><span>' + esc(t('conf_status')) + '</span>'
+      + '<span class="conf-bar"><i style="width:' + Math.round(n / total * 100) + '%"></i></span>'
+      + '<span class="conf-c num' + (full ? ' full' : '') + '">' + n + '/' + total + '</span></div>'
+      + '<div class="cgrid">' + confRowsHTML(tr) + '</div>' + confCmtsHTML(tr) + '</div>';
   }
-  if(prev.length){
-    var pm = {};
-    prev.forEach(function(d){ if(d.machine) pm[d.machine] = true; });
-    var cont = byMc.filter(function(g){ return pm[g.k]; }).map(function(g){ return g.k; });
-    if(cont.length) out.push({ lv:'bad', t:t('f_cont', esc(cont.join(' ／ '))), s:t('f_cont_s'),
-      lt:cont.join(' ／ '), ids:idsOf(function(d){ return cont.indexOf(d.machine || '—') >= 0; }) });
+
+  var tail;
+  if(isMine(tr)){
+    tail = '<div class="c-mine">' + IC_CHECK + '<span>' + esc(t('mine_done')) + ' <span class="num">'
+      + esc(shortDT(tr.cf[myKey()].at)) + '</span></span></div>';
+  } else if(state.openCmt === tr.id){
+    tail = '<div class="cmt"><textarea id="ta' + tr.id + '" data-i18n-ph="ph_comment" placeholder="'
+      + esc(t('ph_comment')) + '"></textarea>'
+      + '<div class="cmt-err" id="er' + tr.id + '">' + esc(t('err_empty')) + '</div><div class="cmt-r">'
+      + '<button class="cmt-b" data-act="cancel" data-id="' + tr.id + '">' + esc(t('btn_cancel')) + '</button>'
+      + '<button class="cmt-b pri" data-act="save" data-id="' + tr.id + '">' + esc(t('btn_save')) + '</button></div></div>';
+  } else {
+    tail = '<div class="c-act">'
+      + '<button class="btn btn-main" data-act="confirm" data-id="' + tr.id + '">' + IC_CHECK + esc(t('btn_confirm')) + '</button>'
+      + '<button class="btn btn-sub" data-act="open" data-id="' + tr.id + '">' + IC_NOTE + esc(t('btn_comment')) + '</button></div>';
   }
-  var rep = {};
-  rows.forEach(function(d){
-    if(!d.machine || !d.category) return;
-    var k = d.machine + ' ' + d.category;
-    rep[k] = (rep[k] || 0) + 1;
-  });
-  Object.keys(rep).filter(function(k){ return rep[k] >= 2; }).forEach(function(k){
-    out.push({ lv:'bad', t:t('f_rep', esc(k), rep[k]), s:t('f_rep_s'),
-      lt:k, ids:idsOf(function(d){ return d.machine + ' ' + d.category === k; }) });
-  });
-  var bySh = groupBy(rows, function(d){ return d.shift; }).sort(function(a, b){ return b.n - a.n; });
-  if(bySh.length){
-    var second = bySh.length > 1 ? bySh[1].n : 0;
-    if(bySh[0].n > second && bySh[0].n >= rows.length / 3 * 1.5){
-      out.push({ lv:'warn', t:t('f_shift', esc(t('shift_n', bySh[0].k)), bySh[0].n, Math.round(bySh[0].n / rows.length * 100)), s:t('f_shift_s'),
-        lt:t('shift_n', bySh[0].k), ids:idsOf(function(d){ return String(d.shift) === String(bySh[0].k); }) });
+
+  return '<div class="card ' + cls + '" data-card="' + tr.id + '"><div class="c-head">' + head
+    + '</div><div class="c-body">' + body + '</div>' + flow + conf + tail + '</div>';
+}
+
+function filteredList(){
+  if(state.tab === 'new')  return TROUBLES.filter(function(tr){ return !isMine(tr); });
+  if(state.tab === 'done') return TROUBLES.filter(isMine);
+  return TROUBLES.slice();
+}
+function renderList(){
+  var rows = filteredList();
+  var slice = rows.slice(0, state.shown);
+  var html;
+  if(!MGRS.length){
+    html = '<div class="empty"><b>' + esc(t('no_mgr_t')) + '</b><br>' + esc(t('no_mgr_b')) + '</div>';
+  } else if(!rows.length){
+    html = '<div class="empty">' + esc(t(state.tab === 'new' ? 'empty_new' : state.tab === 'done' ? 'empty_done' : 'empty_all')) + '</div>';
+  } else {
+    html = slice.map(cardHTML).join('');
+    if(rows.length > slice.length){
+      html += '<button class="more" id="moreBtn">' + esc(t('more')) + '（' + (rows.length - slice.length) + '）</button>';
     }
   }
-  rows.filter(function(d){ return d.stop_minutes >= 60; }).forEach(function(d){
-    out.push({ lv:'bad', t:t('f_long', esc(d.machine), esc(d.category), d.stop_minutes), s:t('f_long_s'),
-      lt:(d.machine || '—') + ' ' + (d.category || ''), ids:[d.id] });
+  document.getElementById('list').innerHTML = html;
+
+  var nMine = TROUBLES.filter(function(tr){ return !isMine(tr); }).length;
+  var nLate = TROUBLES.filter(function(tr){ return confCount(tr) === 0 && hoursSinceISO(tr.approved_at_raw) >= 12; }).length;
+  /* 他の画面のナビに出すバッジ用。問い合わせを増やさず、この画面を開くたびに更新する */
+  try { localStorage.setItem('traq_unconfirmed', String(nMine)); } catch(e){}
+  traqRenderNav('confirm', SESSION);
+  document.getElementById('sTotal').textContent = TROUBLES.length;
+  document.getElementById('sMine').textContent  = nMine;
+  document.getElementById('sStop').textContent  = TROUBLES.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+  document.getElementById('sLate').textContent  = nLate;
+  document.getElementById('tnNew').textContent  = '(' + nMine + ')';
+  document.getElementById('tnDone').textContent = '(' + (TROUBLES.length - nMine) + ')';
+  document.getElementById('tnAll').textContent  = '(' + TROUBLES.length + ')';
+  document.querySelectorAll('#tabs .tab').forEach(function(x){
+    x.setAttribute('aria-selected', x.getAttribute('data-tab') === state.tab ? 'true' : 'false');
   });
-  var zero = rows.filter(function(d){ return confCount(d) === 0; });
-  if(zero.length){
-    out.push({ lv:'warn', t:t('f_zero', zero.length),
-      s:zero.map(function(d){ return (d.machine || '—') + ' ' + t('shift_n', d.shift); }).join(' ／ '),
-      lt:t('m_unconf'), ids:zero.map(function(d){ return d.id; }) });
-  }
-  if(!out.length) out.push({ lv:'', t:esc(t('f_none')), s:t('f_none_s') });
-  return out;
-}
-function renderRep(){
-  var bz = REP.date;
-  var live = bz === businessToday();
-  document.getElementById('dDate').textContent = jpDate(bz);
-  document.getElementById('dWin').innerHTML = esc(t('win')) + ' <span class="num">' + esc(mdOf(bz))
-    + ' 8:00</span> → <span class="num">' + esc(mdOf(addDays(bz, 1))) + ' 8:00</span>'
-    + '<span class="dnav-s ' + (live ? 'st-live">' + esc(t('st_live')) : 'st-done">' + esc(t('st_done'))) + '</span>';
-  document.getElementById('dNext').disabled = live || state.repBusy;
-  document.getElementById('dPrev').disabled = state.repBusy;
-
-  var rows = REP.rows.slice(), prev = REP.prev;
-  /* 未承認があると日報が空・少なく見えるため、理由を明示する */
-  var note = REP.pending > 0 ? '<div class="pend-note">' + t('pend_note', REP.pending) + '</div>' : '';
-  if(!rows.length){
-    document.getElementById('repBody').innerHTML = note +
-      '<div class="sec"><div class="sec-b"><div class="empty">' + esc(t('empty_day')) + '</div></div></div>';
-    return;
-  }
-  var total = MGRS.length;
-  var tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
-  var pTot = prev.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
-  var unconf = rows.filter(function(d){ return total === 0 || confCount(d) < total; }).length;
-
-  function df(now, was, u){
-    if(!prev.length) return '<span class="met-d" style="color:var(--text2)">' + esc(t('d_none')) + '</span>';
-    var v = now - was;
-    if(v === 0) return '<span class="met-d" style="color:var(--text2)">' + esc(t('d_same')) + '</span>';
-    return '<span class="met-d ' + (v > 0 ? 'up' : 'down') + '">' + esc(t('d_diff', v, u)) + '</span>';
-  }
-
-  var h = note + '<div class="sec"><div class="sec-h">' + IC_BAR + esc(t(live ? 'sec_sum_live' : 'sec_sum')) + '</div><div class="mets">'
-    + '<div class="met"><div class="met-n num">' + rows.length + '</div><div class="met-l">' + esc(t('m_count')) + '</div>' + df(rows.length, prev.length, t('u_count')) + '</div>'
-    + '<div class="met"><div class="met-n num" style="color:var(--danger)">' + tot + '</div><div class="met-l">' + esc(t('m_stop')) + '</div>' + df(tot, pTot, t('u_min')) + '</div>'
-    + '<div class="met"><div class="met-n num">' + Math.round(tot / rows.length) + '</div><div class="met-l">' + esc(t('m_avg')) + '</div></div>'
-    + '<div class="met"><div class="met-n num" style="color:' + (unconf ? 'var(--warning)' : 'var(--success)') + '">'
-    + unconf + '</div><div class="met-l">' + esc(t('m_unconf')) + '</div></div></div></div>';
-
-  h += '<div class="sec"><div class="sec-h">' + IC_WARN + esc(t('sec_find')) + '</div>'
-    + buildFindings(rows, prev).map(function(f){
-        var ids = f.ids || [];
-        var tap = ids.length ? ' tap" data-ids="' + ids.join(',') + '" data-lt="' + esc(f.lt || '') + '"' : '"';
-        return '<div class="fi ' + f.lv + tap + '><div class="fi-m"></div><div class="fi-b">' + f.t
-          + '<span class="fi-sub">' + esc(f.s) + '</span></div>'
-          + (ids.length ? '<span class="fi-go">' + IC_CHEV + '</span>' : '') + '</div>';
-      }).join('') + '</div>';
-
-  h += '<div class="sec"><div class="sec-h">' + IC_GRID + esc(t('sec_machine')) + '</div><div class="sec-b"><div class="bars">'
-    + barsHTML(groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; })
-        .map(function(g){
-          return { l:g.k, v:g.stop, n:g.n, lt:g.k,
-                   ids:rows.filter(function(d){ return (d.machine || '—') === g.k; }).map(function(d){ return d.id; }) };
-        }), t('u_min')) + '</div></div></div>';
-
-  h += '<div class="sec"><div class="sec-h">' + IC_LINES + esc(t('sec_cat')) + '</div><div class="sec-b"><div class="bars">'
-    + barsHTML(groupBy(rows, function(d){ return d.category || '—'; }).sort(function(a, b){ return b.n - a.n; })
-        .map(function(g){
-          return { l:g.k, v:g.n, c:'', lt:g.k,
-                   ids:rows.filter(function(d){ return (d.category || '—') === g.k; }).map(function(d){ return d.id; }) };
-        }), t('u_count'))
-    + '</div><div style="height:1px;background:var(--border);margin:10px 0"></div><div class="bars">'
-    + barsHTML([1,2,3].map(function(sh){
-        var hit = rows.filter(function(d){ return Number(d.shift) === sh; });
-        return { l:t('shift_n', sh), v:hit.length, c:'dn', lt:t('shift_n', sh),
-                 ids:hit.map(function(d){ return d.id; }) };
-      }), t('u_count')) + '</div></div></div>';
-
-  h += '<div class="sec"><div class="sec-h">' + IC_NOTE + esc(t('sec_rows')) + '</div><div class="sec-b" style="padding:0"><table>'
-    + '<colgroup><col style="width:26px"><col style="width:54px"><col><col style="width:42px"><col style="width:40px"></colgroup>'
-    + '<thead><tr><th>' + esc(t('th_shift')) + '</th><th>' + esc(t('th_machine')) + '</th><th>' + esc(t('th_body'))
-    + '</th><th class="r">' + esc(t('th_stop')) + '</th><th class="r">' + esc(t('th_conf')) + '</th></tr></thead><tbody>'
-    + rows.map(function(d){
-        var n = confCount(d);
-        return '<tr class="tap" data-ids="' + d.id + '"><td class="num">' + esc(d.shift) + '</td>'
-          + '<td class="num ' + (isEq(d) ? 't-eq' : 't-md') + '">' + esc(d.machine) + '</td>'
-          + '<td>' + esc(d.category) + '</td><td class="r num t-stop">' + d.stop_minutes + '</td>'
-          + '<td class="r num ' + (total > 0 && n === total ? 't-yes' : 't-no') + '">' + n + '/' + total + '</td></tr>';
-      }).join('') + '</tbody></table></div></div>';
-
-  h += '<div class="sec"><div class="sec-h">' + IC_EYE + esc(t('sec_mgr')) + '</div><div class="sec-b">';
-  if(canSeeDetail() && total > 0){
-    h += '<div class="cf">' + MGRS.map(function(m){
-        var done = rows.filter(function(d){ return d.cf[m.id]; }).length;
-        return '<div class="cfr ' + (done === rows.length ? 'ok' : 'ng') + '"><b>' + esc(m.name) + '</b> '
-          + esc(m.title) + '<span class="v num">' + done + '/' + rows.length + '</span></div>';
-      }).join('') + '</div>';
-  } else {
-    /* SL・作業者には氏名の内訳を出さず、件数とコメントだけを見せる */
-    var fullyDone = rows.filter(function(d){ return total > 0 && confCount(d) === total; }).length;
-    h += '<div style="font-size:12px;line-height:1.9">'
-      + esc(t('conf_summary', fullyDone, rows.length)) + '</div>';
-  }
-  var allCm = [];
-  rows.forEach(function(d){
-    MGRS.forEach(function(m){
-      if(d.cf[m.id] && d.cf[m.id].c){
-        allCm.push({ who: canSeeDetail() ? (m.name + m.title) : t('role_mgr'),
-                     at: d.cf[m.id].at, mc: d.machine, body: d.cf[m.id].c });
-      }
-    });
-  });
-  h += allCm.map(function(x){
-    return '<div class="ccmt"><span class="ccmt-w">' + esc(x.who) + '　<span class="num">'
-      + esc(shortDT(x.at)) + '</span>　' + esc(x.mc) + '</span>' + esc(x.body) + '</div>';
-  }).join('');
-  h += '</div></div>';
-
-  h += '<div class="acts">'
-    + '<button class="act" data-r="print">' + IC_PRINT + esc(t('act_print')) + '</button>'
-    + '<button class="act" data-r="xls">' + IC_DOWN + esc(t('act_xls')) + '</button></div>';
-
-  document.getElementById('repBody').innerHTML = h;
 }
 
 /* ===== Render ===== */
 function render(){
-  if(REP.loaded) renderRep();
+  renderList();
+}
+
+/* ===== 確認アクション ===== */
+async function doConfirm(id, comment, btn){
+  if(state.busy) return;
+  var tr = TROUBLES.filter(function(x){ return x.id === id; })[0];
+  if(!tr || isMine(tr)) return;
+  state.busy = true;
+  if(btn) btn.disabled = true;
+  try {
+    var saved = await sbFetch('trouble_confirmations', 'POST', {
+      trouble_id: id,
+      user_id: SESSION.userId,
+      comment: comment || null
+    });
+    var at = (saved && saved[0] && saved[0].confirmed_at) ? utcToJST(saved[0].confirmed_at) : utcToJST(new Date().toISOString());
+    tr.cf[myKey()] = { at: at, c: comment || '' };
+    state.openCmt = null;
+    render();
+    showToast(t(comment ? 'toast_conf_c' : 'toast_conf', shortDT(at)));
+  } catch(e){
+    if(e.status === 409){
+      showToast(t('toast_dup'), 'error');
+      await reloadOne(id);
+    } else {
+      showToast(t('err_save', e.message || ''), 'error');
+      if(btn) btn.disabled = false;
+    }
+  } finally {
+    state.busy = false;
+  }
+}
+async function reloadOne(id){
+  try {
+    var rows = await sbFetch('troubles?' + TSEL + '&id=eq.' + id);
+    if(rows && rows[0]){
+      var fresh = mapTrouble(rows[0]);
+      var i = TROUBLES.findIndex(function(x){ return x.id === id; });
+      if(i >= 0) TROUBLES[i] = fresh;
+      state.openCmt = null;
+      render();
+    }
+  } catch(e){ /* 再取得の失敗は致命ではない */ }
 }
 
 /* ===== Events ===== */
-async function gotoDate(ymd){
-  if(state.repBusy) return;
-  state.repBusy = true;
-  document.getElementById('repBody').innerHTML = '<div class="loading">' + esc(t('loading')) + '</div>';
-  try {
-    await loadReport(ymd);
-    renderRep();
-  } catch(e){
-    document.getElementById('repBody').innerHTML = '<div class="empty">' + esc(t('err_load', e.message || '')) + '</div>';
-  } finally {
-    state.repBusy = false;
-    document.getElementById('dPrev').disabled = false;
-    document.getElementById('dNext').disabled = REP.date === businessToday();
-  }
-}
-document.getElementById('dPrev').onclick = function(){ if(REP.date) gotoDate(addDays(REP.date, -1)); };
-document.getElementById('dNext').onclick = function(){
-  if(!REP.date || REP.date === businessToday()) return;
-  gotoDate(addDays(REP.date, 1));
-};
-document.getElementById('repBody').addEventListener('click', function(ev){
-  var b = ev.target.closest('[data-r]');
-  if(b){
-    if(b.getAttribute('data-r') === 'print'){ window.print(); } else { exportXls(); }
+document.getElementById('tabs').addEventListener('click', function(ev){
+  var x = ev.target.closest('.tab');
+  if(!x) return;
+  state.tab = x.getAttribute('data-tab');
+  state.openCmt = null;
+  state.shown = PAGE_SIZE;
+  render();
+});
+document.getElementById('list').addEventListener('click', function(ev){
+  if(ev.target.closest('#moreBtn')){ state.shown += PAGE_SIZE; renderList(); return; }
+  var b = ev.target.closest('[data-act]');
+  if(!b) return;
+  var act = b.getAttribute('data-act'), id = Number(b.getAttribute('data-id'));
+  if(act === 'confirm'){ doConfirm(id, '', b); return; }
+  if(act === 'open'){
+    state.openCmt = id; renderList();
+    var ta = document.getElementById('ta' + id);
+    if(ta) ta.focus();
     return;
   }
-  var tp = ev.target.closest('[data-ids]');
-  if(!tp) return;
-  var ids = (tp.getAttribute('data-ids') || '').split(',').filter(Boolean);
-  if(!ids.length) return;
-  if(ids.length === 1) openRepDetail(ids[0]);
-  else openRepList(tp.getAttribute('data-lt') || t('sec_find'), ids);
-});
-
-
-/* ===== 日報タブ：トラブル詳細モーダル ===== */
-var RM = { back:null };
-function rmEl(){ return document.getElementById('repModal'); }
-/* モーダル表示中は後ろの画面をスクロールさせない。
-   スマホで背面が動くのを防ぐため、位置を覚えてから止め、閉じるときに戻す。 */
-function rmLock(on){
-  var sc = document.getElementById('scroller');
-  if(on){
-    if(sc && !sc.hasAttribute('data-rm-top')){
-      sc.setAttribute('data-rm-top', String(sc.scrollTop));
-      sc.style.overflow = 'hidden';
+  if(act === 'cancel'){ state.openCmt = null; renderList(); return; }
+  if(act === 'save'){
+    var box = document.getElementById('ta' + id);
+    var v = box ? box.value.trim() : '';
+    if(!v){
+      var e = document.getElementById('er' + id);
+      if(e) e.style.display = 'block';
+      if(box) box.focus();
+      return;
     }
-    document.documentElement.classList.add('rm-open');
-  } else {
-    if(sc && sc.hasAttribute('data-rm-top')){
-      var top = Number(sc.getAttribute('data-rm-top')) || 0;
-      sc.style.overflow = '';
-      sc.removeAttribute('data-rm-top');
-      sc.scrollTop = top;
-    }
-    document.documentElement.classList.remove('rm-open');
+    doConfirm(id, v, b);
   }
-}
-function closeRepModal(){ RM.back = null; var e = rmEl(); e.className = 'rm-ov hide'; e.innerHTML = ''; rmLock(false); }
-function repRow(id){
-  return (REP.rows || []).filter(function(d){ return String(d.id) === String(id); })[0] || null;
-}
-function rmOpen(html){
-  var e = rmEl();
-  e.innerHTML = '<div class="rm-sheet">' + html + '</div>';
-  e.className = 'rm-ov';
-  rmLock(true);
-  e.querySelector('.rm-sheet').scrollTop = 0;
-}
-function rmRow(k, v){
-  return '<div class="rm-row"><span class="rm-k">' + esc(k) + '</span><span class="rm-v">' + v + '</span></div>';
-}
-function rmItem(d){
-  return '<button type="button" class="rm-item ' + (isEq(d) ? 'eq' : 'md') + '" data-open="' + d.id + '">'
-    + '<span class="rm-item-b"><span class="rm-item-t">' + esc((d.machine || '—') + ' — ' + (d.category || '')) + '</span>'
-    + '<span class="rm-item-s">' + esc(t('shift_n', d.shift)) + '　' + esc(d.line || '') + '　' + esc(d.reporter || '') + '</span></span>'
-    + '<span class="rm-item-v">' + esc(t('min_n', d.stop_minutes)) + '</span></button>';
-}
-function openRepList(title, ids){
-  var list = ids.map(repRow).filter(Boolean);
-  if(!list.length) return;
-  if(list.length === 1){ openRepDetail(list[0].id); return; }
-  RM.back = { title:title, ids:ids };
-  rmOpen('<div class="rm-handle"></div>'
-    + '<div class="rm-head"><span class="rm-title">' + esc(title) + '</span>'
-    + '<span class="rm-cnt">' + esc(t('md_n', list.length)) + '</span></div>'
-    + '<div class="rm-sub">' + esc(t('md_tap')) + '</div>'
-    + '<div class="rm-list">' + list.map(rmItem).join('') + '</div>'
-    + '<button type="button" class="rm-btn" data-close="1">' + esc(t('btn_close')) + '</button>');
-}
-function openRepDetail(id){
-  var d = repRow(id);
-  if(!d) return;
-  var total = MGRS.length, n = confCount(d);
-  var stop = esc(t('min_n', d.stop_minutes));
-  if(d.stop_start || d.stop_end){
-    stop += ' <span style="color:var(--text2)">（' + esc((d.stop_start || '').slice(0,5) || '–')
-      + ' → ' + esc((d.stop_end || '').slice(0,5) || '--:--') + '）</span>';
-  }
-  var occ = d.occurrence === 'first' ? t('md_first')
-    : (d.occurrence === 'recurrence' || d.occurrence === 'repeat') ? t('md_rec') : '–';
-  var h = '<div class="rm-handle"></div>'
-    + '<div class="rm-head"><span class="rm-bdg ' + (isEq(d) ? 'eq">' + esc(t('b_eq')) : 'md">' + esc(t('b_md')))
-    + '</span><span class="rm-title">' + esc(t('md_title')) + '</span></div>'
-    + '<div class="rm-sub">No.' + esc(d.id) + '</div>'
-    + rmRow(t('md_date'), '<span class="num">' + esc(mdOf(d.date)) + '</span>　' + esc(t('shift_n', d.shift)))
-    + (d.line ? rmRow(t('k_line'), esc(d.line)) : '')
-    + rmRow(t('th_machine'), '<span class="num">' + esc(d.machine || '—') + '</span>')
-    + rmRow(t('k_product'), '<span class="num">' + esc(d.product_code || '–') + '</span>'
-        + (d.product_name ? '　' + esc(d.product_name) : ''))
-    + rmRow(t('k_stop'), '<span class="num t-stop">' + stop + '</span>')
-    + rmRow(t('k_cat'), esc(d.category || '–'))
-    + rmRow(t('md_occ'), esc(occ))
-    + rmRow(t('th_body'), esc(d.detail || '–'))
-    + rmRow(t('k_report'), esc(d.reporter || '–'))
-    + (d.approver ? rmRow(t('sl_approved'), esc(d.approver) + '　<span class="num">' + esc(shortDT(d.approved_at)) + '</span>') : '');
-  if(total > 0){
-    h += '<div class="conf" style="margin-top:12px"><div class="conf-h"><span>' + esc(t('conf_status')) + '</span>'
-      + '<span class="conf-bar"><i style="width:' + Math.round(n / total * 100) + '%"></i></span>'
-      + '<span class="conf-c num' + (n === total ? ' full' : '') + '">' + n + '/' + total + '</span></div>'
-      + '<div class="cgrid">' + confRowsHTML(d) + '</div>' + confCmtsHTML(d) + '</div>';
-  }
-  if(RM.back) h += '<button type="button" class="rm-btn back" data-back="1">← ' + esc(t('md_back')) + '</button>';
-  h += '<button type="button" class="rm-btn" data-close="1">' + esc(t('btn_close')) + '</button>';
-  rmOpen(h);
-}
-rmEl().addEventListener('click', function(ev){
-  if(ev.target === this){ closeRepModal(); return; }
-  if(ev.target.closest('[data-close]')){ closeRepModal(); return; }
-  if(ev.target.closest('[data-back]')){ var b = RM.back; if(b) openRepList(b.title, b.ids); return; }
-  var it = ev.target.closest('[data-open]');
-  if(it) openRepDetail(it.getAttribute('data-open'));
 });
-document.addEventListener('keydown', function(ev){
-  if(ev.key === 'Escape' && !rmEl().classList.contains('hide')) closeRepModal();
+document.getElementById('list').addEventListener('input', function(ev){
+  if(ev.target.tagName !== 'TEXTAREA') return;
+  var e = document.getElementById('er' + ev.target.id.slice(2));
+  if(e) e.style.display = 'none';
 });
-
-/* ===== Excel出力（SheetJS） ===== */
-function exportXls(){
-  var run = function(){
-    var total = MGRS.length;
-    var aoa = [[jpDate(REP.date) + ' ' + t('tab_report')], []];
-    aoa.push([t('th_shift'), t('th_machine'), t('k_product'), t('th_body'), t('th_stop'), t('th_conf')]);
-    REP.rows.forEach(function(d){
-      aoa.push([d.shift, d.machine, d.product_code, d.category, d.stop_minutes, confCount(d) + '/' + total]);
-    });
-    aoa.push([]);
-    aoa.push([t('sec_mgr')]);
-    MGRS.forEach(function(m){
-      var done = REP.rows.filter(function(d){ return d.cf[m.id]; }).length;
-      aoa.push([m.title, m.name, done + '/' + REP.rows.length]);
-    });
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'report');
-    XLSX.writeFile(wb, 'traq_report_' + REP.date + '.xlsx');
-  };
-  if(window.XLSX){ run(); return; }
-  var s = document.createElement('script');
-  s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
-  s.onload = run;
-  s.onerror = function(){ showToast(t('err_save', 'SheetJS'), 'error'); };
-  document.head.appendChild(s);
-}
-
 /* ===== Init ===== */
 (async function init(){
   initTheme();
@@ -1436,23 +1249,24 @@ function exportXls(){
   if(sbNm) sbNm.textContent = SESSION.name || '';
   var sbRl = document.getElementById('sb-role');
   if(sbRl) sbRl.textContent = traqLevelLabel(SESSION);
-  traqRenderNav('report', SESSION);
+  traqRenderNav('confirm', SESSION);
 
-  /* 日報は全ロール共通。確認は confirm.html へ移した */
+  /* この画面は管理職とアプリ管理者だけ。ほかのロールは日報へ戻す */
+  if(!canConfirm()){ location.href = 'report.html'; return; }
+
   try {
-    await loadManagers();
+    await Promise.all([loadManagers(), loadTroubles()]);
     render();
-    await gotoDate(addDays(businessToday(), -1));
   } catch(e){
-    document.getElementById('repBody').innerHTML = '<div class="empty">' + esc(t('err_load', e.message || '')) + '</div>';
+    document.getElementById('list').innerHTML = '<div class="empty">' + esc(t('err_load', e.message || '')) + '</div>';
   }
 })();
 
-window.__rep = window.__mgr = {
-  get MGRS(){ return MGRS; }, get REP(){ return REP; }, get state(){ return state; },
-  addDays: addDays, businessToday: businessToday, mapTrouble: mapTrouble,
-  buildFindings: buildFindings, confCount: confCount, gotoDate: gotoDate, utcToJST: utcToJST,
-  canConfirm: canConfirm, canSeeDetail: canSeeDetail, roleLabel: roleLabel, START_DATE: START_DATE
+window.__conf = {
+  get MGRS(){ return MGRS; }, get TROUBLES(){ return TROUBLES; }, get state(){ return state; },
+  addDays: addDays, businessToday: businessToday, mapTrouble: mapTrouble, confCount: confCount,
+  utcToJST: utcToJST, canConfirm: canConfirm, canSeeDetail: canSeeDetail,
+  roleLabel: roleLabel, START_DATE: START_DATE
 };
 </script>
 </body>
