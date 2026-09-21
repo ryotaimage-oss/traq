@@ -208,7 +208,7 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 /* Version card */
 .version-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .version-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.version-logo{width:40px;height:40px;border-radius:var(--radius);background:var(--orange);display:flex;align-items:center;justify-content:center}
+.version-logo{width:40px;height:40px;flex-shrink:0;border-radius:var(--radius);overflow:hidden;background:#131C2B;display:flex;align-items:center;justify-content:center}
 .version-name{font-size:15px;font-weight:700}
 .version-num{font-size:12px;color:var(--text2)}
 .version-rows{}
@@ -544,9 +544,7 @@ html{background:var(--bg2)}
       <div class="section-label" data-i18n="sec_version">バージョン情報</div>
       <div class="version-card">
         <div class="version-header">
-          <div class="version-logo">
-            <span class="logo-text" style="font-size:11px;letter-spacing:.5px;color:var(--navy);padding-left:.5px">TRAQ</span>
-          </div>
+          <div class="version-logo"><svg viewBox="0 0 48 48" width="40" height="40" role="img" aria-label="Traq"><rect width="48" height="48" fill="#131C2B"/><g fill="none" stroke="#EF9F27" stroke-width="2.6" stroke-linecap="round"><path d="M9 16.5V12a2 2 0 012-2h4.5"/><path d="M39 16.5V12a2 2 0 00-2-2h-4.5"/><path d="M9 31.5V36a2 2 0 002 2h4.5"/><path d="M39 31.5V36a2 2 0 01-2 2h-4.5"/></g><text x="24" y="29" text-anchor="middle" font-family="'Noto Sans JP',system-ui,sans-serif" font-size="15.5" font-weight="800" textLength="33" lengthAdjust="spacingAndGlyphs" fill="#E6E9EF">TRA<tspan fill="#EF9F27">Q</tspan></text></svg></div>
           <div>
             <div class="version-name">Traq – TroubleTrack System</div>
             <div class="version-num" id="versionNum">v1.0.0</div>
@@ -556,10 +554,6 @@ html{background:var(--bg2)}
           <div class="version-row">
             <span class="version-key" data-i18n="version_label">バージョン</span>
             <span class="version-val" id="versionVal">v1.0.0</span>
-          </div>
-          <div class="version-row">
-            <span class="version-key" data-i18n="release_date">リリース日</span>
-            <span class="version-val" id="releaseDate">2026/09/21</span>
           </div>
           <div class="version-row">
             <span class="version-key">表示領域</span>
@@ -625,8 +619,9 @@ var I18N = {
     lang_label:'言語', lang_desc:'アプリの表示言語',
     pin_change:'PIN変更', pin_change_desc:'ログイン用4桁PINを変更します',
     add_home:'ホーム画面に追加する', add_home_desc:'アプリとしてショートカット登録',
-    version_label:'バージョン', release_date:'リリース日', update_label:'アップデート',
+    version_label:'バージョン', update_label:'アップデート',
     update_checking:'確認中...', update_latest:'最新版です',
+    update_done:function(v){return 'v'+v+' に更新しました';},
     update_available:function(v){return 'v'+v+' に更新可能';},
     update_banner_title:'新しいバージョンがあります',
     update_now:'今すぐ更新',
@@ -676,8 +671,9 @@ var I18N = {
     lang_label:'Ngôn ngữ', lang_desc:'Ngôn ngữ hiển thị',
     pin_change:'Đổi PIN', pin_change_desc:'Đổi mã PIN 4 số để đăng nhập',
     add_home:'Thêm vào màn hình chính', add_home_desc:'Tạo lối tắt ứng dụng',
-    version_label:'Phiên bản', release_date:'Ngày phát hành', update_label:'Cập nhật',
+    version_label:'Phiên bản', update_label:'Cập nhật',
     update_checking:'Đang kiểm tra...', update_latest:'Đã là phiên bản mới nhất',
+    update_done:function(v){return 'Đã cập nhật lên v'+v;},
     update_available:function(v){return 'Có thể cập nhật v'+v;},
     update_banner_title:'Có phiên bản mới',
     update_now:'Cập nhật ngay',
@@ -727,8 +723,9 @@ var I18N = {
     lang_label:'Language', lang_desc:'App display language',
     pin_change:'Change PIN', pin_change_desc:'Change your 4-digit login PIN',
     add_home:'Add to Home Screen', add_home_desc:'Create an app shortcut',
-    version_label:'Version', release_date:'Release Date', update_label:'Update',
+    version_label:'Version', update_label:'Update',
     update_checking:'Checking...', update_latest:'Up to date',
+    update_done:function(v){return 'Updated to v'+v;},
     update_available:function(v){return 'v'+v+' available';},
     update_banner_title:'New version available',
     update_now:'Update now',
@@ -785,7 +782,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.7.2'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.7.4'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -1261,23 +1258,20 @@ function checkVersion(){
   }
 
   if(lastVersion !== APP_VERSION){
-    // 新バージョン検知！バナーを表示
-    showUpdateBanner(lastVersion, APP_VERSION);
+    /* ここに来た時点で新しい版はもう読み込み済み。
+       「更新可能」ではなく「更新しました」を一度だけ出し、版を保存する。
+       本当の更新通知は update_banner.js（画面下のバナー）が担当する。 */
+    localStorage.setItem('traq_last_version', APP_VERSION);
+    setBadgeUpdated(APP_VERSION);
   } else {
     setBadgeLatest();
   }
 }
 
-function showUpdateBanner(oldVer, newVer){
-  const banner=document.getElementById('updateBanner');
-  const sub=document.getElementById('updateBannerSub');
+function setBadgeUpdated(v){
   const badge=document.getElementById('updateBadge');
-  if(banner){
-    banner.style.display='block';
-    if(sub) sub.textContent=`v${oldVer} → v${newVer}`;
-  }
   if(badge){
-    badge.textContent=t('update_available')(newVer);
+    badge.textContent=t('update_done')(v);
     badge.className='update-badge';
     badge.removeAttribute('data-i18n');
   }
