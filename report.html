@@ -128,7 +128,7 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* ===== Main tabs ===== */
-.mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
+.mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:6}
 .mtab{flex:1;min-height:46px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:6px;transition:color .15s,border-color .15s}
 .mtab[aria-selected="true"]{color:var(--orange);border-bottom-color:var(--orange);background:var(--bg2)}
 .mtab-n{font-size:11px;padding:0 4px;border:1px solid var(--warning);color:var(--warning);font-weight:700}
@@ -314,8 +314,39 @@ td.r,th.r{text-align:right}
   [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
   .topbar{display:none}
 }
+@media(min-width:1025px){.sidebar{width:240px}}
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
+/* ===== 統一シェル（PC）v1.7.0 ここから ===== */
+.snav-lang{display:none}
+.page-header{display:none}
+@media(min-width:768px){
+  .snav-lang{display:flex;gap:4px;padding:0 4px;margin-bottom:2px}
+  .snav-lang .lang-btn{flex:1 1 0;min-width:0;height:26px;padding:0;background:none;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s}
+  .snav-lang .lang-btn.active,.snav-lang .lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .sidebar-bottom{gap:2px}
+  .sidebar .snav-icon svg.ico{display:block;margin:0 auto}
+  .page-header,.page-title-bar{height:56px;flex-shrink:0;box-sizing:border-box;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .ph-ico{display:flex;align-items:center;color:var(--orange);flex-shrink:0}
+  .ph-ico svg.ico{width:18px;height:18px}
+  .ph-title,.page-title-text{margin:0;font-size:15px;font-weight:700;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ph-spacer{flex:1 1 auto;min-width:0}
+  .ph-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .ph-btn{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--radius);background:var(--bg3);color:var(--text1);border:1px solid var(--border);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .ph-btn:hover,.ph-btn.active{border-color:var(--orange);color:var(--orange)}
+  .ph-btn.active{background:rgba(239,159,39,.12)}
+  .ph-btn svg.ico{width:15px;height:15px}
+  .ph-btn.primary{background:var(--orange);border-color:var(--orange);color:var(--navy)}
+  .ph-btn.primary:hover{color:var(--navy);opacity:.88}
+  .ph-btn.danger{background:none;color:var(--danger);border-color:rgba(239,68,68,.45)}
+  .ph-btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+  .ph-btn[disabled],.ph-btn.is-disabled{opacity:.35;pointer-events:none}
+  .page-back-btn{width:30px;height:30px;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:15px;line-height:1;cursor:pointer}
+  .page-back-btn:hover{border-color:var(--orange);color:var(--orange)}
+  /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
+  .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+}
+/* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
 </head>
@@ -356,21 +387,20 @@ html{background:var(--bg2)}
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
         <span data-i18n="nav_master">マスタ</span>
       </button>
-    </nav>
-    <div class="sidebar-bottom">
-      <button class="snav-item" onclick="toggleTheme()">
-        <span class="snav-icon" id="sb-theme-icon"></span>
-        <span data-i18n="nav_theme">テーマ切替</span>
-      </button>
-      <button class="snav-item" style="gap:6px">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
-        <button class="lang-btn" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
-        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
-        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
-      </button>
-      <button class="snav-item" onclick="location.href='settings.html'">
+          <button class="snav-item" onclick="location.href='settings.html'">
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
         <span data-i18n="nav_settings">設定</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="snav-lang">
+        <button class="lang-btn active" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
+      </div>
+      <button class="snav-item" onclick="toggleTheme()">
+        <span class="snav-icon" id="sb-theme-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></span>
+        <span data-i18n="nav_theme">テーマ切替</span>
       </button>
       <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
@@ -395,6 +425,13 @@ html{background:var(--bg2)}
       </div>
     </div>
 
+    <div class="page-header">
+      <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <h1 class="ph-title" data-i18n="nav_report">日報</h1>
+    </div>
+
+
+    <div class="scroll-area" id="scroller">
     <div class="mtabs hide" id="mtabs">
       <button class="mtab" data-m="list" id="tabList" aria-selected="true">
         <svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
@@ -405,8 +442,6 @@ html{background:var(--bg2)}
         <span data-i18n="tab_report">日報</span>
       </button>
     </div>
-
-    <div class="scroll-area" id="scroller">
 
       <div id="viewList">
         <div class="summary">
