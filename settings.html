@@ -147,9 +147,11 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 .user-info-name{font-size:16px;font-weight:700;margin-bottom:3px}
 .user-info-meta{font-size:12px;color:var(--text2)}
 .role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--radius);margin-right:5px}
-.role-op{background:rgba(96,165,250,.12);color:#60a5fa}
-.role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
-.role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
+/* 役職の色はバッジにだけ効かせる。ヘッダーにも同じクラスを付けるため、
+   要素を限定しないとヘッダー全体が着色されてしまう */
+.role-badge.role-op{background:rgba(96,165,250,.12);color:#60a5fa}
+.role-badge.role-sl{background:rgba(245,158,11,.12);color:var(--warning)}
+.role-badge.role-admin{background:rgba(239,68,68,.12);color:var(--danger)}
 
 /* Section */
 .section{margin-bottom:20px;animation:slideUp .3s ease both}
@@ -744,7 +746,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.5.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.5.1'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */

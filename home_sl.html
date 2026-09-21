@@ -8,6 +8,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Traq">
+  <script>
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
+
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
+(function(){
+  var el=document.documentElement;
+  function fit(){
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
+  }
+  fit();
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
@@ -72,9 +99,9 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 .topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
 .topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
 .topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-icon-btn{width:30px;height:30px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
 .hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
-.hdr-avatar{width:30px;height:30px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
 .role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
 .role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
 .role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
@@ -452,33 +479,6 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
-<script>
-/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
-   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
-   画面の高さ screen.height を --screen-h に入れ、CSS側で
-
-       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
-
-   として高さを決める。2項の小さい方を採るので、
-     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
-     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
-     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
-     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
-   screen.height は読み込み直後から安定して取得できるため、
-   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
-(function(){
-  var el=document.documentElement;
-  function fit(){
-    var sa=false;
-    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
-    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
-    else el.style.removeProperty('--screen-h');
-  }
-  fit();
-  window.addEventListener('pageshow',fit);
-  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
-})();
-</script>
 </head>
 <body>
 <div class="app" id="app">
