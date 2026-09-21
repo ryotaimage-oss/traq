@@ -766,11 +766,13 @@ function showMasterDenied(){
   ov.appendChild(box);document.body.appendChild(ov);
 }
 
-/* ── Default date (shift=3 → previous day) ── */
+/* ── Default date (shift=3 or before 08:00 → previous day) ── */
+/* 営業日の区切りは 8:00。3直に加え、8時より前の入力は前営業日として扱う
+   （2直が0:10に入力 / 1直が7:50に入力しても日付がずれないように） */
 function setDefaultDate(){
   var now=new Date();
   var shift=parseInt(document.getElementById('shift-select').value)||session.shift;
-  if(shift===3) now.setDate(now.getDate()-1);
+  if(shift===3 || now.getHours()<8) now.setDate(now.getDate()-1);
   document.getElementById('occurred-date').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
 }
 document.getElementById('shift-select').addEventListener('change',function(){setDefaultDate();saveDraft();});
