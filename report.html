@@ -105,13 +105,22 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 .hide{display:none !important}
 
 /* ===== Topbar ===== */
-.topbar{display:flex;align-items:center;gap:6px;padding:env(safe-area-inset-top,0px) 10px 0;height:calc(44px + env(safe-area-inset-top,0px));background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
-.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1;font-family:inherit}
-.role-tag{font-size:10px;font-weight:700;padding:2px 6px;border:1px solid var(--border2);color:var(--text2);white-space:nowrap}
-.tb-user{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.tb-right{margin-left:auto;display:flex;align-items:center;gap:4px;flex-shrink:0}
-.tb-btn{min-width:32px;min-height:32px;padding:0 7px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.tb-btn.active{background:var(--orange);border-color:var(--orange);color:var(--bg1)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,0px) 10px 0;height:calc(44px + env(safe-area-inset-top,0px));background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+/* 他画面と同じヘッダー構成 */
+.topbar-left{display:flex;align-items:center;gap:6px;min-width:0}
+.topbar-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.topbar-logo-text{font-size:16px;font-weight:700;color:var(--orange);letter-spacing:-0.5px;flex-shrink:0}
+.topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.topbar-sub{font-size:9px;font-weight:500;color:var(--text2);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-icon-btn{width:26px;height:26px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;flex-shrink:0;padding:0}
+.hdr-icon-btn:hover{border-color:var(--orange);color:var(--orange)}
+.hdr-avatar{width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-left:2px}
+.role-op .hdr-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+.role-sl .hdr-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+.role-admin .hdr-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+[data-theme="light"] .role-op .hdr-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+[data-theme="light"] .role-sl .hdr-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+[data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* ===== Main tabs ===== */
 .mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
@@ -287,18 +296,17 @@ html{background:var(--bg2)}
   <div class="main-column">
 
     <div class="topbar">
-      <span class="logo-text">TRAQ</span>
-      <span class="role-tag" id="roleTag"></span>
-      <span class="tb-user" id="tbUser"></span>
-      <span class="tb-right">
-        <button class="tb-btn" id="lang-ja" onclick="setLang('ja')">JA</button>
-        <button class="tb-btn" id="lang-vi" onclick="setLang('vi')">VI</button>
-        <button class="tb-btn" id="lang-en" onclick="setLang('en')">EN</button>
-        <button class="tb-btn" id="themeBtn" onclick="toggleTheme()" aria-label="theme"></button>
-        <button class="tb-btn" onclick="doLogout()" aria-label="logout">
-          <svg class="ico" viewBox="0 0 24 24"><path d="M15 17l5-5-5-5"/><path d="M20 12H9"/><path d="M12 3H5v18h7"/></svg>
-        </button>
-      </span>
+      <div class="topbar-left">
+        <span class="topbar-logo-text">TRAQ</span>
+        <span class="topbar-sep"></span>
+        <span class="topbar-sub">Trouble Tracking System</span>
+      </div>
+      <div class="topbar-right">
+        <button class="hdr-icon-btn" onclick="forceReload()" title="リロード"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></button>
+        <button class="hdr-icon-btn" onclick="toggleTheme()" id="themeBtn" title="テーマ切替"><svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg></button>
+        <button class="hdr-icon-btn" onclick="location.href='settings.html'" title="設定"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
+        <div class="hdr-avatar" id="mob-avatar"></div>
+      </div>
     </div>
 
     <div class="mtabs hide" id="mtabs">
@@ -607,6 +615,14 @@ const SESSION = (() => {
     return o;
   } catch(e){ return null; }
 })();
+/* キャッシュを消して再読込。他画面のリロードボタンと同じ実装 */
+function forceReload(){
+  if('caches' in window){
+    caches.keys().then(function(keys){
+      return Promise.all(keys.map(function(k){return caches.delete(k);}));
+    }).then(function(){location.reload(true);});
+  } else { location.reload(true); }
+}
 function doLogout(){
   localStorage.removeItem('traq_session');
   location.href = 'index.html';
@@ -1258,8 +1274,12 @@ function exportXls(){
   if(!SESSION){ location.href = 'index.html'; return; }
   var role = SESSION.role;
 
-  document.getElementById('tbUser').textContent = SESSION.name || '';
-  document.getElementById('roleTag').textContent = roleLabel();
+  /* 他画面と同じく、ヘッダーはアバター1つで表す */
+  var topbarEl = document.querySelector('.topbar');
+  var roleClass = { worker:'role-op', op:'role-op', leader:'role-sl', sl:'role-sl', admin:'role-admin' }[role] || 'role-op';
+  if(topbarEl) topbarEl.classList.add(roleClass);
+  var avEl = document.getElementById('mob-avatar');
+  if(avEl) avEl.textContent = (SESSION.name || '?').charAt(0);
 
   /* 日報は全員。確認タブは管理職とアプリ管理者だけ */
   if(canConfirm()){
