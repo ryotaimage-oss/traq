@@ -318,6 +318,9 @@ td.r,th.r{text-align:right}
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 /* ===== 統一シェル（PC）v1.7.0 ここから ===== */
+.role-mg .hdr-avatar,.role-mg .sidebar-avatar{background:rgba(45,212,191,.22);color:#2DD4BF}
+[data-theme="light"] .role-mg .hdr-avatar,[data-theme="light"] .role-mg .sidebar-avatar{background:rgba(14,140,127,.15);color:#0E8C7F}
+
 .snav-lang{display:none}
 .page-header{display:none}
 @media(min-width:768px){
@@ -346,6 +349,14 @@ td.r,th.r{text-align:right}
   /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
   .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
 }
+@media(min-width:768px){
+  /* 投稿一覧と同じく、本文は16pxの余白の中に置く */
+  #scroller{padding:16px}
+  .mtabs{position:static;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+  .summary{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+  .tabs{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+  .list{padding:0}
+}
 /* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
@@ -372,7 +383,7 @@ html{background:var(--bg2)}
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item active" onclick="void(0)">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
         <span data-i18n="nav_report">日報</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
@@ -426,7 +437,7 @@ html{background:var(--bg2)}
     </div>
 
     <div class="page-header">
-      <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
       <h1 class="ph-title" data-i18n="nav_report">日報</h1>
     </div>
 
@@ -438,7 +449,7 @@ html{background:var(--bg2)}
         <span data-i18n="tab_confirm">確認</span><span class="mtab-n num hide" id="mtabN"></span>
       </button>
       <button class="mtab" data-m="rep" id="tabRep" aria-selected="false">
-        <svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>
+        <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg>
         <span data-i18n="tab_report">日報</span>
       </button>
     </div>
@@ -483,7 +494,7 @@ html{background:var(--bg2)}
         <span class="nav-label" data-i18n="nav_list">一覧</span>
       </button>
       <button class="nav-item active" onclick="void(0)">
-        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="nav-icon"><svg class="ico ico-lg" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
         <span class="nav-label" data-i18n="nav_report">日報</span>
       </button>
       <button class="nav-item" onclick="location.href='dashboard.html'">
@@ -753,6 +764,24 @@ function forceReload(){
     }).then(function(){location.reload(true);});
   } else { location.reload(true); }
 }
+/* ロール表示の共通判定（manager は title から L / C / J を出す） */
+function traqLevelLabel(u){
+  if(!u) return 'OP';
+  if(u.role==='admin') return 'Admin';
+  if(u.title==='次長') return 'J';
+  if(u.title==='チーフ') return 'C';
+  if(u.title==='リーダー') return 'L';
+  if(u.role==='manager') return 'MG';   /* 旧セッションで title 不明のとき。再ログインで L/C/J になる */
+  if(u.role==='leader'||u.role==='sl') return 'SL';
+  return 'OP';
+}
+function traqRoleClass(u){
+  if(!u) return 'role-op';
+  if(u.role==='admin') return 'role-admin';
+  if(u.role==='manager') return 'role-mg';
+  if(u.role==='leader'||u.role==='sl') return 'role-sl';
+  return 'role-op';
+}
 function doLogout(){
   localStorage.removeItem('traq_session');
   location.href = 'index.html';
@@ -855,7 +884,7 @@ const IC_CHECK = '<svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L
 const IC_CK_S  = '<svg class="ico ico-s" viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>';
 const IC_NOTE  = '<svg class="ico" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>';
 const IC_EYE   = '<svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
-const IC_BAR   = '<svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>';
+const IC_BAR   = '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg>';
 const IC_WARN  = '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>';
 const IC_GRID  = '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M3 10h18"/><path d="M9 10v10"/></svg>';
 const IC_LINES = '<svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h12"/></svg>';
@@ -1406,7 +1435,7 @@ function exportXls(){
 
   /* 他画面と同じく、ヘッダーはアバター1つで表す */
   var topbarEl = document.querySelector('.topbar');
-  var roleClass = { worker:'role-op', op:'role-op', leader:'role-sl', sl:'role-sl', admin:'role-admin' }[role] || 'role-op';
+  var roleClass = traqRoleClass(SESSION);
   if(topbarEl) topbarEl.classList.add(roleClass);
   var avEl = document.getElementById('mob-avatar');
   if(avEl) avEl.textContent = (SESSION.name || '?').charAt(0);
@@ -1418,7 +1447,7 @@ function exportXls(){
   var sbNm = document.getElementById('sb-name');
   if(sbNm) sbNm.textContent = SESSION.name || '';
   var sbRl = document.getElementById('sb-role');
-  if(sbRl) sbRl.textContent = roleLabel();
+  if(sbRl) sbRl.textContent = traqLevelLabel(SESSION);
 
   /* 日報は全員。確認タブは管理職とアプリ管理者だけ */
   if(canConfirm()){

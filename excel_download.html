@@ -224,6 +224,9 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 /* ===== 統一シェル（PC）v1.7.0 ここから ===== */
+.role-mg .hdr-avatar,.role-mg .sidebar-avatar{background:rgba(45,212,191,.22);color:#2DD4BF}
+[data-theme="light"] .role-mg .hdr-avatar,[data-theme="light"] .role-mg .sidebar-avatar{background:rgba(14,140,127,.15);color:#0E8C7F}
+
 .snav-lang{display:none}
 .page-header{display:none}
 @media(min-width:768px){
@@ -252,6 +255,10 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
   .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
 }
+@media(min-width:768px){
+  /* この画面はサイドバーで行き来できるので戻るボタンは出さない */
+  .page-back-btn{display:none}
+}
 /* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
@@ -277,7 +284,7 @@ html{background:var(--bg2)}
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='report.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
         <span data-i18n="nav_report">日報</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
@@ -430,7 +437,7 @@ html{background:var(--bg2)}
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
         <button class="nav-item" onclick="location.href='report.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
       <span class="nav-label" data-i18n="nav_report">日報</span>
     </button>
 <button class="nav-item" onclick="location.href='dashboard.html'">
@@ -686,15 +693,14 @@ function initChip(){
   var name=s.name||'';
   var role=s.role||'worker';
   var initial=name?name.charAt(0):'?';
-  var classMap={worker:'role-op',leader:'role-sl',admin:'role-admin'};
-  var roleLabels={worker:'OP',leader:'SL',admin:'Admin'};
+  var __rc=traqRoleClass(s), __rl=traqLevelLabel(s);
   var topbar=document.querySelector('.topbar');
-  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(classMap[role]||'role-op');}
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-mg','role-admin');topbar.classList.add__rc;}
   var av=document.getElementById('mob-avatar');
   if(av) av.textContent=initial;
   // PC sidebar
   var sbWrap=document.getElementById('sb-user-wrap');
-  if(sbWrap){sbWrap.className='sidebar-user '+(classMap[role]||'role-op');}
+  if(sbWrap){sbWrap.className='sidebar-user '+__rc;}
   var sbThIcon=document.getElementById('sb-theme-icon');
   if(sbThIcon)sbThIcon.innerHTML=document.documentElement.getAttribute('data-theme')==='dark'?ICONS.moon:ICONS.sun;
   // sidebar lang buttons
@@ -702,7 +708,7 @@ function initChip(){
   ['ja','vi','en'].forEach(function(x){var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===cl);});
   var sbAv=document.getElementById('sb-avatar');if(sbAv) sbAv.textContent=initial;
   var sbName=document.getElementById('sb-name');if(sbName) sbName.textContent=name;
-  var sbRole=document.getElementById('sb-role');if(sbRole) sbRole.textContent=roleLabels[role]||role;
+  var sbRole=document.getElementById('sb-role');if(sbRole) sbRole.textContent=__rl;
 }
 function goHome(){
   try{
@@ -733,6 +739,24 @@ function forceReload(){
       return Promise.all(keys.map(function(k){return caches.delete(k);}));
     }).then(function(){location.reload(true);});
   } else { location.reload(true); }
+}
+/* ロール表示の共通判定（manager は title から L / C / J を出す） */
+function traqLevelLabel(u){
+  if(!u) return 'OP';
+  if(u.role==='admin') return 'Admin';
+  if(u.title==='次長') return 'J';
+  if(u.title==='チーフ') return 'C';
+  if(u.title==='リーダー') return 'L';
+  if(u.role==='manager') return 'MG';   /* 旧セッションで title 不明のとき。再ログインで L/C/J になる */
+  if(u.role==='leader'||u.role==='sl') return 'SL';
+  return 'OP';
+}
+function traqRoleClass(u){
+  if(!u) return 'role-op';
+  if(u.role==='admin') return 'role-admin';
+  if(u.role==='manager') return 'role-mg';
+  if(u.role==='leader'||u.role==='sl') return 'role-sl';
+  return 'role-op';
 }
 function doLogout(){
   localStorage.removeItem('traq_session');

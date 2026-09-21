@@ -269,6 +269,9 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 /* ===== 統一シェル（PC）v1.7.0 ここから ===== */
+.role-mg .hdr-avatar,.role-mg .sidebar-avatar{background:rgba(45,212,191,.22);color:#2DD4BF}
+[data-theme="light"] .role-mg .hdr-avatar,[data-theme="light"] .role-mg .sidebar-avatar{background:rgba(14,140,127,.15);color:#0E8C7F}
+
 .snav-lang{display:none}
 .page-header{display:none}
 @media(min-width:768px){
@@ -297,6 +300,14 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
   /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
   .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
 }
+@media(min-width:768px){ .inner{max-width:760px} }
+@media(min-width:1180px){
+  /* PCは2カラム。上段のユーザーカードとPIN変更は横いっぱい */
+  .inner{max-width:1040px;display:grid;grid-template-columns:1fr 1fr;gap:0 20px;align-items:start}
+  .inner>.user-card{grid-column:1 / -1}
+  .inner>#section-pin{grid-column:1 / -1}
+  .inner>#sec-logout{grid-column:1 / -1;max-width:420px;justify-self:center;width:100%}
+}
 /* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
@@ -322,7 +333,7 @@ html{background:var(--bg2)}
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='report.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
         <span data-i18n="nav_report">日報</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
@@ -377,21 +388,6 @@ html{background:var(--bg2)}
   </header>
 
   <!-- アップデートバナー（新バージョン検知時に表示） -->
-  <div id="updateBanner" style="display:none;background:rgba(239,159,39,.12);border-bottom:2px solid var(--orange);padding:10px 16px;flex-shrink:0;animation:fadeIn .3s ease">
-    <div style="display:flex;align-items:center;justify-content:space-between;max-width:520px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">🆕</span>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--orange)" id="updateBannerTitle" data-i18n="update_banner_title">新しいバージョンがあります</div>
-          <div style="font-size:11px;color:var(--text2)" id="updateBannerSub"></div>
-        </div>
-      </div>
-      <button onclick="forceReload()" style="background:var(--orange);border:none;border-radius:var(--radius);color:var(--navy);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;flex-shrink:0;margin-left:10px" data-i18n="update_now">
-        今すぐ更新
-      </button>
-    </div>
-  </div>
-
   <div class="page-header">
     <span class="ph-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
     <h1 class="ph-title" data-i18n="nav_settings">設定</h1>
@@ -581,8 +577,8 @@ html{background:var(--bg2)}
     </div>
 
     <!-- ログアウト -->
-    <div class="section" style="animation-delay:.25s">
-      <button onclick="doLogout()" style="width:100%;height:50px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s" data-i18n="logout"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg><span data-i18n="logout">ログアウト</span></button>
+    <div class="section" id="sec-logout" style="animation-delay:.25s">
+      <button onclick="doLogout()" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all .15s"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg><span data-i18n="logout">ログアウト</span></button>
     </div>
 
   </div>
@@ -595,7 +591,7 @@ html{background:var(--bg2)}
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
         <button class="nav-item" onclick="location.href='report.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
       <span class="nav-label" data-i18n="nav_report">日報</span>
     </button>
 <button class="nav-item" onclick="location.href='dashboard.html'">
@@ -789,7 +785,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.7.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.7.1'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -857,17 +853,19 @@ function initChip(){
   var name=SESSION.name||'';
   var role=SESSION.role||'worker';
   var initial=name?name.charAt(0):'?';
-  var classMap={worker:'role-op',leader:'role-sl',admin:'role-admin'};
+  var __rc=traqRoleClass(SESSION);
   var topbar=document.querySelector('.topbar');
-  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(classMap[role]||'role-op');}
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-mg','role-admin');topbar.classList.add(__rc);}
   var av=document.getElementById('mob-avatar');
   if(av) av.textContent=initial;
   // PC sidebar
+  var sbWrap=document.getElementById('sb-user-wrap');
+  if(sbWrap) sbWrap.className='sidebar-user '+__rc;
   var sbAvatar=document.getElementById('sb-avatar');if(sbAvatar) sbAvatar.textContent=initial;
   var sbName=document.getElementById('sb-name');if(sbName) sbName.textContent=name;
   var sbRole=document.getElementById('sb-role');
   if(sbRole){
-    var roleLabel=role==='admin'?'Admin':role==='leader'?'SL':'OP';
+    var roleLabel=traqLevelLabel(SESSION);
     var shiftLabel=SESSION.shift?SESSION.shift+'S':'';
     sbRole.textContent=roleLabel+(shiftLabel?' / '+shiftLabel:'');
   }
@@ -1291,6 +1289,24 @@ function setBadgeLatest(){
 }
 
 /* ===== Logout ===== */
+/* ロール表示の共通判定（manager は title から L / C / J を出す） */
+function traqLevelLabel(u){
+  if(!u) return 'OP';
+  if(u.role==='admin') return 'Admin';
+  if(u.title==='次長') return 'J';
+  if(u.title==='チーフ') return 'C';
+  if(u.title==='リーダー') return 'L';
+  if(u.role==='manager') return 'MG';   /* 旧セッションで title 不明のとき。再ログインで L/C/J になる */
+  if(u.role==='leader'||u.role==='sl') return 'SL';
+  return 'OP';
+}
+function traqRoleClass(u){
+  if(!u) return 'role-op';
+  if(u.role==='admin') return 'role-admin';
+  if(u.role==='manager') return 'role-mg';
+  if(u.role==='leader'||u.role==='sl') return 'role-sl';
+  return 'role-op';
+}
 function doLogout(){
   localStorage.removeItem('traq_session');
   showToast(t('logout_msg'),'info');

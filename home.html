@@ -280,6 +280,9 @@ html, body {
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 /* ===== 統一シェル（PC）v1.7.0 ここから ===== */
+.role-mg .hdr-avatar,.role-mg .sidebar-avatar{background:rgba(45,212,191,.22);color:#2DD4BF}
+[data-theme="light"] .role-mg .hdr-avatar,[data-theme="light"] .role-mg .sidebar-avatar{background:rgba(14,140,127,.15);color:#0E8C7F}
+
 .snav-lang{display:none}
 .page-header{display:none}
 @media(min-width:768px){
@@ -331,7 +334,7 @@ html{background:var(--bg2)}
         <span data-i18n="nav_list">一覧</span>
       </button>
       <button class="snav-item" onclick="location.href='report.html'">
-        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
         <span data-i18n="nav_report">日報</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
@@ -462,7 +465,7 @@ html{background:var(--bg2)}
       <span class="nav-label" data-i18n="nav_list">一覧</span>
     </button>
     <button class="nav-item" onclick="location.href='report.html'">
-      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+      <span class="nav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5"/></svg></span>
       <span class="nav-label" data-i18n="nav_report">日報</span>
     </button>
     <button class="nav-item" onclick="location.href='dashboard.html'">
@@ -605,16 +608,8 @@ let TROUBLES = [];
 let mainTab = 'all';
 let typeFilter = 'all';
 
-function getRoleClass(role) {
-  if (role === 'admin') return 'role-admin';
-  if (role === 'leader' || role === 'sl') return 'role-sl';
-  return 'role-op';
-}
-function getRoleLabel(role) {
-  if (role === 'admin') return t('role_adm');
-  if (role === 'leader' || role === 'sl') return t('role_sl');
-  return t('role_op');
-}
+function getRoleClass(role) { return traqRoleClass(SESSION); }
+function getRoleLabel(role) { return traqLevelLabel(SESSION); }
 
 function renderUserInfo() {
   const u = SESSION;
@@ -623,7 +618,7 @@ function renderUserInfo() {
   const roleLabel = getRoleLabel(u.role);
   const roleClass = getRoleClass(u.role);
   var topbar = document.querySelector('.topbar');
-  if(topbar){topbar.classList.remove('role-op','role-sl','role-admin');topbar.classList.add(roleClass);}
+  if(topbar){topbar.classList.remove('role-op','role-sl','role-mg','role-admin');topbar.classList.add(roleClass);}
   var mobAv = document.getElementById('mob-avatar');
   if(mobAv) mobAv.textContent = initial;
   const sbWrap = document.getElementById('sb-user-wrap');
@@ -986,6 +981,24 @@ async function deleteDraft(id) {
 }
 
 function goInput(type) { location.href = type === 'equipment' ? 'input_equipment.html' : 'input_mold.html'; }
+/* ロール表示の共通判定（manager は title から L / C / J を出す） */
+function traqLevelLabel(u){
+  if(!u) return 'OP';
+  if(u.role==='admin') return 'Admin';
+  if(u.title==='次長') return 'J';
+  if(u.title==='チーフ') return 'C';
+  if(u.title==='リーダー') return 'L';
+  if(u.role==='manager') return 'MG';   /* 旧セッションで title 不明のとき。再ログインで L/C/J になる */
+  if(u.role==='leader'||u.role==='sl') return 'SL';
+  return 'OP';
+}
+function traqRoleClass(u){
+  if(!u) return 'role-op';
+  if(u.role==='admin') return 'role-admin';
+  if(u.role==='manager') return 'role-mg';
+  if(u.role==='leader'||u.role==='sl') return 'role-sl';
+  return 'role-op';
+}
 function doLogout() { localStorage.removeItem('traq_session'); showToast(t('logout_msg')); setTimeout(() => { location.href = 'index.html'; }, 1000); }
 function forceReload(){
   if('caches' in window){ caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>location.reload(true)); }

@@ -725,7 +725,7 @@ async function doLogin() {
   btn.disabled = true;
   clearError();
   try {
-    const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,shift,pin');
+    const rows = await sbFetch('traq_users?id=eq.' + u.id + '&select=id,name,role,title,shift,pin');
     if (!rows || rows.length === 0) throw new Error('user not found');
     const dbUser = rows[0];
 
@@ -748,6 +748,7 @@ async function doLogin() {
       userId: dbUser.id,
       name: dbUser.name,
       role: role,
+      title: dbUser.title || null,
       shift: state.selectedShift,
       expiresAt: Date.now() + 8 * 60 * 60 * 1000
     }));
