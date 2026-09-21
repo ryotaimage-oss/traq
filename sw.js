@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traq-v37';
+const CACHE_NAME = 'traq-v38';
 
 const STATIC_ASSETS = [
   './index.html',

@@ -544,6 +544,25 @@ html{background:var(--bg2)}
     </div>
     -->
 
+    <!-- アプリ -->
+    <div class="section" id="sec-app" style="animation-delay:.15s">
+      <div class="section-label" data-i18n="sec_app">アプリ</div>
+      <div class="setting-group">
+        <div class="setting-row" style="border-bottom:none" onclick="forceReload()">
+          <div class="setting-row-left">
+            <div class="setting-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-3 6.2"/><path d="M20 5v5h-5"/></svg></div>
+            <div>
+              <div class="setting-name" data-i18n="app_reload">アプリを最新にする</div>
+              <div class="setting-desc" data-i18n="app_reload_desc">端末に残っている古い画面を消して読み込み直します</div>
+            </div>
+          </div>
+          <div class="setting-row-right">
+            <span class="setting-arrow"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- バージョン情報 -->
     <div class="section" style="animation-delay:.2s">
       <div class="section-label" data-i18n="sec_version">バージョン情報</div>
@@ -563,6 +582,10 @@ html{background:var(--bg2)}
           <div class="version-row">
             <span class="version-key">表示領域</span>
             <span class="version-val" id="vpInfo" style="font-size:10px;letter-spacing:.2px">–</span>
+          </div>
+          <div class="version-row">
+            <span class="version-key" data-i18n="cache_label">キャッシュ</span>
+            <span class="version-val" id="cacheName" style="font-size:11px">–</span>
           </div>
           <div class="version-row">
             <span class="version-key" data-i18n="update_label">アップデート</span>
@@ -619,7 +642,8 @@ const ICONS={moon:'<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.
 var I18N = {
   ja: {
     nav_theme:'テーマ切替',nav_settings:'設定',nav_logout:'ログアウト',
-    sec_display:'表示設定', sec_account:'アカウント', sec_version:'バージョン情報',
+    sec_display:'表示設定', sec_account:'アカウント', sec_version:'バージョン情報', sec_app:'アプリ',
+    app_reload:'アプリを最新にする', app_reload_desc:'端末に残っている古い画面を消して読み込み直します', cache_label:'キャッシュ',
     dark_mode:'ダークモード', dark_mode_desc:'画面の明暗を切り替えます',
     lang_label:'言語', lang_desc:'アプリの表示言語',
     pin_change:'PIN変更', pin_change_desc:'ログイン用4桁PINを変更します',
@@ -671,7 +695,8 @@ var I18N = {
   },
   vi: {
     nav_excel:'Tải Excel',nav_theme:'Giao diện',nav_settings:'Cài đặt',nav_logout:'Đăng xuất',
-    sec_display:'Cài đặt hiển thị', sec_account:'Tài khoản', sec_version:'Thông tin phiên bản',
+    sec_display:'Cài đặt hiển thị', sec_account:'Tài khoản', sec_version:'Thông tin phiên bản', sec_app:'Ứng dụng',
+    app_reload:'Cập nhật ứng dụng', app_reload_desc:'Xoá dữ liệu cũ trên máy và tải lại', cache_label:'Bộ nhớ đệm',
     dark_mode:'Chế độ tối', dark_mode_desc:'Chuyển đổi sáng/tối',
     lang_label:'Ngôn ngữ', lang_desc:'Ngôn ngữ hiển thị',
     pin_change:'Đổi PIN', pin_change_desc:'Đổi mã PIN 4 số để đăng nhập',
@@ -723,7 +748,8 @@ var I18N = {
   },
   en: {
     nav_excel:'Excel Download',nav_theme:'Theme',nav_settings:'Settings',nav_logout:'Logout',
-    sec_display:'Display', sec_account:'Account', sec_version:'Version Info',
+    sec_display:'Display', sec_account:'Account', sec_version:'Version Info', sec_app:'App',
+    app_reload:'Update the app', app_reload_desc:'Clear the old copy stored on this device and reload', cache_label:'Cache',
     dark_mode:'Dark Mode', dark_mode_desc:'Toggle light/dark appearance',
     lang_label:'Language', lang_desc:'App display language',
     pin_change:'Change PIN', pin_change_desc:'Change your 4-digit login PIN',
@@ -787,7 +813,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.7.9'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.8.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -1229,6 +1255,19 @@ function forceReload(){
   },600);
 }
 
+/* ===== 端末に残っているキャッシュ名を出す =====
+   sw.js の CACHE_NAME を転記するのではなく、実際に端末が持っているキャッシュを読む。
+   ファイル側が新しいのにここが古い番号のままなら、その端末に古い画面が残っている、と判る。 */
+function showCacheName(){
+  var el = document.getElementById('cacheName');
+  if(!el) return;
+  if(!('caches' in window)){ el.textContent = '–'; return; }
+  caches.keys().then(function(keys){
+    var mine = keys.filter(function(k){ return k.indexOf('traq-') === 0; });
+    el.textContent = mine.length ? mine.join(' / ') : '–';
+  }).catch(function(){ el.textContent = '–'; });
+}
+
 /* ===== 表示領域の実測（端末ごとのセーフエリア挙動を確認する診断／解決後に削除可） ===== */
 function showViewportInfo(){
   var el=document.getElementById('vpInfo'); if(!el) return;
@@ -1363,6 +1402,7 @@ function showToast(msg,type='info'){
   initUserInfo();
   checkVersion();
   showViewportInfo();
+  showCacheName();
   applyI18n();
   initPush();
 })();
