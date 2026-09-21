@@ -360,6 +360,12 @@ td.r,th.r{text-align:right}
 }
 /* ===== 日報タブ：タップで詳細 ===== */
 .fi.tap,#repBody table tbody tr.tap{cursor:pointer}
+/* バーの行もタップで詳細へ。display:contents なのでグリッドの桁ぞろえは崩れない */
+.brow{display:contents}
+.brow>*{cursor:pointer}
+.bars .bl,.bars .bv{padding:3px 0}
+.brow:hover .bl,.brow:hover .bv{color:var(--text1)}
+.brow:hover .bt{border-color:var(--orange)}
 .fi.tap:hover,#repBody table tbody tr.tap:hover{background:var(--bg3)}
 .fi.tap .fi-b{flex:1 1 auto;min-width:0;padding-right:8px}
 .fi-go{flex-shrink:0;align-self:center;color:var(--text2);opacity:.7}
@@ -1166,9 +1172,13 @@ function barsHTML(items, unit, cls){
   if(!items.length) return '';
   var max = Math.max.apply(null, items.map(function(r){ return r.v; }));
   return items.map(function(r){
-    return '<span class="bl">' + esc(r.l) + '</span><span class="bt ' + (r.c || cls || '')
+    var cells = '<span class="bl">' + esc(r.l) + '</span><span class="bt ' + (r.c || cls || '')
       + '"><i style="width:' + (max > 0 ? Math.round(r.v / max * 100) : 0) + '%"></i></span>'
       + '<span class="bv num">' + r.v + unit + (r.n ? '<span style="color:var(--text2)"> / ' + r.n + '</span>' : '') + '</span>';
+    var ids = r.ids || [];
+    if(!ids.length) return cells;
+    /* display:contents なので桁ぞろえは崩れない。クリックは中のセルから拾う */
+    return '<div class="brow" data-ids="' + ids.join(',') + '" data-lt="' + esc(r.lt || r.l) + '">' + cells + '</div>';
   }).join('');
 }
 function buildFindings(rows, prev){
@@ -1267,14 +1277,22 @@ function renderRep(){
 
   h += '<div class="sec"><div class="sec-h">' + IC_GRID + esc(t('sec_machine')) + '</div><div class="sec-b"><div class="bars">'
     + barsHTML(groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; })
-        .map(function(g){ return { l:g.k, v:g.stop, n:g.n }; }), t('u_min')) + '</div></div></div>';
+        .map(function(g){
+          return { l:g.k, v:g.stop, n:g.n, lt:g.k,
+                   ids:rows.filter(function(d){ return (d.machine || '—') === g.k; }).map(function(d){ return d.id; }) };
+        }), t('u_min')) + '</div></div></div>';
 
   h += '<div class="sec"><div class="sec-h">' + IC_LINES + esc(t('sec_cat')) + '</div><div class="sec-b"><div class="bars">'
     + barsHTML(groupBy(rows, function(d){ return d.category || '—'; }).sort(function(a, b){ return b.n - a.n; })
-        .map(function(g){ return { l:g.k, v:g.n, c:'' }; }), t('u_count'))
+        .map(function(g){
+          return { l:g.k, v:g.n, c:'', lt:g.k,
+                   ids:rows.filter(function(d){ return (d.category || '—') === g.k; }).map(function(d){ return d.id; }) };
+        }), t('u_count'))
     + '</div><div style="height:1px;background:var(--border);margin:10px 0"></div><div class="bars">'
-    + barsHTML([1,2,3].map(function(s){
-        return { l:t('shift_n', s), v:rows.filter(function(d){ return Number(d.shift) === s; }).length, c:'dn' };
+    + barsHTML([1,2,3].map(function(sh){
+        var hit = rows.filter(function(d){ return Number(d.shift) === sh; });
+        return { l:t('shift_n', sh), v:hit.length, c:'dn', lt:t('shift_n', sh),
+                 ids:hit.map(function(d){ return d.id; }) };
       }), t('u_count')) + '</div></div></div>';
 
   h += '<div class="sec"><div class="sec-h">' + IC_NOTE + esc(t('sec_rows')) + '</div><div class="sec-b" style="padding:0"><table>'
