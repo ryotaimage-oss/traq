@@ -363,9 +363,10 @@ td.r,th.r{text-align:right}
 .fi.tap:hover,#repBody table tbody tr.tap:hover{background:var(--bg3)}
 .fi.tap .fi-b{flex:1 1 auto;min-width:0;padding-right:8px}
 .fi-go{flex-shrink:0;align-self:center;color:var(--text2);opacity:.7}
-.rm-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.rm-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;touch-action:none;overscroll-behavior:contain}
 .rm-ov.hide{display:none}
-.rm-sheet{width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+html.rm-open,html.rm-open body{overflow:hidden;overscroll-behavior:none}
+.rm-sheet{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 @media(min-width:768px){.rm-ov{align-items:center}.rm-sheet{border-radius:var(--radius);max-height:82vh}}
 .rm-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px}
 .rm-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -1466,7 +1467,27 @@ document.getElementById('repBody').addEventListener('click', function(ev){
 /* ===== 日報タブ：トラブル詳細モーダル ===== */
 var RM = { back:null };
 function rmEl(){ return document.getElementById('repModal'); }
-function closeRepModal(){ RM.back = null; var e = rmEl(); e.className = 'rm-ov hide'; e.innerHTML = ''; }
+/* モーダル表示中は後ろの画面をスクロールさせない。
+   スマホで背面が動くのを防ぐため、位置を覚えてから止め、閉じるときに戻す。 */
+function rmLock(on){
+  var sc = document.getElementById('scroller');
+  if(on){
+    if(sc && !sc.hasAttribute('data-rm-top')){
+      sc.setAttribute('data-rm-top', String(sc.scrollTop));
+      sc.style.overflow = 'hidden';
+    }
+    document.documentElement.classList.add('rm-open');
+  } else {
+    if(sc && sc.hasAttribute('data-rm-top')){
+      var top = Number(sc.getAttribute('data-rm-top')) || 0;
+      sc.style.overflow = '';
+      sc.removeAttribute('data-rm-top');
+      sc.scrollTop = top;
+    }
+    document.documentElement.classList.remove('rm-open');
+  }
+}
+function closeRepModal(){ RM.back = null; var e = rmEl(); e.className = 'rm-ov hide'; e.innerHTML = ''; rmLock(false); }
 function repRow(id){
   var a = (REP.rows || []).filter(function(d){ return String(d.id) === String(id); })[0];
   return a || (TROUBLES || []).filter(function(d){ return String(d.id) === String(id); })[0] || null;
@@ -1475,6 +1496,8 @@ function rmOpen(html){
   var e = rmEl();
   e.innerHTML = '<div class="rm-sheet">' + html + '</div>';
   e.className = 'rm-ov';
+  rmLock(true);
+  e.querySelector('.rm-sheet').scrollTop = 0;
 }
 function rmRow(k, v){
   return '<div class="rm-row"><span class="rm-k">' + esc(k) + '</span><span class="rm-v">' + v + '</span></div>';
@@ -1534,7 +1557,7 @@ function openRepDetail(id){
   rmOpen(h);
 }
 rmEl().addEventListener('click', function(ev){
-  if(ev.target === this){ if(RM.back){ openRepList(RM.back.title, RM.back.ids); } else { closeRepModal(); } return; }
+  if(ev.target === this){ closeRepModal(); return; }
   if(ev.target.closest('[data-close]')){ closeRepModal(); return; }
   if(ev.target.closest('[data-back]')){ var b = RM.back; if(b) openRepList(b.title, b.ids); return; }
   var it = ev.target.closest('[data-open]');
