@@ -258,7 +258,7 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 .push-status{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border-radius:var(--radius);margin-bottom:12px;font-size:13px}
 .push-status.active{background:rgba(16,185,129,0.12);color:var(--success)}
 .push-status.inactive{background:rgba(239,68,68,0.12);color:var(--danger)}
-.btn-push{width:100%;padding:12px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-push{width:100%;padding:12px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-push:not(.btn-push-off){background:var(--orange);color:#000}
 .btn-push:not(.btn-push-off):hover{background:var(--orange-dark)}
 .btn-push:disabled{opacity:.5;cursor:not-allowed}
@@ -518,13 +518,17 @@ html{background:var(--bg2)}
       </div>
     </div>
 
-    <!-- Push通知設定（SL・adminのみ表示） -->
+    <!-- Push通知設定 — 2026/09/21、本人判断でこの欄は出さないことにした（機能が未完成のため）。
+         再開するときはこのコメントを下の内容に戻せばよい。JS（initPush / checkPushStatus /
+         subscribePush / unsubscribePush）と CSS（.push-* / .btn-push）はそのまま残してある。
+         initPush() は #sec-push が無ければ何もしないので、消したままでも副作用はない。
+
     <div class="section" id="sec-push" style="animation-delay:.12s">
       <div class="section-label" data-i18n="push_title">Push通知</div>
       <div class="setting-group" style="padding:16px">
         <p class="push-desc" data-i18n="push_desc">トラブル報告が提出されたときにプッシュ通知を受け取ります。</p>
         <div id="push-status" class="push-status">
-          <span id="push-status-icon">⏳</span>
+          <span id="push-status-icon"></span>
           <span id="push-status-text" data-i18n="push_checking">確認中...</span>
         </div>
         <button id="btn-push-on" class="btn-push" onclick="subscribePush()" style="display:none">
@@ -538,6 +542,7 @@ html{background:var(--bg2)}
         <p id="push-denied" class="push-warn" style="display:none" data-i18n="push_denied">通知がブロックされています。ブラウザの設定から許可してください。</p>
       </div>
     </div>
+    -->
 
     <!-- バージョン情報 -->
     <div class="section" style="animation-delay:.2s">
@@ -782,7 +787,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.7.6'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.7.7'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
@@ -1058,6 +1063,9 @@ function urlBase64ToUint8Array(base64String) {
   return arr;
 }
 
+/* 2026/09/21 — 設定画面の Push通知セクションは現在マークアップごとコメントアウトしてある。
+   そのため #sec-push が見つからず、この関数はここで何もせず戻る。機能を再開するときは
+   settings.html の該当コメントを元に戻すだけでよい。 */
 function initPush() {
   var sec = document.getElementById('sec-push');
   if (!sec) return;
@@ -1119,7 +1127,7 @@ async function checkPushStatus() {
 async function subscribePush() {
   var btnOn = document.getElementById('btn-push-on');
   btnOn.disabled = true;
-  btnOn.textContent = '⏳ ...';
+  btnOn.textContent = t('push_checking');   /* 絵文字は使わない方針 */
   try {
     var permission = await Notification.requestPermission();
     if (permission !== 'granted') {
