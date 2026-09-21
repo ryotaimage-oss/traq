@@ -7,7 +7,34 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Traq">
 <title>Traq – 金型トラブル入力</title>
-<link rel="manifest" href="./manifest.json">
+<script>
+/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
+   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
+   画面の高さ screen.height を --screen-h に入れ、CSS側で
+
+       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
+
+   として高さを決める。2項の小さい方を採るので、
+     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
+     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
+     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
+     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
+   screen.height は読み込み直後から安定して取得できるため、
+   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
+(function(){
+  var el=document.documentElement;
+  function fit(){
+    var sa=false;
+    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
+    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
+    else el.style.removeProperty('--screen-h');
+  }
+  fit();
+  window.addEventListener('pageshow',fit);
+  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
+})();
+</script>
+  <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -219,33 +246,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
-<script>
-/* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
-   小さく報告されることがある(実測: 画面932px / ビューポート873px)。
-   画面の高さ screen.height を --screen-h に入れ、CSS側で
-
-       min(var(--screen-h,100dvh), calc(100dvh + env(safe-area-inset-top,0px)))
-
-   として高さを決める。2項の小さい方を採るので、
-     ・iOSでビューポートが足りない  -> 画面高いっぱい(932px)になる
-     ・ビューポートが既に正しい      -> 画面高で頭打ち、伸びすぎない
-     ・Androidのようにナビゲーション -> dvh側が採用され、はみ出さない
-     ・ブラウザ表示(PWA以外)        -> --screen-h を設定せず 100dvh のまま
-   screen.height は読み込み直後から安定して取得できるため、
-   確定待ちによる高さの変動(画面の揺れ)が起きない。 */
-(function(){
-  var el=document.documentElement;
-  function fit(){
-    var sa=false;
-    try{ sa=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }catch(_){}
-    if(sa&&window.screen&&window.screen.height>0) el.style.setProperty('--screen-h',window.screen.height+'px');
-    else el.style.removeProperty('--screen-h');
-  }
-  fit();
-  window.addEventListener('pageshow',fit);
-  window.addEventListener('orientationchange',function(){setTimeout(fit,350);});
-})();
-</script>
 </head>
 <body>
 <div class="app">
@@ -264,6 +264,10 @@ html{background:var(--bg2)}
       <button class="snav-item" onclick="goHome()">
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <span data-i18n="nav_list">一覧</span>
+      </button>
+      <button class="snav-item" onclick="location.href='report.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span data-i18n="nav_report">日報</span>
       </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>

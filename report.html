@@ -97,6 +97,11 @@ html{color-scheme:dark;background:var(--bg1)}
 html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px)));font-family:'Noto Sans JP',sans-serif;background:var(--bg1);color:var(--text1);-webkit-tap-highlight-color:transparent;overflow:hidden}
 .app{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe-area-inset-top,0px)));display:flex;flex-direction:column;background:var(--bg1)}
 .main-column{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg1)}
+/* PC用サイドバー。スマホでは非表示で、下部メニューを使う */
+.sidebar{display:none}
+.logo-text{font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px;line-height:1}
+.lang-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:3px 6px;font-family:inherit;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
 .scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;background:var(--bg1)}
 .num{font-variant-numeric:tabular-nums}
 .ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
@@ -286,6 +291,30 @@ td.r,th.r{text-align:right}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 
+/* PC表示。他画面と同じサイドバー構成にそろえる */
+@media(min-width:768px){.bottom-nav{display:none}
+  .app{flex-direction:row}
+  .sidebar{display:flex;width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);flex-direction:column;overflow-y:auto}
+  .sidebar-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
+  .sidebar-user{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .sidebar-avatar{width:36px;height:36px;border-radius:var(--radius);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sidebar-name{font-size:13px;font-weight:700}
+  .sidebar-role{font-size:11px;color:var(--text2)}
+  .sidebar-nav{flex:1;padding:12px 8px}
+  .snav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;font-family:inherit;width:100%;text-align:left}
+  .snav-item:hover{background:var(--bg3);color:var(--text1)}
+  .snav-item.active{background:rgba(239,159,39,.12);color:var(--orange);font-weight:700}
+  .snav-icon{font-size:18px;width:24px;text-align:center}
+  .sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+  .role-admin .sidebar-avatar{background:rgba(239,68,68,0.25);color:#f87171}
+  .role-sl .sidebar-avatar{background:rgba(239,159,39,0.25);color:#e8a520}
+  .role-op .sidebar-avatar{background:rgba(30,58,110,0.35);color:#6b8ec5}
+  [data-theme="light"] .role-admin .sidebar-avatar{background:rgba(239,68,68,0.15);color:#c53030}
+  [data-theme="light"] .role-sl .sidebar-avatar{background:rgba(200,130,20,0.18);color:#b07a10}
+  [data-theme="light"] .role-op .sidebar-avatar{background:rgba(30,58,110,0.15);color:#2c4a80}
+  .topbar{display:none}
+}
+
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
 </style>
@@ -293,6 +322,63 @@ html{background:var(--bg2)}
 <body>
 
 <div class="app">
+
+  <!-- Sidebar (PC) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-text">TRAQ</span>
+    </div>
+    <div class="sidebar-user" id="sb-user-wrap">
+      <div class="sidebar-avatar" id="sb-avatar"></div>
+      <div>
+        <div class="sidebar-name" id="sb-name"></div>
+        <div class="sidebar-role" id="sb-role"></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="snav-item" onclick="goHome()">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <span data-i18n="nav_list">一覧</span>
+      </button>
+      <button class="snav-item active" onclick="void(0)">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span data-i18n="nav_report">日報</span>
+      </button>
+      <button class="snav-item" onclick="location.href='dashboard.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
+        <span data-i18n="nav_dashboard">ダッシュボード</span>
+      </button>
+      <button class="snav-item" onclick="location.href='excel_download.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v11M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg></span>
+        <span data-i18n="nav_excel">Excelダウンロード</span>
+      </button>
+      <button class="snav-item" onclick="goMaster()">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+        <span data-i18n="nav_master">マスタ</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="snav-item" onclick="toggleTheme()">
+        <span class="snav-icon" id="sb-theme-icon"></span>
+        <span data-i18n="nav_theme">テーマ切替</span>
+      </button>
+      <button class="snav-item" style="gap:6px">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
+        <button class="lang-btn" onclick="setLang('ja')" id="sb-lang-ja">JP</button>
+        <button class="lang-btn" onclick="setLang('vi')" id="sb-lang-vi">VN</button>
+        <button class="lang-btn" onclick="setLang('en')" id="sb-lang-en">EN</button>
+      </button>
+      <button class="snav-item" onclick="location.href='settings.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg></span>
+        <span data-i18n="nav_settings">設定</span>
+      </button>
+      <button class="snav-item" onclick="doLogout()" style="color:var(--danger)">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M14 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg></span>
+        <span data-i18n="nav_logout">ログアウト</span>
+      </button>
+    </div>
+  </aside>
+
   <div class="main-column">
 
     <div class="topbar">
@@ -397,6 +483,7 @@ const I18N = {
     master_denied:'マスタはSL・管理職・管理者のみ利用できます', btn_close:'閉じる',
     conf_summary:(n,t)=>`管理職 ${n}/${t} 名が確認`, conf_none:'管理職はまだ確認していません',
     nav_mgr:'確認', nav_list:'投稿一覧', nav_dashboard:'ダッシュボード', nav_settings:'設定',
+    nav_excel:'Excelダウンロード', nav_theme:'テーマ切替', nav_logout:'ログアウト',
     sm_total:'対象件数', sm_mine:'自分の未確認', sm_stop:'停止計（分）', sm_late:'全員未確認',
     f_new:'自分の未確認', f_done:'確認済み', f_all:'すべて',
     loading:'読み込み中…', empty_new:'未確認の異常はありません', empty_done:'まだ確認した異常はありません',
@@ -445,6 +532,7 @@ const I18N = {
     master_denied:'Chỉ SL, quản lý và quản trị mới dùng được', btn_close:'Đóng',
     conf_summary:(n,t)=>`${n}/${t} quản lý đã xác nhận`, conf_none:'Quản lý chưa xác nhận',
     nav_mgr:'Xác nhận', nav_list:'Danh sách', nav_dashboard:'Bảng điều khiển', nav_settings:'Cài đặt',
+    nav_excel:'Tải Excel', nav_theme:'Giao diện', nav_logout:'Đăng xuất',
     sm_total:'Tổng số', sm_mine:'Tôi chưa xác nhận', sm_stop:'Tổng dừng (phút)', sm_late:'Chưa ai xác nhận',
     f_new:'Tôi chưa xác nhận', f_done:'Đã xác nhận', f_all:'Tất cả',
     loading:'Đang tải…', empty_new:'Không có sự cố chưa xác nhận', empty_done:'Chưa xác nhận sự cố nào',
@@ -493,6 +581,7 @@ const I18N = {
     master_denied:'Master is for SL, managers and admins only', btn_close:'Close',
     conf_summary:(n,t)=>`${n}/${t} managers confirmed`, conf_none:'No manager has confirmed yet',
     nav_mgr:'Confirm', nav_list:'All posts', nav_dashboard:'Dashboard', nav_settings:'Settings',
+    nav_excel:'Excel Download', nav_theme:'Theme', nav_logout:'Logout',
     sm_total:'Total', sm_mine:'My unconfirmed', sm_stop:'Downtime (min)', sm_late:'None confirmed',
     f_new:'My unconfirmed', f_done:'Confirmed', f_all:'All',
     loading:'Loading…', empty_new:'No unconfirmed troubles', empty_done:'No troubles confirmed yet',
@@ -553,6 +642,8 @@ function applyI18n(){
   ['ja','vi','en'].forEach(function(l){
     var b = document.getElementById('lang-' + l);
     if(b) b.classList.toggle('active', l === currentLang);
+    var sb = document.getElementById('sb-lang-' + l);
+    if(sb) sb.classList.toggle('active', l === currentLang);
   });
 }
 function setLang(lang){
@@ -575,6 +666,8 @@ function initTheme(){
   document.documentElement.setAttribute('data-theme', theme);
   var b = document.getElementById('themeBtn');
   if(b) b.innerHTML = theme === 'dark' ? ICO_MOON : ICO_SUN;
+  var sb = document.getElementById('sb-theme-icon');
+  if(sb) sb.innerHTML = theme === 'dark' ? ICO_MOON : ICO_SUN;
 }
 function toggleTheme(){
   var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -583,6 +676,8 @@ function toggleTheme(){
   localStorage.setItem('traq_theme', next);
   var b = document.getElementById('themeBtn');
   if(b) b.innerHTML = next === 'dark' ? ICO_MOON : ICO_SUN;
+  var sb = document.getElementById('sb-theme-icon');
+  if(sb) sb.innerHTML = next === 'dark' ? ICO_MOON : ICO_SUN;
 }
 
 /* ===== Supabase ===== */
@@ -1280,6 +1375,15 @@ function exportXls(){
   if(topbarEl) topbarEl.classList.add(roleClass);
   var avEl = document.getElementById('mob-avatar');
   if(avEl) avEl.textContent = (SESSION.name || '?').charAt(0);
+  /* PCサイドバーの利用者欄 */
+  var sbWrap = document.getElementById('sb-user-wrap');
+  if(sbWrap) sbWrap.className = 'sidebar-user ' + roleClass;
+  var sbAv = document.getElementById('sb-avatar');
+  if(sbAv) sbAv.textContent = (SESSION.name || '?').charAt(0);
+  var sbNm = document.getElementById('sb-name');
+  if(sbNm) sbNm.textContent = SESSION.name || '';
+  var sbRl = document.getElementById('sb-role');
+  if(sbRl) sbRl.textContent = roleLabel();
 
   /* 日報は全員。確認タブは管理職とアプリ管理者だけ */
   if(canConfirm()){

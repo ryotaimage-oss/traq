@@ -290,6 +290,10 @@ html{background:var(--bg2)}
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
         <span data-i18n="nav_list">一覧</span>
       </button>
+      <button class="snav-item" onclick="location.href='report.html'">
+        <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+        <span data-i18n="nav_report">日報</span>
+      </button>
       <button class="snav-item" onclick="location.href='dashboard.html'">
         <span class="snav-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span data-i18n="nav_dashboard">ダッシュボード</span>
@@ -746,7 +750,7 @@ function applyI18n() {
 }
 
 /* ===== Version ===== */
-const APP_VERSION = '1.5.2'; // ★ アップデート時にここを変更する（例: '1.0.1'）
+const APP_VERSION = '1.6.0'; // ★ アップデート時にここを変更する（例: '1.0.1'）
 
 /* ===== Session ===== */
 /* ===== Supabase ===== */
