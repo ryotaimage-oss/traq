@@ -128,7 +128,7 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 [data-theme="light"] .role-admin .hdr-avatar{background:rgba(239,68,68,0.15);color:#c53030}
 
 /* ===== Main tabs ===== */
-.mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:6}
+.mtabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
 .mtab{flex:1;min-height:46px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:6px;transition:color .15s,border-color .15s}
 .mtab[aria-selected="true"]{color:var(--orange);border-bottom-color:var(--orange);background:var(--bg2)}
 .mtab-n{font-size:11px;padding:0 4px;border:1px solid var(--warning);color:var(--warning);font-weight:700}
@@ -349,15 +349,13 @@ td.r,th.r{text-align:right}
   /* ページ内タブは本文側へ。ヘッダーの高さは全画面56pxで固定 */
   .in-tabs{position:sticky;top:0;z-index:5;flex-shrink:0;display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
 }
-@media(min-width:768px){
-  /* 投稿一覧と同じく、本文は16pxの余白の中に置く */
-  #scroller{padding:16px}
-  .mtabs{position:static;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
-  .summary{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
-  .tabs{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
-  .list{padding:0}
-  .sec{margin:0 0 12px}
-}
+/* 投稿一覧と同じく、本文は16pxの余白の中に置く。画面幅によらず同じ形にする */
+#scroller{padding:16px}
+.mtabs{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+.summary{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+.tabs{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+.list{padding:0}
+.sec{margin:0 0 12px}
 /* ===== 日報タブ：タップで詳細 ===== */
 .fi.tap,#repBody table tbody tr.tap{cursor:pointer}
 /* バーの行もタップで詳細へ。display:contents なのでグリッドの桁ぞろえは崩れない */

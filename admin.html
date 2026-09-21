@@ -156,13 +156,14 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 
 /* Tab bar */
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
-@media(max-width:767px){
-  .scroll-area>.tab-bar{position:sticky;top:0;z-index:6;margin:-16px -16px 16px}
-  .scroll-area>.master-actions-bar{margin:-16px -16px 16px}
-}
+/* タブと操作バーも16pxの余白の中に。画面幅によらず同じ形にする。
+   以前は sticky + 負マージンで全幅に見せていたが、余白のあるスクロール領域では
+   sticky が padding box にそろうため、上に灰色の帯が残り、下の操作バーが潜り込んでいた。 */
+.scroll-area>.tab-bar{border:1px solid var(--border);border-radius:var(--radius);margin:0 0 12px}
+.scroll-area>.master-actions-bar{border:1px solid var(--border);border-radius:var(--radius);margin:0 0 12px}
 @media(min-width:768px){
+  /* PCでは同じ操作がページヘッダー右にあるので出さない */
   .scroll-area>.master-actions-bar{display:none}
-  .scroll-area>.tab-bar{border:1px solid var(--border);border-radius:var(--radius);margin:0 0 12px}
 }
 .tab-bar::-webkit-scrollbar{display:none}
 .tab-item{flex:1;min-width:80px;padding:12px 8px;text-align:center;font-family:inherit;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
