@@ -28,7 +28,7 @@
 
   --on-success: #0B1524;
   /* 役職カラー（ダーク用に明度を上げた版） */
-  --c-kacho:#E0737C; --c-chief:#6BA8E8; --c-leader:#EF9F27;
+  --c-jicho:#E0737C; --c-chief:#6BA8E8; --c-leader:#EF9F27;
   --c-op:#8FA6C4; --c-sys:#8D95A3;
 }
 html{color-scheme:dark;background:var(--bg1)}
@@ -44,7 +44,7 @@ html{color-scheme:dark;background:var(--bg1)}
 
   --on-success: #FFFFFF;
   /* 白背景では同じ色味を濃くする */
-  --c-kacho:#9E2A33; --c-chief:#1A5FA8; --c-leader:#8F5708;
+  --c-jicho:#9E2A33; --c-chief:#1A5FA8; --c-leader:#8F5708;
   --c-op:#1F3864; --c-sys:#5F6672;
 }
 .step-dot svg.ico{width:13px;height:13px;margin:0 auto}
@@ -383,7 +383,7 @@ const I18N = {
     shift_badge: s => `${s}直のユーザー`,
     user_title:'ユーザーを選択してください', search_ph:'名前で検索...',
     role_op:'作業者', role_sl:'シフトリーダー', role_adm:'Admin',
-    role_kacho:'課長', role_chief:'チーフ', role_leader:'リーダー', role_sys:'システム管理者',
+    role_jicho:'次長', role_chief:'チーフ', role_leader:'リーダー', role_sys:'システム管理者',
     tab_mgr:'管理職', tab_op:'作業者', recent_cap:'前回のログイン',
     n_people:(n)=>`${n}人`, no_user:'ユーザーを取得できませんでした',
     pin_clear:'クリア', login_btn:'ログイン',
@@ -399,7 +399,7 @@ const I18N = {
     shift_badge: s => `Nhân viên ca ${s}`,
     user_title:'Chọn người dùng', search_ph:'Tìm theo tên...',
     role_op:'Công nhân', role_sl:'Trưởng ca', role_adm:'Admin',
-    role_kacho:'Trưởng phòng', role_chief:'Chief', role_leader:'Leader', role_sys:'Quản trị hệ thống',
+    role_jicho:'Phó phòng', role_chief:'Chief', role_leader:'Leader', role_sys:'Quản trị hệ thống',
     tab_mgr:'Quản lý', tab_op:'Công nhân', recent_cap:'Đăng nhập lần trước',
     n_people:(n)=>`${n} người`, no_user:'Không lấy được danh sách người dùng',
     pin_clear:'Xóa', login_btn:'Đăng nhập',
@@ -415,7 +415,7 @@ const I18N = {
     shift_badge: s => `Shift ${s} users`,
     user_title:'Select user', search_ph:'Search by name...',
     role_op:'Operator', role_sl:'Shift leader', role_adm:'Admin',
-    role_kacho:'Section chief', role_chief:'Chief', role_leader:'Leader', role_sys:'System admin',
+    role_jicho:'Deputy manager', role_chief:'Chief', role_leader:'Leader', role_sys:'System admin',
     tab_mgr:'Managers', tab_op:'Operators', recent_cap:'Last sign-in',
     n_people:(n)=>`${n}`, no_user:'Could not load users',
     pin_clear:'Clear', login_btn:'Login',
@@ -581,7 +581,7 @@ function userRank(u){
 /* 役職の表記と色 */
 function userRole(u){
   if (u.role === 'admin') return { label: t('role_sys'), v: '--c-sys' };
-  if (u.title === '次長')   return { label: t('role_kacho'), v: '--c-kacho' };
+  if (u.title === '次長')   return { label: t('role_jicho'), v: '--c-jicho' };
   if (u.title === 'チーフ') return { label: t('role_chief'), v: '--c-chief' };
   if (u.title === 'リーダー') return { label: t('role_leader'), v: '--c-leader' };
   if (u.role === 'leader' || u.role === 'sl') return { label: t('role_sl'), v: '--c-leader' };
