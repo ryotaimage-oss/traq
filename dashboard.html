@@ -148,7 +148,8 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 
 /* Scroll */
 .scroll-area{flex:1;overflow-y:auto;padding:16px 16px 32px;background:var(--bg1)}
-.inner{max-width:900px;margin:0 auto}
+/* PCではグラフ・表を広く使う。狭い画面では元々幅いっぱいなので影響なし */
+.inner{max-width:none;margin:0 auto}
 
 /* Filters */
 
@@ -677,7 +678,14 @@ const I18N={
     filter_detail:'Detail',filter_count:(n)=>`${n} items`,
     nav_excel:'Excel Download',nav_theme:'Theme',nav_logout:'Logout',page_title:'Dashboard',nav_list:'Post List',nav_dashboard:'Dashboard', nav_report:'Daily report', status_pending:'Pending', status_approved:'Approved', status_rejected:'Rejected', status_draft:'Draft',nav_master:'Master',master_denied_title:'Access restricted',master_denied:'Master is for SL and Admin only',nav_settings:'Settings',filter_all_lines:'All lines',filter_keyword:'Filter by machine/product',filter_clear:'Clear',p7:'Last 7d',p30:'Last 30d',p90:'Last 90d',p_all:'All',t_all:'All',t_eq:'Equipment',t_md:'Mold',kpi_total:'Total',kpi_eq:'Equipment',kpi_md:'Mold',kpi_stop:'Downtime(min)',chart1_title:'Daily Count',chart2_title:'Daily Downtime (min)',chart3_title:'First / Recurrence',chart4_title:'Equipment by Category',chart5_title:'Mold by Category',chart6_title:'Recurrence Rate',chart7_title:'Top 10 Machines',chart8_title:'Top 10 Products',chart9_title:'Heatmap by Time Slot',chart10_title:'Top 10 Lines',chart11_title:'Avg Downtime by Line (min)',chart12_title:'Count by Shift',chart13_title:'Top 10 Longest Downtime',heatmap_no_data:'No stop_start data',hm_few:'Low',hm_many:'High',cmp_title:'Comparison',cmp_week:'Week',cmp_month:'Month',cmp_done:'Completed',cmp_partial:'In progress',cmp_prev:'Prev',cmp_lastweek:'Last week',cmp_2weeksago:'2 weeks ago',cmp_thisweek:'This week',cmp_lastmonth:'Last month',cmp_2monthsago:'2 months ago',cmp_thismonth:'This month',avg_min:'min (avg)',first:'First',rec:'Recurrence',no_data:'No data'}
 };
-function t(k){return(I18N[currentLang]||I18N.ja)[k]||(I18N.ja[k]||k)}
+/* 翻訳が関数のとき(例: filter_count)は、後ろの引数を渡して呼び出す。
+   他画面の t() と同じ挙動にそろえている。 */
+function t(k){
+  var v=(I18N[currentLang]||I18N.ja)[k];
+  if(v===undefined) v=I18N.ja[k];
+  if(typeof v==='function') return v.apply(null,Array.prototype.slice.call(arguments,1));
+  return v===undefined?k:v;
+}
 function setLang(l){
   currentLang=l;localStorage.setItem('traq_lang',l);
   ['ja','vi','en'].forEach(x=>{var el=document.getElementById('sb-lang-'+x);if(el)el.classList.toggle('active',x===l);});

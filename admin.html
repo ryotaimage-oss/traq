@@ -157,7 +157,8 @@ html,body{height:100%;height:min(var(--screen-h, 100dvh), calc(100dvh + env(safe
 
 /* Scroll area */
 .scroll-area{flex:1;overflow-y:auto;padding:16px;padding-bottom:8px;background:var(--bg1)}
-.inner{max-width:900px;margin:0 auto}
+/* PCでは表を広く使う。狭い画面では元々幅いっぱいなので影響なし */
+.inner{max-width:none;margin:0 auto}
 
 /* Panel */
 .panel{display:none}

@@ -156,7 +156,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 /* メイン */
 .main { flex: 1; overflow-y: auto; padding: 24px 16px; background:var(--bg);}
-.main-inner { max-width: 560px; margin: 0 auto; width: 100%; }
+/* PCでは一覧を広く使う。狭い画面では元々幅いっぱいなので影響なし */
+.main-inner { max-width: none; margin: 0 auto; width: 100%; }
 
 /* セクション */
 .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
