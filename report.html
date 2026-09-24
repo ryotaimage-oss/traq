@@ -554,6 +554,9 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} で <b>${st}分</b>停止`,
     f_long_s:'60分超の長時間停止。個別の原因究明が要ります。',
     f_zero:(n)=>`管理職が誰も確認していない案件が <b>${n}件</b>`,
+    f_cont3:(mc,d,st)=>`<b>${mc}</b> で同じ内容が <b>${d}日連続</b>（本日 ${st}分）`,
+    f_cont3_s:(md,det)=>`前日 ${md}「${det}」`,
+    f_cont3_s3:(md,det)=>`3日以上続いています。前日 ${md}「${det}」`,
     rel_h:'関連', rel_prev:(md)=>`${md} の同じ内容`,
     rel_hist:(mc,c)=>`${mc} ${c} の直近7日をまとめて見る`, rel_hist_t:(mc,c)=>`${mc} ${c} の直近7日`,
     rel_same:(mc)=>`${mc} の当日の他の異常`, rel_same_t:(mc)=>`${mc} の当日の異常`,
@@ -616,6 +619,9 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} dừng <b>${st} phút</b>`,
     f_long_s:'Dừng trên 60 phút. Cần điều tra nguyên nhân riêng.',
     f_zero:(n)=>`Có <b>${n}</b> sự cố chưa ai trong ban quản lý xác nhận`,
+    f_cont3:(mc,d,st)=>`Máy <b>${mc}</b>: cùng nội dung <b>${d} ngày liên tiếp</b> (hôm nay ${st}p)`,
+    f_cont3_s:(md,det)=>`Hôm trước ${md}: “${det}”`,
+    f_cont3_s3:(md,det)=>`Đã kéo dài từ 3 ngày. Hôm trước ${md}: “${det}”`,
     rel_h:'Liên quan', rel_prev:(md)=>`Cùng nội dung ngày ${md}`,
     rel_hist:(mc,c)=>`Xem 7 ngày gần đây của ${mc} ${c}`, rel_hist_t:(mc,c)=>`${mc} ${c} · 7 ngày gần đây`,
     rel_same:(mc)=>`Sự cố khác của ${mc} trong ngày`, rel_same_t:(mc)=>`${mc} · trong ngày`,
@@ -678,6 +684,9 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} stopped for <b>${st} min</b>`,
     f_long_s:'Over 60 minutes. Needs individual root-cause work.',
     f_zero:(n)=>`<b>${n}</b> troubles confirmed by nobody in management`,
+    f_cont3:(mc,d,st)=>`<b>${mc}</b>: same issue <b>${d} days running</b> (${st}m today)`,
+    f_cont3_s:(md,det)=>`Previous day ${md}: “${det}”`,
+    f_cont3_s3:(md,det)=>`Running for 3+ days. Previous day ${md}: “${det}”`,
     rel_h:'Related', rel_prev:(md)=>`Same issue on ${md}`,
     rel_hist:(mc,c)=>`See the last 7 days of ${mc} ${c}`, rel_hist_t:(mc,c)=>`${mc} ${c} · last 7 days`,
     rel_same:(mc)=>`Other troubles on ${mc} today`, rel_same_t:(mc)=>`${mc} · today`,
@@ -1133,6 +1142,25 @@ function barsHTML(items, unit, cls){
     return '<div class="brow" data-ids="' + ids.join(',') + '" data-lt="' + esc(r.lt || r.l) + '">' + cells + '</div>';
   }).join('');
 }
+/* 内容が同じ問題かどうかの目安。2文字ずつの重なり（Dice係数）で見る。日本語でも動く。
+   実測: 「製品アッパー部ショート」vs「ホットランナー断線」= 0.00、
+         「製品アッパー部ショート」vs「アッパー部ショート　成形条件を調整して復帰」= 0.55。
+   言い方が大きく違うと拾えない（「吸着異常多発」vs「取出機の吸着が弱い」= 0.15）。
+   そのぶんは要点に前日の内容を出して、人が判断できるようにしている。 */
+const CONT_SIM = 0.35;
+function textSim(a, b){
+  var norm = function(s){ return String(s == null ? '' : s).replace(/[\s　、。・,.\-–—()（）]/g, ''); };
+  a = norm(a); b = norm(b);
+  if(a.length < 2 || b.length < 2) return (a && a === b) ? 1 : 0;
+  var gram = function(s){ var m = {}; for(var i = 0; i < s.length - 1; i++){ var k = s.substr(i, 2); m[k] = (m[k] || 0) + 1; } return m; };
+  var ga = gram(a), gb = gram(b), inter = 0, na = 0, nb = 0, k1, k2;
+  for(k1 in ga){ na += ga[k1]; if(gb[k1]) inter += Math.min(ga[k1], gb[k1]); }
+  for(k2 in gb){ nb += gb[k2]; }
+  return na + nb === 0 ? 0 : (2 * inter) / (na + nb);
+}
+/* 作業者が「再発」で入力したか */
+function isRecur(d){ return d.occurrence === 'recurrence' || d.occurrence === 'repeat'; }
+
 function buildFindings(rows, prev, hist){
   var out = [], tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
 
@@ -1140,39 +1168,52 @@ function buildFindings(rows, prev, hist){
   hist = hist || [];
   var base = (rows[0] && rows[0].date) || REP.date;
 
-  /* ── 連日（v1.9.2 で作り直した） ─────────────────────────────
-     旧: 前日に同じ「機番」が出ていれば連日とみなし、機番を1行に並べていた。
-         区分を見ていないので、昨日バリ・今日その他でも「前日の処置が効いていない」と出た。
-     新: 「機番＋区分」が一致した日を当日からさかのぼって数え、2日以上続いたものだけを
-         1件ずつ出す。機番だけの一致は別の問題のことがあるので拾わない。 */
-  var seen = {};
-  hist.forEach(function(d){
-    if(d.machine && d.category) seen[d.date + '|' + d.machine + '|' + d.category] = true;
-  });
+  /* ── 連日（v1.9.5 で作り直した） ─────────────────────────────
+     v1.9.2: 「機番＋区分」の一致で連日とした。
+       → 区分「その他」は“分類できなかったもの”の置き場なので分類として機能せず、
+         27号機の「製品アッパー部ショート」と「ホットランナー断線」が同じ連日として出た。
+         しかも両方とも入力は「初発」で、現場の判断と食い違っていた。
+     v1.9.5: 同じ機番で、内容が似ているか、当日の入力が「再発」のときだけ連日とする。
+       ・区分は問わない。同じ問題が別の区分で入力されていても拾える
+       ・判定は外れることがあるので、要点の行に前日の内容をそのまま出して人が捨てられるようにする */
+  var pickedC = [];   /* 同じ機番で内容が似ている当日の行は、代表1つにまとめる */
+  rows.filter(function(d){ return d.machine; })
+      .slice().sort(function(a, b){ return b.stop_minutes - a.stop_minutes; })
+      .forEach(function(d){
+        var dup = pickedC.some(function(p){
+          return p.machine === d.machine && textSim(p.detail, d.detail) >= CONT_SIM;
+        });
+        if(!dup) pickedC.push(d);
+      });
   var streaks = [];
-  groupBy(rows.filter(function(d){ return d.machine && d.category; }),
-          function(d){ return d.machine + '|' + d.category; }).forEach(function(g){
-    var p = g.k.split('|'), n = 0;
-    for(var i = 0; i < HIST_DAYS; i++){
-      if(seen[addDays(base, -i) + '|' + p[0] + '|' + p[1]]) n++; else break;
+  pickedC.forEach(function(d){
+    var chain = [d];
+    for(var k = 1; k < HIST_DAYS; k++){
+      var day = addDays(base, -k), hit = null;
+      for(var j = 0; j < hist.length; j++){
+        var r = hist[j];
+        if(r.date !== day || r.machine !== d.machine) continue;
+        /* 内容が似ている、または当日の入力が「再発」で区分も同じ */
+        if(textSim(d.detail, r.detail) >= CONT_SIM
+           || (isRecur(d) && r.category && r.category === d.category)){ hit = r; break; }
+      }
+      if(!hit) break;
+      chain.push(hit);
     }
-    if(n >= 2) streaks.push({ m:p[0], c:p[1], days:n, stop:g.stop });
+    if(chain.length >= 2) streaks.push({ d:d, days:chain.length, chain:chain });
   });
   /* 続いている日数が長い順、同じなら本日の停止が長い順 */
-  streaks.sort(function(a, b){ return (b.days - a.days) || (b.stop - a.stop); });
+  streaks.sort(function(a, b){ return (b.days - a.days) || (b.d.stop_minutes - a.d.stop_minutes); });
   streaks.forEach(function(x){
-    /* タップ対象は続いている日数ぶん（当日→過去の順）。
-       当日の1件だけだと送り先が無く、連日の要点なのに前日を見に行けないため（v1.9.4） */
-    var sIds = [];
-    for(var k = 0; k < x.days; k++){
-      var day = addDays(base, -k);
-      hist.forEach(function(r){
-        if(r.date === day && r.machine === x.m && r.category === x.c) sIds.push(r.id);
-      });
-    }
-    out.push({ lv:'bad', t:t('f_cont2', esc(x.m), esc(x.c), x.days, x.stop),
-      s:t(x.days >= 3 ? 'f_cont2_s3' : 'f_cont2_s2'),
-      lt:x.m + ' ' + x.c, ids:sIds });
+    var pv = x.chain[1];
+    var det = String(pv.detail || '').replace(/\s+/g, ' ');
+    if(det.length > 40) det = det.slice(0, 40) + '…';
+    out.push({ lv:'bad',
+      t:t('f_cont3', esc(x.d.machine), x.days, x.d.stop_minutes),
+      s:t(x.days >= 3 ? 'f_cont3_s3' : 'f_cont3_s', mdOf(pv.date), det || '–'),
+      lt:x.d.machine + ' ' + (x.d.category || ''),
+      /* タップ対象は連日の当事者だけ（当日→過去の順）。送りで日をまたいで見比べられる */
+      ids:x.chain.map(function(r){ return r.id; }) });
   });
 
   /* ── 集中（v1.9.2 で条件を変えた） ───────────────────────────
