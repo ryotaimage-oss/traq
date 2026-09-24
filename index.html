@@ -205,6 +205,43 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
 /* 画面外の下地はナビと同色にする（アプリ外周にページ背景を出さない） */
 html{background:var(--bg2)}
+
+/* ===== PC 2カラム（v1.9.3）ここから =====
+   index.html には元々メディアクエリが1つも無く、1440pxのPCでも380px幅で出ていた。
+   スマホ（767px以下）の見た目は変えない。PCのときだけ左に案内、右に操作を置く。 */
+.bside-logo,.bpick{display:none}
+@media(min-width:768px){
+  .logo-area,.sub-logo{display:none}   /* ロゴは左パネルへ移す */
+  .card{max-width:880px;padding:0;display:grid;grid-template-columns:300px 1fr;overflow:hidden;align-items:stretch}
+  .bside{background:var(--bg3);border-right:1px solid var(--border);padding:32px 26px;display:flex;flex-direction:column;gap:20px}
+  .bmain{padding:32px 36px}
+  .bside-logo{display:block}
+  .bside-logo .logo-text{font-size:38px;letter-spacing:5px}
+  .bsub{font-size:10px;color:var(--text2);letter-spacing:1px;margin-top:4px}
+  .bpick{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+  .bpick-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--text2);padding-top:10px;border-top:1px solid var(--border)}
+  .bpick-row b{color:var(--text1);font-size:13px;font-weight:600}
+  .bpick-row.todo b{color:var(--text2);font-weight:400}
+  /* ステップは縦並びにする */
+  .steps{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:16px;margin:0}
+  .steps .step-item{display:flex;align-items:center;gap:10px;text-align:left}
+  .steps .step-dot{margin:0}
+  .steps .step-label{font-size:12px}
+  .step-line{display:none}
+  /* 右側は操作しやすい大きさに */
+  .card-title{font-size:18px}
+  .shift-btn{padding:20px 0}
+  .shift-num{font-size:26px}
+  .user-grid{grid-template-columns:repeat(4,1fr);gap:10px}
+  .user-tile{min-height:80px}
+  .ut-n{font-size:15px}
+  .pin-dots{gap:14px;margin-bottom:20px}
+  .pin-dot{width:50px;height:56px;font-size:28px}
+  .pin-keypad{max-width:320px;gap:10px}
+  .key-btn{height:60px;font-size:21px}
+  .btn-primary{height:50px;font-size:15px}
+}
+/* ===== PC 2カラム ここまで ===== */
 </style>
 <script>
 /* iOSのスタンドアロンPWAでは、ビューポート(100dvh)が画面より上部セーフエリア分だけ
@@ -261,6 +298,9 @@ html{background:var(--bg2)}
     <p class="sub-logo">TROUBLETRACK SYSTEM</p>
     <!-- Step 1: シフト選択 -->
     <div class="card" id="step1">
+      <div class="bside">
+        <div class="bside-logo"><span class="logo-text">TRAQ</span><div class="bsub">TROUBLETRACK SYSTEM</div></div>
+
       <div class="steps">
         <div class="step-item"><div class="step-dot active">1</div><div class="step-label active" data-i18n="step_shift">直</div></div>
         <div class="step-line pending"></div>
@@ -268,6 +308,13 @@ html{background:var(--bg2)}
         <div class="step-line pending"></div>
         <div class="step-item"><div class="step-dot">3</div><div class="step-label" data-i18n="step_pin">PIN</div></div>
       </div>
+        <div class="bpick">
+          <div class="bpick-row bp-shift todo"><span data-i18n="step_shift">直</span><b>—</b></div>
+          <div class="bpick-row bp-user todo"><span data-i18n="step_name">名前</span><b>—</b></div>
+        </div>
+      </div>
+      <div class="bmain">
+
       <div class="card-title" data-i18n="shift_title">シフトを選択してください</div>
       <div class="card-hint" data-i18n="shift_hint">本日のシフトを選んでください</div>
       <div class="shift-grid">
@@ -284,9 +331,13 @@ html{background:var(--bg2)}
           <span class="shift-time">00–08</span>
         </button>
       </div>
+          </div>
     </div>
     <!-- Step 2: ユーザー選択 -->
     <div class="card" id="step2" style="display:none">
+      <div class="bside">
+        <div class="bside-logo"><span class="logo-text">TRAQ</span><div class="bsub">TROUBLETRACK SYSTEM</div></div>
+
       <div class="steps">
         <div class="step-item"><div class="step-dot done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div><div class="step-label done" data-i18n="step_shift">直</div></div>
         <div class="step-line done"></div>
@@ -294,6 +345,13 @@ html{background:var(--bg2)}
         <div class="step-line pending"></div>
         <div class="step-item"><div class="step-dot">3</div><div class="step-label" data-i18n="step_pin">PIN</div></div>
       </div>
+        <div class="bpick">
+          <div class="bpick-row bp-shift todo"><span data-i18n="step_shift">直</span><b>—</b></div>
+          <div class="bpick-row bp-user todo"><span data-i18n="step_name">名前</span><b>—</b></div>
+        </div>
+      </div>
+      <div class="bmain">
+
       <div class="card-title" data-i18n="user_title">ユーザーを選択してください</div>
       <div class="card-hint" id="shiftBadge"></div>
       <div id="recentWrap"></div>
@@ -302,9 +360,13 @@ html{background:var(--bg2)}
         <div class="loading">読み込み中...</div>
       </div>
       <button class="btn-secondary" onclick="goStep(1)">← <span data-i18n="back">もどる</span></button>
+          </div>
     </div>
     <!-- Step 3: PIN入力 -->
     <div class="card" id="step3" style="display:none">
+      <div class="bside">
+        <div class="bside-logo"><span class="logo-text">TRAQ</span><div class="bsub">TROUBLETRACK SYSTEM</div></div>
+
       <div class="steps">
         <div class="step-item"><div class="step-dot done"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div><div class="step-label done" data-i18n="step_shift">直</div></div>
         <div class="step-line done"></div>
@@ -312,6 +374,13 @@ html{background:var(--bg2)}
         <div class="step-line done"></div>
         <div class="step-item"><div class="step-dot active">3</div><div class="step-label active" data-i18n="step_pin">PIN</div></div>
       </div>
+        <div class="bpick">
+          <div class="bpick-row bp-shift todo"><span data-i18n="step_shift">直</span><b>—</b></div>
+          <div class="bpick-row bp-user todo"><span data-i18n="step_name">名前</span><b>—</b></div>
+        </div>
+      </div>
+      <div class="bmain">
+
       <div class="pin-user-info">
         <div class="pin-avatar" id="pinAvatar"></div>
         <div>
@@ -344,9 +413,10 @@ html{background:var(--bg2)}
         <button class="btn-primary" id="loginBtn" onclick="doLogin()" disabled data-i18n="login_btn">ログイン</button>
       </div>
       <button class="btn-secondary" onclick="goStep(2)">← <span data-i18n="back">もどる</span></button>
+          </div>
     </div>
   </main>
-  <div class="footer"><span>TROUBLETRACK SYSTEM v2.0</span></div>
+  <div class="footer"><span>TROUBLETRACK SYSTEM</span></div>
 </div>
 <div class="toast" id="toastEl"></div>
 <script>
@@ -380,7 +450,7 @@ const I18N = {
   ja:{
     shift_title:'シフトを選択してください', shift_hint:'本日のシフトを選んでください',
     shift1_name:'1直', shift2_name:'2直', shift3_name:'3直',
-    shift_badge: s => `${s}直のユーザー`,
+    shift_badge: s => `${s}直のユーザー`, shift_short: s => `${s}直`,
     user_title:'ユーザーを選択してください', search_ph:'名前で検索...',
     role_op:'作業者', role_sl:'シフトリーダー', role_adm:'Admin',
     role_jicho:'次長', role_chief:'チーフ', role_leader:'リーダー', role_sys:'システム管理者',
@@ -396,7 +466,7 @@ const I18N = {
   vi:{
     shift_title:'Chọn ca làm việc', shift_hint:'Vui lòng chọn ca hôm nay',
     shift1_name:'Ca 1', shift2_name:'Ca 2', shift3_name:'Ca 3',
-    shift_badge: s => `Nhân viên ca ${s}`,
+    shift_badge: s => `Nhân viên ca ${s}`, shift_short: s => `Ca ${s}`,
     user_title:'Chọn người dùng', search_ph:'Tìm theo tên...',
     role_op:'Công nhân', role_sl:'Trưởng ca', role_adm:'Admin',
     role_jicho:'Phó phòng', role_chief:'Chief', role_leader:'Leader', role_sys:'Quản trị hệ thống',
@@ -412,7 +482,7 @@ const I18N = {
   en:{
     shift_title:'Select your shift', shift_hint:'Choose your shift for today',
     shift1_name:'Shift 1', shift2_name:'Shift 2', shift3_name:'Shift 3',
-    shift_badge: s => `Shift ${s} users`,
+    shift_badge: s => `Shift ${s} users`, shift_short: s => `Shift ${s}`,
     user_title:'Select user', search_ph:'Search by name...',
     role_op:'Operator', role_sl:'Shift leader', role_adm:'Admin',
     role_jicho:'Deputy manager', role_chief:'Chief', role_leader:'Leader', role_sys:'System admin',
@@ -452,6 +522,7 @@ function applyI18n() {
     const sb = document.getElementById('shiftBadge');
     if (sb) sb.textContent = t('shift_badge', state.selectedShift);
   }
+  if (typeof syncSidePanel === 'function') syncSidePanel();
 }
 
 /* ===== State ===== */
@@ -519,10 +590,49 @@ function toggleTheme() {
 function goStep(n) {
   [1,2,3].forEach(i => {
     const el = document.getElementById('step'+i);
-    if (el) el.style.display = i === n ? 'block' : 'none';
+    /* 'block' を入れるとPCの2カラム（display:grid）をインラインで上書きしてしまうので、
+       表示するときは指定を外してCSS側に任せる（v1.9.3 でここを踏んだ） */
+    if (el) el.style.display = i === n ? '' : 'none';
   });
   updateProgressBar(n);
+  syncSidePanel();
 }
+
+/* ===== PCの左パネル（v1.9.3）=====
+   選んだ直と名前を左に出しておく。スマホでは CSS で隠れているので何も起きない。 */
+function syncSidePanel() {
+  var sh = state.selectedShift, u = state.selectedUser;
+  document.querySelectorAll('.bp-shift').forEach(function(el){
+    el.classList.toggle('todo', !sh);
+    var b = el.querySelector('b');
+    if (b) b.textContent = sh ? t('shift_short', sh) : '—';
+  });
+  document.querySelectorAll('.bp-user').forEach(function(el){
+    el.classList.toggle('todo', !u);
+    var b = el.querySelector('b');
+    if (b) b.textContent = u ? u.name : '—';
+  });
+}
+
+/* ===== テンキー・数字キーでのPIN入力（v1.9.3）=====
+   これまでは12個のボタンに onclick が付いているだけで、キーボードを受けていなかった。
+   ⚠ NumLock が切れているとテンキーは ev.key が 'End' や 'ArrowDown' になって数字として届かない。
+      NumLock に左右されない ev.code（Numpad0〜Numpad9）も見ること。 */
+document.addEventListener('keydown', function(ev){
+  var st3 = document.getElementById('step3');
+  if (!st3 || st3.style.display === 'none') return;      /* PIN画面のときだけ */
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  var d = null;
+  if (ev.key >= '0' && ev.key <= '9') d = ev.key;
+  else if (/^Numpad[0-9]$/.test(ev.code)) d = ev.code.slice(6);
+  if (d !== null) { ev.preventDefault(); pinKey(d); return; }
+  if (ev.key === 'Backspace') { ev.preventDefault(); pinDel(); return; }
+  if (ev.key === 'Escape')    { ev.preventDefault(); pinClear(); return; }
+  if (ev.key === 'Enter') {
+    var b = document.getElementById('loginBtn');
+    if (b && !b.disabled) { ev.preventDefault(); doLogin(); }
+  }
+});
 
 function updateProgressBar(n) {
   for (let i = 1; i <= 3; i++) {
