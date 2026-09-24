@@ -542,6 +542,13 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} で <b>${st}分</b>停止`,
     f_long_s:'60分超の長時間停止。個別の原因究明が要ります。',
     f_zero:(n)=>`管理職が誰も確認していない案件が <b>${n}件</b>`,
+    f_cont2:(mc,c,d,st)=>`<b>${mc}</b> ${c} が <b>${d}日連続</b>（本日 ${st}分）`,
+    f_cont2_s3:'3日以上続いています。前日までの処置が効いていません。恒久対策の対象です。',
+    f_cont2_s2:'前日に続けて同じ内容が出ています。前日の処置を確認してください。',
+    f_focus2:(mc,st,pc,n)=>`<b>${mc}</b> の停止が <b>${st}分</b>（全体の ${pc}%・${n}件）`,
+    f_focus2_s:'本日の停止がこの設備に偏っています。',
+    f_long2:(n,sum,pc)=>`60分超の停止が <b>${n}件</b>（計 <b>${sum}分</b>・全体の ${pc}%）`,
+    f_long2_s:(top)=>`長い順に ${top}`, f_long2_more:'ほか', f_long2_lt:'60分超の停止',
     f_none:'特記事項なし', f_none_s:'集計ルールに該当する事象はありませんでした。',
     toast_conf:(at)=>`確認を記録しました　${at}`,
     toast_conf_c:(at)=>`コメント付きで確認を記録しました　${at}`,
@@ -593,6 +600,13 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} dừng <b>${st} phút</b>`,
     f_long_s:'Dừng trên 60 phút. Cần điều tra nguyên nhân riêng.',
     f_zero:(n)=>`Có <b>${n}</b> sự cố chưa ai trong ban quản lý xác nhận`,
+    f_cont2:(mc,c,d,st)=>`<b>${mc}</b> ${c} <b>${d} ngày liên tiếp</b> (hôm nay ${st}p)`,
+    f_cont2_s3:'Kéo dài từ 3 ngày trở lên. Xử lý trước đó chưa hiệu quả. Cần biện pháp lâu dài.',
+    f_cont2_s2:'Lặp lại đúng nội dung của hôm trước. Hãy kiểm tra lại xử lý hôm qua.',
+    f_focus2:(mc,st,pc,n)=>`Máy <b>${mc}</b> dừng <b>${st}p</b> (${pc}% tổng · ${n} vụ)`,
+    f_focus2_s:'Thời gian dừng hôm nay tập trung vào thiết bị này.',
+    f_long2:(n,sum,pc)=>`Dừng trên 60p: <b>${n} vụ</b> (tổng <b>${sum}p</b> · ${pc}%)`,
+    f_long2_s:(top)=>`Dài nhất: ${top}`, f_long2_more:'v.v.', f_long2_lt:'Dừng trên 60 phút',
     f_none:'Không có điểm đặc biệt', f_none_s:'Không có mục nào khớp với quy tắc tổng hợp.',
     toast_conf:(at)=>`Đã ghi nhận xác nhận　${at}`,
     toast_conf_c:(at)=>`Đã ghi nhận kèm ghi chú　${at}`,
@@ -644,6 +658,13 @@ const I18N = {
     f_long:(mc,ti,st)=>`<b>${mc}</b> ${ti} stopped for <b>${st} min</b>`,
     f_long_s:'Over 60 minutes. Needs individual root-cause work.',
     f_zero:(n)=>`<b>${n}</b> troubles confirmed by nobody in management`,
+    f_cont2:(mc,c,d,st)=>`<b>${mc}</b> ${c} for <b>${d} days running</b> (${st}m today)`,
+    f_cont2_s3:'Running for 3+ days. Earlier fixes are not holding. Needs a permanent countermeasure.',
+    f_cont2_s2:'Same issue as the previous day. Check what was done yesterday.',
+    f_focus2:(mc,st,pc,n)=>`<b>${mc}</b> down <b>${st}m</b> (${pc}% of total, ${n} cases)`,
+    f_focus2_s:"Today's downtime is concentrated on this machine.",
+    f_long2:(n,sum,pc)=>`<b>${n}</b> stops over 60m (<b>${sum}m</b> total, ${pc}%)`,
+    f_long2_s:(top)=>`Longest: ${top}`, f_long2_more:'and more', f_long2_lt:'Stops over 60 min',
     f_none:'Nothing of note', f_none_s:'No items matched the aggregation rules.',
     toast_conf:(at)=>`Confirmation recorded　${at}`,
     toast_conf_c:(at)=>`Confirmation with comment recorded　${at}`,
@@ -942,6 +963,7 @@ const IC_DOWN  = '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12"/><path
 /* ===== State ===== */
 const PAGE_SIZE = 30;
 const LIST_DAYS = 21;
+const HIST_DAYS = 7;   /* 連日の判定でさかのぼる日数（v1.9.2） */
 /* 運用開始日。これより前の異常は確認対象に含めない（過去分の積み残しを防ぐ） */
 const START_DATE = '2026-09-19';
 /* 確認機能を使えるのは 管理職(manager) と アプリ管理者(admin) のみ。
@@ -957,7 +979,7 @@ function roleLabel(){
   return t('role_op');
 }
 let MGRS = [];
-let REP = { date:'', rows:[], prev:[], loaded:false, pending:0 };
+let REP = { date:'', rows:[], prev:[], hist:[], loaded:false, pending:0 };
 let state = { openCmt:null, busy:false, repBusy:false };
 
 const TSEL = 'select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,approved_at,'
@@ -1029,14 +1051,19 @@ async function loadReport(ymd){
   var prevYmd = addDays(ymd, -1);
   /* 承認済みと未承認を1回の問い合わせでまとめて取る。
      集計に使うのは承認済みのみ。未承認は件数の告知だけに使う。 */
+  /* 連日の判定に使うので HIST_DAYS 日分さかのぼって取る。
+     集計に使うのは当日だけ、前日比に使うのは前日だけで、そこは変わらない。 */
+  var from = addDays(ymd, -(HIST_DAYS - 1));
+  if(from < START_DATE) from = START_DATE;
   var rows = await sbFetch('troubles?' + TSEL
-    + '&status=in.(approved,pending)&occurred_date=in.(' + ymd + ',' + prevYmd + ')'
-    + '&order=id.asc&limit=400');
+    + '&status=in.(approved,pending)&occurred_date=gte.' + from + '&occurred_date=lte.' + ymd
+    + '&order=id.asc&limit=600');
   var raw = rows || [];
   var approved = raw.filter(function(r){ return r.status === 'approved'; }).map(mapTrouble);
   REP.date = ymd;
   REP.rows = approved.filter(function(r){ return r.date === ymd; });
   REP.prev = approved.filter(function(r){ return r.date === prevYmd; });
+  REP.hist = approved;   /* さかのぼった分すべて。連日の判定だけに使う */
   REP.pending = raw.filter(function(r){ return r.status === 'pending' && r.occurred_date === ymd; }).length;
   REP.loaded = true;
 }
@@ -1081,22 +1108,51 @@ function barsHTML(items, unit, cls){
     return '<div class="brow" data-ids="' + ids.join(',') + '" data-lt="' + esc(r.lt || r.l) + '">' + cells + '</div>';
   }).join('');
 }
-function buildFindings(rows, prev){
+function buildFindings(rows, prev, hist){
   var out = [], tot = rows.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
 
   var idsOf = function(fn){ return rows.filter(fn).map(function(d){ return d.id; }); };
+  hist = hist || [];
+  var base = (rows[0] && rows[0].date) || REP.date;
 
+  /* ── 連日（v1.9.2 で作り直した） ─────────────────────────────
+     旧: 前日に同じ「機番」が出ていれば連日とみなし、機番を1行に並べていた。
+         区分を見ていないので、昨日バリ・今日その他でも「前日の処置が効いていない」と出た。
+     新: 「機番＋区分」が一致した日を当日からさかのぼって数え、2日以上続いたものだけを
+         1件ずつ出す。機番だけの一致は別の問題のことがあるので拾わない。 */
+  var seen = {};
+  hist.forEach(function(d){
+    if(d.machine && d.category) seen[d.date + '|' + d.machine + '|' + d.category] = true;
+  });
+  var streaks = [];
+  groupBy(rows.filter(function(d){ return d.machine && d.category; }),
+          function(d){ return d.machine + '|' + d.category; }).forEach(function(g){
+    var p = g.k.split('|'), n = 0;
+    for(var i = 0; i < HIST_DAYS; i++){
+      if(seen[addDays(base, -i) + '|' + p[0] + '|' + p[1]]) n++; else break;
+    }
+    if(n >= 2) streaks.push({ m:p[0], c:p[1], days:n, stop:g.stop });
+  });
+  /* 続いている日数が長い順、同じなら本日の停止が長い順 */
+  streaks.sort(function(a, b){ return (b.days - a.days) || (b.stop - a.stop); });
+  streaks.forEach(function(x){
+    out.push({ lv:'bad', t:t('f_cont2', esc(x.m), esc(x.c), x.days, x.stop),
+      s:t(x.days >= 3 ? 'f_cont2_s3' : 'f_cont2_s2'),
+      lt:x.m + ' ' + x.c,
+      ids:idsOf(function(d){ return d.machine === x.m && d.category === x.c; }) });
+  });
+
+  /* ── 集中（v1.9.2 で条件を変えた） ───────────────────────────
+     旧: 停止計が最大の機番が「2件以上」のときだけ出していたので、
+         その日いちばん止まった設備が1件だと要点に出なかった。
+     新: 件数の条件を外し、全体の3割以上を占めていたら出す。 */
   var byMc = groupBy(rows, function(d){ return d.machine || '—'; }).sort(function(a, b){ return b.stop - a.stop; });
-  if(byMc.length && byMc[0].n >= 2 && tot > 0){
-    out.push({ lv:'warn', t:t('f_focus', esc(byMc[0].k), byMc[0].n, byMc[0].stop, Math.round(byMc[0].stop / tot * 100)), s:t('f_focus_s'),
-      lt:byMc[0].k, ids:idsOf(function(d){ return (d.machine || '—') === byMc[0].k; }) });
-  }
-  if(prev.length){
-    var pm = {};
-    prev.forEach(function(d){ if(d.machine) pm[d.machine] = true; });
-    var cont = byMc.filter(function(g){ return pm[g.k]; }).map(function(g){ return g.k; });
-    if(cont.length) out.push({ lv:'bad', t:t('f_cont', esc(cont.join(' ／ '))), s:t('f_cont_s'),
-      lt:cont.join(' ／ '), ids:idsOf(function(d){ return cont.indexOf(d.machine || '—') >= 0; }) });
+  if(byMc.length && tot > 0){
+    var pc = Math.round(byMc[0].stop / tot * 100);
+    if(pc >= 30){
+      out.push({ lv:'warn', t:t('f_focus2', esc(byMc[0].k), byMc[0].stop, pc, byMc[0].n), s:t('f_focus2_s'),
+        lt:byMc[0].k, ids:idsOf(function(d){ return (d.machine || '—') === byMc[0].k; }) });
+    }
   }
   var rep = {};
   rows.forEach(function(d){
@@ -1116,10 +1172,20 @@ function buildFindings(rows, prev){
         lt:t('shift_n', bySh[0].k), ids:idsOf(function(d){ return String(d.shift) === String(bySh[0].k); }) });
     }
   }
-  rows.filter(function(d){ return d.stop_minutes >= 60; }).forEach(function(d){
-    out.push({ lv:'bad', t:t('f_long', esc(d.machine), esc(d.category), d.stop_minutes), s:t('f_long_s'),
-      lt:(d.machine || '—') + ' ' + (d.category || ''), ids:[d.id] });
-  });
+  /* ── 長時間停止（v1.9.2 でまとめた） ────────────────────────
+     旧: 60分超を1件ずつ全部並べていた。60分超が多い日は要点が一覧の転記になっていた。
+     新: 1行にまとめ、長い順に3件だけ名前を出す。タップすれば全件見られる。 */
+  var longs = rows.filter(function(d){ return d.stop_minutes >= 60; })
+                  .sort(function(a, b){ return b.stop_minutes - a.stop_minutes; });
+  if(longs.length){
+    var lsum = longs.reduce(function(a, b){ return a + b.stop_minutes; }, 0);
+    var top = longs.slice(0, 3).map(function(d){
+      return (d.machine || '—') + ' ' + (d.category || '') + ' ' + d.stop_minutes + t('u_min');
+    }).join(' ／ ');
+    out.push({ lv:'warn', t:t('f_long2', longs.length, lsum, tot ? Math.round(lsum / tot * 100) : 0),
+      s:t('f_long2_s', top) + (longs.length > 3 ? ' ' + t('f_long2_more') : ''),
+      lt:t('f_long2_lt'), ids:longs.map(function(d){ return d.id; }) });
+  }
   var zero = rows.filter(function(d){ return confCount(d) === 0; });
   if(zero.length){
     out.push({ lv:'warn', t:t('f_zero', zero.length),
@@ -1167,7 +1233,7 @@ function renderRep(){
     + unconf + '</div><div class="met-l">' + esc(t('m_unconf')) + '</div></div></div></div>';
 
   h += '<div class="sec"><div class="sec-h">' + IC_WARN + esc(t('sec_find')) + '</div>'
-    + buildFindings(rows, prev).map(function(f){
+    + buildFindings(rows, prev, REP.hist).map(function(f){
         var ids = f.ids || [];
         var tap = ids.length ? ' tap" data-ids="' + ids.join(',') + '" data-lt="' + esc(f.lt || '') + '"' : '"';
         return '<div class="fi ' + f.lv + tap + '><div class="fi-m"></div><div class="fi-b">' + f.t
