@@ -411,6 +411,9 @@ html.rm-open,html.rm-open body{overflow:hidden;overscroll-behavior:none}
 .rel-b{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;padding:10px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:var(--radius);font-family:inherit;text-align:left;cursor:pointer;color:var(--text1);font-size:13px;transition:border-color .15s}
 .rel-b:hover{border-color:var(--orange)}
 .rel-b .rel-s{margin-left:auto;font-size:11px;color:var(--text2);flex-shrink:0}
+.rel-h2{font-size:11px;font-weight:700;color:var(--text2);margin:12px 0 8px;padding-top:10px;border-top:1px dashed var(--border)}
+.rel-b.soft{border-left-color:var(--text2);color:var(--text2)}
+.rel-b.soft:hover{border-color:var(--border2);color:var(--text1)}
 /* ===== 統一シェル（PC）ここまで ===== */
 html{background:var(--bg2)}
 </style>
@@ -558,6 +561,7 @@ const I18N = {
     f_cont3_s:(md,det)=>`前日 ${md}「${det}」`,
     f_cont3_s3:(md,det)=>`3日以上続いています。前日 ${md}「${det}」`,
     rel_h:'関連', rel_prev:(md)=>`${md} の同じ内容`,
+    rel_maybe_h:'関連の可能性（内容が少し似ています）',
     rel_hist:(mc,c)=>`${mc} ${c} の直近7日をまとめて見る`, rel_hist_t:(mc,c)=>`${mc} ${c} の直近7日`,
     rel_same:(mc)=>`${mc} の当日の他の異常`, rel_same_t:(mc)=>`${mc} の当日の異常`,
     md_prev_day:'前日', md_past_day:'過去',
@@ -623,6 +627,7 @@ const I18N = {
     f_cont3_s:(md,det)=>`Hôm trước ${md}: “${det}”`,
     f_cont3_s3:(md,det)=>`Đã kéo dài từ 3 ngày. Hôm trước ${md}: “${det}”`,
     rel_h:'Liên quan', rel_prev:(md)=>`Cùng nội dung ngày ${md}`,
+    rel_maybe_h:'Có thể liên quan (nội dung hơi giống)',
     rel_hist:(mc,c)=>`Xem 7 ngày gần đây của ${mc} ${c}`, rel_hist_t:(mc,c)=>`${mc} ${c} · 7 ngày gần đây`,
     rel_same:(mc)=>`Sự cố khác của ${mc} trong ngày`, rel_same_t:(mc)=>`${mc} · trong ngày`,
     md_prev_day:'Hôm trước', md_past_day:'Trước đó',
@@ -688,6 +693,7 @@ const I18N = {
     f_cont3_s:(md,det)=>`Previous day ${md}: “${det}”`,
     f_cont3_s3:(md,det)=>`Running for 3+ days. Previous day ${md}: “${det}”`,
     rel_h:'Related', rel_prev:(md)=>`Same issue on ${md}`,
+    rel_maybe_h:'Possibly related (somewhat similar)',
     rel_hist:(mc,c)=>`See the last 7 days of ${mc} ${c}`, rel_hist_t:(mc,c)=>`${mc} ${c} · last 7 days`,
     rel_same:(mc)=>`Other troubles on ${mc} today`, rel_same_t:(mc)=>`${mc} · today`,
     md_prev_day:'Prev day', md_past_day:'Earlier',
@@ -1147,7 +1153,8 @@ function barsHTML(items, unit, cls){
          「製品アッパー部ショート」vs「アッパー部ショート　成形条件を調整して復帰」= 0.55。
    言い方が大きく違うと拾えない（「吸着異常多発」vs「取出機の吸着が弱い」= 0.15）。
    そのぶんは要点に前日の内容を出して、人が判断できるようにしている。 */
-const CONT_SIM = 0.35;
+const CONT_SIM = 0.35;   /* ここ以上なら「同じ内容」とみなす */
+const SOFT_SIM = 0.15;   /* ここ以上 CONT_SIM 未満は「関連の可能性」として断定せずに出す */
 function textSim(a, b){
   var norm = function(s){ return String(s == null ? '' : s).replace(/[\s　、。・,.\-–—()（）]/g, ''); };
   a = norm(a); b = norm(b);
@@ -1452,12 +1459,33 @@ function repRow(id){
   var f = function(list){ return (list || []).filter(function(d){ return String(d.id) === String(id); })[0]; };
   return f(REP.rows) || f(REP.hist) || null;
 }
-/* 同じ機番＋同じ区分の、その日より前でいちばん近いもの */
+/* 同じ内容がその日より前にあったか（v1.9.6 で要点の連日と同じ判定にそろえた）。
+   v1.9.4 は機番＋区分だけで見ていたので、27号機の「製品アッパー部ショート」と
+   「ホットランナー断線」が「同じ内容」として出てしまっていた。 */
 function repPrevSame(d){
-  if(!d.machine || !d.category) return null;
+  if(!d.machine) return null;
   return (REP.hist || []).filter(function(r){
-    return r.machine === d.machine && r.category === d.category && r.date < d.date;
+    if(r.machine !== d.machine || !r.date || r.date >= d.date) return false;
+    return textSim(d.detail, r.detail) >= CONT_SIM
+        || (isRecur(d) && r.category && r.category === d.category);
   }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null;
+}
+/* 関連の可能性（v1.9.6）。
+   同じ機番の過去の案件で、内容が少し似ているもの。断定はせず候補として出すだけ。
+   「初発」も選択ミスがあり得るので、再発フラグだけに頼らないための逃げ道でもある。
+   ・内容の類似が SOFT_SIM 以上 CONT_SIM 未満（CONT_SIM 以上は「同じ内容」として別に出る）
+   ・または当日の入力が「再発」で、区分だけが違うもの */
+function repMaybeRelated(d){
+  if(!d.machine) return [];
+  var list = (REP.hist || []).filter(function(r){
+    if(r.machine !== d.machine || !r.date || r.date >= d.date) return false;
+    var sim = textSim(d.detail, r.detail);
+    if(sim >= CONT_SIM) return false;
+    if(sim >= SOFT_SIM) return true;
+    return isRecur(d) && r.category !== d.category;
+  }).map(function(r){ return { r:r, sim:textSim(d.detail, r.detail) }; });
+  list.sort(function(a, b){ return (b.sim - a.sim) || (a.r.date < b.r.date ? 1 : -1); });
+  return list.slice(0, 3);
 }
 /* 同じ機番＋同じ区分の7日分（新しい順） */
 function repHistOf(d){
@@ -1581,6 +1609,18 @@ function openRepDetail(id){
     rel.push('<button type="button" class="rel-b" data-samemc="' + esc(d.id) + '">' + IC_GRID + ' '
       + esc(t('rel_same', d.machine))
       + '<span class="rel-s">' + esc(t('md_n', sm.length)) + '</span></button>');
+  }
+  /* 関連の可能性（v1.9.6）。断定しないので見た目も控えめにする */
+  var mb = repMaybeRelated(d);
+  if(mb.length){
+    rel.push('<div class="rel-h2">' + esc(t('rel_maybe_h')) + '</div>');
+    mb.forEach(function(x){
+      var md2 = String(x.r.detail || '').replace(/\s+/g, ' ');
+      if(md2.length > 28) md2 = md2.slice(0, 28) + '…';
+      rel.push('<button type="button" class="rel-b soft" data-jump="' + x.r.id + '">' + IC_LINES + ' '
+        + esc(mdOf(x.r.date)) + '「' + esc(md2 || '–') + '」'
+        + '<span class="rel-s">' + esc(x.r.category || '') + ' / ' + esc(t('min_n', x.r.stop_minutes)) + '</span></button>');
+    });
   }
   if(rel.length){
     h += '<div class="rel"><div class="rel-h">' + esc(t('rel_h')) + '</div>' + rel.join('') + '</div>';
