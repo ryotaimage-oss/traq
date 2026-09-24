@@ -391,6 +391,13 @@ svg.ico-xl{width:34px;height:34px;stroke-width:1.2}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .modal-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
 
+/* 詳細モーダルの送り（v1.9.1）。タイトル行の右端に置く */
+.mnav{display:flex;align-items:center;gap:2px;margin-left:auto;flex-shrink:0}
+.mnav-b{width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;transition:all .15s}
+.mnav-b:hover:not(:disabled){border-color:var(--orange);color:var(--orange)}
+.mnav-b:disabled{opacity:.3;cursor:default}
+.mnav-c{font-size:12px;color:var(--text2);min-width:58px;text-align:center}
+
 /* Detail rows */
 .detail-row{display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .detail-row:last-child{border-bottom:none;margin-bottom:0}
@@ -730,7 +737,7 @@ const I18N = {
     occ_first:'初発', occ_rec:'再発',
     stop_min:(n)=>`${n}分`, stop_none:'不明',
     shift_label:(s)=>`${s}直`,
-    btn_approve:'承認する', btn_reject:'差し戻す', btn_resubmit:'修正して再送信', btn_edit_approved:'修正する', edit_denied:'修正はSL・管理者のみ可能です',
+    btn_approve:'承認する', btn_approve_next:'承認して次へ', approve_done_rest:(n)=>`承認しました（残り ${n} 件）`, approve_done_all:'承認待ちはすべて片付きました', btn_reject:'差し戻す', btn_resubmit:'修正して再送信', btn_edit_approved:'修正する', edit_denied:'修正はSL・管理者のみ可能です',
     btn_close:'閉じる',
     approve_confirm:'この内容を承認しますか？',
     approve_done:'承認しました',
@@ -740,7 +747,7 @@ const I18N = {
     reject_placeholder:'例：詳細内容が不足しています',
     reject_confirm:'差し戻す', reject_cancel:'キャンセル',
     reject_done:'差し戻しました',
-    detail_title:'トラブル詳細',
+    detail_title:'トラブル詳細', nav_prev_item:'前の案件', nav_next_item:'次の案件',
     key_status:'ステータス', key_date:'日付', key_shift:'直', key_line:'ライン',
     key_machine:'機番', key_product:'品名', key_stop:'停止時間',
     key_category:'分類', key_detail:'詳細', key_occurrence:'初発/再発',
@@ -786,7 +793,7 @@ const I18N = {
     occ_first:'Lần đầu', occ_rec:'Tái phát',
     stop_min:(n)=>`${n} phút`, stop_none:'Không rõ',
     shift_label:(s)=>`Ca ${s}`,
-    btn_approve:'Duyệt', btn_reject:'Trả lại', btn_resubmit:'Sửa và gửi lại', btn_edit_approved:'Chỉnh sửa', edit_denied:'Chỉ SL và Admin mới được chỉnh sửa',
+    btn_approve:'Duyệt', btn_approve_next:'Duyệt và tiếp', approve_done_rest:(n)=>`Đã duyệt (còn ${n})`, approve_done_all:'Đã duyệt hết', btn_reject:'Trả lại', btn_resubmit:'Sửa và gửi lại', btn_edit_approved:'Chỉnh sửa', edit_denied:'Chỉ SL và Admin mới được chỉnh sửa',
     btn_close:'Đóng',
     approve_confirm:'Bạn có muốn duyệt nội dung này không?',
     approve_done:'Đã duyệt',
@@ -796,7 +803,7 @@ const I18N = {
     reject_placeholder:'Ví dụ: Nội dung chưa đầy đủ',
     reject_confirm:'Trả lại', reject_cancel:'Huỷ',
     reject_done:'Đã trả lại',
-    detail_title:'Chi tiết sự cố',
+    detail_title:'Chi tiết sự cố', nav_prev_item:'Mục trước', nav_next_item:'Mục sau',
     key_status:'Trạng thái', key_date:'Ngày', key_shift:'Ca', key_line:'Dây chuyền',
     key_machine:'Máy', key_product:'Sản phẩm', key_stop:'Thời gian dừng',
     key_category:'Phân loại', key_detail:'Chi tiết', key_occurrence:'Lần đầu/Tái phát',
@@ -842,7 +849,7 @@ const I18N = {
     occ_first:'First', occ_rec:'Recurrence',
     stop_min:(n)=>`${n} min`, stop_none:'Unknown',
     shift_label:(s)=>`Shift ${s}`,
-    btn_approve:'Approve', btn_reject:'Reject', btn_resubmit:'Fix & Resubmit', btn_edit_approved:'Edit', edit_denied:'Only SL and Admin can edit',
+    btn_approve:'Approve', btn_approve_next:'Approve & next', approve_done_rest:(n)=>`Approved (${n} left)`, approve_done_all:'No more to approve', btn_reject:'Reject', btn_resubmit:'Fix & Resubmit', btn_edit_approved:'Edit', edit_denied:'Only SL and Admin can edit',
     btn_close:'Close',
     approve_confirm:'Approve this submission?',
     approve_done:'Approved',
@@ -852,7 +859,7 @@ const I18N = {
     reject_placeholder:'e.g. Please add more detail',
     reject_confirm:'Reject', reject_cancel:'Cancel',
     reject_done:'Rejected',
-    detail_title:'Trouble Detail',
+    detail_title:'Trouble Detail', nav_prev_item:'Previous', nav_next_item:'Next',
     key_status:'Status', key_date:'Date', key_shift:'Shift', key_line:'Line',
     key_machine:'Machine', key_product:'Product', key_stop:'Downtime',
     key_category:'Category', key_detail:'Detail', key_occurrence:'First/Recurrence',
@@ -1940,24 +1947,28 @@ function editApproved(id){
   location.href=(tr.type==='equipment'?'input_equipment':'input_mold')+'.html?edit='+tr.id+'&keepapproved=1';
 }
 
-async function quickApprove(id){
+/* advance=true は詳細モーダルの「承認して次へ」から。承認待ちタブに留まって次の案件を開く。
+   カード側の承認ボタンは今までどおり（承認済みタブへ切り替わる）。 */
+async function quickApprove(id, advance){
   if(!canApprove()){ showToast(t('approve_denied'),'error'); return; }
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
   // 終了時刻が未入力なら入力モーダルを表示
   if(!tr.stop_end){
-    openStopTimeModal(id);
+    openStopTimeModal(id, advance);
     return;
   }
-  doApprove(id, null, null);
+  if(!advance) closeModal();
+  doApprove(id, null, null, null, advance);
 }
 
 var _drumState = {eh:0, em:0, startH:0, startM:0, approveId:null};
 
-function openStopTimeModal(id){
+function openStopTimeModal(id, advance){
   const tr = TROUBLES.find(x => x.id === id);
   if(!tr) return;
   _drumState.approveId = id;
+  _drumState.advance = !!advance;
   _drumState.noStart = false;
 
   // 開始時刻: stop_startがあればそれを使用、なければ投稿時刻(submitted_at)を代替表示
@@ -2116,8 +2127,9 @@ function submitDrumApprove(){
     if(em <= sm) em += 24 * 60;
     stopMinutes = em - sm;
   }
+  var _adv = _drumState.advance, _id = _drumState.approveId;
   closeModal();
-  doApprove(_drumState.approveId, stopMinutes, endStr, null);
+  doApprove(_id, stopMinutes, endStr, null, _adv);
 }
 
 function submitMinutesApprove(){
@@ -2128,13 +2140,15 @@ function submitMinutesApprove(){
     if(input) input.focus();
     return;
   }
+  var _adv = _drumState.advance, _id = _drumState.approveId;
   closeModal();
-  doApprove(_drumState.approveId, val, null);
+  doApprove(_id, val, null, null, _adv);
 }
 
-async function doApprove(id, stopMinutes, stopEnd, stopStart){
+async function doApprove(id, stopMinutes, stopEnd, stopStart, advance){
   const tr = TROUBLES.find(x => x.id === id);
   if (!tr) return;
+  const _idx = detailIndex(id);   /* 送り先を決めるため、一覧をいじる前に位置を控えておく */
   const card = document.querySelector(`[data-id="${id}"]`);
   if (card) card.classList.add('actioned');
   try {
@@ -2163,6 +2177,36 @@ async function doApprove(id, stopMinutes, stopEnd, stopStart){
       tr.stop_end = stopEnd;
     }
     tr._actioned = true;
+    if(advance){
+      /* 承認待ち・差し戻しタブでは承認した時点で一覧から外れる。全件・承認済みでは残る */
+      var _drops = (mainTab === 'pending' || mainTab === 'rejected');
+      var _nextId = null;
+      if(_drops){
+        if(_idx >= 0){
+          TROUBLES.splice(_idx, 1);
+          if(FILTERED_TOTAL > 0) FILTERED_TOTAL--;
+          if(PAGE_LOADED > 0) PAGE_LOADED--;
+          if(TAB_TOTAL > 0) TAB_TOTAL--;
+          if(_idx < TROUBLES.length) _nextId = TROUBLES[_idx].id;
+        }
+      } else {
+        var _n = detailNeighbor(_idx, 1);
+        if(_n >= 0) _nextId = TROUBLES[_n].id;
+      }
+      renderCurrent();
+      updateFilterCount();
+      loadBadgeCounts();
+      if(_nextId !== null){
+        showToast(_drops ? t('approve_done_rest', FILTERED_TOTAL) : t('approve_done'), 'success');
+        openDetail(_nextId);
+        var _sheet = document.querySelector('#modalEl .modal-sheet');
+        if(_sheet) _sheet.scrollTop = 0;
+      } else {
+        closeModal();
+        showToast(_drops ? t('approve_done_all') : t('approve_done'), 'success');
+      }
+      return;
+    }
     setMainTab('approved');
     loadBadgeCounts();
     showToast(t('approve_done'), 'success');
@@ -2216,9 +2260,60 @@ async function doReject(id){
 }
 
 /* ===== Detail modal ===== */
+/* ===== 詳細モーダルの送り（v1.9.1） =====
+   TROUBLES は絞り込み後の表示順そのもの。その前後を辿れば、いま画面に見えている並びのまま送れる。
+   一覧は30件ずつしか読んでいないので、読み込み済みの最後まで来たら続きを読んでから進む。
+   下書きタブのカードは editDraft へ行くので openDetail は呼ばれないが、念のため下書きは飛ばす。 */
+let DETAIL_ID = null;
+function detailIndex(id){
+  return TROUBLES.findIndex(function(x){ return String(x.id) === String(id); });
+}
+function detailNeighbor(idx, dir){
+  for(var i = idx + dir; i >= 0 && i < TROUBLES.length; i += dir){
+    if(TROUBLES[i].status !== 'draft') return i;
+  }
+  return -1;
+}
+async function detailStep(dir){
+  if(DETAIL_ID === null) return;
+  var idx = detailIndex(DETAIL_ID);
+  if(idx < 0) return;
+  var next = detailNeighbor(idx, dir);
+  if(next < 0 && dir > 0 && PAGE_LOADED < FILTERED_TOTAL){
+    var nb = document.getElementById('mnavNext');
+    if(nb) nb.disabled = true;
+    try { await loadMore(); } catch(e){ /* 失敗しても開いたままにする */ }
+    idx = detailIndex(DETAIL_ID);
+    next = idx < 0 ? -1 : detailNeighbor(idx, 1);
+    if(next < 0){ if(DETAIL_ID !== null) openDetail(DETAIL_ID); return; }
+  }
+  if(next < 0) return;
+  openDetail(TROUBLES[next].id);
+  var sheet = document.querySelector('#modalEl .modal-sheet');
+  if(sheet) sheet.scrollTop = 0;
+}
+document.addEventListener('keydown', function(ev){
+  if(DETAIL_ID === null) return;
+  var el = document.getElementById('modalEl');
+  if(!el || el.style.display === 'none') return;
+  if(ev.key === 'ArrowRight'){ ev.preventDefault(); detailStep(1); }
+  else if(ev.key === 'ArrowLeft'){ ev.preventDefault(); detailStep(-1); }
+});
+
 function openDetail(id){
   const tr=TROUBLES.find(x=>x.id===id);
   if(!tr) return;
+  DETAIL_ID = tr.id;
+  const _i = detailIndex(tr.id);
+  const _hasPrev = detailNeighbor(_i, -1) >= 0;
+  const _hasNext = detailNeighbor(_i, 1) >= 0 || PAGE_LOADED < FILTERED_TOTAL;
+  const _total = (mainTab === 'draft') ? TROUBLES.length : FILTERED_TOTAL;
+  const navHTML = `
+      <div class="mnav">
+        <button class="mnav-b" onclick="detailStep(-1)" ${_hasPrev?'':'disabled'} aria-label="${t('nav_prev_item')}"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <span class="mnav-c num">${_i+1} / ${_total}</span>
+        <button class="mnav-b" id="mnavNext" onclick="detailStep(1)" ${_hasNext?'':'disabled'} aria-label="${t('nav_next_item')}"><svg class="ico" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>`;
   const typeClass=tr.type==='equipment'?'eq':'md';
   const typeLabel=t('type_'+typeClass);
   const stopMinutesStr = tr.stop_minutes ? t('stop_min', tr.stop_minutes) : null;
@@ -2240,11 +2335,14 @@ function openDetail(id){
   const occLabel=tr.occurrence==='first'?t('occ_first'):t('occ_rec');
   const statusLabel=t('status_'+tr.status);
 
+  /* 次に送れる相手がいるときだけ「承認して次へ」。最後の1件は「承認する」のまま */
+  const _apvLabel = (detailNeighbor(_i, 1) >= 0) ? t('btn_approve_next') : t('btn_approve');
+
   let approveActionsHTML='';
   if(tr.status==='pending' && canApprove()){
     approveActionsHTML=`
       <div class="modal-actions">
-        <button class="btn-approve"      onclick="closeModal();quickApprove(${id})">${t('btn_approve')}</button>
+        <button class="btn-approve"      onclick="quickApprove(${id}, true)">${_apvLabel}</button>
         <button class="btn-reject-modal" onclick="closeModal();openRejectModal(${id})">${t('btn_reject')}</button>
       </div>`;
   } else if(tr.status==='rejected'){
@@ -2273,6 +2371,7 @@ function openDetail(id){
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
       <span class="tcard-type ${typeClass}" style="font-size:11px;padding:3px 8px">${typeLabel}</span>
       <span class="modal-title" style="margin:0">${t('detail_title')}</span>
+      ${navHTML}
     </div>
     <div class="modal-sub">No.${tr.id}</div>
     <div class="detail-row"><span class="detail-key">${t('key_status')}</span><span class="detail-val"><span class="status-badge status-${tr.status}">${statusLabel}</span></span></div>
@@ -2366,7 +2465,7 @@ function showModal(html, center=false){
   el.innerHTML=`<div class="modal-overlay ${center?'center':''}" onclick="handleOverlay(event)"><div class="modal-sheet">${html}</div></div>`;
   el.style.display='block';
 }
-function closeModal(){ document.getElementById('modalEl').style.display='none'; }
+function closeModal(){ DETAIL_ID = null; document.getElementById('modalEl').style.display='none'; }
 function handleOverlay(e){ if(e.target.classList.contains('modal-overlay')) closeModal(); }
 
 /* ===== Toast ===== */
