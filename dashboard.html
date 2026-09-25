@@ -734,20 +734,30 @@ function catName(r){
 })();
 
 /* ===== Load ===== */
+/* 読み込みと描画を分ける（v1.9.7）。
+   以前は描画の失敗まで catch が拾い、「データ読込エラー」と出したうえ RAW=[] でデータを捨てていた。
+   そのため1つのグラフが落ちただけで、集計の数字まで全部0になっていた。 */
 async function loadData(){
+  let rows;
   try{
-    const rows=await sbFetchAll(
+    rows=await sbFetchAll(
       'troubles?select=id,trouble_type,status,occurred_date,shift,stop_start,stop_end,stop_minutes,occurrence,detail,lines(name),categories(name,name_vi,name_en),machines(machine_no),products(product_code,product_name),traq_users!reporter_id(name),approver:traq_users!approver_id(name)'+
       '&status=neq.draft&order=occurred_date.desc,id.desc'
     );
-    RAW=(rows||[]).filter(r=>r.status!=='draft');
-    buildLineOptions();
-    render();
   }catch(e){
     showToast('データ読込エラー: '+e.message,'error');
     RAW=[];
-    render();
+    safeRender();
+    return;
   }
+  RAW=(rows||[]).filter(r=>r.status!=='draft');
+  buildLineOptions();
+  safeRender();
+}
+/* 描画で落ちても、取得したデータは捨てない */
+function safeRender(){
+  try{ render(); }
+  catch(e){ console.error('描画エラー:', e); showToast('表示エラー: '+e.message,'error'); }
 }
 
 /* ===== Filter ===== */
@@ -1120,6 +1130,35 @@ function renderKPI(data){
 
 /* ===== Chart helpers ===== */
 function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+/* canvas を取り出す。無ければ null を返して描画を飛ばす（v1.9.7）。
+   1つのグラフが描けなくても、他のグラフと集計が止まらないようにするため。 */
+function chartCtx(canvasId){
+  var cv = document.getElementById(canvasId);
+  if(!cv || !cv.getContext) return null;
+  return cv.getContext('2d');
+}
+/* データが無いときの表示。⚠ canvas を innerHTML で置き換えないこと。
+   置き換えると canvas が二度と戻らず、次にデータが入った期間へ切り替えたときに
+   getContext が null で落ちる（v1.9.7 でこれを踏んだ）。隠してメッセージを添えるだけにする。 */
+function showChartEmpty(canvasId){
+  var cv = document.getElementById(canvasId);
+  if(!cv) return;
+  var wrap = cv.closest('.chart-wrap');
+  if(!wrap) return;
+  cv.style.display = 'none';
+  var m = wrap.querySelector('.chart-empty');
+  if(!m){ m = document.createElement('div'); m.className = 'empty-state chart-empty'; wrap.appendChild(m); }
+  m.textContent = t('no_data');
+  m.style.display = '';
+}
+function clearChartEmpty(canvasId){
+  var cv = document.getElementById(canvasId);
+  if(cv) cv.style.display = '';
+  if(!cv) return;
+  var wrap = cv.closest('.chart-wrap');
+  var m = wrap && wrap.querySelector('.chart-empty');
+  if(m) m.style.display = 'none';
+}
 function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
 function gridColor(){return cssVar('--grid');}
 function tickColor(){return isDark()?'#8b90a0':'#666666';}
@@ -1152,7 +1191,7 @@ function renderChart1(data){
     data.filter(r=>r.trouble_type==='mold').forEach(r=>{const d=getDateKey(r);if(d&&mdMap[d]!==undefined)mdMap[d]++;});
     datasets.push({label:t('t_md'),data:days.map(d=>mdMap[d]),backgroundColor:cssVar('--md'),borderRadius:0});
   }
-  const ctx=document.getElementById('chart1').getContext('2d');
+  const ctx=chartCtx('chart1'); if(!ctx) return;
   const chart1opts=Object.assign({},barOpts());
   chart1opts.onClick=function(e){
     const chart=chartInstances['c1'];
@@ -1180,7 +1219,7 @@ function renderChart2(data){
     if(d&&stopMap[d]!==undefined) stopMap[d]+=(r.stop_minutes||0);
   });
   const labels=days.map(d=>d.slice(5));
-  const ctx=document.getElementById('chart2').getContext('2d');
+  const ctx=chartCtx('chart2'); if(!ctx) return;
   chartInstances['c2']=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[{
@@ -1197,7 +1236,7 @@ function renderChart3(data){
   destroyChart('c3');
   const first=data.filter(r=>r.occurrence==='first').length;
   const rec=data.filter(r=>r.occurrence==='recurrence'||r.occurrence==='repeat').length;
-  const ctx=document.getElementById('chart3').getContext('2d');
+  const ctx=chartCtx('chart3'); if(!ctx) return;
   chartInstances['c3']=new Chart(ctx,{
     type:'doughnut',
     data:{
@@ -1237,7 +1276,7 @@ function renderPieChart(canvasId,legendId,map,srcData,filterFn){
   const keys=Object.keys(map);const vals=keys.map(k=>map[k]);
   const colors=keys.map((_,i)=>PIE_COLORS[i%PIE_COLORS.length]);
   destroyChart(canvasId);
-  const ctx=document.getElementById(canvasId).getContext('2d');
+  const ctx=chartCtx(canvasId); if(!ctx) return;
   const opts=Object.assign({},pieOpts());
   if(srcData&&filterFn){
     opts.onClick=function(e){
@@ -1286,7 +1325,7 @@ function renderChart6(data){
     const rec=sub.filter(r=>r.occurrence==='recurrence'||r.occurrence==='repeat').length;
     return Math.round(rec/sub.length*100);
   });
-  const ctx=document.getElementById('chart6').getContext('2d');
+  const ctx=chartCtx('chart6'); if(!ctx) return;
   chartInstances['c6']=new Chart(ctx,{
     type:'bar',
     data:{labels,datasets:[{label:'再発率(%)',data:rates,backgroundColor:colors,borderRadius:0}]},
@@ -1695,13 +1734,13 @@ function renderLineAvgStop(data){
     .sort((a,b)=>b.avg-a.avg)
     .slice(0,10);
   if(!entries.length){
-    const cv=document.getElementById('chart11');
-    if(cv) cv.closest('.chart-wrap').innerHTML='<div class="empty-state">'+t('no_data')+'</div>';
+    showChartEmpty('chart11');
     return;
   }
+  clearChartEmpty('chart11');
   // 高さを動的設定
   if(wrap) wrap.style.height=Math.max(180,entries.length*44+60)+'px';
-  const ctx=document.getElementById('chart11').getContext('2d');
+  const ctx=chartCtx('chart11'); if(!ctx) return;
   chartInstances['c11']=new Chart(ctx,{
     type:'bar',
     data:{
@@ -1733,7 +1772,7 @@ function renderShiftChart(data){
   destroyChart('c12');
   const shifts=['1','2','3'];
   const labels=shifts.map(s=>s+'直');
-  const ctx=document.getElementById('chart12').getContext('2d');
+  const ctx=chartCtx('chart12'); if(!ctx) return;
   if(currentType==='all'){
     // stacked bar: 設備と金型を積み上げ
     const eqData=shifts.map(s=>data.filter(r=>r.trouble_type==='equipment'&&String(r.shift)===s).length);
