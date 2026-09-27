@@ -1,178 +1,53 @@
-const CACHE_NAME = 'traq-v49';
+/* ===========================================================================
+   Traq — 旧アドレス（https://ryotaimage-oss.github.io/traq/）用の後片付けSW
+   ---------------------------------------------------------------------------
+   役割はひとつだけ。「端末に残った古い Traq を自分で消す」こと。
 
-const STATIC_ASSETS = [
-  './index.html',
-  './home.html',
-  './home_sl.html',
-  './report.html',
-  './confirm.html',
-  './input_equipment.html',
-  './input_mold.html',
-  './dashboard.html',
-  './settings.html',
-  './admin.html',
-  './excel_download.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-];
+   なぜ必要か：
+     旧アプリの Service Worker は画面(HTML)をキャッシュ優先で返す。
+     そのため新アドレスへ移した後も、端末に残ったキャッシュのせいで
+     いつまでも古い画面が表示され続けてしまう。
+     ブラウザは起動時に sw.js の更新を自動で確認するので、
+     旧アドレスにこのファイルを置いておけば、そこで古いSWが
+     この「後片付けSW」に置き換わり、キャッシュごと消えて引っ越しページに進む。
 
-// インストール：静的リソースをキャッシュ
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      self._isUpdate = keys.some(k => k !== 'traq-push-nav' && k !== CACHE_NAME);
-    }).then(() =>
-      caches.open(CACHE_NAME).then(cache => {
-        // addAll は1件でも失敗すると全件キャッシュされないため、1件ずつ登録する。
-        // 1ファイルが欠けても残りはキャッシュされ、オフライン動作が保たれる。
-        // {cache:'reload'} でブラウザのHTTPキャッシュを迂回する。
-        // これが無いと、更新直後でも古いファイルをSWのキャッシュに取り込んでしまう。
-        // 一斉取得は回線を占有し、表示中のページの読み込みを妨げるため1件ずつ順に取る。
-        // 1件失敗しても残りは取得され、オフライン動作が保たれる。
-        return STATIC_ASSETS.reduce(function(chain, url){
-          return chain.then(function(){
-            return cache.add(new Request(url, { cache: 'reload' })).catch(function(err){
-              console.warn('SW: キャッシュ失敗 ' + url, err);
-            });
-          });
-        }, Promise.resolve());
-      })
-    )
-  );
+   やること：
+     1. 即座に有効化（待機しない）
+     2. キャッシュを全部削除
+     3. 開いている画面を ./index.html（引っ越しページ）へ移す
+     4. 最後に自分自身の登録を解除する
+
+   fetch ハンドラは意図的に置かない。
+   置かない＝すべての通信がそのままネットワークへ抜けるので、
+   キャッシュを消した直後から常に最新のファイルが読まれる。
+   =========================================================================== */
+
+self.addEventListener('install', function () {
   self.skipWaiting();
 });
 
-// アクティベート：古いキャッシュを削除
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME && k !== 'traq-push-nav').map(k => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
-     .then(() => {
-       if (self._isUpdate) {
-         return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
-           clients.forEach(client => {
-             client.postMessage({ type: 'UPDATE_AVAILABLE', version: CACHE_NAME });
-           });
-         });
-       }
-     })
-  );
-});
+self.addEventListener('activate', function (event) {
+  event.waitUntil((async function () {
+    // 開いている画面の制御を引き取る（古いSWを追い出す）
+    try { await self.clients.claim(); } catch (e) {}
 
-// フェッチ戦略
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
+    // 古いキャッシュを全部消す
+    try {
+      var keys = await caches.keys();
+      await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+    } catch (e) {}
 
-  if (url.hostname.includes('supabase.co')) {
-    return;
-  }
-
-  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          return res;
-        });
-      })
-    );
-    return;
-  }
-
-  // 画面(HTML)はキャッシュ優先。まず手元の分を即返し、裏で最新を取って次回に備える。
-  // ネットワーク優先だと、回線が遅いだけで毎回その往復を待つことになり体感が重くなる。
-  if (event.request.destination === 'document' || url.pathname.endsWith('.html')) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        const fromNet = fetch(event.request)
-          .then(res => {
-            if (res && res.status === 200) {
-              const clone = res.clone();
-              caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-            }
-            return res;
-          })
-          .catch(() => cached);
-        // キャッシュがあれば即返し、裏側の更新はSWが落ちないよう待機対象にする
-        if (cached) {
-          event.waitUntil(fromNet);
-          return cached;
-        }
-        return fromNet;
-      })
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(res => {
-        if (res && res.status === 200) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        }
-        return res;
-      });
-    })
-  );
-});
-
-// ===== Push通知 =====
-
-// Push通知を受信
-self.addEventListener('push', event => {
-  // フォールバックURLを ./home_sl.html（相対パス）に変更
-  var data = { title: 'Traq', body: '新しい通知があります', url: './home_sl.html' };
-  try {
-    if (event.data) data = event.data.json();
-  } catch (e) {}
-
-  var options = {
-    body: data.body,
-    icon: './icons/icon-192.png',
-    badge: './icons/icon-192.png',
-    tag: 'traq-trouble-' + Date.now(),
-    renotify: true,
-    data: { url: data.url || './home_sl.html' },
-    vibrate: [200, 100, 200],
-    actions: [{ action: 'open', title: '確認する' }]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'Traq', options)
-  );
-});
-
-// 通知タップ時 — Cache APIにナビ先URLを保存してからアプリを開く
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
-  var targetUrl = (event.notification.data && event.notification.data.url) || './home_sl.html';
-
-  // ★修正: self.location.href（= .../traq/sw.js）を基準にすることで /traq/ が正しく付く
-  var fullUrl = new URL(targetUrl, self.location.href).href;
-
-  event.waitUntil(
-    caches.open('traq-push-nav').then(function(cache) {
-      return cache.put('/__push_nav__', new Response(fullUrl));
-    }).then(function() {
-      return clients.matchAll({ type: 'window', includeUncontrolled: true });
-    }).then(function(windowClients) {
-      for (var i = 0; i < windowClients.length; i++) {
-        var client = windowClients[i];
-        if (client.url.includes('ryotaimage-oss.github.io/traq')) {
-          client.postMessage({ type: 'PUSH_NAV', url: fullUrl });
-          return client.focus();
-        }
+    // 開いている画面を引っ越しページへ送る
+    // （navigate は同一オリジンのみ許可されるため、まず旧アドレスの index.html に送り、
+    //   そこから新アドレスへ転送させる）
+    try {
+      var list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (var i = 0; i < list.length; i++) {
+        try { await list[i].navigate('./index.html?moved=1'); } catch (e) {}
       }
-      return clients.openWindow(fullUrl);
-    })
-  );
+    } catch (e) {}
+
+    // 役目を終えたので自分を消す
+    try { await self.registration.unregister(); } catch (e) {}
+  })());
 });
